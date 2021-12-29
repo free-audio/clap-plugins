@@ -1,7 +1,9 @@
 {
-  "name": "clap-host",
-  "version-string": "0.1.0",
+  "name": "main",
+  "version-string": "latest",
   "dependencies": [
+    "boost-iostreams",
+    "boost-serialization",
     "rtaudio",
     "rtmidi",
     {
@@ -9,6 +11,7 @@
       "features": [
         "widgets"
       ]
-    }
+    },
+    "qtdeclarative"
   ]
 }

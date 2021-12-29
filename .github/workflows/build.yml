@@ -1,0 +1,86 @@
+# Copyright (c) 2021 Luca Cappa
+# Released under the term specified in file LICENSE.txt
+# SPDX short identifier: MIT
+#
+# The peculiarity of this workflow is that assumes vcpkg stored as a submodule of this repository.
+# This workflow does the following:
+# - Restores vcpkg artifacts from cache.
+# - Sets up vcpkg if needed, then run CMake with CMakePreset.json using a configuration
+#   that leverages the vcpkg's toolchain file. This will automatically run vcpkg to install dependencies
+#   described by the vcpkg.json manifest file. It will be a no-op if those are restored from cache.
+# - Finally builds the sources with Ninja.
+name: build
+on: [push, workflow_dispatch]
+
+jobs:
+  VCPKG:
+    name: ${{ matrix.os }}-${{ github.workflow }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - uses: seanmiddleditch/gha-setup-ninja@master
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Setup MacOS
+        if: startsWith(matrix.os, 'macOS')
+        run: brew install automake autoconf ninja cmake
+
+      - name: Setup Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt update && sudo apt upgrade && sudo apt install
+          build-essential gperf ninja-build cmake
+          libgl1-mesa-dev
+          libfontconfig1-dev
+          libfreetype6-dev
+          libx11-dev
+          libx11-xcb-dev
+          libxcb-damage0-dev
+          libxcb-dpms0-dev
+          libxcb-glx0-dev
+          libxcb-icccm4-dev
+          libxcb-image0-dev
+          libxcb-keysyms1-dev
+          libxcb-present-dev
+          libxcb-randr0-dev
+          libxcb-record0-dev
+          libxcb-render-util0-dev
+          libxcb-render0-dev
+          libxcb-res0-dev
+          libxcb-shape0-dev
+          libxcb-shm0-dev
+          libxcb-sync-dev
+          libxcb-util-dev
+          libxcb-xfixes0-dev
+          libxcb-xinerama0-dev
+          libxcb-xkb-dev
+          libxcb1-dev
+          libxext-dev
+          libxfixes-dev
+          libxi-dev
+          libxkbcommon-dev
+          libxkbcommon-x11-dev
+          libxrender-dev
+          libatspi2.0-dev
+
+      - name: Restore artifacts, or setup vcpkg for building artifacts
+        uses: lukka/run-vcpkg@v10
+        id: runvcpkg
+        with:
+          vcpkgJsonGlob: "vcpkg.json"
+
+      - name: Run CMake+vcpkg+Ninja+CTest to generate/build/test.
+        uses: lukka/run-cmake@v10
+        id: runcmake
+        with:
+          configurePreset: "github"
+          buildPreset: "github"
+          testPreset: "github"

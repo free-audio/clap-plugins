@@ -1,0 +1,9 @@
+[submodule "clap"]
+	path = clap
+	url = ../clap
+[submodule "clap-helpers"]
+	path = clap-helpers
+	url = ../clap-helpers
+[submodule "vcpkg"]
+	path = vcpkg
+	url = ../../microsoft/vcpkg

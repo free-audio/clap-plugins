@@ -1,0 +1,158 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 17,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "github",
+      "displayName": "Github Actions",
+      "description": "Configuration used by Github",
+      "binaryDir": "${sourceDir}/builds/${presetName}",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "boolean",
+          "value": true
+        },
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+        },
+        "VCPKG_OVERLAY_TRIPLETS": {
+          "type": "FILEPATH",
+          "value": "./vcpkg-overlay/triplets"
+        },
+        "UsePkgConfig": {
+          "type": "boolean",
+          "value": false
+        }
+      }
+    },
+    {
+      "name": "ninja-vcpkg",
+      "displayName": "Ninja + VCPKG",
+      "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
+      "binaryDir": "${sourceDir}/builds/${presetName}",
+      "generator": "Ninja Multi-Config",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "boolean",
+          "value": true
+        },
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+        },
+        "VCPKG_OVERLAY_TRIPLETS": {
+          "type": "FILEPATH",
+          "value": "./vcpkg-overlay/triplets"
+        },
+        "UsePkgConfig": {
+          "type": "boolean",
+          "value": false
+        }
+      }
+    },
+    {
+      "name": "vs-vcpkg",
+      "displayName": "Visual Studio + VCPKG",
+      "description": "Configure with vcpkg toolchain and generate VS project files for all configurations",
+      "binaryDir": "${sourceDir}/vsb",
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "boolean",
+          "value": true
+        },
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+        },
+        "VCPKG_OVERLAY_TRIPLETS": {
+          "type": "FILEPATH",
+          "value": "./vcpkg-overlay/triplets"
+        },
+        "UsePkgConfig": {
+          "type": "boolean",
+          "value": false
+        }
+      }
+    },
+    {
+      "name": "xcode-vcpkg",
+      "displayName": "XCode + VCPKG",
+      "description": "Configure with vcpkg toolchain and generate XCode project files for all configurations",
+      "binaryDir": "${sourceDir}/builds/${presetName}",
+      "generator": "Xcode",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "boolean",
+          "value": true
+        },
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+        },
+        "VCPKG_OVERLAY_TRIPLETS": {
+          "type": "FILEPATH",
+          "value": "./vcpkg-overlay/triplets"
+        },
+        "UsePkgConfig": {
+          "type": "boolean",
+          "value": false
+        }
+      }
+    },
+    {
+      "name": "ninja-system",
+      "displayName": "Ninja + System Libraries",
+      "binaryDir": "${sourceDir}/builds/${presetName}",
+      "generator": "Ninja Multi-Config",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "boolean",
+          "value": true
+        },
+        "UsePkgConfig": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    },
+    {
+      "name": "xcode-system",
+      "displayName": "XCode + System Libraries",
+      "binaryDir": "${sourceDir}/builds/${presetName}",
+      "generator": "Xcode",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": {
+          "type": "boolean",
+          "value": true
+        },
+        "UsePkgConfig": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "github",
+      "configurePreset": "github",
+      "displayName": "Build github",
+      "description": "Build github",
+      "configuration": "RelWithDebInfo"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "github",
+      "configurePreset": "github",
+      "configuration": "RelWithDebInfo"
+    }
+  ]
+}

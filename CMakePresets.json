@@ -33,7 +33,7 @@
         },
         {
             "name": "ninja-vcpkg",
-            "displayName": "Ninja + VCPKG",
+            "displayName": "ninja-vcpkg",
             "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja Multi-Config",
@@ -60,7 +60,7 @@
             "name": "vs-vcpkg",
             "displayName": "vs-vcpkg",
             "description": "Configure with vcpkg toolchain and generate VS project files for all configurations",
-            "binaryDir": "${sourceDir}/vsb",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Visual Studio 17 2022",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
@@ -73,7 +73,7 @@
                 },
                 "VCPKG_OVERLAY_TRIPLETS": {
                     "type": "FILEPATH",
-                    "value": "${sourceDir}//vcpkg-overlay/triplets"
+                    "value": "${sourceDir}/vcpkg-overlay/triplets"
                 },
                 "UsePkgConfig": {
                     "type": "boolean",
@@ -155,6 +155,15 @@
             "targets": [
                 "all", "clap-host", "clap-plugins"
             ]
+        },
+        {
+            "name": "ninja-vcpkg",
+            "description": "Build using Ninja and VCPKG",
+            "displayName": "ninja-vcpkg",
+            "configurePreset": "ninja-vcpkg",
+            "targets": [
+                "all", "clap-host", "clap-plugins"
+            ]
         }
     ],
     "testPresets": [
@@ -168,6 +177,12 @@
             "description": "Test using Visual Studio and VCPKG",
             "displayName": "vs-vcpkg",
             "configurePreset": "vs-vcpkg"
+        },
+        {
+            "name": "ninja-vcpkg",
+            "description": "Test using Ninja and VCPKG",
+            "displayName": "ninja-vcpkg",
+            "configurePreset": "ninja-vcpkg"
         }
     ]
 }

@@ -1,6 +1,8 @@
 #ifdef __unix__
 #   include <fcntl.h>
 #   include <sys/socket.h>
+#else
+#include <namedpipeapi,h>
 #endif
 
 #include <cassert>
@@ -22,18 +24,12 @@ namespace clap {
       assert(_child == -1);
       assert(!_channel);
 
+      static const constexpr size_t KPIPE_BUFSZ = 128 * 1024;
+
       if (!_plugin._host.canUseTimerSupport() || !_plugin._host.canUseFdSupport())
          return false;
 
       auto &pathProvider = _plugin.pathProvider();
-
-#ifdef __unix__
-      /* create a socket pair */
-      int sockets[2];
-      if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets)) {
-         return false;
-      }
-
       auto path = pathProvider.getGuiExecutable();
       auto skin = pathProvider.getSkinDirectory();
       auto qmlLib = pathProvider.getQmlLibDirectory();
@@ -43,6 +39,13 @@ namespace clap {
              sockets[0],
              skin.c_str(),
              qmlLib.c_str());
+
+#ifdef __unix__
+      /* create a socket pair */
+      int sockets[2];
+      if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets)) {
+         return false;
+      }
 
       _child = ::fork();
       if (_child == -1) {
@@ -80,6 +83,47 @@ namespace clap {
 
       return true;
 #else
+      HANDLE pluginToGuiPipes[2];
+      HANDLE guiToPluginPipes[2];
+      SECURITY_ATTRIBUTES secAttrs;
+
+      secAttrs.nLenght = sizeof(secAttrs);
+      secAttrs.lpSecurityDescriptor = nullptr;
+      secAttrs.bInheritHandle = true;
+
+      if (!CreatePipe(&pluginToGuiPipes[0], &pluginToGuiPipes[1], &secAttrs, KPIPE_BUFSZ))
+         goto fail0;
+
+      if (!CreatePipe(&guiToPluginPipes[0], &guiToPluginPipes[1], &secAttrs, KPIPE_BUFSZ))
+         goto fail1;
+
+      if (!SetHandleInformation(&pluginToGuiPipes[1], HANDLE_FLAG_INHERIT, 0))
+         goto fail1;
+
+      if (!SetHandleInformation(&guiToPluginPipes[0], HANDLE_FLAG_INHERIT, 0))
+         goto fail1;
+
+      memset(&_si, 0, sizeof (_si));
+      memset(&_childInfo, 0, sizeof(_childInfo));
+
+      if (!CreateProcess("clap-gui", nullptr, nullptr, true, 0, nullptr, nullptr,
+      &_si, &_childInfo))
+         goto fail2;
+
+      CloseHandle(pluginToGuiPipes[1]);
+      CloseHandle(guiToPluginPipes[0]);
+
+      _channel.reset(new RemoteChannel(
+         [this](const RemoteChannel::Message &msg) { onMessage(msg); }, true, pluginToGuiPipes[0], guiToPluginPipes[1]));
+      return true;
+
+fail2:
+      CloseHandle(guiToPluginPipes[0]);
+      CloseHandle(guiToPluginPipes[1]);
+fail1:
+      CloseHandle(pluginToGuiPipes[0]);
+      CloseHandle(pluginToGuiPipes[1]);
+fail0:
       return false;
 #endif
    }

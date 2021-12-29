@@ -19,11 +19,11 @@
                 },
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
                 "VCPKG_OVERLAY_TRIPLETS": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg-overlay/triplets"
+                    "value": "${sourceDir}/vcpkg-overlay/triplets"
                 },
                 "UsePkgConfig": {
                     "type": "boolean",
@@ -44,11 +44,11 @@
                 },
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
                 "VCPKG_OVERLAY_TRIPLETS": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg-overlay/triplets"
+                    "value": "${sourceDir}/vcpkg-overlay/triplets"
                 },
                 "UsePkgConfig": {
                     "type": "boolean",
@@ -69,11 +69,11 @@
                 },
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
                 "VCPKG_OVERLAY_TRIPLETS": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg-overlay/triplets"
+                    "value": "${sourceDir}//vcpkg-overlay/triplets"
                 },
                 "UsePkgConfig": {
                     "type": "boolean",
@@ -94,11 +94,11 @@
                 },
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg/scripts/buildsystems/vcpkg.cmake"
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
                 "VCPKG_OVERLAY_TRIPLETS": {
                     "type": "FILEPATH",
-                    "value": "./vcpkg-overlay/triplets"
+                    "value": "${sourceDir}/vcpkg-overlay/triplets"
                 },
                 "UsePkgConfig": {
                     "type": "boolean",
@@ -150,7 +150,7 @@
         {
             "name": "vs-vcpkg",
             "description": "Build using Visual Studio and VCPKG",
-            "displayName": "vs-vcpkg/all",
+            "displayName": "vs-vcpkg",
             "configurePreset": "vs-vcpkg",
             "targets": [
                 "all", "clap-host", "clap-plugins"
@@ -166,7 +166,7 @@
         {
             "name": "vs-vcpkg",
             "description": "Test using Visual Studio and VCPKG",
-            "displayName": "vs-vcpkg/all",
+            "displayName": "vs-vcpkg",
             "configurePreset": "vs-vcpkg"
         }
     ]

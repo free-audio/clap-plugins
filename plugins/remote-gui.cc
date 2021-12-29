@@ -34,9 +34,8 @@ namespace clap {
       auto skin = pathProvider.getSkinDirectory();
       auto qmlLib = pathProvider.getQmlLibDirectory();
 
-      printf("About to start GUI: %s --socket %d --skin %s --qml-import %s\n",
+      printf("About to start GUI: %s --skin %s --qml-import %s\n",
              path.c_str(),
-             sockets[0],
              skin.c_str(),
              qmlLib.c_str());
 

@@ -8,8 +8,7 @@
     "configurePresets": [
         {
             "name": "github",
-            "displayName": "Github Actions",
-            "description": "Configuration used by Github",
+            "description": "Configuration used by Github Actions",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja",
             "cacheVariables": {
@@ -33,7 +32,6 @@
         },
         {
             "name": "ninja-vcpkg",
-            "displayName": "ninja-vcpkg",
             "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja Multi-Config",
@@ -58,7 +56,6 @@
         },
         {
             "name": "vs-vcpkg",
-            "displayName": "vs-vcpkg",
             "description": "Configure with vcpkg toolchain and generate VS project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Visual Studio 17 2022",
@@ -83,7 +80,6 @@
         },
         {
             "name": "xcode-vcpkg",
-            "displayName": "XCode + VCPKG",
             "description": "Configure with vcpkg toolchain and generate XCode project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Xcode",
@@ -108,7 +104,7 @@
         },
         {
             "name": "ninja-system",
-            "displayName": "Ninja + System Libraries",
+            "description": "Ninja + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja Multi-Config",
             "cacheVariables": {
@@ -124,7 +120,6 @@
         },
         {
             "name": "xcode-system",
-            "displayName": "XCode + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Xcode",
             "cacheVariables": {
@@ -143,14 +138,12 @@
         {
             "name": "github",
             "configurePreset": "github",
-            "displayName": "Build github",
-            "description": "Build github",
+            "description": "Build used by Github Actions",
             "configuration": "RelWithDebInfo"
         },
         {
             "name": "vs-vcpkg",
             "description": "Build using Visual Studio and VCPKG",
-            "displayName": "vs-vcpkg",
             "configurePreset": "vs-vcpkg",
             "targets": [
                 "all", "clap-host", "clap-plugins"
@@ -159,8 +152,15 @@
         {
             "name": "ninja-vcpkg",
             "description": "Build using Ninja and VCPKG",
-            "displayName": "ninja-vcpkg",
             "configurePreset": "ninja-vcpkg",
+            "targets": [
+                "all", "clap-host", "clap-plugins"
+            ]
+        },
+        {
+            "name": "ninja-system",
+            "description": "Build using Ninja and system libraries",
+            "configurePreset": "ninja-system",
             "targets": [
                 "all", "clap-host", "clap-plugins"
             ]
@@ -175,14 +175,17 @@
         {
             "name": "vs-vcpkg",
             "description": "Test using Visual Studio and VCPKG",
-            "displayName": "vs-vcpkg",
             "configurePreset": "vs-vcpkg"
         },
         {
             "name": "ninja-vcpkg",
             "description": "Test using Ninja and VCPKG",
-            "displayName": "ninja-vcpkg",
             "configurePreset": "ninja-vcpkg"
+        },
+        {
+            "name": "ninja-system",
+            "description": "Test using Ninja and system libraries",
+            "configurePreset": "ninja-system"
         }
     ]
 }

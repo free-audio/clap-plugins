@@ -9,7 +9,8 @@ namespace clap {
 
    class LinuxPathProvider final : public PathProvider {
    public:
-      LinuxPathProvider(const std::string &pluginPath, const std::string &pluginName) : prefix_(computePrefix(pluginPath)), pluginName_(pluginName) {}
+      LinuxPathProvider(const std::string &pluginPath, const std::string &pluginName)
+         : prefix_(computePrefix(pluginPath)), pluginName_(pluginName) {}
 
       static std::string computePrefix(const std::string &pluginPath) {
          static const std::regex r("(/.*)/lib/clap/.*$", std::regex::optimize);
@@ -20,11 +21,17 @@ namespace clap {
          return m[1];
       }
 
-      std::string getGuiExecutable() const override { return prefix_ / "bin/clap-gui"; }
+      std::string getGuiExecutable() const override {
+         return (prefix_ / "bin/clap-gui").generic_string();
+      }
 
-      std::string getSkinDirectory() const override { return prefix_ / "lib/clap/qml" / pluginName_; }
+      std::string getSkinDirectory() const override {
+         return (prefix_ / "lib/clap/qml" / pluginName_).generic_string();
+      }
 
-      std::string getQmlLibDirectory() const override { return prefix_ / "lib/clap/qml"; }
+      std::string getQmlLibDirectory() const override {
+         return (prefix_ / "lib/clap/qml").generic_string();
+      }
 
       bool isValid() const noexcept override { return !prefix_.empty(); }
 
@@ -36,8 +43,8 @@ namespace clap {
    class LinuxDevelopmentPathProvider final : public PathProvider {
    public:
       LinuxDevelopmentPathProvider(const std::string &pluginPath, const std::string &pluginName)
-         : srcRoot_(computeSrcRoot(pluginPath)), buildRoot_(computeBuildRoot(pluginPath)), pluginName_(pluginName),
-      _multiPrefix(computeMultiPrefix(pluginPath)) {}
+         : srcRoot_(computeSrcRoot(pluginPath)), buildRoot_(computeBuildRoot(pluginPath)),
+           pluginName_(pluginName), _multiPrefix(computeMultiPrefix(pluginPath)) {}
 
       static std::string computeSrcRoot(const std::string &pluginPath) {
          static const std::regex r("(/.*)/.*build.*/.*$", std::regex::optimize);
@@ -69,12 +76,16 @@ namespace clap {
       }
 
       std::string getGuiExecutable() const override {
-         return buildRoot_ / "plugins/gui" / _multiPrefix / "clap-gui";
+         return (buildRoot_ / "plugins/gui" / _multiPrefix / "clap-gui").generic_string();
       }
 
-      std::string getSkinDirectory() const override { return srcRoot_ / "plugins/qml" / pluginName_; }
+      std::string getSkinDirectory() const override {
+         return (srcRoot_ / "plugins/qml" / pluginName_).generic_string();
+      }
 
-      std::string getQmlLibDirectory() const override { return srcRoot_ / "plugins/qml"; }
+      std::string getQmlLibDirectory() const override {
+         return (srcRoot_ / "plugins/qml").generic_string();
+      }
 
       bool isValid() const noexcept override { return !srcRoot_.empty() && !buildRoot_.empty(); }
 
@@ -85,7 +96,8 @@ namespace clap {
       const std::string _multiPrefix;
    };
 
-   std::unique_ptr<PathProvider> PathProvider::create(const std::string &_pluginPath, const std::string& pluginName) {
+   std::unique_ptr<PathProvider> PathProvider::create(const std::string &_pluginPath,
+                                                      const std::string &pluginName) {
 #ifdef __linux__
       {
          auto pluginPath = std::filesystem::absolute(_pluginPath);

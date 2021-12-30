@@ -10,10 +10,11 @@
 #include "remote-channel.hh"
 
 namespace clap {
+   struct RemoteGuiWin32Data;
    class RemoteGui : public AbstractGui, public RemoteChannel::EventControl
    {
    public:
-      RemoteGui(CorePlugin &plugin) : AbstractGui(plugin) {}
+      RemoteGui(CorePlugin &plugin);
       ~RemoteGui();
 
       bool spawn();
@@ -52,9 +53,8 @@ namespace clap {
 
 #ifdef __unix__
       pid_t _child = -1;
-#else
-      STARTUPINFO _si;
-      PROCESS_INFORMATION _childInfo;
+#elif defined(_WIN32)
+      std::unique_ptr<RemoteGuiWin32Data> _data;
 #endif
    };
 } // namespace clap

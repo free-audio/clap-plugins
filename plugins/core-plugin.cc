@@ -143,8 +143,10 @@ namespace clap {
    }
 
    void CorePlugin::onFd(clap_fd fd, uint32_t flags) noexcept {
+#ifdef __unix
       if (_remoteGui && fd == _remoteGui->fd())
          _remoteGui->onFd(flags);
+#endif
    }
 
    void CorePlugin::onTimer(clap_id timerId) noexcept {

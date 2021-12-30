@@ -1,8 +1,8 @@
 #ifdef __unix__
 #   include <fcntl.h>
 #   include <sys/socket.h>
-#else
-#include <namedpipeapi,h>
+#elif defined(_WIN32)
+#   include <Windows.h>
 #endif
 
 #include <cassert>
@@ -13,6 +13,19 @@
 #include "remote-gui.hh"
 
 namespace clap {
+#ifdef _WIN32
+   struct RemoteGuiWin32Data final {
+      STARTUPINFO _si;
+      PROCESS_INFORMATION _childInfo;
+   };
+#endif
+
+   RemoteGui::RemoteGui(CorePlugin &plugin) : AbstractGui(plugin) {
+#ifdef _WIN32
+      _data = std::make_unique<RemoteGuiWin32Data>();
+#endif
+   }
+
    RemoteGui::~RemoteGui() {
       if (_channel)
          destroy();
@@ -86,7 +99,7 @@ namespace clap {
       HANDLE guiToPluginPipes[2];
       SECURITY_ATTRIBUTES secAttrs;
 
-      secAttrs.nLenght = sizeof(secAttrs);
+      secAttrs.nLength = sizeof(secAttrs);
       secAttrs.lpSecurityDescriptor = nullptr;
       secAttrs.bInheritHandle = true;
 
@@ -102,41 +115,55 @@ namespace clap {
       if (!SetHandleInformation(&guiToPluginPipes[0], HANDLE_FLAG_INHERIT, 0))
          goto fail1;
 
-      memset(&_si, 0, sizeof (_si));
-      memset(&_childInfo, 0, sizeof(_childInfo));
+      memset(&_data->_si, 0, sizeof(_data->_si));
+      memset(&_data->_childInfo, 0, sizeof(_data->_childInfo));
 
-      if (!CreateProcess("clap-gui", nullptr, nullptr, true, 0, nullptr, nullptr,
-      &_si, &_childInfo))
+      if (!CreateProcess("clap-gui",
+                         nullptr,
+                         nullptr,
+                         true,
+                         0,
+                         nullptr,
+                         nullptr,
+                         &_data->_si,
+                         &_data->_childInfo))
          goto fail2;
 
       CloseHandle(pluginToGuiPipes[1]);
       CloseHandle(guiToPluginPipes[0]);
 
-      _channel.reset(new RemoteChannel(
-         [this](const RemoteChannel::Message &msg) { onMessage(msg); }, true, pluginToGuiPipes[0], guiToPluginPipes[1]));
+      _channel.reset(
+         new RemoteChannel([this](const RemoteChannel::Message &msg) { onMessage(msg); },
+                           true,
+                           pluginToGuiPipes[0],
+                           guiToPluginPipes[1]));
       return true;
 
-fail2:
+   fail2:
       CloseHandle(guiToPluginPipes[0]);
       CloseHandle(guiToPluginPipes[1]);
-fail1:
+   fail1:
       CloseHandle(pluginToGuiPipes[0]);
       CloseHandle(pluginToGuiPipes[1]);
-fail0:
+   fail0:
       return false;
 #endif
    }
 
    void RemoteGui::modifyFd(clap_fd_flags flags) {
-      _plugin._host.fdSupportModifyFD(_channel->fd(), flags);
+#ifdef __unix
+      _plugin._host.fdSupportModifyFD(fd(), flags);
+#endif
    }
 
    void RemoteGui::removeFd() {
-      _plugin._host.fdSupportUnregisterFD(_channel->fd());
+#ifdef __unix
+      _plugin._host.fdSupportUnregisterFD(fd());
+#endif
       _plugin._host.timerSupportUnregisterTimer(_timerId);
    }
 
-   clap_fd RemoteGui::fd() const {
+   int RemoteGui::fd() const {
 #ifdef __unix
       return _channel ? _channel->fd() : -1;
 #endif
@@ -252,7 +279,8 @@ fail0:
       messages::AttachResponse response;
 
       request.window = window;
-      std::snprintf(request.display, sizeof(request.display), "%s", display_name ?: "");
+      std::snprintf(
+         request.display, sizeof(request.display), "%s", display_name ? display_name : "");
 
       return _channel->sendRequestSync(request, response);
    }

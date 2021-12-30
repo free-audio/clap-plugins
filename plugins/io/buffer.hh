@@ -36,7 +36,7 @@ namespace clap {
 
       void write(const T *&data, size_t &size) {
          size_t avail = writeAvail();
-         avail = std::min(size, avail);
+         avail = std::min<size_t>(size, avail);
          auto end = data + avail;
          std::copy(data, end, writePtr());
          wrote(size);

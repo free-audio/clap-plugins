@@ -5,8 +5,12 @@
 #include <QQuickView>
 #include <QWindow>
 
+#include <iostream>
+
 #include "../io/messages.hh"
 #include "application.hh"
+
+#include <windows.h>
 
 Application::Application(int &argc, char **argv)
    : QGuiApplication(argc, argv), _quickView(new QQuickView()) {
@@ -88,8 +92,27 @@ Application::Application(int &argc, char **argv)
 #endif
 
 #ifdef Q_OS_WINDOWS
-   auto pipeInHandle = reinterpret_cast<void *>(parser.value(pipeInOpt).toULongLong());
-   auto pipeOutHandle = reinterpret_cast<void *>(parser.value(pipeOutOpt).toULongLong());
+
+   auto pipeInName = parser.value(pipeInOpt).toStdString();
+   auto pipeOutName = parser.value(pipeOutOpt).toStdString();
+
+   auto pipeInHandle = CreateFileA(pipeInName.c_str(),
+                                   GENERIC_READ,
+                                   0,
+                                   nullptr,
+                                   OPEN_EXISTING,
+                                   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+                                   NULL);
+
+   auto pipeOutHandle = CreateFileA(pipeOutName.c_str(),
+                                    GENERIC_WRITE,
+                                    0,
+                                    nullptr,
+                                    OPEN_EXISTING,
+                                    FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+                                    NULL);
+
+   std::cout << "Inside clap-gui " << pipeInName << ", " << pipeOutName << std::endl;
 
    _remoteChannel.reset(
       new clap::RemoteChannel([this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
@@ -125,6 +148,7 @@ void Application::removeFd() {
 }
 
 void Application::onMessage(const clap::RemoteChannel::Message &msg) {
+   std::cout << "[GUI] received msg: " << msg.type << std::endl;
    switch (msg.type) {
    case clap::messages::kDestroyRequest:
       clap::messages::DestroyResponse rp;
@@ -187,11 +211,19 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       msg.get(rq);
 
 #ifdef Q_OS_WIN
+      std::cout << "QWindow::winId: " << reinterpret_cast<WId>(rq.hwnd) << std::endl;
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.hwnd)));
-      _quickView->setParent(_hostWindow.get());
-      _quickView->show();
-      sync();
-      rp.succeed = true;
+      if (_hostWindow) {
+         std::cout << "setParent" << std::endl;
+         _quickView->setParent(_hostWindow.get());
+         std::cout << "show" << std::endl;
+         sync();
+         _quickView->show();
+         std::cout << "sync" << std::endl;
+         sync();
+         std::cout << "finished" << std::endl;
+         rp.succeed = true;
+      }
 #endif
 
       _remoteChannel->sendResponseAsync(rp, msg.cookie);

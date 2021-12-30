@@ -102,10 +102,25 @@ namespace clap {
       return true;
 #else
       std::ostringstream cmdline;
-      HANDLE pluginToGuiPipes[2];
-      HANDLE guiToPluginPipes[2];
+      HANDLE pluginToGuiPipe;
+      HANDLE guiToPluginPipe;
       SECURITY_ATTRIBUTES secAttrs;
       char buffer[32 * 1024];
+      char pipeInPath[256];
+      char pipeOutPath[256];
+      static int counter{0};
+
+      snprintf(pipeInPath,
+               sizeof(pipeInPath),
+               "\\\\.\\pipe\\clap-plugtogui.%08x.%08x",
+               GetCurrentProcessId(),
+               ++counter);
+
+      snprintf(pipeOutPath,
+               sizeof(pipeOutPath),
+               "\\\\.\\pipe\\clap-guitoplug.%08x.%08x",
+               GetCurrentProcessId(),
+               counter);
 
       secAttrs.nLength = sizeof(secAttrs);
       secAttrs.lpSecurityDescriptor = nullptr;
@@ -115,58 +130,31 @@ namespace clap {
       memset(&_data->_si, 0, sizeof(_data->_si));
       memset(&_data->_childInfo, 0, sizeof(_data->_childInfo));
 
-      auto createPipe = [&buffer](HANDLE &readHandle, HANDLE &writeHandle) -> bool {
-         static std::atomic_int counter{0};
-         snprintf(buffer,
-                  sizeof(buffer),
-                  "\\\\.\\pipe\\clap-plugin.remote-gui.%08x.%08x",
-                  GetCurrentProcessId(),
-                  counter++);
-
-         auto rh = CreateNamedPipe(buffer,
-                                   PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
-                                   PIPE_TYPE_BYTE,
-                                   1,
-                                   KPIPE_BUFSZ,
-                                   KPIPE_BUFSZ,
-                                   0,
-                                   nullptr);
-         if (!rh)
-            return false;
-
-         auto wh = CreateFile(buffer,
-                              GENERIC_WRITE,
-                              0,
-                              nullptr,
-                              OPEN_EXISTING,
-                              FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
-                              NULL);
-         if (!wh) {
-            CloseHandle(rh);
-            return false;
-         }
-         
-         readHandle = rh;
-         writeHandle = wh;
-         return true;
-      };
-
-      if (!createPipe(pluginToGuiPipes[0], pluginToGuiPipes[1]))
+      pluginToGuiPipe = CreateNamedPipe(pipeInPath,
+                                        PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+                                        PIPE_TYPE_BYTE | PIPE_WAIT,
+                                        1,
+                                        KPIPE_BUFSZ,
+                                        KPIPE_BUFSZ,
+                                        0,
+                                        nullptr);
+      if (!pluginToGuiPipe)
          goto fail0;
 
-      if (!createPipe(guiToPluginPipes[0], guiToPluginPipes[1]))
+      guiToPluginPipe = CreateNamedPipe(pipeOutPath,
+                                        PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+                                        PIPE_TYPE_BYTE | PIPE_WAIT,
+                                        1,
+                                        KPIPE_BUFSZ,
+                                        KPIPE_BUFSZ,
+                                        0,
+                                        nullptr);
+      if (!guiToPluginPipe)
          goto fail1;
 
-      if (!SetHandleInformation(pluginToGuiPipes[0], HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
-         goto fail2;
-
-      if (!SetHandleInformation(guiToPluginPipes[1], HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
-         goto fail2;
-
       cmdline << escapeArg(path) << " --skin " << escapeArg(skin) << " --qml-import "
-              << escapeArg(qmlLib) << " --pipe-in "
-              << reinterpret_cast<uintptr_t>(pluginToGuiPipes[0]) << " --pipe-out "
-              << reinterpret_cast<uintptr_t>(guiToPluginPipes[1]);
+              << escapeArg(qmlLib) << " --pipe-in " << pipeInPath << " --pipe-out " << pipeOutPath;
+
       snprintf(buffer, sizeof(buffer), "%s", cmdline.str().c_str());
 
       if (!CreateProcess(nullptr,
@@ -174,29 +162,27 @@ namespace clap {
                          nullptr,
                          nullptr,
                          true,
-                         NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT,
+                         NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT | STARTF_USESTDHANDLES,
                          nullptr,
                          nullptr,
                          &_data->_si,
                          &_data->_childInfo))
          goto fail2;
 
-      // CloseHandle(pluginToGuiPipes[1]);
-      // CloseHandle(guiToPluginPipes[0]);
+      ConnectNamedPipe(guiToPluginPipe, nullptr);
+      ConnectNamedPipe(pluginToGuiPipe, nullptr);
 
       _channel = std::make_unique<RemoteChannel>(
          [this](const RemoteChannel::Message &msg) { onMessage(msg); },
          true,
-         pluginToGuiPipes[0],
-         guiToPluginPipes[1]);
+         guiToPluginPipe,
+         pluginToGuiPipe);
       return true;
 
    fail2:
-      CloseHandle(guiToPluginPipes[0]);
-      CloseHandle(guiToPluginPipes[1]);
+      CloseHandle(guiToPluginPipe);
    fail1:
-      CloseHandle(pluginToGuiPipes[0]);
-      CloseHandle(pluginToGuiPipes[1]);
+      CloseHandle(pluginToGuiPipe);
    fail0:
       _data.reset();
       return false;

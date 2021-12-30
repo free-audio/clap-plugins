@@ -8,11 +8,13 @@ namespace clap {
 
    struct Win32RemoteChannelOverlapped final {
       Win32RemoteChannelOverlapped(Win32RemoteChannel &c) : remoteChannel(c) {}
-      ~Win32RemoteChannelOverlapped() { CloseHandle(event); }
+      ~Win32RemoteChannelOverlapped() { 
+          //CloseHandle(event);
+      }
 
       OVERLAPPED overlapped{};
       Win32RemoteChannel &remoteChannel;
-      HANDLE const event = CreateEvent(nullptr, false, false, nullptr);
+      //HANDLE const event = CreateEvent(nullptr, false, false, nullptr);
    };
 
    Win32RemoteChannel::Win32RemoteChannel(const MessageHandler &handler,
@@ -44,7 +46,7 @@ namespace clap {
    bool Win32RemoteChannel::isOpen() const noexcept { return _rHandle && _wHandle; }
 
    void Win32RemoteChannel::tryReceive() {
-      if (_isReceiving)
+      if (_isReceiving || !_rHandle)
          return;
 
       _isReceiving = true;
@@ -67,6 +69,8 @@ namespace clap {
       auto *o = reinterpret_cast<Win32RemoteChannelOverlapped *>(lpOverlapped);
       auto &c = o->remoteChannel;
 
+      //std::cout << " -- completed read I/O " << dwNumberOfBytesTransfered << std::endl;
+
       if (dwErrorCode == 0) {
          assert(c._isReceiving);
          c._inputBuffer.wrote(dwNumberOfBytesTransfered);
@@ -79,7 +83,7 @@ namespace clap {
    }
 
    void Win32RemoteChannel::trySend() {
-      if (_isSending)
+      if (_isSending || !_wHandle)
          return;
 
       while (!_outputBuffers.empty()) {
@@ -96,6 +100,7 @@ namespace clap {
                           buffer.readAvail(),
                           &_wOverlapped->overlapped,
                           &Win32RemoteChannel::sendCompleted)) {
+            std::cerr << "WriteFileEx(pipe) failed: " << GetLastError() << std::endl;
             _isSending = false;
             close();
          }
@@ -108,6 +113,8 @@ namespace clap {
                                           LPOVERLAPPED lpOverlapped) {
       auto *o = reinterpret_cast<Win32RemoteChannelOverlapped *>(lpOverlapped);
       auto &c = o->remoteChannel;
+
+      //std::cout << " -- completed write I/O " << dwNumberOfBytesTransfered << std::endl;
 
       if (dwErrorCode == 0) {
          assert(c._isSending);
@@ -126,8 +133,10 @@ namespace clap {
       trySend();
       tryReceive();
 
-      HANDLE events[2] = {_rOverlapped->event, _wOverlapped->event};
-      WaitForMultipleObjects(2, events, false, INFINITE);
+      SleepEx(10, true);
+
+      //HANDLE events[2] = {_rOverlapped->event, _wOverlapped->event};
+      //WaitForMultipleObjects(2, events, false, 10);
    }
 
 } // namespace clap

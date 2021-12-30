@@ -48,6 +48,7 @@ Application::Application(int argc, char **argv)
       _pluginIndex = 0;
    }
 
+   sync();
    if (_engine->loadPlugin(_pluginPath, _pluginIndex))
       _engine->start();
 }

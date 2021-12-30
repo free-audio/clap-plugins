@@ -1,13 +1,14 @@
+#include <iostream>
+
 #include <Windows.h>
 
 #include "win32-remote-channel.hh"
 
 namespace clap {
+
    struct Win32RemoteChannelOverlapped final {
       Win32RemoteChannelOverlapped(Win32RemoteChannel &c) : remoteChannel(c) {}
-      ~Win32RemoteChannelOverlapped() {
-         CloseHandle(event);
-      }
+      ~Win32RemoteChannelOverlapped() { CloseHandle(event); }
 
       OVERLAPPED overlapped{};
       Win32RemoteChannel &remoteChannel;
@@ -30,11 +31,13 @@ namespace clap {
       if (_rHandle) {
          CloseHandle(_rHandle);
          _rHandle = nullptr;
+         _isReceiving = false;
       }
 
       if (_wHandle) {
          CloseHandle(_wHandle);
          _wHandle = nullptr;
+         _isSending = false;
       }
    }
 
@@ -51,6 +54,7 @@ namespace clap {
                       _inputBuffer.writeAvail(),
                       &_rOverlapped->overlapped,
                       &Win32RemoteChannel::receiveCompleted)) {
+         std::cerr << "ReadFileEx(pipe) failed: " << GetLastError() << std::endl;
          _isReceiving = false;
          close();
          return;

@@ -18,11 +18,21 @@ Application::Application(int &argc, char **argv)
    QCommandLineParser parser;
 
    QCommandLineOption skinOpt("skin", tr("path to the skin directory"), tr("path"));
-   QCommandLineOption socketOpt("socket", tr("path to the QML skin"), tr("path"));
    QCommandLineOption qmlLibOpt("qml-import", tr("QML import path"), tr("path"));
 
-   parser.addOption(skinOpt);
+#ifdef Q_OS_UNIX
+   QCommandLineOption socketOpt("socket", tr("socket fd"), tr("path"));
    parser.addOption(socketOpt);
+#endif
+
+#ifdef Q_OS_WINDOWS
+   QCommandLineOption pipeInOpt("pipe-in", tr("input pipe handle"), tr("path"));
+   QCommandLineOption pipeOutOpt("pipe-out", tr("output pipe handle"), tr("path"));
+   parser.addOption(pipeInOpt);
+   parser.addOption(pipeOutOpt);
+#endif
+
+   parser.addOption(skinOpt);
    parser.addOption(qmlLibOpt);
    parser.addHelpOption();
 
@@ -39,6 +49,7 @@ Application::Application(int &argc, char **argv)
    // I/O initialization //
    ////////////////////////
 
+#ifdef Q_OS_UNIX
    auto socket = parser.value(socketOpt).toULongLong();
 
    _remoteChannel.reset(new clap::RemoteChannel(
@@ -74,6 +85,18 @@ Application::Application(int &argc, char **argv)
    _socketReadNotifier->setEnabled(true);
    _socketWriteNotifier->setEnabled(false);
    _socketErrorNotifier->setEnabled(false);
+#endif
+
+#ifdef Q_OS_WINDOWS
+   auto pipeInHandle = reinterpret_cast<void *>(parser.value(pipeInOpt).toULongLong());
+   auto pipeOutHandle = reinterpret_cast<void *>(parser.value(pipeOutOpt).toULongLong());
+
+   _remoteChannel.reset(
+      new clap::RemoteChannel([this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
+                              false,
+                              pipeInHandle,
+                              pipeOutHandle));
+#endif
 
    ////////////////////////
    // QML initialization //
@@ -164,8 +187,8 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       msg.get(rq);
 
 #ifdef Q_OS_WIN
-      hostWindow_.reset(QWindow::fromWinId(rq.hwnd));
-      quickView_->setParent(hostWindow_.get());
+      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.hwnd)));
+      _quickView->setParent(_hostWindow.get());
       _quickView->show();
       sync();
       rp.succeed = true;

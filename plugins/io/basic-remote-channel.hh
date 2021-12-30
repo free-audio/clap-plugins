@@ -13,6 +13,12 @@
 namespace clap {
    class BasicRemoteChannel {
    public:
+      class EventControl {
+      public:
+         virtual void modifyFd(clap_fd_flags flags) = 0;
+         virtual void removeFd() = 0;
+      };
+
       struct Message final {
          uint32_t type = 0;
          uint32_t cookie = 0;

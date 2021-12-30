@@ -7,11 +7,6 @@ namespace clap {
    class PosixRemoteChannel final : public BasicRemoteChannel {
       using super = BasicRemoteChannel;
    public:
-      class EventControl {
-      public:
-         virtual void modifyFd(clap_fd_flags flags) = 0;
-         virtual void removeFd() = 0;
-      };
 
       PosixRemoteChannel(const MessageHandler &handler,
                          bool cookieHalf,

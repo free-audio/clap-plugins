@@ -34,7 +34,7 @@
             "name": "ninja-vcpkg",
             "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Ninja Multi-Config",
+            "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
                     "type": "boolean",
@@ -106,7 +106,7 @@
             "name": "ninja-system",
             "description": "Ninja + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Ninja Multi-Config",
+            "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
                     "type": "boolean",
@@ -162,7 +162,7 @@
             "description": "Build using Ninja and system libraries",
             "configurePreset": "ninja-system",
             "targets": [
-                "all", "clap-host", "clap-plugins"
+                "all", "clap-host", "clap-plugins", "run-host"
             ]
         }
     ],

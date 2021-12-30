@@ -52,14 +52,18 @@ add_executable(clap-host
   settings-widget.hh
   )
 
-set_target_properties(clap-host PROPERTIES CXX_STANDARD 17)
-target_link_libraries(clap-host Qt6::Widgets Qt6::Core)
+set_target_properties(clap-host PROPERTIES
+  CXX_STANDARD 17
+  WIN32_EXECUTABLE true
+  VS_DEBUGGER_COMMAND_ARGUMENTS "-p $<TARGET_FILE:clap-plugins> -i 0")
+
+target_link_libraries(clap-host Qt6::Widgets Qt6::Core clap-core clap-helpers)
+
 if(UsePkgConfig)
   target_link_libraries(clap-host PkgConfig::RtMidi PkgConfig::RtAudio)
 else()
   target_link_libraries(clap-host RtAudio::rtaudio RtMidi::rtmidi)
 endif()
-target_link_libraries(clap-host clap-core clap-helpers)
 
 if (LINUX)
   target_link_libraries(clap-host dl pthread)
@@ -79,6 +83,4 @@ if (APPLE)
   target_link_libraries(clap-host ${CARBON} ${AUDIO_UNIT} ${AUDIO_TOOLBOX} ${CORE_MIDI} ${CORE_AUDIO} ${CORE_SERVICES} ${CORE_FOUNDATION})
 endif()
 
-install(TARGETS clap-host DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-
-set_target_properties(clap-host PROPERTIES VS_DEBUGGER_COMMAND_ARGUMENTS "-p $<TARGET_FILE:clap-plugins> -i 0")
+install(TARGETS clap-host DESTINATION "bin")

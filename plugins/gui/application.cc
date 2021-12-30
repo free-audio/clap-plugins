@@ -108,7 +108,7 @@ Application::Application(int &argc, char **argv)
    qmlContext->setContextProperty("plugin", _pluginProxy);
    qmlContext->setContextProperty("transport", _transportProxy);
 
-   _quickView->setSource(parser.value(skinOpt) + "/main.qml");
+   _quickView->setSource(QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
 }
 
 void Application::modifyFd(clap_fd_flags flags) {

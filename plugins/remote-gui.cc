@@ -105,7 +105,7 @@ namespace clap {
       HANDLE pluginToGuiPipes[2];
       HANDLE guiToPluginPipes[2];
       SECURITY_ATTRIBUTES secAttrs;
-      char cmdlineBuffer[32 * 1024];
+      char buffer[32 * 1024];
 
       secAttrs.nLength = sizeof(secAttrs);
       secAttrs.lpSecurityDescriptor = nullptr;
@@ -115,26 +115,62 @@ namespace clap {
       memset(&_data->_si, 0, sizeof(_data->_si));
       memset(&_data->_childInfo, 0, sizeof(_data->_childInfo));
 
-      if (!CreatePipe(&pluginToGuiPipes[0], &pluginToGuiPipes[1], &secAttrs, KPIPE_BUFSZ))
+      auto createPipe = [&buffer](HANDLE &readHandle, HANDLE &writeHandle) -> bool {
+         static std::atomic_int counter{0};
+         snprintf(buffer,
+                  sizeof(buffer),
+                  "\\\\.\\pipe\\clap-plugin.remote-gui.%08x.%08x",
+                  GetCurrentProcessId(),
+                  counter++);
+
+         auto rh = CreateNamedPipe(buffer,
+                                   PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+                                   PIPE_TYPE_BYTE,
+                                   1,
+                                   KPIPE_BUFSZ,
+                                   KPIPE_BUFSZ,
+                                   0,
+                                   nullptr);
+         if (!rh)
+            return false;
+
+         auto wh = CreateFile(buffer,
+                              GENERIC_WRITE,
+                              0,
+                              nullptr,
+                              OPEN_EXISTING,
+                              FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+                              NULL);
+         if (!wh) {
+            CloseHandle(rh);
+            return false;
+         }
+         
+         readHandle = rh;
+         writeHandle = wh;
+         return true;
+      };
+
+      if (!createPipe(pluginToGuiPipes[0], pluginToGuiPipes[1]))
          goto fail0;
 
-      if (!CreatePipe(&guiToPluginPipes[0], &guiToPluginPipes[1], &secAttrs, KPIPE_BUFSZ))
+      if (!createPipe(guiToPluginPipes[0], guiToPluginPipes[1]))
          goto fail1;
 
-      if (!SetHandleInformation(pluginToGuiPipes[1], HANDLE_FLAG_INHERIT, 0))
+      if (!SetHandleInformation(pluginToGuiPipes[0], HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
          goto fail2;
 
-      if (!SetHandleInformation(guiToPluginPipes[0], HANDLE_FLAG_INHERIT, 0))
+      if (!SetHandleInformation(guiToPluginPipes[1], HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
          goto fail2;
 
       cmdline << escapeArg(path) << " --skin " << escapeArg(skin) << " --qml-import "
               << escapeArg(qmlLib) << " --pipe-in "
               << reinterpret_cast<uintptr_t>(pluginToGuiPipes[0]) << " --pipe-out "
               << reinterpret_cast<uintptr_t>(guiToPluginPipes[1]);
-      snprintf(cmdlineBuffer, sizeof(cmdlineBuffer), "%s", cmdline.str().c_str());
+      snprintf(buffer, sizeof(buffer), "%s", cmdline.str().c_str());
 
       if (!CreateProcess(nullptr,
-                         cmdlineBuffer,
+                         buffer,
                          nullptr,
                          nullptr,
                          true,
@@ -145,8 +181,8 @@ namespace clap {
                          &_data->_childInfo))
          goto fail2;
 
-      CloseHandle(pluginToGuiPipes[1]);
-      CloseHandle(guiToPluginPipes[0]);
+      // CloseHandle(pluginToGuiPipes[1]);
+      // CloseHandle(guiToPluginPipes[0]);
 
       _channel = std::make_unique<RemoteChannel>(
          [this](const RemoteChannel::Message &msg) { onMessage(msg); },

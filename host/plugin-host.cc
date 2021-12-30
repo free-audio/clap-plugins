@@ -308,6 +308,7 @@ void PluginHost::setParentWindow(WId parentWindow) {
    }
 
    Application::instance().mainWindow()->resizePluginView(width, height);
+   Application::instance().sync();
 
    setPluginWindowVisibility(true);
 }

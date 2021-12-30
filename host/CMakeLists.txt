@@ -80,3 +80,5 @@ if (APPLE)
 endif()
 
 install(TARGETS clap-host DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+
+set_target_properties(clap-host PROPERTIES VS_DEBUGGER_COMMAND_ARGUMENTS "-p $<TARGET_FILE:clap-plugins> -i 0")

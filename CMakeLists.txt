@@ -23,3 +23,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "clap-examples")
 
 include(CPack)
+
+add_custom_target(run-host
+    COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_FILE:clap-plugins> -i 0
+    DEPENDS clap-host clap-plugins clap-gui
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")

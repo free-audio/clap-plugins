@@ -35,9 +35,9 @@ static void addPlugin() {
 static bool clap_init(const char *plugin_path) {
    g_pluginPath = plugin_path;
 
-   addPlugin<clap::Gain>();
    addPlugin<clap::DcOffset>();
    addPlugin<clap::TransportInfo>();
+   addPlugin<clap::Gain>();
    return true;
 }
 

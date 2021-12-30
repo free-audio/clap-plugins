@@ -2,6 +2,8 @@
 
 #include <QObject>
 
+#include <algorithm>
+
 #include <clap/clap.h>
 
 class ParameterProxy : public QObject {
@@ -57,8 +59,8 @@ public:
    double getDefaultValue() const { return _defaultValue; }
    void setDefaultValueFromPlugin(double defaultValue);
 
-   double clip(double v) const { return std::min(_maxValue, std::max(_minValue, v)); }
-   static double clipNormalized(double v) { return std::min(1., std::max(0., v)); }
+   double clip(double v) const { return std::min<double>(_maxValue, std::max<double>(_minValue, v)); }
+   static double clipNormalized(double v) { return std::min<double>(1., std::max<double>(0., v)); }
 
    double normalize(double value) const {
       double delta = _maxValue - _minValue;

@@ -26,11 +26,7 @@ namespace clap {
    }
 #endif
 
-   RemoteGui::RemoteGui(CorePlugin &plugin) : AbstractGui(plugin) {
-#ifdef _WIN32
-      _data = std::make_unique<RemoteGuiWin32Data>();
-#endif
-   }
+   RemoteGui::RemoteGui(CorePlugin &plugin) : AbstractGui(plugin) {}
 
    RemoteGui::~RemoteGui() {
       if (_channel)
@@ -40,7 +36,11 @@ namespace clap {
    }
 
    bool RemoteGui::spawn() {
+#ifdef __unix
       assert(_child == -1);
+#elif defined(_WIN32)
+      assert(!_data);
+#endif
       assert(!_channel);
 
       static const constexpr size_t KPIPE_BUFSZ = 128 * 1024;
@@ -111,6 +111,10 @@ namespace clap {
       secAttrs.lpSecurityDescriptor = nullptr;
       secAttrs.bInheritHandle = true;
 
+      _data = std::make_unique<RemoteGuiWin32Data>();
+      memset(&_data->_si, 0, sizeof(_data->_si));
+      memset(&_data->_childInfo, 0, sizeof(_data->_childInfo));
+
       if (!CreatePipe(&pluginToGuiPipes[0], &pluginToGuiPipes[1], &secAttrs, KPIPE_BUFSZ))
          goto fail0;
 
@@ -118,13 +122,10 @@ namespace clap {
          goto fail1;
 
       if (!SetHandleInformation(&pluginToGuiPipes[1], HANDLE_FLAG_INHERIT, 0))
-         goto fail1;
+         goto fail2;
 
       if (!SetHandleInformation(&guiToPluginPipes[0], HANDLE_FLAG_INHERIT, 0))
-         goto fail1;
-
-      memset(&_data->_si, 0, sizeof(_data->_si));
-      memset(&_data->_childInfo, 0, sizeof(_data->_childInfo));
+         goto fail2;
 
       cmdline << escapeArg(path) << " --skin " << escapeArg(skin) << " --qml-import "
               << escapeArg(qmlLib) << " --pipe-in "
@@ -147,11 +148,11 @@ namespace clap {
       CloseHandle(pluginToGuiPipes[1]);
       CloseHandle(guiToPluginPipes[0]);
 
-      _channel.reset(
-         new RemoteChannel([this](const RemoteChannel::Message &msg) { onMessage(msg); },
-                           true,
-                           pluginToGuiPipes[0],
-                           guiToPluginPipes[1]));
+      _channel = std::make_unique<RemoteChannel>(
+         [this](const RemoteChannel::Message &msg) { onMessage(msg); },
+         true,
+         pluginToGuiPipes[0],
+         guiToPluginPipes[1]);
       return true;
 
    fail2:
@@ -161,6 +162,7 @@ namespace clap {
       CloseHandle(pluginToGuiPipes[0]);
       CloseHandle(pluginToGuiPipes[1]);
    fail0:
+      _data.reset();
       return false;
 #endif
    }

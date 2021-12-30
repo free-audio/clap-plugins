@@ -40,14 +40,14 @@ namespace clap {
       const std::string pluginName_;
    };
 
-   class LinuxDevelopmentPathProvider final : public PathProvider {
+   class DevelopmentPathProvider final : public PathProvider {
    public:
-      LinuxDevelopmentPathProvider(const std::string &pluginPath, const std::string &pluginName)
+      DevelopmentPathProvider(const std::string &pluginPath, const std::string &pluginName)
          : srcRoot_(computeSrcRoot(pluginPath)), buildRoot_(computeBuildRoot(pluginPath)),
            pluginName_(pluginName), _multiPrefix(computeMultiPrefix(pluginPath)) {}
 
       static std::string computeSrcRoot(const std::string &pluginPath) {
-         static const std::regex r("(/.*)/.*build.*/.*$", std::regex::optimize);
+         static const std::regex r("^(.*)/builds/.*$", std::regex::optimize);
 
          std::smatch m;
          if (!std::regex_match(pluginPath, m, r))
@@ -56,8 +56,7 @@ namespace clap {
       }
 
       static std::string computeBuildRoot(const std::string &pluginPath) {
-         static const std::regex r("(/.*/.*build.*(/.*)?)/plugins/.*\\.clap$",
-                                   std::regex::optimize);
+         static const std::regex r("^((.*)/builds/.*)/plugins/.*\\.clap$", std::regex::optimize);
 
          std::smatch m;
          if (!std::regex_match(pluginPath, m, r))
@@ -66,11 +65,10 @@ namespace clap {
       }
 
       static std::string computeMultiPrefix(const std::string &pluginPath) {
-         static const std::regex r("/.*/builds/[^/]*/plugins/([^/]*)/.*\\.clap$",
-                                   std::regex::optimize);
+         static const std::regex r("^.*/builds/.*/plugins/(.*)/.*\\.clap$", std::regex::optimize);
 
          std::smatch m;
-         if (!std::regex_match(pluginPath, r))
+         if (!std::regex_match(pluginPath, m, r))
             return "";
          return m[1];
       }
@@ -98,17 +96,23 @@ namespace clap {
 
    std::unique_ptr<PathProvider> PathProvider::create(const std::string &_pluginPath,
                                                       const std::string &pluginName) {
-#ifdef __linux__
-      {
-         auto pluginPath = std::filesystem::absolute(_pluginPath);
-         auto devPtr = std::make_unique<LinuxDevelopmentPathProvider>(pluginPath, pluginName);
-         if (devPtr->isValid())
-            return std::move(devPtr);
 
-         auto ptr = std::make_unique<LinuxPathProvider>(pluginPath, pluginName);
-         if (ptr->isValid())
-            return std::move(ptr);
-      }
+      auto pluginPath = std::filesystem::absolute(_pluginPath).generic_string();
+
+      auto devPtr = std::make_unique<DevelopmentPathProvider>(pluginPath, pluginName);
+      if (devPtr->isValid())
+         return std::move(devPtr);
+
+#ifdef __unix
+
+     auto ptr = std::make_unique<LinuxPathProvider>(pluginPath, pluginName);
+      if (ptr->isValid())
+         return std::move(ptr);
+
+#elif defined(_WIN32)
+
+      
+
 #endif
 
       // TODO

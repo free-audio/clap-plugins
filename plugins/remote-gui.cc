@@ -121,10 +121,10 @@ namespace clap {
       if (!CreatePipe(&guiToPluginPipes[0], &guiToPluginPipes[1], &secAttrs, KPIPE_BUFSZ))
          goto fail1;
 
-      if (!SetHandleInformation(&pluginToGuiPipes[1], HANDLE_FLAG_INHERIT, 0))
+      if (!SetHandleInformation(pluginToGuiPipes[1], HANDLE_FLAG_INHERIT, 0))
          goto fail2;
 
-      if (!SetHandleInformation(&guiToPluginPipes[0], HANDLE_FLAG_INHERIT, 0))
+      if (!SetHandleInformation(guiToPluginPipes[0], HANDLE_FLAG_INHERIT, 0))
          goto fail2;
 
       cmdline << escapeArg(path) << " --skin " << escapeArg(skin) << " --qml-import "
@@ -133,7 +133,7 @@ namespace clap {
               << reinterpret_cast<uintptr_t>(guiToPluginPipes[1]);
       snprintf(cmdlineBuffer, sizeof(cmdlineBuffer), "%s", cmdline.str().c_str());
 
-      if (!CreateProcess("clap-gui",
+      if (!CreateProcess(nullptr,
                          cmdlineBuffer,
                          nullptr,
                          nullptr,

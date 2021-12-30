@@ -30,6 +30,7 @@ MainWindow::MainWindow(Application &app)
    _pluginViewWidget->show();
    _pluginViewWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+   setMinimumSize(100, 75);
 
    connect(_settingsDialog, SIGNAL(accepted()), &_application, SLOT(restartEngine()));
 

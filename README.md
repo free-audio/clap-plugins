@@ -44,8 +44,8 @@ cd clap
 
 # Build
 cmake --preset vs-vcpkg
-cmake --build vsb --config Release
+cmake --build builds/vs-vcpkg --config Release
 
 # Build installer
-cmake --build vsb --target PACKAGE --config Release
+cmake --build builds/vs-vcpkg --target PACKAGE --config Release
 ```

@@ -23,14 +23,12 @@ namespace clap {
 
       bool isOpen() const noexcept override;
 
-      // Called when there is data to be read, non-blocking
       void tryReceive() override;
-
-      // Called when data can be written, non-blocking
       void trySend() override;
-
-      // Called on socket exception
       void onError() override;
+
+   protected:
+      void runOnce() override;
 
    private:
       static void receiveCompleted(unsigned long dwErrorCode,

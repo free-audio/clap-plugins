@@ -5,8 +5,13 @@
 namespace clap {
    struct Win32RemoteChannelOverlapped final {
       Win32RemoteChannelOverlapped(Win32RemoteChannel &c) : remoteChannel(c) {}
+      ~Win32RemoteChannelOverlapped() {
+         CloseHandle(event);
+      }
+
       OVERLAPPED overlapped{};
       Win32RemoteChannel &remoteChannel;
+      HANDLE const event = CreateEvent(nullptr, false, false, nullptr);
    };
 
    Win32RemoteChannel::Win32RemoteChannel(const MessageHandler &handler,
@@ -112,5 +117,13 @@ namespace clap {
    }
 
    void Win32RemoteChannel::onError() { close(); }
+
+   void Win32RemoteChannel::runOnce() {
+      trySend();
+      tryReceive();
+
+      HANDLE events[2] = {_rOverlapped->event, _wOverlapped->event};
+      WaitForMultipleObjects(2, events, false, INFINITE);
+   }
 
 } // namespace clap

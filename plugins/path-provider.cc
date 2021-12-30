@@ -48,7 +48,7 @@ namespace clap {
       }
 
       static std::string computeBuildRoot(const std::string &pluginPath) {
-         static const std::regex r("(/.*/.*build.*(/.*)?)/examples/plugins/.*\\.clap$",
+         static const std::regex r("(/.*/.*build.*(/.*)?)/plugins/.*\\.clap$",
                                    std::regex::optimize);
 
          std::smatch m;
@@ -57,11 +57,11 @@ namespace clap {
          return m[1];
       }
 
-      std::string getGuiExecutable() const override { return buildRoot_ / "examples/plugins/gui/clap-gui"; }
+      std::string getGuiExecutable() const override { return buildRoot_ / "plugins/gui/clap-gui"; }
 
-      std::string getSkinDirectory() const override { return srcRoot_ / "examples/plugins/qml" / pluginName_; }
+      std::string getSkinDirectory() const override { return srcRoot_ / "plugins/qml" / pluginName_; }
 
-      std::string getQmlLibDirectory() const override { return srcRoot_ / "examples/plugins/qml"; }
+      std::string getQmlLibDirectory() const override { return srcRoot_ / "plugins/qml"; }
 
       bool isValid() const noexcept override { return !srcRoot_.empty() && !buildRoot_.empty(); }
 

@@ -12,6 +12,7 @@
         "widgets"
       ]
     },
-    "qtdeclarative"
+    "qtdeclarative",
+    "qtquickcontrols2"
   ]
 }

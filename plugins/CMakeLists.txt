@@ -38,4 +38,4 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 install(TARGETS clap-plugins DESTINATION "lib/clap")
-install(DIRECTORY qml DESTINATION "lib/clap-examples")
+install(DIRECTORY gui/qml DESTINATION "lib/clap-examples")

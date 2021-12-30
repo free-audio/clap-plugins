@@ -6,6 +6,8 @@
 #endif
 
 #include <cassert>
+#include <regex>
+#include <sstream>
 
 #include "../io/messages.hh"
 #include "core-plugin.hh"
@@ -18,6 +20,10 @@ namespace clap {
       STARTUPINFO _si;
       PROCESS_INFORMATION _childInfo;
    };
+
+   std::string escapeArg(const std::string &s) {
+      return "\"" + std::regex_replace(s, std::regex("\""), "\\\"") + "\"";
+   }
 #endif
 
    RemoteGui::RemoteGui(CorePlugin &plugin) : AbstractGui(plugin) {
@@ -95,9 +101,11 @@ namespace clap {
 
       return true;
 #else
+      std::ostringstream cmdline;
       HANDLE pluginToGuiPipes[2];
       HANDLE guiToPluginPipes[2];
       SECURITY_ATTRIBUTES secAttrs;
+      char cmdlineBuffer[32 * 1024];
 
       secAttrs.nLength = sizeof(secAttrs);
       secAttrs.lpSecurityDescriptor = nullptr;
@@ -118,11 +126,18 @@ namespace clap {
       memset(&_data->_si, 0, sizeof(_data->_si));
       memset(&_data->_childInfo, 0, sizeof(_data->_childInfo));
 
+      cmdline << escapeArg(path) << " --skin " << escapeArg(skin) << " --qml-import "
+              << escapeArg(qmlLib) << " --pipe-in "
+              << reinterpret_cast<uintptr_t>(pluginToGuiPipes[0]) << " --pipe-out "
+              << reinterpret_cast<uintptr_t>(guiToPluginPipes[1]);
+      snprintf(cmdlineBuffer, sizeof(cmdlineBuffer), "%s", cmdline.str().c_str());
+
       if (!CreateProcess("clap-gui",
+                         cmdlineBuffer,
                          nullptr,
                          nullptr,
                          true,
-                         0,
+                         NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT,
                          nullptr,
                          nullptr,
                          &_data->_si,

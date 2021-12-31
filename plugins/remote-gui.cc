@@ -8,6 +8,7 @@
 #include <cassert>
 #include <regex>
 #include <sstream>
+#include <iostream>
 
 #include "../io/messages.hh"
 #include "core-plugin.hh"

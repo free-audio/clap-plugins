@@ -31,15 +31,20 @@ namespace clap {
 
    void Win32RemoteChannel::close() {
       if (_rHandle) {
+         CancelIoEx(_rHandle, nullptr);
          CloseHandle(_rHandle);
          _rHandle = nullptr;
          _isReceiving = false;
       }
 
       if (_wHandle) {
+         CancelIo(_wHandle);
+         CancelIoEx(_wHandle, nullptr);
          CloseHandle(_wHandle);
          _wHandle = nullptr;
          _isSending = false;
+         _bytesSent = 0;
+         _bytesToSend = 0;
       }
    }
 
@@ -69,7 +74,7 @@ namespace clap {
       auto *o = reinterpret_cast<Win32RemoteChannelOverlapped *>(lpOverlapped);
       auto &c = o->remoteChannel;
 
-      //std::cout << " -- completed read I/O " << dwNumberOfBytesTransfered << std::endl;
+      std::cout << " -- completed read I/O " << dwNumberOfBytesTransfered << std::endl;
 
       if (dwErrorCode == 0) {
          assert(c._isReceiving);
@@ -83,6 +88,9 @@ namespace clap {
    }
 
    void Win32RemoteChannel::trySend() {
+      assert(_isSending ? (_bytesToSend > 0 && _bytesSent < _bytesToSend)
+                          : (_bytesToSend == 0 && _bytesSent == 0));
+
       if (_isSending || !_wHandle)
          return;
 
@@ -95,9 +103,11 @@ namespace clap {
          }
 
          _isSending = true;
+         _bytesToSend = buffer.readAvail();
+         _bytesSent = 0;
          if (!WriteFileEx(_wHandle,
                           buffer.readPtr(),
-                          buffer.readAvail(),
+                          _bytesToSend,
                           &_wOverlapped->overlapped,
                           &Win32RemoteChannel::sendCompleted)) {
             std::cerr << "WriteFileEx(pipe) failed: " << GetLastError() << std::endl;
@@ -114,14 +124,19 @@ namespace clap {
       auto *o = reinterpret_cast<Win32RemoteChannelOverlapped *>(lpOverlapped);
       auto &c = o->remoteChannel;
 
-      //std::cout << " -- completed write I/O " << dwNumberOfBytesTransfered << std::endl;
+      std::cout << " -- completed write I/O " << dwNumberOfBytesTransfered << std::endl;
 
       if (dwErrorCode == 0) {
          assert(c._isSending);
          auto &buffer = c._outputBuffers.front();
          buffer.read(dwNumberOfBytesTransfered);
-         c._isSending = false;
-         c.trySend();
+         c._bytesSent += dwNumberOfBytesTransfered;
+         if (c._bytesSent == c._bytesToSend) {
+            c._bytesSent = 0;
+            c._bytesToSend = 0;
+            c._isSending = false;
+            c.trySend();
+         }
       } else {
          c.close();
       }

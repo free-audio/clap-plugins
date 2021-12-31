@@ -44,6 +44,8 @@ namespace clap {
 
       bool _isReceiving = false;
       bool _isSending = false;
+      size_t _bytesToSend = 0;
+      size_t _bytesSent = 0;
 
       std::unique_ptr<Win32RemoteChannelOverlapped> _rOverlapped;
       std::unique_ptr<Win32RemoteChannelOverlapped> _wOverlapped;

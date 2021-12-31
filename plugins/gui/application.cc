@@ -11,7 +11,7 @@
 #include <windows.h>
 
 Application::Application(int &argc, char **argv)
-   : QGuiApplication(argc, argv), _quickView(new QQuickView()) {
+   : super(argc, argv), _quickView(new QQuickView()) {
 
    bool waitForDebbugger = false;
    while (waitForDebbugger)

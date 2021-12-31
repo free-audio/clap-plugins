@@ -1,6 +1,9 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
+
+find_package(Qt6Core CONFIG REQUIRED)
+find_package(Qt6Widgets CONFIG REQUIRED)
 find_package(Qt6 COMPONENTS Qml Quick QuickControls2 REQUIRED)
 
 add_executable(clap-gui
@@ -16,7 +19,7 @@ add_executable(clap-gui
     transport-proxy.hh
     transport-proxy.cc
 )
-target_link_libraries(clap-gui PRIVATE clap-io Qt6::Qml Qt6::Quick Qt6::QuickControls2)
+target_link_libraries(clap-gui PRIVATE clap-io Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Core )
 qt6_import_qml_plugins(clap-gui)
 
 if(false)

@@ -285,6 +285,9 @@ void PluginHost::setParentWindow(WId parentWindow) {
       return;
    }
 
+   Application::instance().mainWindow()->resizePluginView(width, height);
+   Application::instance().sync();
+
    bool didAttach = false;
 
 #if defined(Q_OS_LINUX)
@@ -307,8 +310,8 @@ void PluginHost::setParentWindow(WId parentWindow) {
       return;
    }
 
-   Application::instance().mainWindow()->resizePluginView(width, height);
    Application::instance().sync();
+   Application::instance().processEvents();
 
    setPluginWindowVisibility(true);
 }

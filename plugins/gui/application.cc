@@ -195,10 +195,11 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
 
 #ifdef Q_OS_LINUX
       _hostWindow.reset(QWindow::fromWinId(rq.window));
-      _quickView->setParent(_hostWindow.get());
-      _quickView->show();
-      sync();
-      rp.succeed = true;
+      if (_hostWindow) {
+         _quickView->setParent(_hostWindow.get());
+         sync();
+         rp.succeed = true;
+      }
 #endif
 
       _remoteChannel->sendResponseAsync(rp, msg.cookie);
@@ -211,17 +212,11 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       msg.get(rq);
 
 #ifdef Q_OS_WIN
-      std::cout << "QWindow::winId: " << reinterpret_cast<WId>(rq.hwnd) << std::endl;
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.hwnd)));
       if (_hostWindow) {
-         std::cout << "setParent" << std::endl;
          _quickView->setParent(_hostWindow.get());
-         std::cout << "show" << std::endl;
          sync();
-         _quickView->show();
-         std::cout << "sync" << std::endl;
-         sync();
-         std::cout << "finished" << std::endl;
+         processEvents();
          rp.succeed = true;
       }
 #endif
@@ -238,10 +233,11 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
 
 #ifdef Q_OS_MACOS
       hostWindow_.reset(QWindow::fromWinId(rq.nsView));
-      quickView_->setParent(hostWindow_.get());
-      _quickView->show();
-      sync();
-      rp.succeed = true;
+      if (_hostWindow) {
+         _quickView->setParent(_hostWindow.get());
+         sync();
+         rp.succeed = true;
+      }
 #endif
 
       _remoteChannel->sendResponseAsync(rp, msg.cookie);
@@ -249,6 +245,8 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
    }
 
    case clap::messages::kShowRequest: {
+      sync();
+      processEvents();
       _quickView->show();
       clap::messages::ShowResponse rp;
       _remoteChannel->sendResponseAsync(rp, msg.cookie);

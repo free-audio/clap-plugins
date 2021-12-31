@@ -8,10 +8,11 @@
 #include "../io/messages.hh"
 #include "application.hh"
 
-#include <windows.h>
+#ifdef _WIN32
+#   include <windows.h>
+#endif
 
-Application::Application(int &argc, char **argv)
-   : super(argc, argv), _quickView(new QQuickView()) {
+Application::Application(int &argc, char **argv) : super(argc, argv), _quickView(new QQuickView()) {
 
    bool waitForDebbugger = false;
    while (waitForDebbugger)

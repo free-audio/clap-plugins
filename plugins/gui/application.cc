@@ -5,8 +5,6 @@
 #include <QQuickView>
 #include <QWindow>
 
-#include <iostream>
-
 #include "../io/messages.hh"
 #include "application.hh"
 
@@ -112,8 +110,6 @@ Application::Application(int &argc, char **argv)
                                     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
                                     NULL);
 
-   std::cout << "Inside clap-gui " << pipeInName << ", " << pipeOutName << std::endl;
-
    _remoteChannel.reset(
       new clap::RemoteChannel([this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
                               false,
@@ -148,7 +144,6 @@ void Application::removeFd() {
 }
 
 void Application::onMessage(const clap::RemoteChannel::Message &msg) {
-   std::cout << "[GUI] received msg: " << msg.type << std::endl;
    switch (msg.type) {
    case clap::messages::kDestroyRequest:
       clap::messages::DestroyResponse rp;
@@ -215,8 +210,6 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.hwnd)));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
-         sync();
-         processEvents();
          rp.succeed = true;
       }
 #endif
@@ -245,8 +238,6 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
    }
 
    case clap::messages::kShowRequest: {
-      sync();
-      processEvents();
       _quickView->show();
       clap::messages::ShowResponse rp;
       _remoteChannel->sendResponseAsync(rp, msg.cookie);

@@ -241,6 +241,11 @@ namespace clap {
       _channel->sendRequestAsync(messages::DefineParameterRequest{info});
    }
 
+   void RemoteGui::updateParameter(clap_id paramId, double value, double modAmount) noexcept {
+      messages::ParameterValueRequest rq{paramId, value, modAmount};
+      _channel->sendRequestAsync(rq);
+   }
+
    bool RemoteGui::size(uint32_t *width, uint32_t *height) noexcept {
       messages::SizeRequest request;
       messages::SizeResponse response;
@@ -326,8 +331,7 @@ namespace clap {
    void RemoteGui::onTimer() {
       _plugin._pluginToGuiQueue.consume(
          [this](clap_id paramId, const CorePlugin::PluginToGuiValue &value) {
-            messages::ParameterValueRequest rq{paramId, value.value, value.mod};
-            _channel->sendRequestAsync(rq);
+            updateParameter(paramId, value.value, value.mod);
          });
 
       if (_isTransportSubscribed && _plugin._hasTransportCopy) {

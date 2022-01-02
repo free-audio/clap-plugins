@@ -41,6 +41,7 @@ namespace clap {
       int fd() const;
       void onFd(clap_fd_flags flags);
 
+      void registerTimer();
       clap_id timerId() const noexcept { return _timerId; }
       void onTimer();
 

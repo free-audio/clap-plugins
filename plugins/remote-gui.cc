@@ -36,6 +36,11 @@ namespace clap {
       assert(!_channel);
    }
 
+   void RemoteGui::registerTimer() {
+      _timerId = CLAP_INVALID_ID;
+      _plugin._host.timerSupportRegisterTimer(1000 / 60, &_timerId);
+   }
+
    bool RemoteGui::spawn() {
 #ifdef __unix
       assert(_child == -1);
@@ -94,13 +99,10 @@ namespace clap {
          ::close(sockets[1]);
       }
 
-      _timerId = CLAP_INVALID_ID;
-      _plugin._host.timerSupportRegisterTimer(1000 / 60, &_timerId);
-      _plugin._host.fdSupportRegisterFD(sockets[0], CLAP_FD_READ | CLAP_FD_ERROR);
       _channel.reset(new RemoteChannel(
          [this](const RemoteChannel::Message &msg) { onMessage(msg); }, true, *this, sockets[0]));
-
-      return true;
+      _plugin._host.fdSupportRegisterFD(sockets[0], CLAP_FD_READ | CLAP_FD_ERROR);
+      registerTimer();
 #else
       std::ostringstream cmdline;
       HANDLE pluginToGuiPipe;
@@ -178,6 +180,8 @@ namespace clap {
          true,
          guiToPluginPipe,
          pluginToGuiPipe);
+
+      registerTimer();
       return true;
 
    fail2:

@@ -259,16 +259,14 @@ namespace clap {
 
    bool RemoteGui::show() noexcept {
       messages::ShowRequest request;
-      messages::ShowResponse response;
 
-      return _channel->sendRequestSync(request, response);
+      return _channel->sendRequestAsync(request);
    }
 
    bool RemoteGui::hide() noexcept {
       messages::HideRequest request;
-      messages::HideResponse response;
 
-      return _channel->sendRequestSync(request, response);
+      return _channel->sendRequestAsync(request);
    }
 
    void RemoteGui::destroy() noexcept {

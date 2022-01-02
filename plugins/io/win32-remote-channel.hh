@@ -16,7 +16,8 @@ namespace clap {
       Win32RemoteChannel(const MessageHandler &handler,
                          bool cookieHalf,
                          void *readHandle,
-                         void *writeHandle);
+                         void *writeHandle,
+                         const std::function<void()> &errorHandler = {});
       ~Win32RemoteChannel() override;
 
       void close() override;
@@ -49,5 +50,7 @@ namespace clap {
 
       std::unique_ptr<Win32RemoteChannelOverlapped> _rOverlapped;
       std::unique_ptr<Win32RemoteChannelOverlapped> _wOverlapped;
+
+      const std::function<void()> _errorHandler;
    };
 } // namespace clap

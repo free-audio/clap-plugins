@@ -115,7 +115,8 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
       new clap::RemoteChannel([this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
                               false,
                               pipeInHandle,
-                              pipeOutHandle));
+                              pipeOutHandle,
+                              [this] { this->quit(); }));
 #endif
 
    ////////////////////////

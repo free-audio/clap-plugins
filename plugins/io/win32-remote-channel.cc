@@ -8,22 +8,21 @@ namespace clap {
 
    struct Win32RemoteChannelOverlapped final {
       Win32RemoteChannelOverlapped(Win32RemoteChannel &c) : remoteChannel(c) {}
-      ~Win32RemoteChannelOverlapped() { 
-          //CloseHandle(event);
-      }
+      ~Win32RemoteChannelOverlapped() {}
 
       OVERLAPPED overlapped{};
       Win32RemoteChannel &remoteChannel;
-      //HANDLE const event = CreateEvent(nullptr, false, false, nullptr);
+      // HANDLE const event = CreateEvent(nullptr, false, false, nullptr);
    };
 
    Win32RemoteChannel::Win32RemoteChannel(const MessageHandler &handler,
                                           bool cookieHalf,
                                           void *readHandle,
-                                          void *writeHandle)
+                                          void *writeHandle,
+                                          const std::function<void()> &errorHandler)
       : super(handler, cookieHalf), _rHandle(readHandle), _wHandle(writeHandle),
         _rOverlapped(new Win32RemoteChannelOverlapped(*this)),
-        _wOverlapped(new Win32RemoteChannelOverlapped(*this)) {
+        _wOverlapped(new Win32RemoteChannelOverlapped(*this)), _errorHandler(errorHandler) {
       tryReceive();
    }
 
@@ -64,6 +63,8 @@ namespace clap {
          std::cerr << "ReadFileEx(pipe) failed: " << GetLastError() << std::endl;
          _isReceiving = false;
          close();
+         if (_errorHandler)
+            _errorHandler();
          return;
       }
    }
@@ -84,12 +85,14 @@ namespace clap {
          c.tryReceive();
       } else {
          c.close();
+         if (c._errorHandler)
+            c._errorHandler();
       }
    }
 
    void Win32RemoteChannel::trySend() {
       assert(_isSending ? (_bytesToSend > 0 && _bytesSent < _bytesToSend)
-                          : (_bytesToSend == 0 && _bytesSent == 0));
+                        : (_bytesToSend == 0 && _bytesSent == 0));
 
       if (_isSending || !_wHandle)
          return;
@@ -113,6 +116,8 @@ namespace clap {
             std::cerr << "WriteFileEx(pipe) failed: " << GetLastError() << std::endl;
             _isSending = false;
             close();
+            if (_errorHandler)
+               _errorHandler();
          }
          return;
       }
@@ -139,6 +144,8 @@ namespace clap {
          }
       } else {
          c.close();
+         if (c._errorHandler)
+            c._errorHandler();
       }
    }
 
@@ -150,8 +157,8 @@ namespace clap {
 
       SleepEx(10, true);
 
-      //HANDLE events[2] = {_rOverlapped->event, _wOverlapped->event};
-      //WaitForMultipleObjects(2, events, false, 10);
+      // HANDLE events[2] = {_rOverlapped->event, _wOverlapped->event};
+      // WaitForMultipleObjects(2, events, false, 10);
    }
 
 } // namespace clap

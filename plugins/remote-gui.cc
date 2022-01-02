@@ -6,9 +6,9 @@
 #endif
 
 #include <cassert>
+#include <iostream>
 #include <regex>
 #include <sstream>
-#include <iostream>
 
 #include "../io/messages.hh"
 #include "core-plugin.hh"
@@ -283,9 +283,7 @@ namespace clap {
          return;
 
       messages::DestroyRequest request;
-      messages::DestroyResponse response;
-
-      _channel->sendRequestSync(request, response);
+      _channel->sendRequestAsync(request);
       _channel->close();
       _channel.reset();
 
@@ -304,6 +302,14 @@ namespace clap {
       } while (ret == -1 && errno == EINTR);
 
       _child = -1;
+
+#elif defined(_WIN32)
+
+      if (!_data)
+         return;
+
+      WaitForSingleObject(_data->_childInfo.hProcess, INFINITE);
+      _data.reset();
 #endif
    }
 

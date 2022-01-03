@@ -52,7 +52,7 @@ namespace clap {
             auto nbytes = ::write(_socket, buffer.readPtr(), avail);
             if (nbytes == -1) {
                if (errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR) {
-                  modifyFd(CLAP_FD_READ | CLAP_FD_WRITE);
+                  modifyFd(CLAP_POSIX_FD_READ | CLAP_POSIX_FD_WRITE);
                   return;
                }
 
@@ -66,7 +66,7 @@ namespace clap {
          _outputBuffers.pop();
       }
 
-      modifyFd(CLAP_FD_READ);
+      modifyFd(CLAP_POSIX_FD_READ);
    }
 
    void PosixRemoteChannel::runOnce() {
@@ -75,7 +75,7 @@ namespace clap {
 
       pollfd pfd;
       pfd.fd = _socket;
-      pfd.events = POLLIN | (_ioFlags & CLAP_FD_WRITE ? POLLOUT : 0);
+      pfd.events = POLLIN | (_ioFlags & CLAP_POSIX_FD_WRITE ? POLLOUT : 0);
       pfd.revents = 0;
 
       int ret = ::poll(&pfd, 1, -1);
@@ -106,7 +106,7 @@ namespace clap {
       _socket = -1;
    }
 
-   void PosixRemoteChannel::modifyFd(clap_fd_flags flags) {
+   void PosixRemoteChannel::modifyFd(int flags) {
       if (flags == _ioFlags)
          return;
 

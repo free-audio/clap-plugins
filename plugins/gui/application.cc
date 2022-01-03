@@ -131,10 +131,10 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
    _quickView->setSource(QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
 }
 
-void Application::modifyFd(clap_fd_flags flags) {
-   _socketReadNotifier->setEnabled(flags & CLAP_FD_READ);
-   _socketWriteNotifier->setEnabled(flags & CLAP_FD_WRITE);
-   _socketErrorNotifier->setEnabled(flags & CLAP_FD_ERROR);
+void Application::modifyFd(int flags) {
+   _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
+   _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
+   _socketErrorNotifier->setEnabled(flags & CLAP_POSIX_FD_ERROR);
 }
 
 void Application::removeFd() {

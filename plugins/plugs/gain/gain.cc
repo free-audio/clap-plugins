@@ -15,9 +15,7 @@ namespace clap {
          nullptr,
          "0.1",
          "example gain plugin",
-         "mix;gain",
-         CLAP_PLUGIN_AUDIO_EFFECT
-
+         "mix;gain;audio_effect"
       };
       return &desc;
    }

@@ -46,7 +46,7 @@ namespace clap {
 
       static const constexpr size_t KPIPE_BUFSZ = 128 * 1024;
 
-      if (!_plugin._host.canUseTimerSupport() || !_plugin._host.canUseFdSupport())
+      if (!_plugin._host.canUseTimerSupport() || !_plugin._host.canUsePosixFdSupport())
          return false;
 
       auto &pathProvider = _plugin.pathProvider();
@@ -95,8 +95,8 @@ namespace clap {
       }
 
       _timerId = CLAP_INVALID_ID;
-      _plugin._host.timerSupportRegisterTimer(1000 / 60, &_timerId);
-      _plugin._host.fdSupportRegisterFD(sockets[0], CLAP_FD_READ | CLAP_FD_ERROR);
+      _plugin._host.timerSupportRegister(1000 / 60, &_timerId);
+      _plugin._host.posixFdSupportRegister(sockets[0], CLAP_POSIX_FD_READ | CLAP_POSIX_FD_ERROR);
       _channel.reset(new RemoteChannel(
          [this](const RemoteChannel::Message &msg) { onMessage(msg); }, true, *this, sockets[0]));
 
@@ -190,32 +190,32 @@ namespace clap {
 #endif
    }
 
-   void RemoteGui::modifyFd(clap_fd_flags flags) {
+   void RemoteGui::modifyFd(int flags) {
 #ifdef __unix
-      _plugin._host.fdSupportModifyFD(fd(), flags);
+      _plugin._host.posixFdSupportModify(posixFd(), flags);
 #endif
    }
 
    void RemoteGui::removeFd() {
 #ifdef __unix
-      _plugin._host.fdSupportUnregisterFD(fd());
+      _plugin._host.posixFdSupportUnregister(posixFd());
 #endif
-      _plugin._host.timerSupportUnregisterTimer(_timerId);
+      _plugin._host.timerSupportUnregister(_timerId);
    }
 
-   int RemoteGui::fd() const {
+   int RemoteGui::posixFd() const {
 #ifdef __unix
       return _channel ? _channel->fd() : -1;
 #endif
       return -1;
    }
 
-   void RemoteGui::onFd(clap_fd_flags flags) {
-      if (flags & CLAP_FD_READ)
+   void RemoteGui::onPosixFd(int flags) {
+      if (flags & CLAP_POSIX_FD_READ)
          _channel->tryReceive();
-      if (flags & CLAP_FD_WRITE)
+      if (flags & CLAP_POSIX_FD_WRITE)
          _channel->trySend();
-      if (flags & CLAP_FD_ERROR)
+      if (flags & CLAP_POSIX_FD_ERROR)
          _channel->onError();
    }
 

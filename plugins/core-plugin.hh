@@ -153,13 +153,13 @@ namespace clap {
       //------------------------//
       // clap_plugin_fd_support //
       //------------------------//
-      bool implementsFdSupport() const noexcept override { return true; }
-      void onFd(clap_fd fd, uint32_t flags) noexcept override;
+      bool implementsPosixFdSupport() const noexcept override { return true; }
+      void onPosixFd(int fd, int flags) noexcept override;
 
    protected:
       friend class RemoteGui;
 
-      void guiAdjust(clap_id paramId, double value, clap_event_param_flags flags);
+      void guiAdjust(clap_id paramId, double value, uint32_t flags);
       void processGuiEvents(const clap_process *process);
       uint32_t
       processEvents(const clap_process *process, uint32_t &index, uint32_t count, uint32_t time);
@@ -167,7 +167,7 @@ namespace clap {
       struct GuiToPluginValue {
          clap_id paramId;
          double value;
-         clap_event_param_flags flags;
+         uint32_t flags;
       };
 
       struct PluginToGuiValue {

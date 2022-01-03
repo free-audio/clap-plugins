@@ -15,6 +15,7 @@
 
 #include <clap/clap.h>
 #include <clap/helpers/reducing-param-queue.hh>
+#include <clap/helpers/events-heap.hh>
 
 #include "engine.hh"
 #include "plugin-param.hh"
@@ -118,10 +119,10 @@ private:
 
    static bool clapRegisterTimer(const clap_host *host, uint32_t period_ms, clap_id *timer_id);
    static bool clapUnregisterTimer(const clap_host *host, clap_id timer_id);
-   static bool clapRegisterFd(const clap_host *host, clap_fd fd, uint32_t flags);
-   static bool clapModifyFd(const clap_host *host, clap_fd fd, uint32_t flags);
-   static bool clapUnregisterFd(const clap_host *host, clap_fd fd);
-   void eventLoopSetFdNotifierFlags(clap_fd fd, uint32_t flags);
+   static bool clapRegisterPosixFd(const clap_host *host, int fd, int flags);
+   static bool clapModifyPosixFd(const clap_host *host, int fd, int flags);
+   static bool clapUnregisterPosixFd(const clap_host *host, int fd);
+   void eventLoopSetFdNotifierFlags(int fd, int flags);
 
    static bool clapThreadPoolRequestExec(const clap_host *host, uint32_t num_tasks);
 
@@ -160,10 +161,10 @@ private:
       PluginHost::clapRegisterTimer,
       PluginHost::clapUnregisterTimer,
    };
-   static const constexpr clap_host_fd_support _hostFdSupport = {
-      PluginHost::clapRegisterFd,
-      PluginHost::clapModifyFd,
-      PluginHost::clapUnregisterFd,
+   static const constexpr clap_host_posix_fd_support _hostPosixFdSupport = {
+      PluginHost::clapRegisterPosixFd,
+      PluginHost::clapModifyPosixFd,
+      PluginHost::clapUnregisterPosixFd,
    };
    static const constexpr clap_host_thread_check _hostThreadCheck = {
       PluginHost::clapIsMainThread,
@@ -188,7 +189,7 @@ private:
    const clap_plugin_gui_cocoa *_pluginGuiCocoa = nullptr;
    const clap_plugin_gui_free_standing *_pluginGuiFreeStanding = nullptr;
    const clap_plugin_timer_support *_pluginTimerSupport = nullptr;
-   const clap_plugin_fd_support *_pluginFdSupport = nullptr;
+   const clap_plugin_posix_fd_support *_pluginPosixFdSupport = nullptr;
    const clap_plugin_thread_pool *_pluginThreadPool = nullptr;
    const clap_plugin_preset_load *_pluginPresetLoad = nullptr;
    const clap_plugin_state *_pluginState = nullptr;
@@ -205,7 +206,7 @@ private:
       std::unique_ptr<QSocketNotifier> wr;
       std::unique_ptr<QSocketNotifier> err;
    };
-   std::unordered_map<clap_fd, std::unique_ptr<Notifiers>> _fds;
+   std::unordered_map<int, std::unique_ptr<Notifiers>> _fds;
 
    /* thread pool */
    std::vector<std::unique_ptr<QThread>> _threadPool;
@@ -217,8 +218,8 @@ private:
    /* process stuff */
    clap_audio_buffer _audioIn = {};
    clap_audio_buffer _audioOut = {};
-   std::vector<clap_event> _evIn;
-   std::vector<clap_event> _evOut;
+   clap::helpers::EventsHeap _evIn;
+   clap::helpers::EventsHeap _evOut;
    clap_process _process;
 
    /* param update queues */

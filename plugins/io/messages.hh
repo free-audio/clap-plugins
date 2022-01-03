@@ -43,7 +43,7 @@ namespace clap::messages {
 
       clap_id paramId;
       double value;
-      clap_event_param_flags flags;
+      uint32_t flags;
    };
 
    struct DefineParameterRequest final {

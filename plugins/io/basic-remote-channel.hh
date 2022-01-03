@@ -15,7 +15,7 @@ namespace clap {
    public:
       class EventControl {
       public:
-         virtual void modifyFd(clap_fd_flags flags) = 0;
+         virtual void modifyFd(int flags) = 0;
          virtual void removeFd() = 0;
       };
 

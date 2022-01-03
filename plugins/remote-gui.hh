@@ -34,11 +34,11 @@ namespace clap {
       void destroy() noexcept override;
 
       // RemoteChannel::EventControl
-      void modifyFd(clap_fd_flags flags) override;
+      void modifyFd(int flags) override;
       void removeFd() override;
 
-      int fd() const;
-      void onFd(clap_fd_flags flags);
+      int posixFd() const;
+      void onPosixFd(int flags);
 
       clap_id timerId() const noexcept { return _timerId; }
       void onTimer();

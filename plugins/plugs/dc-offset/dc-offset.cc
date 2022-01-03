@@ -16,8 +16,7 @@ namespace clap {
          nullptr,
          "0.1",
          "Example DC Offset plugin",
-         "utility",
-         CLAP_PLUGIN_AUDIO_EFFECT
+         "utility;audio_effect"
 
       };
       return &desc;

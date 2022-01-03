@@ -16,9 +16,7 @@ namespace clap {
          nullptr,
          "0.1",
          "Displays transport info",
-         "utility",
-         CLAP_PLUGIN_AUDIO_EFFECT
-
+         "utility;analyzer"
       };
       return &desc;
    }

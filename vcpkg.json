@@ -4,6 +4,7 @@
   "dependencies": [
     "boost-iostreams",
     "boost-serialization",
+    "catch2",
     "rtaudio",
     "rtmidi",
     {

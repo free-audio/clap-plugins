@@ -74,7 +74,7 @@ namespace clap {
    clap_process_status DcOffset::process(const clap_process *process) noexcept {
       float **in = process->audio_inputs[0].data32;
       float **out = process->audio_outputs[0].data32;
-      uint32_t evCount = process->in_events->size(process->in_events);
+      const uint32_t evCount = process->in_events->size(process->in_events);
       uint32_t nextEvIndex = 0;
       uint32_t N = process->frames_count;
 

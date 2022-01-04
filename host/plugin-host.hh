@@ -15,7 +15,7 @@
 
 #include <clap/clap.h>
 #include <clap/helpers/reducing-param-queue.hh>
-#include <clap/helpers/events-heap.hh>
+#include <clap/helpers/event-list.hh>
 
 #include "engine.hh"
 #include "plugin-param.hh"
@@ -218,8 +218,8 @@ private:
    /* process stuff */
    clap_audio_buffer _audioIn = {};
    clap_audio_buffer _audioOut = {};
-   clap::helpers::EventsHeap _evIn;
-   clap::helpers::EventsHeap _evOut;
+   clap::helpers::EventList _evIn;
+   clap::helpers::EventList _evOut;
    clap_process _process;
 
    /* param update queues */

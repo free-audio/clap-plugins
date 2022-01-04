@@ -193,6 +193,7 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       _hostWindow.reset(QWindow::fromWinId(rq.window));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
+         _quickView->show();
          sync();
          rp.succeed = true;
       }
@@ -216,6 +217,9 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
 #endif
 
       _remoteChannel->sendResponseAsync(rp, msg.cookie);
+
+      if (_hostWindow && _quickView)
+         _quickView->show();
       break;
    }
 
@@ -230,6 +234,7 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          sync();
+         _quickView->show();
          rp.succeed = true;
       }
 #endif

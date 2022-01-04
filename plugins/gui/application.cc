@@ -184,6 +184,16 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       break;
    }
 
+   case clap::messages::kSetScaleRequest: {
+      clap::messages::SetScaleRequest rq;
+      clap::messages::SetScaleResponse rp{false};
+
+      msg.get(rq);
+      // We ignore it.
+      _remoteChannel->sendResponseAsync(rp, msg.cookie);
+      break;
+   }
+
    case clap::messages::kAttachX11Request: {
       clap::messages::AttachX11Request rq;
       clap::messages::AttachResponse rp{false};

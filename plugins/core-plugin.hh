@@ -100,7 +100,7 @@ namespace clap {
       void guiRoundSize(uint32_t *width, uint32_t *height) noexcept override {
          guiSize(width, height);
       }
-      void guiSetScale(double scale) noexcept override;
+      bool guiSetScale(double scale) noexcept override;
       void guiShow() noexcept override;
       void guiHide() noexcept override;
       void guiDefineParameters();

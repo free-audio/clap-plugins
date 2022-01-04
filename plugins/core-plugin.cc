@@ -129,9 +129,10 @@ namespace clap {
       return _remoteGui->size(width, height);
    }
 
-   void CorePlugin::guiSetScale(double scale) noexcept {
+   bool CorePlugin::guiSetScale(double scale) noexcept {
       if (_remoteGui)
-         _remoteGui->setScale(scale);
+         return _remoteGui->setScale(scale);
+      return false;
    }
 
    void CorePlugin::guiShow() noexcept {

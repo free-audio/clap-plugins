@@ -26,7 +26,7 @@ namespace clap {
       bool attachX11(const char *display_name, unsigned long window) noexcept override;
 
       bool size(uint32_t *width, uint32_t *height) noexcept override;
-      void setScale(double scale) noexcept override;
+      bool setScale(double scale) noexcept override;
 
       bool show() noexcept override;
       bool hide() noexcept override;

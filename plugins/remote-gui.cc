@@ -253,8 +253,14 @@ namespace clap {
       return true;
    }
 
-   void RemoteGui::setScale(double scale) noexcept {
-      _channel->sendRequestAsync(messages::SetScaleRequest{scale});
+   bool RemoteGui::setScale(double scale) noexcept {
+      messages::SetScaleRequest request{scale};
+      messages::SetScaleResponse response;
+
+      if (!_channel->sendRequestSync(request, response))
+         return false;
+
+      return response.succeed;
    }
 
    bool RemoteGui::show() noexcept {

@@ -5,16 +5,18 @@
 #include <sstream>
 #include <thread>
 
-#include <clap/helpers/plugin.hxx>
 #include <clap/helpers/host-proxy.hxx>
+#include <clap/helpers/plugin.hxx>
 
 #include "core-plugin.hh"
 #include "stream-helper.hh"
 
 namespace clap {
 
-   template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
-   template class helpers::HostProxy<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
+   template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate,
+                                  helpers::CheckingLevel::Maximal>;
+   template class helpers::HostProxy<helpers::MisbehaviourHandler::Terminate,
+                                     helpers::CheckingLevel::Maximal>;
 
    CorePlugin::CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
                           const clap_plugin_descriptor *desc,
@@ -247,40 +249,42 @@ namespace clap {
             return std::min(hdr->time, process->frames_count);
          }
 
-         switch (hdr->type) {
-         case CLAP_EVENT_PARAM_VALUE: {
-            auto ev = reinterpret_cast<const clap_event_param_value *>(hdr);
-            auto p = reinterpret_cast<Parameter *>(ev->cookie);
-            if (p) {
-               if (p->info().id != ev->param_id) {
-                  std::ostringstream os;
-                  os << "Host provided invalid cookie for param id: " << ev->param_id;
-                  hostMisbehaving(os.str());
-                  std::terminate();
+         if (hdr->space_id == CLAP_CORE_EVENT_SPACE_ID) {
+            switch (hdr->type) {
+            case CLAP_EVENT_PARAM_VALUE: {
+               auto ev = reinterpret_cast<const clap_event_param_value *>(hdr);
+               auto p = reinterpret_cast<Parameter *>(ev->cookie);
+               if (p) {
+                  if (p->info().id != ev->param_id) {
+                     std::ostringstream os;
+                     os << "Host provided invalid cookie for param id: " << ev->param_id;
+                     hostMisbehaving(os.str());
+                     std::terminate();
+                  }
+
+                  p->setValueSmoothed(ev->value, _paramSmoothingDuration);
+                  _pluginToGuiQueue.set(p->info().id, {ev->value, p->modulation()});
                }
-
-               p->setValueSmoothed(ev->value, _paramSmoothingDuration);
-               _pluginToGuiQueue.set(p->info().id, {ev->value, p->modulation()});
+               break;
             }
-            break;
-         }
 
-         case CLAP_EVENT_PARAM_MOD: {
-            auto ev = reinterpret_cast<const clap_event_param_mod *>(hdr);
-            auto p = reinterpret_cast<Parameter *>(ev->cookie);
-            if (p) {
-               if (p->info().id != ev->param_id) {
-                  std::ostringstream os;
-                  os << "Host provided invalid cookie for param id: " << ev->param_id;
-                  hostMisbehaving(os.str());
-                  std::terminate();
+            case CLAP_EVENT_PARAM_MOD: {
+               auto ev = reinterpret_cast<const clap_event_param_mod *>(hdr);
+               auto p = reinterpret_cast<Parameter *>(ev->cookie);
+               if (p) {
+                  if (p->info().id != ev->param_id) {
+                     std::ostringstream os;
+                     os << "Host provided invalid cookie for param id: " << ev->param_id;
+                     hostMisbehaving(os.str());
+                     std::terminate();
+                  }
+
+                  p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
+                  _pluginToGuiQueue.set(p->info().id, {p->value(), ev->amount});
                }
-
-               p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
-               _pluginToGuiQueue.set(p->info().id, {p->value(), ev->amount});
+               break;
             }
-            break;
-         }
+            }
          }
       }
 

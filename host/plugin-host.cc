@@ -596,11 +596,25 @@ void PluginHost::eventLoopSetFdNotifierFlags(int fd, int flags) {
       it->second->err->setEnabled(false);
 }
 
-bool PluginHost::clapGuiResize(const clap_host *host, uint32_t width, uint32_t height) {
+bool PluginHost::clapGuiRequestResize(const clap_host *host, uint32_t width, uint32_t height) {
    checkForMainThread();
 
    Application::instance().mainWindow()->resizePluginView(width, height);
    return true;
+}
+
+bool PluginHost::clapGuiRequestShow(const clap_host *host) {
+   checkForMainThread();
+
+   Application::instance().mainWindow()->showPluginWindow();
+   return false;
+}
+
+bool PluginHost::clapGuiRequestHide(const clap_host *host) {
+   checkForMainThread();
+
+   Application::instance().mainWindow()->hidePluginWindow();
+   return false;
 }
 
 void PluginHost::processBegin(int nframes) {

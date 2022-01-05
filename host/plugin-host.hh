@@ -129,7 +129,9 @@ private:
    static const void *clapExtension(const clap_host *host, const char *extension);
 
    /* clap host gui callbacks */
-   static bool clapGuiResize(const clap_host *host, uint32_t width, uint32_t height);
+   static bool clapGuiRequestResize(const clap_host *host, uint32_t width, uint32_t height);
+   static bool clapGuiRequestShow(const clap_host *host);
+   static bool clapGuiRequestHide(const clap_host *host);
 
    static void clapStateMarkDirty(const clap_host *host);
 
@@ -145,7 +147,9 @@ private:
       PluginHost::clapLog,
    };
    static const constexpr clap_host_gui _hostGui = {
-      PluginHost::clapGuiResize,
+      PluginHost::clapGuiRequestResize,
+      PluginHost::clapGuiRequestShow,
+      PluginHost::clapGuiRequestHide,
    };
    // static const constexpr clap_host_audio_ports hostAudioPorts_;
    // static const constexpr clap_host_audio_ports_config hostAudioPortsConfig_;

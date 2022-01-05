@@ -16,6 +16,7 @@ namespace clap::messages {
 
       // Gui, Host->Plugin
       kSetScaleRequest,
+      kSetScaleResponse,
       kSizeRequest,
       kSizeResponse,
       kRoundSizeRequest,
@@ -43,7 +44,7 @@ namespace clap::messages {
 
       clap_id paramId;
       double value;
-      clap_event_param_flags flags;
+      uint32_t flags;
    };
 
    struct DefineParameterRequest final {
@@ -72,6 +73,11 @@ namespace clap::messages {
    struct SetScaleRequest final {
       static const constexpr Type type = kSetScaleRequest;
       double scale;
+   };
+
+   struct SetScaleResponse final {
+      static const constexpr Type type = kSetScaleResponse;
+      bool succeed;
    };
 
    struct SizeRequest final {

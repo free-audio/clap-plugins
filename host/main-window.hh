@@ -23,6 +23,14 @@ public:
    void showPluginQuickControlsWindow();
    void resizePluginView(int width, int height);
 
+   void showPluginWindow() {
+      _pluginViewWidget->show();
+   }
+
+   void hidePluginWindow() {
+      _pluginViewWidget->hide();
+   }
+
 private:
    void createMenu();
 

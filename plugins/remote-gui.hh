@@ -27,7 +27,7 @@ namespace clap {
       bool attachX11(const char *display_name, unsigned long window) noexcept override;
 
       bool size(uint32_t *width, uint32_t *height) noexcept override;
-      void setScale(double scale) noexcept override;
+      bool setScale(double scale) noexcept override;
 
       bool show() noexcept override;
       bool hide() noexcept override;
@@ -35,11 +35,11 @@ namespace clap {
       void destroy() noexcept override;
 
       // RemoteChannel::EventControl
-      void modifyFd(clap_fd_flags flags) override;
+      void modifyFd(int flags) override;
       void removeFd() override;
 
-      int fd() const;
-      void onFd(clap_fd_flags flags);
+      int posixFd() const;
+      void onPosixFd(int flags);
 
       void registerTimer();
       clap_id timerId() const noexcept { return _timerId; }

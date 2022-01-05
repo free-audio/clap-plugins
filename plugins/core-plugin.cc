@@ -129,9 +129,10 @@ namespace clap {
       return _remoteGui->size(width, height);
    }
 
-   void CorePlugin::guiSetScale(double scale) noexcept {
+   bool CorePlugin::guiSetScale(double scale) noexcept {
       if (_remoteGui)
-         _remoteGui->setScale(scale);
+         return _remoteGui->setScale(scale);
+      return false;
    }
 
    void CorePlugin::guiShow() noexcept {
@@ -144,10 +145,10 @@ namespace clap {
          _remoteGui->hide();
    }
 
-   void CorePlugin::onFd(clap_fd fd, uint32_t flags) noexcept {
+   void CorePlugin::onPosixFd(int fd, int flags) noexcept {
 #ifdef __unix
-      if (_remoteGui && fd == _remoteGui->fd())
-         _remoteGui->onFd(flags);
+      if (_remoteGui && fd == _remoteGui->posixFd())
+         _remoteGui->onPosixFd(flags);
 #endif
    }
 
@@ -182,7 +183,7 @@ namespace clap {
       return false;
    }
 
-   void CorePlugin::guiAdjust(clap_id paramId, double value, clap_event_param_flags flags) {
+   void CorePlugin::guiAdjust(clap_id paramId, double value, uint32_t flags) {
       GuiToPluginValue item{paramId, value, flags};
 
       // very highly likely to succeed
@@ -202,17 +203,19 @@ namespace clap {
             return;
          p->setValueSmoothed(value.value, std::max<int>(process->frames_count, 128));
 
-         clap_event ev;
-         ev.time = 0;
-         ev.type = CLAP_EVENT_PARAM_VALUE;
-         ev.param_value.param_id = value.paramId;
-         ev.param_value.value = value.value;
-         ev.param_value.channel = -1;
-         ev.param_value.key = -1;
-         ev.param_value.flags = value.flags;
-         ev.param_value.cookie = p;
+         clap_event_param_value ev;
+         ev.header.time = 0;
+         ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+         ev.header.type = CLAP_EVENT_PARAM_VALUE;
+         ev.header.size = sizeof(ev);
+         ev.header.flags = value.flags;
+         ev.param_id = value.paramId;
+         ev.value = value.value;
+         ev.channel = -1;
+         ev.key = -1;
+         ev.cookie = p;
 
-         process->out_events->push_back(process->out_events, &ev);
+         process->out_events->push_back(process->out_events, &ev.header);
       }
 
       /* We keep a copy of the transport to be able to send it to the plugin GUI */
@@ -232,48 +235,49 @@ namespace clap {
                                       uint32_t count,
                                       uint32_t time) {
       for (; index < count; ++index) {
-         auto ev = process->in_events->get(process->in_events, index);
+         auto hdr = process->in_events->get(process->in_events, index);
 
-         if (ev->time < time) {
+         if (hdr->time < time) {
             hostMisbehaving("Events must be ordered by time");
             std::terminate();
          }
 
-         if (ev->time > time) {
+         if (hdr->time > time) {
             // This event is in the future
-            return std::min(ev->time, process->frames_count);
+            return std::min(hdr->time, process->frames_count);
          }
 
-         switch (ev->type) {
+         switch (hdr->type) {
          case CLAP_EVENT_PARAM_VALUE: {
-            auto p = reinterpret_cast<Parameter *>(ev->param_value.cookie);
+            auto ev = reinterpret_cast<const clap_event_param_value *>(hdr);
+            auto p = reinterpret_cast<Parameter *>(ev->cookie);
             if (p) {
-               if (p->info().id != ev->param_value.param_id) {
+               if (p->info().id != ev->param_id) {
                   std::ostringstream os;
-                  os << "Host provided invalid cookie for param id: " << ev->param_value.param_id;
+                  os << "Host provided invalid cookie for param id: " << ev->param_id;
                   hostMisbehaving(os.str());
                   std::terminate();
                }
 
-               p->setValueSmoothed(ev->param_value.value, _paramSmoothingDuration);
-               // p->setValueImmediately(ev->param_value.value);
-               _pluginToGuiQueue.set(p->info().id, {ev->param_value.value, p->modulation()});
+               p->setValueSmoothed(ev->value, _paramSmoothingDuration);
+               _pluginToGuiQueue.set(p->info().id, {ev->value, p->modulation()});
             }
             break;
          }
 
          case CLAP_EVENT_PARAM_MOD: {
-            auto p = reinterpret_cast<Parameter *>(ev->param_mod.cookie);
+            auto ev = reinterpret_cast<const clap_event_param_mod *>(hdr);
+            auto p = reinterpret_cast<Parameter *>(ev->cookie);
             if (p) {
-               if (p->info().id != ev->param_mod.param_id) {
+               if (p->info().id != ev->param_id) {
                   std::ostringstream os;
-                  os << "Host provided invalid cookie for param id: " << ev->param_mod.param_id;
+                  os << "Host provided invalid cookie for param id: " << ev->param_id;
                   hostMisbehaving(os.str());
                   std::terminate();
                }
 
-               p->setModulationSmoothed(ev->param_mod.amount, _paramSmoothingDuration);
-               _pluginToGuiQueue.set(p->info().id, {p->value(), ev->param_mod.amount});
+               p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
+               _pluginToGuiQueue.set(p->info().id, {p->value(), ev->amount});
             }
             break;
          }

@@ -14,7 +14,7 @@ namespace clap {
                          int socket);
       ~PosixRemoteChannel() override;
 
-      clap_fd fd() const noexcept { return _socket; }
+      int fd() const noexcept { return _socket; }
       bool isOpen() const noexcept override { return _socket != -1; }
 
       void close() override;
@@ -27,10 +27,10 @@ namespace clap {
 
       void runOnce() override;
 
-      void modifyFd(clap_fd_flags flags);
+      void modifyFd(int flags);
 
       EventControl &_evControl;
       int _socket;
-      clap_fd_flags _ioFlags = 0;
+      int _ioFlags = 0;
    };
 } // namespace clap

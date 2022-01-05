@@ -107,7 +107,8 @@ bool PluginHost::load(const QString &path, int pluginIndex) {
 
    _pluginEntry->init(path.toStdString().c_str());
 
-   _pluginFactory = static_cast<const clap_plugin_factory *>(_pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
+   _pluginFactory =
+      static_cast<const clap_plugin_factory *>(_pluginEntry->get_factory(CLAP_PLUGIN_FACTORY_ID));
 
    auto count = _pluginFactory->get_plugin_count(_pluginFactory);
    if (pluginIndex > count) {
@@ -156,7 +157,7 @@ void PluginHost::initPluginExtensions() {
    initPluginExtension(_pluginGuiCocoa, CLAP_EXT_GUI_COCOA);
    initPluginExtension(_pluginGuiFreeStanding, CLAP_EXT_GUI_FREE_STANDING);
    initPluginExtension(_pluginTimerSupport, CLAP_EXT_TIMER_SUPPORT);
-   initPluginExtension(_pluginFdSupport, CLAP_EXT_FD_SUPPORT);
+   initPluginExtension(_pluginPosixFdSupport, CLAP_EXT_POSIX_FD_SUPPORT);
    initPluginExtension(_pluginThreadPool, CLAP_EXT_THREAD_POOL);
    initPluginExtension(_pluginPresetLoad, CLAP_EXT_PRESET_LOAD);
    initPluginExtension(_pluginState, CLAP_EXT_STATE);
@@ -186,7 +187,7 @@ void PluginHost::unload() {
    _pluginGuiWin32 = nullptr;
    _pluginGuiFreeStanding = nullptr;
    _pluginTimerSupport = nullptr;
-   _pluginFdSupport = nullptr;
+   _pluginPosixFdSupport = nullptr;
    _pluginThreadPool = nullptr;
    _pluginPresetLoad = nullptr;
    _pluginState = nullptr;
@@ -388,8 +389,8 @@ const void *PluginHost::clapExtension(const clap_host *host, const char *extensi
       return &h->_hostThreadPool;
    if (!strcmp(extension, CLAP_EXT_TIMER_SUPPORT))
       return &h->_hostTimerSupport;
-   if (!strcmp(extension, CLAP_EXT_FD_SUPPORT))
-      return &h->_hostFdSupport;
+   if (!strcmp(extension, CLAP_EXT_POSIX_FD_SUPPORT))
+      return &h->_hostPosixFdSupport;
    if (!strcmp(extension, CLAP_EXT_PARAMS))
       return &h->_hostParams;
    if (!strcmp(extension, CLAP_EXT_QUICK_CONTROLS))
@@ -414,9 +415,13 @@ PluginHost *PluginHost::fromHost(const clap_host *host) {
    return h;
 }
 
-bool PluginHost::clapIsMainThread(const clap_host *host) { return g_thread_type == ThreadType::MainThread; }
+bool PluginHost::clapIsMainThread(const clap_host *host) {
+   return g_thread_type == ThreadType::MainThread;
+}
 
-bool PluginHost::clapIsAudioThread(const clap_host *host) { return g_thread_type == ThreadType::AudioThread; }
+bool PluginHost::clapIsAudioThread(const clap_host *host) {
+   return g_thread_type == ThreadType::AudioThread;
+}
 
 void PluginHost::checkForMainThread() {
    if (g_thread_type != ThreadType::MainThread)
@@ -495,12 +500,12 @@ bool PluginHost::clapUnregisterTimer(const clap_host *host, clap_id timer_id) {
    return true;
 }
 
-bool PluginHost::clapRegisterFd(const clap_host *host, clap_fd fd, uint32_t flags) {
+bool PluginHost::clapRegisterPosixFd(const clap_host *host, int fd, int flags) {
    checkForMainThread();
 
    auto h = fromHost(host);
    h->initPluginExtensions();
-   if (!h->_pluginFdSupport || !h->_pluginFdSupport->on_fd)
+   if (!h->_pluginPosixFdSupport || !h->_pluginPosixFdSupport->on_fd)
       throw std::logic_error("Called register_fd() without providing clap_plugin_fd_support to "
                              "receive the fd event.");
 
@@ -514,11 +519,11 @@ bool PluginHost::clapRegisterFd(const clap_host *host, clap_fd fd, uint32_t flag
    return true;
 }
 
-bool PluginHost::clapModifyFd(const clap_host *host, clap_fd fd, uint32_t flags) {
+bool PluginHost::clapModifyPosixFd(const clap_host *host, int fd, int flags) {
    checkForMainThread();
 
    auto h = fromHost(host);
-   if (!h->_pluginFdSupport || !h->_pluginFdSupport->on_fd)
+   if (!h->_pluginPosixFdSupport || !h->_pluginPosixFdSupport->on_fd)
       throw std::logic_error("Called modify_fd() without providing clap_plugin_fd_support to "
                              "receive the fd event.");
 
@@ -532,11 +537,11 @@ bool PluginHost::clapModifyFd(const clap_host *host, clap_fd fd, uint32_t flags)
    return true;
 }
 
-bool PluginHost::clapUnregisterFd(const clap_host *host, clap_fd fd) {
+bool PluginHost::clapUnregisterPosixFd(const clap_host *host, int fd) {
    checkForMainThread();
 
    auto h = fromHost(host);
-   if (!h->_pluginFdSupport || !h->_pluginFdSupport->on_fd)
+   if (!h->_pluginPosixFdSupport || !h->_pluginPosixFdSupport->on_fd)
       throw std::logic_error("Called unregister_fd() without providing clap_plugin_fd_support to "
                              "receive the fd event.");
 
@@ -548,42 +553,42 @@ bool PluginHost::clapUnregisterFd(const clap_host *host, clap_fd fd) {
    return true;
 }
 
-void PluginHost::eventLoopSetFdNotifierFlags(clap_fd fd, uint32_t flags) {
+void PluginHost::eventLoopSetFdNotifierFlags(int fd, int flags) {
    checkForMainThread();
 
    auto it = _fds.find(fd);
    Q_ASSERT(it != _fds.end());
 
-   if (flags & CLAP_FD_READ) {
+   if (flags & CLAP_POSIX_FD_READ) {
       if (!it->second->rd) {
          it->second->rd.reset(new QSocketNotifier((qintptr)fd, QSocketNotifier::Read));
          QObject::connect(it->second->rd.get(), &QSocketNotifier::activated, [this, fd] {
             checkForMainThread();
-            _pluginFdSupport->on_fd(this->_plugin, fd, CLAP_FD_READ);
+            _pluginPosixFdSupport->on_fd(this->_plugin, fd, CLAP_POSIX_FD_READ);
          });
       }
       it->second->rd->setEnabled(true);
    } else if (it->second->rd)
       it->second->rd->setEnabled(false);
 
-   if (flags & CLAP_FD_WRITE) {
+   if (flags & CLAP_POSIX_FD_WRITE) {
       if (!it->second->wr) {
          it->second->wr.reset(new QSocketNotifier((qintptr)fd, QSocketNotifier::Write));
          QObject::connect(it->second->wr.get(), &QSocketNotifier::activated, [this, fd] {
             checkForMainThread();
-            _pluginFdSupport->on_fd(this->_plugin, fd, CLAP_FD_WRITE);
+            _pluginPosixFdSupport->on_fd(this->_plugin, fd, CLAP_POSIX_FD_WRITE);
          });
       }
       it->second->wr->setEnabled(true);
    } else if (it->second->wr)
       it->second->wr->setEnabled(false);
 
-   if (flags & CLAP_FD_ERROR) {
+   if (flags & CLAP_POSIX_FD_ERROR) {
       if (!it->second->err) {
          it->second->err.reset(new QSocketNotifier((qintptr)fd, QSocketNotifier::Exception));
          QObject::connect(it->second->err.get(), &QSocketNotifier::activated, [this, fd] {
             checkForMainThread();
-            _pluginFdSupport->on_fd(this->_plugin, fd, CLAP_FD_ERROR);
+            _pluginPosixFdSupport->on_fd(this->_plugin, fd, CLAP_POSIX_FD_ERROR);
          });
       }
       it->second->err->setEnabled(true);
@@ -591,11 +596,25 @@ void PluginHost::eventLoopSetFdNotifierFlags(clap_fd fd, uint32_t flags) {
       it->second->err->setEnabled(false);
 }
 
-bool PluginHost::clapGuiResize(const clap_host *host, uint32_t width, uint32_t height) {
+bool PluginHost::clapGuiRequestResize(const clap_host *host, uint32_t width, uint32_t height) {
    checkForMainThread();
 
    Application::instance().mainWindow()->resizePluginView(width, height);
    return true;
+}
+
+bool PluginHost::clapGuiRequestShow(const clap_host *host) {
+   checkForMainThread();
+
+   Application::instance().mainWindow()->showPluginWindow();
+   return false;
+}
+
+bool PluginHost::clapGuiRequestHide(const clap_host *host) {
+   checkForMainThread();
+
+   Application::instance().mainWindow()->hidePluginWindow();
+   return false;
 }
 
 void PluginHost::processBegin(int nframes) {
@@ -615,29 +634,35 @@ void PluginHost::processEnd(int nframes) {
 void PluginHost::processNoteOn(int sampleOffset, int channel, int key, int velocity) {
    checkForAudioThread();
 
-   clap_event ev;
-   ev.type = CLAP_EVENT_NOTE_ON;
-   ev.time = sampleOffset;
-   ev.note.port_index = 0;
-   ev.note.key = key;
-   ev.note.channel = channel;
-   ev.note.velocity = velocity / 127.0;
+   clap_event_note ev;
+   ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+   ev.header.type = CLAP_EVENT_NOTE_ON;
+   ev.header.time = sampleOffset;
+   ev.header.flags = 0;
+   ev.header.size = sizeof(ev);
+   ev.port_index = 0;
+   ev.key = key;
+   ev.channel = channel;
+   ev.velocity = velocity / 127.0;
 
-   _evIn.push_back(ev);
+   _evIn.push(&ev.header);
 }
 
 void PluginHost::processNoteOff(int sampleOffset, int channel, int key, int velocity) {
    checkForAudioThread();
 
-   clap_event ev;
-   ev.type = CLAP_EVENT_NOTE_OFF;
-   ev.time = sampleOffset;
-   ev.note.port_index = 0;
-   ev.note.key = key;
-   ev.note.channel = channel;
-   ev.note.velocity = velocity / 127.0;
+   clap_event_note ev;
+   ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+   ev.header.type = CLAP_EVENT_NOTE_OFF;
+   ev.header.time = sampleOffset;
+   ev.header.flags = 0;
+   ev.header.size = sizeof(ev);
+   ev.port_index = 0;
+   ev.key = key;
+   ev.channel = channel;
+   ev.velocity = velocity / 127.0;
 
-   _evIn.push_back(ev);
+   _evIn.push(&ev.header);
 }
 
 void PluginHost::processNoteAt(int sampleOffset, int channel, int key, int pressure) {
@@ -655,42 +680,18 @@ void PluginHost::processPitchBend(int sampleOffset, int channel, int value) {
 void PluginHost::processCC(int sampleOffset, int channel, int cc, int value) {
    checkForAudioThread();
 
-   clap_event ev;
+   clap_event_midi ev;
+   ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+   ev.header.type = CLAP_EVENT_MIDI;
+   ev.header.time = sampleOffset;
+   ev.header.flags = 0;
+   ev.header.size = sizeof(ev);
+   ev.port_index = 0;
+   ev.data[0] = 0xB0 | channel;
+   ev.data[1] = cc;
+   ev.data[2] = value;
 
-   ev.type = CLAP_EVENT_MIDI;
-   ev.time = sampleOffset;
-   ev.midi.port_index = 0;
-   ev.midi.data[0] = 0xB0 | channel;
-   ev.midi.data[1] = cc;
-   ev.midi.data[2] = value;
-
-   _evIn.push_back(ev);
-}
-
-static uint32_t clap_host_event_list_size(const struct clap_event_list *list) {
-   PluginHost::checkForAudioThread();
-
-   auto vec = reinterpret_cast<std::vector<clap_event> *>(list->ctx);
-   return vec->size();
-}
-
-const struct clap_event *clap_host_event_list_get(const struct clap_event_list *list,
-                                                  uint32_t index) {
-   PluginHost::checkForAudioThread();
-
-   auto vec = reinterpret_cast<std::vector<clap_event> *>(list->ctx);
-   if (index < 0 || index >= vec->size())
-      return nullptr;
-   return vec->data() + index;
-}
-
-// Makes a copy of the event
-void clap_host_event_list_push_back(const struct clap_event_list *list,
-                                    const struct clap_event *event) {
-   PluginHost::checkForAudioThread();
-
-   auto vec = reinterpret_cast<std::vector<clap_event> *>(list->ctx);
-   vec->push_back(*event);
+   _evIn.push(&ev.header);
 }
 
 void PluginHost::process() {
@@ -714,14 +715,8 @@ void PluginHost::process() {
 
    _process.transport = nullptr;
 
-   clap_event_list in_ev = {
-      &_evIn, clap_host_event_list_size, clap_host_event_list_get, clap_host_event_list_push_back};
-
-   clap_event_list out_ev = {
-      &_evOut, clap_host_event_list_size, clap_host_event_list_get, clap_host_event_list_push_back};
-
-   _process.in_events = &in_ev;
-   _process.out_events = &out_ev;
+   _process.in_events = _evIn.clapInputEvents();
+   _process.out_events = _evOut.clapOutputEvents();
 
    _process.audio_inputs = &_audioIn;
    _process.audio_inputs_count = 1;
@@ -731,30 +726,35 @@ void PluginHost::process() {
    _evOut.clear();
    _appToEngineValueQueue.consume(
       [this](clap_id param_id, const AppToEngineParamQueueValue &value) {
-         clap_event ev;
-         ev.time = 0;
-         ev.type = CLAP_EVENT_PARAM_VALUE;
-         ev.param_value.param_id = param_id;
-         ev.param_value.cookie = value.cookie;
-         ev.param_value.port_index = 0;
-         ev.param_value.key = -1;
-         ev.param_value.channel = -1;
-         ev.param_value.value = value.value;
-         ev.param_value.flags = 0;
-         _evIn.push_back(ev);
+         clap_event_param_value ev;
+         ev.header.time = 0;
+         ev.header.type = CLAP_EVENT_PARAM_VALUE;
+         ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+         ev.header.flags = 0;
+         ev.header.size = sizeof(ev);
+         ev.param_id = param_id;
+         ev.cookie = value.cookie;
+         ev.port_index = 0;
+         ev.key = -1;
+         ev.channel = -1;
+         ev.value = value.value;
+         _evIn.push(&ev.header);
       });
 
    _appToEngineModQueue.consume([this](clap_id param_id, const AppToEngineParamQueueValue &value) {
-      clap_event ev;
-      ev.time = 0;
-      ev.type = CLAP_EVENT_PARAM_MOD;
-      ev.param_mod.param_id = param_id;
-      ev.param_mod.cookie = value.cookie;
-      ev.param_mod.port_index = 0;
-      ev.param_mod.key = -1;
-      ev.param_mod.channel = -1;
-      ev.param_mod.amount = value.value;
-      _evIn.push_back(ev);
+      clap_event_param_mod ev;
+      ev.header.time = 0;
+      ev.header.type = CLAP_EVENT_PARAM_MOD;
+      ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+      ev.header.flags = 0;
+      ev.header.size = sizeof(ev);
+      ev.param_id = param_id;
+      ev.cookie = value.cookie;
+      ev.port_index = 0;
+      ev.key = -1;
+      ev.channel = -1;
+      ev.amount = value.value;
+      _evIn.push(&ev.header);
    });
 
    if (isPluginSleeping()) {
@@ -777,25 +777,27 @@ void PluginHost::process() {
    if (_plugin && _plugin->process && isPluginProcessing())
       status = _plugin->process(_plugin, &_process);
 
-   for (auto &ev : _evOut) {
-      switch (ev.type) {
+   for (uint32_t i = 0; i < _evOut.size(); ++i) {
+      auto h = _evOut.get(i);
+      switch (h->type) {
       case CLAP_EVENT_PARAM_VALUE: {
-         bool &isAdj = _isAdjusting[ev.param_value.param_id];
+         auto ev = reinterpret_cast<const clap_event_param_value *>(h);
+         bool &isAdj = _isAdjusting[ev->param_id];
 
-         if (ev.param_value.flags & CLAP_EVENT_PARAM_BEGIN_ADJUST) {
+         if (ev->header.flags & CLAP_EVENT_BEGIN_ADJUST) {
             if (isAdj)
                throw std::logic_error("The plugin sent BEGIN_ADJUST twice");
             isAdj = true;
          }
 
-         if (ev.param_value.flags & CLAP_EVENT_PARAM_END_ADJUST) {
+         if (ev->header.flags & CLAP_EVENT_END_ADJUST) {
             if (!isAdj)
                throw std::logic_error(
                   "The plugin sent END_ADJUST without a preceding BEGIN_ADJUST");
             isAdj = false;
          }
 
-         _engineToAppValueQueue.set(ev.param_value.param_id, {ev.param_value.value, isAdj});
+         _engineToAppValueQueue.set(ev->param_id, {ev->value, isAdj});
          break;
       }
       }
@@ -1016,13 +1018,13 @@ void PluginHost::clapParamsRescan(const clap_host *host, uint32_t flags) {
       h->paramsChanged();
 }
 
-void PluginHost::clapParamsClear(const clap_host *host, clap_id param_id, clap_param_clear_flags flags)
-{
+void PluginHost::clapParamsClear(const clap_host *host,
+                                 clap_id param_id,
+                                 clap_param_clear_flags flags) {
    checkForMainThread();
 }
 
-void PluginHost::clapParamsRequestFlush(const clap_host *host)
-{
+void PluginHost::clapParamsRequestFlush(const clap_host *host) {
    // Nothing to do we always flush and always process
 }
 

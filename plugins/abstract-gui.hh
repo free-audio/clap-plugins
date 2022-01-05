@@ -18,7 +18,7 @@ namespace clap {
       virtual bool attachX11(const char *display_name, unsigned long window) noexcept = 0;
 
       virtual bool size(uint32_t *width, uint32_t *height) noexcept = 0;
-      virtual void setScale(double scale) noexcept = 0;
+      virtual bool setScale(double scale) noexcept = 0;
 
       virtual bool show() noexcept = 0;
       virtual bool hide() noexcept = 0;

@@ -132,10 +132,10 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
    _quickView->setSource(QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
 }
 
-void Application::modifyFd(clap_fd_flags flags) {
-   _socketReadNotifier->setEnabled(flags & CLAP_FD_READ);
-   _socketWriteNotifier->setEnabled(flags & CLAP_FD_WRITE);
-   _socketErrorNotifier->setEnabled(flags & CLAP_FD_ERROR);
+void Application::modifyFd(int flags) {
+   _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
+   _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
+   _socketErrorNotifier->setEnabled(flags & CLAP_POSIX_FD_ERROR);
 }
 
 void Application::removeFd() {
@@ -185,6 +185,16 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       break;
    }
 
+   case clap::messages::kSetScaleRequest: {
+      clap::messages::SetScaleRequest rq;
+      clap::messages::SetScaleResponse rp{false};
+
+      msg.get(rq);
+      // We ignore it.
+      _remoteChannel->sendResponseAsync(rp, msg.cookie);
+      break;
+   }
+
    case clap::messages::kAttachX11Request: {
       clap::messages::AttachX11Request rq;
       clap::messages::AttachResponse rp{false};
@@ -194,6 +204,7 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       _hostWindow.reset(QWindow::fromWinId(rq.window));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
+         _quickView->show();
          sync();
          rp.succeed = true;
       }
@@ -217,6 +228,9 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
 #endif
 
       _remoteChannel->sendResponseAsync(rp, msg.cookie);
+
+      if (_hostWindow && _quickView)
+         _quickView->show();
       break;
    }
 
@@ -231,6 +245,7 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          sync();
+         _quickView->show();
          rp.succeed = true;
       }
 #endif

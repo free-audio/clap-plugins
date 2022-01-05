@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QApplication>
+#include <QGuiApplication>
 #include <QSocketNotifier>
 #include <QWindow>
 
@@ -10,18 +10,18 @@
 
 class QQuickView;
 
-class Application : public QApplication, public clap::RemoteChannel::EventControl {
+class Application : public QGuiApplication, public clap::RemoteChannel::EventControl {
    Q_OBJECT;
-   using super = QApplication;
+   using super = QGuiApplication;
 
 public:
    Application(int& argc, char **argv);
 
    clap::RemoteChannel& remoteChannel() const { return *_remoteChannel; }
-   void modifyFd(clap_fd_flags flags) override;
+   void modifyFd(int flags) override;
    void removeFd() override;
 
-   static Application& instance() { return *dynamic_cast<Application *>(QApplication::instance()); }
+   static Application& instance() { return *dynamic_cast<Application *>(super::instance()); }
 
 private:
    void onMessage(const clap::RemoteChannel::Message& msg);

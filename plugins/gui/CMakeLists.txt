@@ -34,4 +34,4 @@ if(false)
 endif()
 
 set_target_properties(clap-gui PROPERTIES CXX_STANDARD 17)
-install(TARGETS clap-gui DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+install(TARGETS clap-gui DESTINATION "bin")

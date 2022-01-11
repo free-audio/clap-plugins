@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef __unix
+#if (defined(__unix__) || defined(__APPLE__))
 #   include "posix-remote-channel.hh"
 
 namespace clap {

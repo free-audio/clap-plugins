@@ -241,7 +241,7 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       msg.get(rq);
 
 #ifdef Q_OS_MACOS
-      hostWindow_.reset(QWindow::fromWinId(rq.nsView));
+      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.nsView)));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          sync();

@@ -1,4 +1,4 @@
-#ifdef __unix__
+#if (defined(__unix__) || defined(__APPLE__))
 #   include <fcntl.h>
 #   include <sys/socket.h>
 #elif defined(_WIN32)
@@ -42,7 +42,7 @@ namespace clap {
    }
 
    bool RemoteGui::spawn() {
-#ifdef __unix
+#if (defined(__unix__) || defined(__APPLE__))
       assert(_child == -1);
 #elif defined(_WIN32)
       assert(!_data);
@@ -64,7 +64,7 @@ namespace clap {
              skin.c_str(),
              qmlLib.c_str());
 
-#ifdef __unix__
+#if (defined(__unix__) || defined(__APPLE__))
       /* create a socket pair */
       int sockets[2];
       if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets)) {

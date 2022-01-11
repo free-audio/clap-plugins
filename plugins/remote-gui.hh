@@ -53,7 +53,7 @@ namespace clap {
 
       clap_id _timerId = CLAP_INVALID_ID;
 
-#ifdef __unix__
+#if (defined(__unix__) || defined(__APPLE__))
       pid_t _child = -1;
 #elif defined(_WIN32)
       std::unique_ptr<RemoteGuiWin32Data> _data;

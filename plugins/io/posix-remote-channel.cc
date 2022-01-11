@@ -1,4 +1,4 @@
-#ifndef __unix__
+#if !(defined(__unix__) || defined(__APPLE__))
 #   error "This file can only be compile for unix targets"
 #endif
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QHash>
+#include <unordered_map>
+
 #include <QObject>
 
 #include <clap/clap.h>

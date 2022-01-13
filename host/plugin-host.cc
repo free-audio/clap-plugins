@@ -1,4 +1,4 @@
-﻿#include <exception>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -582,18 +582,6 @@ void PluginHost::eventLoopSetFdNotifierFlags(int fd, int flags) {
       it->second->wr->setEnabled(true);
    } else if (it->second->wr)
       it->second->wr->setEnabled(false);
-
-   if (flags & CLAP_POSIX_FD_ERROR) {
-      if (!it->second->err) {
-         it->second->err.reset(new QSocketNotifier((qintptr)fd, QSocketNotifier::Exception));
-         QObject::connect(it->second->err.get(), &QSocketNotifier::activated, [this, fd] {
-            checkForMainThread();
-            _pluginPosixFdSupport->on_fd(this->_plugin, fd, CLAP_POSIX_FD_ERROR);
-         });
-      }
-      it->second->err->setEnabled(true);
-   } else if (it->second->err)
-      it->second->err->setEnabled(false);
 }
 
 bool PluginHost::clapGuiRequestResize(const clap_host *host, uint32_t width, uint32_t height) {

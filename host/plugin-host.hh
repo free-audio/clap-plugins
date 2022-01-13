@@ -208,7 +208,6 @@ private:
    struct Notifiers {
       std::unique_ptr<QSocketNotifier> rd;
       std::unique_ptr<QSocketNotifier> wr;
-      std::unique_ptr<QSocketNotifier> err;
    };
    std::unordered_map<int, std::unique_ptr<Notifiers>> _fds;
 

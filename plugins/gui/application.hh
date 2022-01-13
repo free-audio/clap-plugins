@@ -29,7 +29,6 @@ private:
    QQuickView *_quickView = nullptr;
    std::unique_ptr<QSocketNotifier> _socketReadNotifier;
    std::unique_ptr<QSocketNotifier> _socketWriteNotifier;
-   std::unique_ptr<QSocketNotifier> _socketErrorNotifier;
 
    std::unique_ptr<QWindow> _hostWindow = nullptr;
 

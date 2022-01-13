@@ -77,17 +77,8 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
               }
            });
 
-   _socketErrorNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Exception, this));
-   connect(_socketErrorNotifier.get(),
-           &QSocketNotifier::activated,
-           [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
-              _remoteChannel->onError();
-              quit();
-           });
-
    _socketReadNotifier->setEnabled(true);
    _socketWriteNotifier->setEnabled(false);
-   _socketErrorNotifier->setEnabled(false);
 #endif
 
 #ifdef Q_OS_WINDOWS
@@ -135,13 +126,11 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
 void Application::modifyFd(int flags) {
    _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
    _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
-   _socketErrorNotifier->setEnabled(flags & CLAP_POSIX_FD_ERROR);
 }
 
 void Application::removeFd() {
    _socketReadNotifier.reset();
    _socketWriteNotifier.reset();
-   _socketErrorNotifier.reset();
    quit();
 }
 

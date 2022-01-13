@@ -1,4 +1,4 @@
-﻿#include <exception>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -691,7 +691,8 @@ void PluginHost::process() {
    // Do we want to deactivate the plugin?
    if (_scheduleDeactivate) {
       _scheduleDeactivate = false;
-      _plugin->stop_processing(_plugin);
+      if (_state == ActiveAndProcessing)
+         _plugin->stop_processing(_plugin);
       setPluginState(ActiveAndReadyToDeactivate);
       return;
    }

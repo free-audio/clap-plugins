@@ -1,4 +1,4 @@
-#include <exception>
+﻿#include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -310,8 +310,7 @@ void PluginHost::setParentWindow(WId parentWindow) {
       return;
    }
 
-   Application::instance().sync();
-   Application::instance().processEvents();
+   //Application::instance().processEvents();
 
    setPluginWindowVisibility(true);
 }

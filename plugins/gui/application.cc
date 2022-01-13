@@ -233,7 +233,6 @@ void Application::onMessage(const clap::RemoteChannel::Message &msg) {
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.nsView)));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
-         sync();
          _quickView->show();
          rp.succeed = true;
       }

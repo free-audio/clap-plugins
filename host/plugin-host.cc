@@ -1,4 +1,4 @@
-#include <exception>
+﻿#include <exception>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -287,7 +287,6 @@ void PluginHost::setParentWindow(WId parentWindow) {
    }
 
    Application::instance().mainWindow()->resizePluginView(width, height);
-   Application::instance().sync();
 
    bool didAttach = false;
 
@@ -296,7 +295,7 @@ void PluginHost::setParentWindow(WId parentWindow) {
       didAttach = _pluginGuiX11->attach(_plugin, nullptr, parentWindow);
 #elif defined(Q_OS_MACX)
    if (_pluginGuiCocoa)
-      didAttach = _pluginGuiCocoa->attach(_plugin, (void *)parentWindow);
+      didAttach = _pluginGuiCocoa->attach(_plugin, reinterpret_cast<void *>(parentWindow));
 #elif defined(Q_OS_WIN32)
    if (_pluginGuiWin32)
       didAttach = _pluginGuiWin32->attach(_plugin, (clap_hwnd)parentWindow);

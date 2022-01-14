@@ -4,6 +4,7 @@
 #include <QQuickItem>
 #include <QQuickView>
 #include <QWindow>
+#include <QThread>
 
 #include "../io/messages.hh"
 #include "application.hh"
@@ -16,7 +17,7 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
 
    bool waitForDebbugger = false;
    while (waitForDebbugger)
-      ;
+      QThread::sleep(1);
 
    QCommandLineParser parser;
 

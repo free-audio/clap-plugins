@@ -1,3 +1,15 @@
+set(CLAP_PLUGIN_GUI_MODEL "" CACHE STRING "remote, local")
+
+if(CLAP_PLUGIN_GUI_MODEL STREQUAL "local")
+  set(use_local_gui TRUE)
+  set(use_remote_gui FALSE)
+  set(gui_sources local-gui-proxy.hh local-gui-proxy.cc)
+elseif(CLAP_PLUGIN_GUI_MODEL STREQUAL "remote")
+  set(use_local_gui FALSE)
+  set(use_remote_gui TRUE)
+  set(gui_sources remote-gui-proxy.hh remote-gui-proxy.cc)
+endif()
+
 find_package(Boost REQUIRED COMPONENTS serialization iostreams)
 
 add_subdirectory(io)
@@ -20,6 +32,7 @@ add_library(
   abstract-gui.hh
   remote-gui.hh
   remote-gui.cc
+  ${gui_sources}
 
   plugs/dc-offset/dc-offset.hh
   plugs/dc-offset/dc-offset.cc
@@ -27,6 +40,10 @@ add_library(
   plugs/gain/gain.cc
   plugs/transport/transport-info.hh
   plugs/transport/transport-info.cc)
+
+if(use_local_gui)
+  target_link_libraries(clap-plugins PUBLIC clap-plugin-gui)
+endif()
 
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20 SUFFIX ".clap" PREFIX "")
 

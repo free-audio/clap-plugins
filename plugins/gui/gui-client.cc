@@ -1,4 +1,3 @@
-#include <QCommandLineParser>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickItem>
@@ -7,44 +6,14 @@
 #include <QThread>
 
 #include "../io/messages.hh"
-#include "application.hh"
+#include "gui-client.hh"
 
 #ifdef _WIN32
 #   include <windows.h>
 #endif
 
-Application::Application(int &argc, char **argv) : super(argc, argv), _quickView(new QQuickView()) {
-
-   bool waitForDebbugger = false;
-   while (waitForDebbugger)
-      QThread::sleep(1);
-
-   QCommandLineParser parser;
-
-   QCommandLineOption skinOpt("skin", tr("path to the skin directory"), tr("path"));
-   QCommandLineOption qmlLibOpt("qml-import", tr("QML import path"), tr("path"));
-
-#ifdef Q_OS_UNIX
-   QCommandLineOption socketOpt("socket", tr("socket fd"), tr("path"));
-   parser.addOption(socketOpt);
-#endif
-
-#ifdef Q_OS_WINDOWS
-   QCommandLineOption pipeInOpt("pipe-in", tr("input pipe handle"), tr("path"));
-   QCommandLineOption pipeOutOpt("pipe-out", tr("output pipe handle"), tr("path"));
-   parser.addOption(pipeInOpt);
-   parser.addOption(pipeOutOpt);
-#endif
-
-   parser.addOption(skinOpt);
-   parser.addOption(qmlLibOpt);
-   parser.addHelpOption();
-
-   parser.process(*this);
-
-   qmlRegisterType<ParameterProxy>("org.clap", 1, 0, "ParameterProxy");
-   qmlRegisterType<TransportProxy>("org.clap", 1, 0, "TransportProxy");
-   qmlRegisterType<PluginProxy>("org.clap", 1, 0, "PluginProxy");
+GuiClient::GuiClient(int socket, const QStringList& qmlImportPath, const QString& qmlSkin)
+: _quickView(new QQuickView()) {
 
    _pluginProxy = new PluginProxy(this);
    _transportProxy = new TransportProxy(this);
@@ -53,9 +22,7 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
    // I/O initialization //
    ////////////////////////
 
-#ifdef Q_OS_UNIX
-   auto socket = parser.value(socketOpt).toULongLong();
-
+#if defined(Q_OS_UNIX)
    _remoteChannel.reset(new clap::RemoteChannel(
       [this](const clap::RemoteChannel::Message &msg) { onMessage(msg); }, false, *this, socket));
 
@@ -65,7 +32,7 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
            [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
               _remoteChannel->tryReceive();
               if (!_remoteChannel->isOpen())
-                 quit();
+                 QCoreApplication::quit();
            });
 
    _socketWriteNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Write, this));
@@ -74,41 +41,19 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
            [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
               _remoteChannel->trySend();
               if (!_remoteChannel->isOpen()) {
-                 quit();
+                 QCoreApplication::quit();
               }
            });
 
    _socketReadNotifier->setEnabled(true);
    _socketWriteNotifier->setEnabled(false);
-#endif
-
-#ifdef Q_OS_WINDOWS
-
-   auto pipeInName = parser.value(pipeInOpt).toStdString();
-   auto pipeOutName = parser.value(pipeOutOpt).toStdString();
-
-   auto pipeInHandle = CreateFileA(pipeInName.c_str(),
-                                   GENERIC_READ,
-                                   0,
-                                   nullptr,
-                                   OPEN_EXISTING,
-                                   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
-                                   NULL);
-
-   auto pipeOutHandle = CreateFileA(pipeOutName.c_str(),
-                                    GENERIC_WRITE,
-                                    0,
-                                    nullptr,
-                                    OPEN_EXISTING,
-                                    FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
-                                    NULL);
-
+#elif defined(Q_OS_WINDOWS)
    _remoteChannel.reset(
       new clap::RemoteChannel([this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
                               false,
                               pipeInHandle,
                               pipeOutHandle,
-                              [this] { this->quit(); }));
+                              [] { QCoreApplication::quit(); }));
 #endif
 
    ////////////////////////
@@ -116,31 +61,31 @@ Application::Application(int &argc, char **argv) : super(argc, argv), _quickView
    ////////////////////////
 
    auto qmlContext = _quickView->engine()->rootContext();
-   for (const auto &str : parser.values(qmlLibOpt))
+   for (const auto &str : qmlImportPath)
       _quickView->engine()->addImportPath(str);
    qmlContext->setContextProperty("plugin", _pluginProxy);
    qmlContext->setContextProperty("transport", _transportProxy);
 
-   _quickView->setSource(QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
+   _quickView->setSource(QUrl::fromLocalFile(qmlSkin));
 }
 
-void Application::modifyFd(int flags) {
+void GuiClient::modifyFd(int flags) {
    _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
    _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
 }
 
-void Application::removeFd() {
+void GuiClient::removeFd() {
    _socketReadNotifier.reset();
    _socketWriteNotifier.reset();
-   quit();
+   QCoreApplication::quit();
 }
 
-void Application::onMessage(const clap::RemoteChannel::Message &msg) {
+void GuiClient::onMessage(const clap::RemoteChannel::Message &msg) {
    switch (msg.type) {
    case clap::messages::kDestroyRequest:
       clap::messages::DestroyResponse rp;
       _remoteChannel->sendResponseAsync(rp, msg.cookie);
-      quit();
+      QCoreApplication::quit();
       break;
 
    case clap::messages::kUpdateTransportRequest: {

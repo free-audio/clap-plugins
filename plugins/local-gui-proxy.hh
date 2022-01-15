@@ -1,11 +1,14 @@
 #pragma once
 
-#include "remote-gui.hh"
+#include "gui-proxy.hh"
 
 namespace clap {
-class ThreadedRemoteGui : public RemoteGui {
+class LocalGuiProxy : public GuiProxy {
 public:
-    ThreadedRemoteGui(CorePlugin &plugin);
-    ~ThreadedRemoteGui() override;
+    LocalGuiProxy(CorePlugin &plugin);
+    ~LocalGuiProxy() override;
+
+private:
+
 };
 }

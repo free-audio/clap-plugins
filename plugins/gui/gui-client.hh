@@ -10,18 +10,17 @@
 
 class QQuickView;
 
-class Application : public QGuiApplication, public clap::RemoteChannel::EventControl {
+class GuiClient : public QObject, public clap::RemoteChannel::EventControl {
    Q_OBJECT;
    using super = QGuiApplication;
 
 public:
-   Application(int& argc, char **argv);
+   GuiClient(int socket, const QStringList& qmlImportPath, const QString& qmlSkin);
+   GuiClient(void* pipeIn, void *pipeOut, const QStringList& qmlImportPath, const QString& qmlSkin);
 
    clap::RemoteChannel& remoteChannel() const { return *_remoteChannel; }
    void modifyFd(int flags) override;
    void removeFd() override;
-
-   static Application& instance() { return *dynamic_cast<Application *>(super::instance()); }
 
 private:
    void onMessage(const clap::RemoteChannel::Message& msg);

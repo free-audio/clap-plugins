@@ -8,6 +8,7 @@
 
 class QGuiApplication;
 class QThread;
+class GuiClient;
 
 class GuiClientFactory : public QObject
 {

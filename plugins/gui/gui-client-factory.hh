@@ -18,14 +18,7 @@ class GuiClientFactory : public QObject
 
 public:
     ~GuiClientFactory();
-    static std::shared_ptr<GuiClientFactory> getInstance() {
-        auto ptr = _instance.lock();
-        if (ptr)
-            return ptr;
-        ptr = std::make_shared<GuiClientFactory>();
-        _instance = ptr;
-        return ptr;
-    }
+    static std::shared_ptr<GuiClientFactory> getInstance();
 
     uint32_t createGuiClient();
     void terminteGuiClient(uint32_t clientId);

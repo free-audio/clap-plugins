@@ -9,14 +9,15 @@
 #include "transport-proxy.hh"
 
 class QQuickView;
+class QUrl;
 
 class GuiClient : public QObject, public clap::RemoteChannel::EventControl {
    Q_OBJECT;
    using super = QGuiApplication;
 
 public:
-   GuiClient(int socket, const QStringList& qmlImportPath, const QString& qmlSkin);
-   GuiClient(void* pipeIn, void *pipeOut, const QStringList& qmlImportPath, const QString& qmlSkin);
+   GuiClient(int socket, const QStringList& qmlImportPath, const QUrl& qmlSkin);
+   GuiClient(void* pipeIn, void *pipeOut, const QStringList& qmlImportPath, const QUrl& qmlSkin);
 
    clap::RemoteChannel& remoteChannel() const { return *_remoteChannel; }
    void modifyFd(int flags) override;

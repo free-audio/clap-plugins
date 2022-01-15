@@ -12,7 +12,7 @@
 #   include <windows.h>
 #endif
 
-GuiClient::GuiClient(int socket, const QStringList& qmlImportPath, const QString& qmlSkin)
+GuiClient::GuiClient(int socket, const QStringList& qmlImportPath, const QUrl& qmlSkin)
 : _quickView(new QQuickView()) {
 
    _pluginProxy = new PluginProxy(this);
@@ -66,7 +66,7 @@ GuiClient::GuiClient(int socket, const QStringList& qmlImportPath, const QString
    qmlContext->setContextProperty("plugin", _pluginProxy);
    qmlContext->setContextProperty("transport", _transportProxy);
 
-   _quickView->setSource(QUrl::fromLocalFile(qmlSkin));
+   _quickView->setSource(qmlSkin);
 }
 
 void GuiClient::modifyFd(int flags) {

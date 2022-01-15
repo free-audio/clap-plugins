@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 
 #if defined(Q_OS_UNIX)
    auto socket = parser.value(socketOpt).toULongLong();
-   GuiClient client(socket, parser.values(qmlLibOpt), parser.value(skinOpt) + "/main.qml");
+   GuiClient client(socket, parser.values(qmlLibOpt), QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
 #elif defined(Q_OS_WINDOWS)
    auto pipeInName = parser.value(pipeInOpt).toStdString();
    auto pipeOutName = parser.value(pipeOutOpt).toStdString();

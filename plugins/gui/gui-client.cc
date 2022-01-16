@@ -15,8 +15,8 @@
 GuiClient::GuiClient(int socket, const QStringList& qmlImportPath, const QUrl& qmlSkin)
 : _quickView(new QQuickView()) {
 
-   _pluginProxy = new PluginProxy(this);
-   _transportProxy = new TransportProxy(this);
+   _pluginProxy = new PluginProxy(*this);
+   _transportProxy = new TransportProxy(*this);
 
    ////////////////////////
    // I/O initialization //
@@ -140,7 +140,7 @@ void GuiClient::onMessage(const clap::RemoteChannel::Message &msg) {
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          _quickView->show();
-         sync();
+         QGuiApplication::sync();
          rp.succeed = true;
       }
 #endif

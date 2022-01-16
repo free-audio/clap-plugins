@@ -1,8 +1,8 @@
 #include "transport-proxy.hh"
 #include "../io/messages.hh"
-#include "application.hh"
+#include "gui-client.hh"
 
-TransportProxy::TransportProxy(QObject *parent) : QObject(parent) {}
+TransportProxy::TransportProxy(GuiClient &client) : super(&client), _client(client) {}
 
 void TransportProxy::update(bool hasTransport, const clap_event_transport &t) {
    update<bool>(_hasTransport, hasTransport, &TransportProxy::hasTransportChanged);
@@ -66,5 +66,5 @@ void TransportProxy::setIsSubscribed(bool value) {
    _isSubscribed = value;
    isSubscribedChanged();
    clap::messages::SubscribeToTransportRequest rq{value};
-   Application::instance().remoteChannel().sendRequestAsync(rq);
+   _client.remoteChannel().sendRequestAsync(rq);
 }

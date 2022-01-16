@@ -1,14 +1,14 @@
 #include "parameter-proxy.hh"
 #include "../io/messages.hh"
-#include "application.hh"
+#include "gui-client.hh"
 
-ParameterProxy::ParameterProxy(const clap_param_info &info, QObject *parent)
-   : QObject(parent), _id(info.id), _name(info.name), _module(info.module),
+ParameterProxy::ParameterProxy(GuiClient &client, const clap_param_info &info)
+   : super(&client), _client(client), _id(info.id), _name(info.name), _module(info.module),
      _value(info.default_value), _minValue(info.min_value), _maxValue(info.max_value),
      _defaultValue(info.default_value) {}
 
-ParameterProxy::ParameterProxy(clap_id param_id, QObject *parent)
-   : QObject(parent), _id(param_id) {}
+ParameterProxy::ParameterProxy(GuiClient &client, clap_id param_id)
+   : super(&client), _client(client), _id(param_id) {}
 
 void ParameterProxy::redefine(const clap_param_info &info) {
    Q_ASSERT(_id == info.id);
@@ -38,7 +38,7 @@ void ParameterProxy::setIsAdjusting(bool isAdjusting) {
    uint32_t flags = CLAP_EVENT_SHOULD_RECORD;
    flags |= isAdjusting ? CLAP_EVENT_BEGIN_ADJUST : CLAP_EVENT_END_ADJUST;
    clap::messages::AdjustRequest rq{_id, _value, flags};
-   Application::instance().remoteChannel().sendRequestAsync(rq);
+   _client.remoteChannel().sendRequestAsync(rq);
    emit isAdjustingChanged();
 }
 
@@ -50,7 +50,7 @@ void ParameterProxy::setValueFromUI(double value) {
    _value = value;
 
    clap::messages::AdjustRequest rq{_id, _value, CLAP_EVENT_SHOULD_RECORD};
-   Application::instance().remoteChannel().sendRequestAsync(rq);
+   _client.remoteChannel().sendRequestAsync(rq);
    emit valueChanged();
    emit finalValueChanged();
 }

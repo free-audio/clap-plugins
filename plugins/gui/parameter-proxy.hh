@@ -6,7 +6,10 @@
 
 #include <clap/clap.h>
 
+class GuiClient;
 class ParameterProxy : public QObject {
+   using super = QObject;
+
    Q_OBJECT
    Q_PROPERTY(uint32_t id READ getId)
    Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
@@ -25,8 +28,8 @@ class ParameterProxy : public QObject {
    Q_PROPERTY(bool isHovered READ isHovered WRITE setIsHovered NOTIFY isHoveredChanged)
 
 public:
-   explicit ParameterProxy(const clap_param_info &info, QObject *parent = nullptr);
-   explicit ParameterProxy(clap_id param_id, QObject *parent = nullptr);
+   explicit ParameterProxy(GuiClient &client, const clap_param_info &info);
+   explicit ParameterProxy(GuiClient &client, clap_id param_id);
 
    void redefine(const clap_param_info &info);
 
@@ -59,7 +62,9 @@ public:
    double getDefaultValue() const { return _defaultValue; }
    void setDefaultValueFromPlugin(double defaultValue);
 
-   double clip(double v) const { return std::min<double>(_maxValue, std::max<double>(_minValue, v)); }
+   double clip(double v) const {
+      return std::min<double>(_maxValue, std::max<double>(_minValue, v));
+   }
    static double clipNormalized(double v) { return std::min<double>(1., std::max<double>(0., v)); }
 
    double normalize(double value) const {
@@ -90,6 +95,7 @@ signals:
    void isAdjustingChanged();
 
 private:
+   GuiClient &_client;
    const uint32_t _id;
    QString _name;
    QString _module;

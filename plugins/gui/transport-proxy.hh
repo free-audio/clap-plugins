@@ -4,7 +4,10 @@
 
 #include <clap/clap.h>
 
+class GuiClient;
 class TransportProxy : public QObject {
+   using super = QObject;
+
    Q_OBJECT
    Q_PROPERTY(bool hasTransport READ hasTransport NOTIFY hasTransportChanged)
    Q_PROPERTY(bool isSubscribed READ isSubscribed WRITE setIsSubscribed NOTIFY isSubscribedChanged)
@@ -38,7 +41,7 @@ class TransportProxy : public QObject {
                  timeSignatureDenominatorChanged)
 
 public:
-   explicit TransportProxy(QObject *parent = nullptr);
+   explicit TransportProxy(GuiClient& client);
 
    void update(bool hasTransport, const clap_event_transport &transport);
 
@@ -129,6 +132,8 @@ private:
       attr = value;
       (this->*notify)();
    }
+
+   GuiClient& _client;
 
    bool _isSubscribed = false;
    bool _hasTransport = false;

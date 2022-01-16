@@ -33,5 +33,5 @@ include(CPack)
 
 add_custom_target(run-host
     COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_FILE:clap-plugins> -i 0
-    DEPENDS clap-host clap-plugins clap-gui
+    DEPENDS clap-host clap-plugins
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")

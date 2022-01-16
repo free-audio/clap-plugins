@@ -19,11 +19,14 @@ transport-proxy.hh
 transport-proxy.cc
 )
 
-set_target_properties(clap-plugin-gui PROPERTIES
-    POSITION_INDEPENDENT_CODE true
-    CXX_STANDARD 17)
+set_property(TARGET clap-plugin-gui PROPERTY CXX_STANDARD 20)
+if(use_local_gui)
+    set_property(TARGET clap-plugin-gui PROPERTYPOSITION_INDEPENDENT_CODE true)
+endif()
+
 target_link_libraries(clap-plugin-gui PUBLIC clap-io Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Core )
 qt6_import_qml_plugins(clap-plugin-gui)
+
 if(false)
     # Static link of qml gui
     qt6_add_qml_module(clap-plugin-gui
@@ -35,7 +38,9 @@ if(false)
     )
 endif()
 
-add_executable(clap-gui main.cc)
-target_link_libraries(clap-gui PRIVATE clap-plugin-gui)
-set_target_properties(clap-gui PROPERTIES CXX_STANDARD 17)
-install(TARGETS clap-gui DESTINATION "bin")
+if (use_remote_gui)
+    add_executable(clap-gui main.cc)
+    target_link_libraries(clap-gui PUBLIC clap-plugin-gui)
+    set_target_properties(clap-gui PROPERTIES CXX_STANDARD 20)
+    install(TARGETS clap-gui DESTINATION "bin")
+endif()

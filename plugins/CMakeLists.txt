@@ -43,6 +43,8 @@ add_library(
 
 if(use_local_gui)
   target_link_libraries(clap-plugins PUBLIC clap-plugin-gui)
+elseif(use_remote_gui)
+  add_dependencies(clap-plugins clap-gui)
 endif()
 
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20 SUFFIX ".clap" PREFIX "")

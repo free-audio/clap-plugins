@@ -56,5 +56,5 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins -Wl,-z,defs)
 endif()
 
-install(TARGETS clap-plugins DESTINATION "lib/clap")
+install(TARGETS clap-plugins DESTINATION "lib/clap" COMPONENT plugins)
 install(DIRECTORY gui/qml DESTINATION "lib/clap-examples")

@@ -147,9 +147,11 @@ namespace clap {
          assert(_hasTrackInfo);
          return _trackInfo;
       }
+
       uint32_t trackChannelCount() const noexcept {
          return _hasTrackInfo ? _trackInfo.channel_count : 2;
       }
+
       clap_chmap trackChannelMap() const noexcept {
          return _hasTrackInfo ? _trackInfo.channel_map : CLAP_CHMAP_STEREO;
       }

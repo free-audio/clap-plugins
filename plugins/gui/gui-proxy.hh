@@ -13,7 +13,7 @@ namespace clap {
    class GuiProxy : public AbstractGui, public RemoteChannel::EventControl
    {
    public:
-      GuiProxy(CorePlugin &plugin);
+      GuiProxy(AbstractGuiListener &listener);
       ~GuiProxy();
 
       virtual std::unique_ptr<RemoteChannel> spawnRemote() = 0;

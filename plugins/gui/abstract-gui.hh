@@ -5,13 +5,19 @@
 namespace clap {
 
    class CorePlugin;
+   class AbstractGuiListener;
    class AbstractGui {
    public:
-      AbstractGui(CorePlugin &plugin) : _plugin(plugin) {}
+      AbstractGui(AbstractGuiListener &listener) : _listener(listener) {}
       virtual ~AbstractGui() = default;
 
-      virtual void defineParameter(const clap_param_info&) noexcept = 0;
+      virtual bool spawn() noexcept = 0;
+
+      virtual void defineParameter(const clap_param_info &paramInfo) noexcept = 0;
       virtual void updateParameter(clap_id paramId, double value, double modAmount) noexcept = 0;
+
+      virtual void clearTransport() = 0;
+      virtual void updateTransport(const clap_event_transport &transport) = 0;
 
       virtual bool attachCocoa(void *nsView) noexcept = 0;
       virtual bool attachWin32(clap_hwnd window) noexcept = 0;
@@ -26,7 +32,7 @@ namespace clap {
       virtual void destroy() noexcept = 0;
 
    protected:
-      CorePlugin &_plugin;
+      AbstractGuiListener &_listener;
 
       bool _isTransportSubscribed = false;
    };

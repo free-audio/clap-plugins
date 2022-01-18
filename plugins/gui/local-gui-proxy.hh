@@ -5,7 +5,7 @@
 namespace clap {
 class LocalGuiProxy : public GuiProxy {
 public:
-    LocalGuiProxy(CorePlugin &plugin);
+    LocalGuiProxy(AbstractGuiListener &listener);
     ~LocalGuiProxy() override;
 
 private:

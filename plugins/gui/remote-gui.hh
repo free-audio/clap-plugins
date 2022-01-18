@@ -14,13 +14,16 @@ namespace clap {
    class RemoteGui : public AbstractGui, public RemoteChannel::EventControl
    {
    public:
-      RemoteGui(CorePlugin &plugin);
+      RemoteGui(AbstractGuiListener &listener);
       ~RemoteGui();
 
-      bool spawn();
+      bool spawn() noexcept override;
 
       void defineParameter(const clap_param_info &) noexcept override;
       void updateParameter(clap_id paramId, double value, double modAmount) noexcept override;
+
+      void clearTransport() override;
+      void updateTransport(const clap_event_transport &transport) override;
 
       bool attachCocoa(void *nsView) noexcept override;
       bool attachWin32(clap_hwnd window) noexcept override;
@@ -41,17 +44,11 @@ namespace clap {
       int posixFd() const;
       void onPosixFd(int flags);
 
-      void registerTimer();
-      clap_id timerId() const noexcept { return _timerId; }
-      void onTimer();
-
    private:
       void onMessage(const RemoteChannel::Message &msg);
       void waitChild();
 
       std::unique_ptr<RemoteChannel> _channel;
-
-      clap_id _timerId = CLAP_INVALID_ID;
 
 #if (defined(__unix__) || defined(__APPLE__))
       pid_t _child = -1;

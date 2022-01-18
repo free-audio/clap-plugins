@@ -345,17 +345,16 @@ namespace clap {
       return _channel->sendRequestSync(request, response);
    }
 
-   void RemoteGui::onTimer() {
-      _plugin._pluginToGuiQueue.consume(
-         [this](clap_id paramId, const CorePlugin::PluginToGuiValue &value) {
-            updateParameter(paramId, value.value, value.mod);
-         });
+   void RemoteGui::clearTransport()
+   {
+      messages::UpdateTransportRequest rq{false};
+      _channel->sendRequestAsync(rq);
+   }
 
-      if (_isTransportSubscribed && _plugin._hasTransportCopy) {
-         messages::UpdateTransportRequest rq{_plugin._hasTransport, _plugin._transportCopy};
-         _channel->sendRequestAsync(rq);
-         _plugin._hasTransportCopy = false;
-      }
+   void RemoteGui::updateTransport(const clap_event_transport &transport)
+   {
+      messages::UpdateTransportRequest rq{true, transport};
+      _channel->sendRequestAsync(rq);
    }
 
 } // namespace clap

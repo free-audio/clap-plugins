@@ -8,20 +8,23 @@
 
 #include "parameters.hh"
 #include "path-provider.hh"
-#include "remote-gui.hh"
+#include "gui/abstract-gui-listener.h"
 
 namespace clap {
 
    using PluginGlue = helpers::Plugin<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
    extern template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
 
-   class CorePlugin : public PluginGlue {
+   class AbstractGui;
+
+   class CorePlugin : public PluginGlue, public AbstractGuiListener {
       using super = PluginGlue;
 
    public:
       CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
                  const clap_plugin_descriptor *desc,
                  const clap_host *host);
+      ~CorePlugin() override;
 
       const PathProvider &pathProvider() const noexcept { return *_pathProvider; }
 
@@ -106,6 +109,13 @@ namespace clap {
       void guiDefineParameters();
 
       //---------------------//
+      // AbstractGuiListener //
+      //---------------------//
+      void onGuiPoll() override;
+      void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
+      void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
+
+      //---------------------//
       // clap_plugin_gui_x11 //
       //---------------------//
       bool implementsGuiX11() const noexcept override { return true; }
@@ -157,8 +167,6 @@ namespace clap {
       void onPosixFd(int fd, int flags) noexcept override;
 
    protected:
-      friend class RemoteGui;
-
       void guiAdjust(clap_id paramId, double value, uint32_t flags);
       void processGuiEvents(const clap_process *process);
       uint32_t
@@ -187,12 +195,14 @@ namespace clap {
       std::vector<clap_audio_port_info> _audioOutputs;
       std::vector<clap_audio_ports_config> _audioConfigs;
 
-      std::unique_ptr<RemoteGui> _remoteGui;
+      clap_id _guiTimerId = CLAP_INVALID_ID;
+      std::unique_ptr<AbstractGui> _gui;
 
       Parameters _parameters;
 
       static const constexpr uint32_t _paramSmoothingDuration = 64;
 
+      bool _isGuiTransportSubscribed = false;
       bool _hasTransportCopy = false;
       bool _hasTransport = false;
       clap_event_transport _transportCopy;

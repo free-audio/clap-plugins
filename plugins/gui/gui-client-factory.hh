@@ -8,7 +8,11 @@
 
 class QGuiApplication;
 class QThread;
+
+namespace clap {
+
 class GuiClient;
+class AbstractGui;
 
 class GuiClientFactory : public QObject
 {
@@ -20,8 +24,7 @@ public:
     ~GuiClientFactory();
     static std::shared_ptr<GuiClientFactory> getInstance();
 
-    uint32_t createGuiClient();
-    void terminteGuiClient(uint32_t clientId);
+    std::shared_ptr<AbstractGui> createGuiClient();
 
 private:
     GuiClientFactory();
@@ -34,3 +37,5 @@ private:
     std::unique_ptr<QGuiApplication> _app;
     std::unordered_map<uint32_t, std::unique_ptr<GuiClient>> _guiClients;
 };
+
+}

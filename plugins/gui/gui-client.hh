@@ -11,13 +11,16 @@
 class QQuickView;
 class QUrl;
 
+namespace clap {
+
+class AbstractGuiListener;
 class GuiClient : public QObject, public clap::RemoteChannel::EventControl {
    Q_OBJECT;
    using super = QGuiApplication;
 
 public:
    GuiClient(int socket, const QStringList& qmlImportPath, const QUrl& qmlSkin);
-   GuiClient(void* pipeIn, void *pipeOut, const QStringList& qmlImportPath, const QUrl& qmlSkin);
+   GuiClient(AbstractGuiListener& listener, const QStringList& qmlImportPath, const QUrl& qmlSkin);
 
    clap::RemoteChannel& remoteChannel() const { return *_remoteChannel; }
    void modifyFd(int flags) override;
@@ -36,3 +39,5 @@ private:
    PluginProxy *_pluginProxy = nullptr;
    TransportProxy *_transportProxy = nullptr;
 };
+
+}

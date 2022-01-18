@@ -11,6 +11,8 @@
 #include "core-plugin.hh"
 #include "stream-helper.hh"
 
+#include "gui/remote-gui.hh"
+
 namespace clap {
 
    template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate,
@@ -24,6 +26,8 @@ namespace clap {
       : Plugin(desc, host), _pathProvider(std::move(pathProvider)) {
       assert(_pathProvider);
    }
+
+   CorePlugin::~CorePlugin() {}
 
    bool CorePlugin::init() noexcept {
       initTrackInfo();
@@ -97,14 +101,14 @@ namespace clap {
    }
 
    bool CorePlugin::guiCreate() noexcept {
-      _remoteGui.reset(new RemoteGui(*this));
+      _gui.reset(new RemoteGui(*this));
 
-      if (!_remoteGui->spawn()) {
-         _remoteGui.reset();
+      if (!_gui->spawn()) {
+         _gui.reset();
          return false;
       }
 
-      if (!_remoteGui)
+      if (!_gui)
          return false;
 
       guiDefineParameters();
@@ -115,67 +119,55 @@ namespace clap {
       for (int i = 0; i < paramsCount(); ++i) {
          clap_param_info info;
          paramsInfo(i, &info);
-         _remoteGui->defineParameter(info);
+         _gui->defineParameter(info);
       }
    }
 
    void CorePlugin::guiDestroy() noexcept {
-      if (_remoteGui)
-         _remoteGui.reset();
+      if (_gui)
+         _gui.reset();
    }
 
    bool CorePlugin::guiSize(uint32_t *width, uint32_t *height) noexcept {
-      if (!_remoteGui)
+      if (!_gui)
          return false;
 
-      return _remoteGui->size(width, height);
+      return _gui->size(width, height);
    }
 
    bool CorePlugin::guiSetScale(double scale) noexcept {
-      if (_remoteGui)
-         return _remoteGui->setScale(scale);
+      if (_gui)
+         return _gui->setScale(scale);
       return false;
    }
 
    void CorePlugin::guiShow() noexcept {
-      if (_remoteGui)
-         _remoteGui->show();
+      if (_gui)
+         _gui->show();
    }
 
    void CorePlugin::guiHide() noexcept {
-      if (_remoteGui)
-         _remoteGui->hide();
-   }
-
-   void CorePlugin::onPosixFd(int fd, int flags) noexcept {
-#ifdef __unix
-      if (_remoteGui && fd == _remoteGui->posixFd())
-         _remoteGui->onPosixFd(flags);
-#endif
-   }
-
-   void CorePlugin::onTimer(clap_id timerId) noexcept {
-      if (_remoteGui && timerId == _remoteGui->timerId())
-         _remoteGui->onTimer();
+      if (_gui)
+         _gui->hide();
    }
 
    bool CorePlugin::guiX11Attach(const char *displayName, unsigned long window) noexcept {
-      if (_remoteGui)
-         return _remoteGui->attachX11(displayName, window);
+      if (_gui)
+         return _gui->attachX11(displayName, window);
 
       return false;
    }
 
    bool CorePlugin::guiWin32Attach(clap_hwnd window) noexcept {
-      if (_remoteGui)
-         return _remoteGui->attachWin32(window);
+      if (_gui)
+         return _gui->attachWin32(window);
 
       return false;
    }
 
    bool CorePlugin::guiCocoaAttach(void *nsView) noexcept {
-      if (_remoteGui)
-         return _remoteGui->attachCocoa(nsView);
+      if (_gui)
+         return _gui->attachCocoa(nsView);
 
       return false;
    }
@@ -185,7 +177,21 @@ namespace clap {
       return false;
    }
 
-   void CorePlugin::guiAdjust(clap_id paramId, double value, uint32_t flags) {
+   //---------------------//
+   // AbstractGuiListener //
+   //---------------------//
+   void CorePlugin::onGuiPoll() {
+      _pluginToGuiQueue.consume([this](clap_id paramId, const CorePlugin::PluginToGuiValue &value) {
+         _gui->updateParameter(paramId, value.value, value.mod);
+      });
+
+      if (_isGuiTransportSubscribed && _hasTransportCopy) {
+         _gui->updateTransport(_transportCopy);
+         _hasTransportCopy = false;
+      }
+   }
+
+   void CorePlugin::onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) {
       GuiToPluginValue item{paramId, value, flags};
 
       // very highly likely to succeed
@@ -196,6 +202,8 @@ namespace clap {
          std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
    }
+
+   void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {}
 
    void CorePlugin::processGuiEvents(const clap_process *process) {
       GuiToPluginValue value;

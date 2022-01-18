@@ -4,8 +4,12 @@
 
 TransportProxy::TransportProxy(GuiClient &client) : super(&client), _client(client) {}
 
-void TransportProxy::update(bool hasTransport, const clap_event_transport &t) {
-   update<bool>(_hasTransport, hasTransport, &TransportProxy::hasTransportChanged);
+void TransportProxy::clear() {
+   update<bool>(_hasTransport, false, &TransportProxy::hasTransportChanged);
+}
+
+void TransportProxy::update(const clap_event_transport &t) {
+   update<bool>(_hasTransport, true, &TransportProxy::hasTransportChanged);
 
    update<bool>(_hasTempo, t.flags & CLAP_TRANSPORT_HAS_TEMPO, &TransportProxy::hasTempoChanged);
    update<bool>(_hasBeatsTimeline,

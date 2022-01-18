@@ -2,8 +2,8 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QQuickView>
-#include <QWindow>
 #include <QThread>
+#include <QWindow>
 
 #include "../io/messages.hh"
 #include "gui-client.hh"
@@ -12,194 +12,166 @@
 #   include <windows.h>
 #endif
 
-GuiClient::GuiClient(int socket, const QStringList& qmlImportPath, const QUrl& qmlSkin)
-: _quickView(new QQuickView()) {
+namespace clap {
 
-   _pluginProxy = new PluginProxy(*this);
-   _transportProxy = new TransportProxy(*this);
+   GuiClient::GuiClient(int socket, const QStringList &qmlImportPath, const QUrl &qmlSkin)
+      : _quickView(new QQuickView()) {
 
-   ////////////////////////
-   // I/O initialization //
-   ////////////////////////
+      _pluginProxy = new PluginProxy(*this);
+      _transportProxy = new TransportProxy(*this);
+
+      ////////////////////////
+      // I/O initialization //
+      ////////////////////////
 
 #if defined(Q_OS_UNIX)
-   _remoteChannel.reset(new clap::RemoteChannel(
-      [this](const clap::RemoteChannel::Message &msg) { onMessage(msg); }, false, *this, socket));
+      _remoteChannel.reset(new clap::RemoteChannel(
+         [this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
+         false,
+         *this,
+         socket));
 
-   _socketReadNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Read, this));
-   connect(_socketReadNotifier.get(),
-           &QSocketNotifier::activated,
-           [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
-              _remoteChannel->tryReceive();
-              if (!_remoteChannel->isOpen())
-                 QCoreApplication::quit();
-           });
+      _socketReadNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Read, this));
+      connect(_socketReadNotifier.get(),
+              &QSocketNotifier::activated,
+              [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
+                 _remoteChannel->tryReceive();
+                 if (!_remoteChannel->isOpen())
+                    QCoreApplication::quit();
+              });
 
-   _socketWriteNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Write, this));
-   connect(_socketWriteNotifier.get(),
-           &QSocketNotifier::activated,
-           [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
-              _remoteChannel->trySend();
-              if (!_remoteChannel->isOpen()) {
-                 QCoreApplication::quit();
-              }
-           });
+      _socketWriteNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Write, this));
+      connect(_socketWriteNotifier.get(),
+              &QSocketNotifier::activated,
+              [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
+                 _remoteChannel->trySend();
+                 if (!_remoteChannel->isOpen()) {
+                    QCoreApplication::quit();
+                 }
+              });
 
-   _socketReadNotifier->setEnabled(true);
-   _socketWriteNotifier->setEnabled(false);
+      _socketReadNotifier->setEnabled(true);
+      _socketWriteNotifier->setEnabled(false);
 #elif defined(Q_OS_WINDOWS)
-   _remoteChannel.reset(
-      new clap::RemoteChannel([this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
-                              false,
-                              pipeInHandle,
-                              pipeOutHandle,
-                              [] { QCoreApplication::quit(); }));
+      _remoteChannel.reset(new clap::RemoteChannel(
+         [this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
+         false,
+         pipeInHandle,
+         pipeOutHandle,
+         [] { QCoreApplication::quit(); }));
 #endif
 
-   ////////////////////////
-   // QML initialization //
-   ////////////////////////
+      ////////////////////////
+      // QML initialization //
+      ////////////////////////
 
-   auto qmlContext = _quickView->engine()->rootContext();
-   for (const auto &str : qmlImportPath)
-      _quickView->engine()->addImportPath(str);
-   qmlContext->setContextProperty("plugin", _pluginProxy);
-   qmlContext->setContextProperty("transport", _transportProxy);
+      auto qmlContext = _quickView->engine()->rootContext();
+      for (const auto &str : qmlImportPath)
+         _quickView->engine()->addImportPath(str);
+      qmlContext->setContextProperty("plugin", _pluginProxy);
+      qmlContext->setContextProperty("transport", _transportProxy);
 
-   _quickView->setSource(qmlSkin);
-}
+      _quickView->setSource(qmlSkin);
+   }
 
-void GuiClient::modifyFd(int flags) {
-   _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
-   _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
-}
+   void GuiClient::modifyFd(int flags) {
+      _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
+      _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
+   }
 
-void GuiClient::removeFd() {
-   _socketReadNotifier.reset();
-   _socketWriteNotifier.reset();
-   QCoreApplication::quit();
-}
-
-void GuiClient::onMessage(const clap::RemoteChannel::Message &msg) {
-   switch (msg.type) {
-   case clap::messages::kDestroyRequest:
-      clap::messages::DestroyResponse rp;
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
+   void GuiClient::removeFd() {
+      _socketReadNotifier.reset();
+      _socketWriteNotifier.reset();
       QCoreApplication::quit();
-      break;
-
-   case clap::messages::kUpdateTransportRequest: {
-      clap::messages::UpdateTransportRequest rq;
-      msg.get(rq);
-      _transportProxy->update(rq.hasTransport, rq.transport);
-      break;
    }
 
-   case clap::messages::kDefineParameterRequest: {
-      clap::messages::DefineParameterRequest rq;
-      msg.get(rq);
-      _pluginProxy->defineParameter(rq.info);
-      break;
+   bool GuiClient::spawn() {
+      // Nothing to do
    }
 
-   case clap::messages::kParameterValueRequest: {
-      clap::messages::ParameterValueRequest rq;
-      msg.get(rq);
-      auto p = _pluginProxy->param(rq.paramId);
+   void GuiClient::defineParameter(const clap_param_info &paramInfo) {
+      _pluginProxy->defineParameter(paramInfo);
+   }
+
+   void GuiClient::updateParameter(clap_id paramId, double value, double modAmount) {
+      auto p = _pluginProxy->param(paramId);
+      assert(p);
+      if (!p)
+         return;
+
       p->setValueFromPlugin(rq.value);
       p->setModulationFromPlugin(rq.modulation);
-      break;
    }
 
-   case clap::messages::kSizeRequest: {
-      clap::messages::SizeResponse rp;
-      auto rootItem = _quickView->rootObject();
-      rp.width = rootItem ? rootItem->width() : 500;
-      rp.height = rootItem ? rootItem->height() : 300;
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
-      break;
+   void GuiClient::clearTransport() { _transportProxy->clear(); }
+
+   void GuiClient::updateTransport(const clap_event_transport &transport) {
+      _transportProxy->update(transport);
    }
 
-   case clap::messages::kSetScaleRequest: {
-      clap::messages::SetScaleRequest rq;
-      clap::messages::SetScaleResponse rp{false};
-
-      msg.get(rq);
-      // We ignore it.
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
-      break;
+   void GuiClient::showLater() {
+      return QMetaObject::invokeMethod(
+         this,
+         [this] {
+            if (_hostWindow && _quickView)
+               _quickView->show();
+         },
+         Qt::QueuedConnection);
    }
 
-   case clap::messages::kAttachX11Request: {
-      clap::messages::AttachX11Request rq;
-      clap::messages::AttachResponse rp{false};
-      msg.get(rq);
-
-#ifdef Q_OS_LINUX
-      _hostWindow.reset(QWindow::fromWinId(rq.window));
-      if (_hostWindow) {
-         _quickView->setParent(_hostWindow.get());
-         _quickView->show();
-         QGuiApplication::sync();
-         rp.succeed = true;
-      }
-#endif
-
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
-      break;
-   }
-
-   case clap::messages::kAttachWin32Request: {
-      clap::messages::AttachWin32Request rq;
-      clap::messages::AttachResponse rp{false};
-      msg.get(rq);
-
-#ifdef Q_OS_WIN
-      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.hwnd)));
-      if (_hostWindow) {
-         _quickView->setParent(_hostWindow.get());
-         rp.succeed = true;
-      }
-#endif
-
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
-
-      if (_hostWindow && _quickView)
-         _quickView->show();
-      break;
-   }
-
-   case clap::messages::kAttachCocoaRequest: {
-      clap::messages::AttachCocoaRequest rq;
-      clap::messages::AttachResponse rp{false};
-
-      msg.get(rq);
-
+   bool GuiClient::attachCocoa(void *nsView) {
 #ifdef Q_OS_MACOS
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.nsView)));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          _quickView->show();
-         rp.succeed = true;
+         return true;
       }
 #endif
-
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
-      break;
+      return false;
    }
 
-   case clap::messages::kShowRequest: {
-      _quickView->show();
-      clap::messages::ShowResponse rp;
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
-      break;
+   bool GuiClient::attachWin32(clap_hwnd window) {
+#ifdef Q_OS_WIN
+      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.hwnd)));
+      if (_hostWindow) {
+         return false;
+         _quickView->setParent(_hostWindow.get());
+         return showLater();
+      }
+#endif
+      return false;
    }
 
-   case clap::messages::kHideRequest: {
-      _quickView->hide();
-      clap::messages::HideResponse rp;
-      _remoteChannel->sendResponseAsync(rp, msg.cookie);
-      break;
+   bool GuiClient::attachX11(const char *display_name, unsigned long window) {
+#ifdef Q_OS_LINUX
+      _hostWindow.reset(QWindow::fromWinId(rq.window));
+      if (_hostWindow) {
+         _quickView->setParent(_hostWindow.get());
+         _quickView->show();
+         return true;
+      }
+#endif
+      return false;
    }
+
+   bool GuiClient::size(uint32_t *width, uint32_t *height) {
+      if (!_quickView)
+         return false;
+
+      auto rootItem = _quickView->rootObject();
+      if (!rootItem)
+         return false;
+
+      *width = rootItem->width();
+      *height = rootItem->height();
    }
-}
+
+   bool GuiClient::setScale(double scale) {}
+
+   bool GuiClient::show() { _quickView->show(); }
+
+   bool GuiClient::hide() { _quickView->hide(); }
+
+   void GuiClient::destroy() {}
+} // namespace clap

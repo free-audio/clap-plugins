@@ -5,6 +5,7 @@
 #include <QWindow>
 
 #include "../io/remote-channel.hh"
+#include "abstract-gui.hh"
 #include "plugin-proxy.hh"
 #include "transport-proxy.hh"
 
@@ -13,31 +14,48 @@ class QUrl;
 
 namespace clap {
 
-class AbstractGuiListener;
-class GuiClient : public QObject, public clap::RemoteChannel::EventControl {
-   Q_OBJECT;
-   using super = QGuiApplication;
+   class AbstractGui;
+   class AbstractGuiListener;
 
-public:
-   GuiClient(int socket, const QStringList& qmlImportPath, const QUrl& qmlSkin);
-   GuiClient(AbstractGuiListener& listener, const QStringList& qmlImportPath, const QUrl& qmlSkin);
+   class GuiClient : public QObject, public AbstractGui {
+      Q_OBJECT;
+      using super = QGuiApplication;
 
-   clap::RemoteChannel& remoteChannel() const { return *_remoteChannel; }
-   void modifyFd(int flags) override;
-   void removeFd() override;
+   public:
+      GuiClient(AbstractGuiListener &listener,
+                const QStringList &qmlImportPath,
+                const QUrl &qmlSkin);
 
-private:
-   void onMessage(const clap::RemoteChannel::Message& msg);
+      bool spawn() override;
 
-   QQuickView *_quickView = nullptr;
-   std::unique_ptr<QSocketNotifier> _socketReadNotifier;
-   std::unique_ptr<QSocketNotifier> _socketWriteNotifier;
+      void defineParameter(const clap_param_info &paramInfo) override;
+      void updateParameter(clap_id paramId, double value, double modAmount) override;
 
-   std::unique_ptr<QWindow> _hostWindow = nullptr;
+      void clearTransport() override;
+      void updateTransport(const clap_event_transport &transport) override;
 
-   std::unique_ptr<clap::RemoteChannel> _remoteChannel;
-   PluginProxy *_pluginProxy = nullptr;
-   TransportProxy *_transportProxy = nullptr;
-};
+      bool attachCocoa(void *nsView) override;
+      bool attachWin32(clap_hwnd window) override;
+      bool attachX11(const char *display_name, unsigned long window) override;
 
-}
+      bool size(uint32_t *width, uint32_t *height) override;
+      bool setScale(double scale) override;
+
+      bool show() override;
+      bool hide() override;
+
+      void destroy() override;
+
+   private:
+      void showLater();
+
+      // Qt windows
+      QQuickView *_quickView = nullptr;
+      std::unique_ptr<QWindow> _hostWindow = nullptr;
+
+      // QML proxy objects
+      PluginProxy *_pluginProxy = nullptr;
+      TransportProxy *_transportProxy = nullptr;
+   };
+
+} // namespace clap

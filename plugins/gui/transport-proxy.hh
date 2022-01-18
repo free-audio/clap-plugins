@@ -43,7 +43,8 @@ class TransportProxy : public QObject {
 public:
    explicit TransportProxy(GuiClient& client);
 
-   void update(bool hasTransport, const clap_event_transport &transport);
+   void clear();
+   void update(const clap_event_transport &transport);
 
    [[nodiscard]] bool isSubscribed() const noexcept { return _isSubscribed; }
    void setIsSubscribed(bool value);

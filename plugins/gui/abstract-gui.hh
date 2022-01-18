@@ -11,25 +11,25 @@ namespace clap {
       AbstractGui(AbstractGuiListener &listener) : _listener(listener) {}
       virtual ~AbstractGui() = default;
 
-      virtual bool spawn() noexcept = 0;
+      virtual bool spawn() = 0;
 
-      virtual void defineParameter(const clap_param_info &paramInfo) noexcept = 0;
-      virtual void updateParameter(clap_id paramId, double value, double modAmount) noexcept = 0;
+      virtual void defineParameter(const clap_param_info &paramInfo) = 0;
+      virtual void updateParameter(clap_id paramId, double value, double modAmount) = 0;
 
       virtual void clearTransport() = 0;
       virtual void updateTransport(const clap_event_transport &transport) = 0;
 
-      virtual bool attachCocoa(void *nsView) noexcept = 0;
-      virtual bool attachWin32(clap_hwnd window) noexcept = 0;
-      virtual bool attachX11(const char *display_name, unsigned long window) noexcept = 0;
+      virtual bool attachCocoa(void *nsView) = 0;
+      virtual bool attachWin32(clap_hwnd window) = 0;
+      virtual bool attachX11(const char *display_name, unsigned long window) = 0;
 
-      virtual bool size(uint32_t *width, uint32_t *height) noexcept = 0;
-      virtual bool setScale(double scale) noexcept = 0;
+      virtual bool size(uint32_t *width, uint32_t *height) = 0;
+      virtual bool setScale(double scale) = 0;
 
-      virtual bool show() noexcept = 0;
-      virtual bool hide() noexcept = 0;
+      virtual bool show() = 0;
+      virtual bool hide() = 0;
 
-      virtual void destroy() noexcept = 0;
+      virtual void destroy() = 0;
 
    protected:
       AbstractGuiListener &_listener;

@@ -6,7 +6,17 @@ find_package(Qt6Widgets CONFIG REQUIRED)
 find_package(Qt6 COMPONENTS Qml Quick QuickControls2 REQUIRED)
 
 add_library(clap-plugin-gui
-gui-client-factory.hh
+abstract-gui.hh
+abstract-gui-listener.hh
+
+abstract-gui-client-factory.hh
+remote-gui-client-factory.hh
+remote-gui-client-factory.cc
+remote-gui-client-factory-proxy.hh
+remote-gui-client-factory-proxy.cc
+local-gui-client-factory.hh
+local-gui-client-factory.cc
+
 gui-client-factory.cc
 gui-client.hh
 gui-client.cc

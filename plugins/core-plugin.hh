@@ -154,18 +154,6 @@ namespace clap {
          return _hasTrackInfo ? _trackInfo.channel_map : CLAP_CHMAP_STEREO;
       }
 
-      //---------------------------//
-      // clap_plugin_timer_support //
-      //---------------------------//
-      bool implementsTimerSupport() const noexcept override { return true; }
-      void onTimer(clap_id timerId) noexcept override;
-
-      //------------------------//
-      // clap_plugin_fd_support //
-      //------------------------//
-      bool implementsPosixFdSupport() const noexcept override { return true; }
-      void onPosixFd(int fd, int flags) noexcept override;
-
    protected:
       void guiAdjust(clap_id paramId, double value, uint32_t flags);
       void processGuiEvents(const clap_process *process);

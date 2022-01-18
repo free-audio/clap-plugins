@@ -1,11 +1,14 @@
 #include <unordered_map>
 
+#include <QObject>
+
 #include "../io/messages.hh"
+#include "../io/remote-channel.hh"
 
 #include "gui-client.hh"
 
 namespace clap {
-   class RemoteGuiClientFactory {
+   class RemoteGuiClientFactory : public QObject, public BasicRemoteChannel::EventControl {
    public:
       RemoteGuiClientFactory(int socket);
 
@@ -20,6 +23,9 @@ namespace clap {
       }
 
       void onMessage(const clap::RemoteChannel::Message &msg);
+
+      void modifyFd(int flags) override;
+      void removeFd() override;
 
       std::unordered_map<uint32_t, std::unique_ptr<GuiClient>> _guiClients;
 

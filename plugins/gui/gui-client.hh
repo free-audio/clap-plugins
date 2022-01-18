@@ -4,7 +4,6 @@
 #include <QSocketNotifier>
 #include <QWindow>
 
-#include "../io/remote-channel.hh"
 #include "abstract-gui.hh"
 #include "plugin-proxy.hh"
 #include "transport-proxy.hh"
@@ -36,7 +35,7 @@ namespace clap {
 
       bool attachCocoa(void *nsView) override;
       bool attachWin32(clap_hwnd window) override;
-      bool attachX11(const char *display_name, unsigned long window) override;
+      bool attachX11(const char *displayName, unsigned long window) override;
 
       bool size(uint32_t *width, uint32_t *height) override;
       bool setScale(double scale) override;

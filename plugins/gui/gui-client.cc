@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickItem>
@@ -14,52 +16,13 @@
 
 namespace clap {
 
-   GuiClient::GuiClient(int socket, const QStringList &qmlImportPath, const QUrl &qmlSkin)
-      : _quickView(new QQuickView()) {
+   GuiClient::GuiClient(AbstractGuiListener &listener,
+                        const QStringList &qmlImportPath,
+                        const QUrl &qmlSkin)
+      : AbstractGui(listener), _quickView(new QQuickView()) {
 
       _pluginProxy = new PluginProxy(*this);
       _transportProxy = new TransportProxy(*this);
-
-      ////////////////////////
-      // I/O initialization //
-      ////////////////////////
-
-#if defined(Q_OS_UNIX)
-      _remoteChannel.reset(new clap::RemoteChannel(
-         [this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
-         false,
-         *this,
-         socket));
-
-      _socketReadNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Read, this));
-      connect(_socketReadNotifier.get(),
-              &QSocketNotifier::activated,
-              [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
-                 _remoteChannel->tryReceive();
-                 if (!_remoteChannel->isOpen())
-                    QCoreApplication::quit();
-              });
-
-      _socketWriteNotifier.reset(new QSocketNotifier(socket, QSocketNotifier::Write, this));
-      connect(_socketWriteNotifier.get(),
-              &QSocketNotifier::activated,
-              [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
-                 _remoteChannel->trySend();
-                 if (!_remoteChannel->isOpen()) {
-                    QCoreApplication::quit();
-                 }
-              });
-
-      _socketReadNotifier->setEnabled(true);
-      _socketWriteNotifier->setEnabled(false);
-#elif defined(Q_OS_WINDOWS)
-      _remoteChannel.reset(new clap::RemoteChannel(
-         [this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
-         false,
-         pipeInHandle,
-         pipeOutHandle,
-         [] { QCoreApplication::quit(); }));
-#endif
 
       ////////////////////////
       // QML initialization //
@@ -74,20 +37,7 @@ namespace clap {
       _quickView->setSource(qmlSkin);
    }
 
-   void GuiClient::modifyFd(int flags) {
-      _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
-      _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
-   }
-
-   void GuiClient::removeFd() {
-      _socketReadNotifier.reset();
-      _socketWriteNotifier.reset();
-      QCoreApplication::quit();
-   }
-
-   bool GuiClient::spawn() {
-      // Nothing to do
-   }
+   bool GuiClient::spawn() { throw std::logic_error("should not called"); }
 
    void GuiClient::defineParameter(const clap_param_info &paramInfo) {
       _pluginProxy->defineParameter(paramInfo);
@@ -99,8 +49,8 @@ namespace clap {
       if (!p)
          return;
 
-      p->setValueFromPlugin(rq.value);
-      p->setModulationFromPlugin(rq.modulation);
+      p->setValueFromPlugin(value);
+      p->setModulationFromPlugin(modAmount);
    }
 
    void GuiClient::clearTransport() { _transportProxy->clear(); }
@@ -110,7 +60,7 @@ namespace clap {
    }
 
    void GuiClient::showLater() {
-      return QMetaObject::invokeMethod(
+      QMetaObject::invokeMethod(
          this,
          [this] {
             if (_hostWindow && _quickView)
@@ -143,9 +93,10 @@ namespace clap {
       return false;
    }
 
-   bool GuiClient::attachX11(const char *display_name, unsigned long window) {
+   bool GuiClient::attachX11(const char *displayName, unsigned long window) {
 #ifdef Q_OS_LINUX
-      _hostWindow.reset(QWindow::fromWinId(rq.window));
+      // TODO: check the displayName
+      _hostWindow.reset(QWindow::fromWinId(window));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          _quickView->show();
@@ -165,13 +116,20 @@ namespace clap {
 
       *width = rootItem->width();
       *height = rootItem->height();
+      return true;
    }
 
-   bool GuiClient::setScale(double scale) {}
+   bool GuiClient::setScale(double scale) { return false; }
 
-   bool GuiClient::show() { _quickView->show(); }
+   bool GuiClient::show() {
+      _quickView->show();
+      return true;
+   }
 
-   bool GuiClient::hide() { _quickView->hide(); }
+   bool GuiClient::hide() {
+      _quickView->hide();
+      return true;
+   }
 
    void GuiClient::destroy() {}
 } // namespace clap

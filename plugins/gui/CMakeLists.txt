@@ -20,7 +20,6 @@ local-gui-client-factory.cc
 local-gui-proxy.hh
 local-gui-proxy.cc
 
-gui-client-factory.cc
 gui-client.hh
 gui-client.cc
 

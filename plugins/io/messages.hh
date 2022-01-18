@@ -129,23 +129,23 @@ namespace clap::messages {
    struct ShowRequest final {
       static const constexpr Type type = kShowRequest;
       uint32_t clientId;
-      bool succeed;
    };
 
    struct ShowResponse final {
       static const constexpr Type type = kShowResponse;
       uint32_t clientId;
+      bool succeed;
    };
 
    struct HideRequest final {
       static const constexpr Type type = kHideRequest;
       uint32_t clientId;
-      bool succeed;
    };
 
    struct HideResponse final {
       static const constexpr Type type = kHideResponse;
       uint32_t clientId;
+      bool succeed;
    };
 
    struct DestroyRequest final {

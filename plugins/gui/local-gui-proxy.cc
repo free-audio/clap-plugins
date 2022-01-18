@@ -6,7 +6,7 @@
 namespace clap {
 
    LocalGuiProxy::LocalGuiProxy(AbstractGuiListener &listener, GuiClient &guiClient)
-      : AbstactGui(listener), _guiClient(guiClient) {}
+      : AbstractGui(listener), _guiClient(guiClient) {}
 
    LocalGuiProxy::~LocalGuiProxy() {}
 
@@ -14,31 +14,31 @@ namespace clap {
 
    void clap::LocalGuiProxy::defineParameter(const clap_param_info &paramInfo) {
       QMetaObject::invokeMethod(
-         &_guiClient, [=] { _guiClient.defineParameter(paramInfo); }, Qt::QueuedConnection);
+         &_guiClient, [=, this] { _guiClient.defineParameter(paramInfo); }, Qt::QueuedConnection);
    }
 
    void LocalGuiProxy::updateParameter(clap_id paramId, double value, double modAmount) {
       QMetaObject::invokeMethod(
          &_guiClient,
-         [=] { _guiClient.updateParameter(paramId, value, modAmount); },
+         [=, this] { _guiClient.updateParameter(paramId, value, modAmount); },
          Qt::QueuedConnection);
    }
 
    void LocalGuiProxy::clearTransport() {
       QMetaObject::invokeMethod(
-         &_guiClient, [=] { _guiClient.clearTransport(); }, Qt::QueuedConnection);
+         &_guiClient, [=, this] { _guiClient.clearTransport(); }, Qt::QueuedConnection);
    }
 
    void LocalGuiProxy::updateTransport(const clap_event_transport &transport) {
       QMetaObject::invokeMethod(
-         &_guiClient, [=] { _guiClient.updateTransport(transport); }, Qt::QueuedConnection);
+         &_guiClient, [=, this] { _guiClient.updateTransport(transport); }, Qt::QueuedConnection);
    }
 
    bool LocalGuiProxy::attachCocoa(void *nsView) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          &_guiClient,
-         [=, &succeed] { succeed = _guiClient.attachCocoa(nsView); },
+         [=, this, &succeed] { succeed = _guiClient.attachCocoa(nsView); },
          Qt::BlockingQueuedConnection);
       return succeed;
    }
@@ -47,7 +47,7 @@ namespace clap {
       bool succeed = false;
       QMetaObject::invokeMethod(
          &_guiClient,
-         [=, &succeed] { succeed = _guiClient.attachWin32(window); },
+         [=, this, &succeed] { succeed = _guiClient.attachWin32(window); },
          Qt::BlockingQueuedConnection);
       return succeed;
    }
@@ -56,7 +56,7 @@ namespace clap {
       bool succeed = false;
       QMetaObject::invokeMethod(
          &_guiClient,
-         [=, &succeed] { succeed = _guiClient.attachX11(displayName, window); },
+         [=, this, &succeed] { succeed = _guiClient.attachX11(displayName, window); },
          Qt::BlockingQueuedConnection);
       return succeed;
    }
@@ -65,7 +65,7 @@ namespace clap {
       bool succeed = false;
       QMetaObject::invokeMethod(
          &_guiClient,
-         [=, &succeed] { succeed = _guiClient.size(width, height); },
+         [=, this, &succeed] { succeed = _guiClient.size(width, height); },
          Qt::BlockingQueuedConnection);
       return succeed;
    }
@@ -74,7 +74,7 @@ namespace clap {
       bool succeed = false;
       QMetaObject::invokeMethod(
          &_guiClient,
-         [=, &succeed] { succeed = _guiClient.setScale(scale); },
+         [=, this, &succeed] { succeed = _guiClient.setScale(scale); },
          Qt::BlockingQueuedConnection);
       return succeed;
    }
@@ -82,14 +82,14 @@ namespace clap {
    bool LocalGuiProxy::show() {
       bool succeed = false;
       QMetaObject::invokeMethod(
-         &_guiClient, [=, &succeed] { succeed = _guiClient.show(); }, Qt::BlockingQueuedConnection);
+         &_guiClient, [=, this, &succeed] { succeed = _guiClient.show(); }, Qt::BlockingQueuedConnection);
       return succeed;
    }
 
    bool LocalGuiProxy::hide() {
       bool succeed = false;
       QMetaObject::invokeMethod(
-         &_guiClient, [=, &succeed] { succeed = _guiClient.hide(); }, Qt::BlockingQueuedConnection);
+         &_guiClient, [=, this, &succeed] { succeed = _guiClient.hide(); }, Qt::BlockingQueuedConnection);
       return succeed;
    }
 

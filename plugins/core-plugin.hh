@@ -8,7 +8,7 @@
 
 #include "parameters.hh"
 #include "path-provider.hh"
-#include "gui/abstract-gui-listener.h"
+#include "gui/abstract-gui-listener.hh"
 
 namespace clap {
 

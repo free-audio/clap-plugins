@@ -46,6 +46,8 @@ namespace clap {
 
       void destroy() override;
 
+      auto &guiListener() const { return _listener; }
+
    private:
       void showLater();
 

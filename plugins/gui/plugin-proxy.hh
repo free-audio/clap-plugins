@@ -8,21 +8,25 @@
 
 #include "parameter-proxy.hh"
 
-class GuiClient;
-class PluginProxy : public QObject {
-   using super = QObject;
+namespace clap {
 
-   Q_OBJECT
+   class GuiClient;
+   class PluginProxy : public QObject {
+      using super = QObject;
 
-public:
-   explicit PluginProxy(GuiClient& client);
+      Q_OBJECT
 
-   void defineParameter(const clap_param_info& info);
+   public:
+      explicit PluginProxy(GuiClient &client);
 
-   Q_INVOKABLE ParameterProxy *param(clap_id paramId);
-   Q_INVOKABLE QString toString() const;
+      void defineParameter(const clap_param_info &info);
 
-private:
-   GuiClient& _client;
-   std::unordered_map<clap_id, ParameterProxy *> _parameters;
-};
+      Q_INVOKABLE ParameterProxy *param(clap_id paramId);
+      Q_INVOKABLE QString toString() const;
+
+   private:
+      GuiClient &_client;
+      std::unordered_map<clap_id, ParameterProxy *> _parameters;
+   };
+
+} // namespace clap

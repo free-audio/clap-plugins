@@ -1,119 +1,121 @@
 #include "parameter-proxy.hh"
 #include "../io/messages.hh"
+#include "abstract-gui-listener.hh"
 #include "gui-client.hh"
 
-ParameterProxy::ParameterProxy(GuiClient &client, const clap_param_info &info)
-   : super(&client), _client(client), _id(info.id), _name(info.name), _module(info.module),
-     _value(info.default_value), _minValue(info.min_value), _maxValue(info.max_value),
-     _defaultValue(info.default_value) {}
+namespace clap {
+   ParameterProxy::ParameterProxy(GuiClient &client, const clap_param_info &info)
+      : super(&client), _client(client), _id(info.id), _name(info.name), _module(info.module),
+        _value(info.default_value), _minValue(info.min_value), _maxValue(info.max_value),
+        _defaultValue(info.default_value) {}
 
-ParameterProxy::ParameterProxy(GuiClient &client, clap_id param_id)
-   : super(&client), _client(client), _id(param_id) {}
+   ParameterProxy::ParameterProxy(GuiClient &client, clap_id param_id)
+      : super(&client), _client(client), _id(param_id) {}
 
-void ParameterProxy::redefine(const clap_param_info &info) {
-   Q_ASSERT(_id == info.id);
+   void ParameterProxy::redefine(const clap_param_info &info) {
+      Q_ASSERT(_id == info.id);
 
-   if (_name != info.name) {
-      _name = info.name;
-      emit nameChanged();
+      if (_name != info.name) {
+         _name = info.name;
+         emit nameChanged();
+      }
+
+      if (_module != info.module) {
+         _module = info.module;
+         emit moduleChanged();
+      }
+
+      setMinValueFromPlugin(info.min_value);
+      setMaxValueFromPlugin(info.max_value);
+      setDefaultValueFromPlugin(info.default_value);
+
+      setValueFromPlugin(std::min(_maxValue, std::max(_minValue, _value)));
    }
 
-   if (_module != info.module) {
-      _module = info.module;
-      emit moduleChanged();
+   void ParameterProxy::setIsAdjusting(bool isAdjusting) {
+      if (isAdjusting == _isAdjusting)
+         return;
+
+      _isAdjusting = isAdjusting;
+      uint32_t flags = CLAP_EVENT_SHOULD_RECORD;
+      flags |= isAdjusting ? CLAP_EVENT_BEGIN_ADJUST : CLAP_EVENT_END_ADJUST;
+      _client.guiListener().onGuiParamAdjust(_id, _value, flags);
+      emit isAdjustingChanged();
    }
 
-   setMinValueFromPlugin(info.min_value);
-   setMaxValueFromPlugin(info.max_value);
-   setDefaultValueFromPlugin(info.default_value);
+   void ParameterProxy::setValueFromUI(double value) {
+      value = clip(value);
+      if (value == _value)
+         return;
 
-   setValueFromPlugin(std::min(_maxValue, std::max(_minValue, _value)));
-}
+      _value = value;
 
-void ParameterProxy::setIsAdjusting(bool isAdjusting) {
-   if (isAdjusting == _isAdjusting)
-      return;
+      _client.guiListener().onGuiParamAdjust(_id, _value, CLAP_EVENT_SHOULD_RECORD);
+      emit valueChanged();
+      emit finalValueChanged();
+   }
 
-   _isAdjusting = isAdjusting;
-   uint32_t flags = CLAP_EVENT_SHOULD_RECORD;
-   flags |= isAdjusting ? CLAP_EVENT_BEGIN_ADJUST : CLAP_EVENT_END_ADJUST;
-   clap::messages::AdjustRequest rq{_id, _value, flags};
-   _client.remoteChannel().sendRequestAsync(rq);
-   emit isAdjustingChanged();
-}
+   void ParameterProxy::setValueFromPlugin(double value) {
+      if (_isAdjusting)
+         return;
 
-void ParameterProxy::setValueFromUI(double value) {
-   value = clip(value);
-   if (value == _value)
-      return;
+      value = clip(value);
+      if (value == _value)
+         return;
 
-   _value = value;
+      _value = value;
+      emit valueChanged();
+      emit finalValueChanged();
+   }
 
-   clap::messages::AdjustRequest rq{_id, _value, CLAP_EVENT_SHOULD_RECORD};
-   _client.remoteChannel().sendRequestAsync(rq);
-   emit valueChanged();
-   emit finalValueChanged();
-}
+   void ParameterProxy::setModulationFromPlugin(double mod) {
+      if (mod == _modulation)
+         return;
 
-void ParameterProxy::setValueFromPlugin(double value) {
-   if (_isAdjusting)
-      return;
+      _modulation = mod;
+      emit modulationChanged();
+      emit finalValueChanged();
+   }
 
-   value = clip(value);
-   if (value == _value)
-      return;
+   void ParameterProxy::setMinValueFromPlugin(double minValue) {
+      if (minValue == _minValue)
+         return;
 
-   _value = value;
-   emit valueChanged();
-   emit finalValueChanged();
-}
+      _minValue = minValue;
+      emit minValueChanged();
+   }
 
-void ParameterProxy::setModulationFromPlugin(double mod) {
-   if (mod == _modulation)
-      return;
+   void ParameterProxy::setMaxValueFromPlugin(double maxValue) {
+      if (maxValue == _maxValue)
+         return;
 
-   _modulation = mod;
-   emit modulationChanged();
-   emit finalValueChanged();
-}
+      _maxValue = maxValue;
+      emit maxValueChanged();
+   }
 
-void ParameterProxy::setMinValueFromPlugin(double minValue) {
-   if (minValue == _minValue)
-      return;
+   void ParameterProxy::setDefaultValueFromPlugin(double defaultValue) {
+      if (defaultValue == _defaultValue)
+         return;
 
-   _minValue = minValue;
-   emit minValueChanged();
-}
+      _defaultValue = defaultValue;
+      emit defaultValueChanged();
+   }
 
-void ParameterProxy::setMaxValueFromPlugin(double maxValue) {
-   if (maxValue == _maxValue)
-      return;
+   void ParameterProxy::setToDefault() {
+      bool wasAdjusting = _isAdjusting;
 
-   _maxValue = maxValue;
-   emit maxValueChanged();
-}
+      if (!wasAdjusting)
+         setIsAdjusting(true);
+      setValueFromUI(_defaultValue);
+      if (!wasAdjusting)
+         setIsAdjusting(false);
+   }
 
-void ParameterProxy::setDefaultValueFromPlugin(double defaultValue) {
-   if (defaultValue == _defaultValue)
-      return;
+   void ParameterProxy::setIsHovered(bool value) {
+      if (_isHovered == value)
+         return;
+      _isHovered = value;
+      emit isHoveredChanged();
+   }
 
-   _defaultValue = defaultValue;
-   emit defaultValueChanged();
-}
-
-void ParameterProxy::setToDefault() {
-   bool wasAdjusting = _isAdjusting;
-
-   if (!wasAdjusting)
-      setIsAdjusting(true);
-   setValueFromUI(_defaultValue);
-   if (!wasAdjusting)
-      setIsAdjusting(false);
-}
-
-void ParameterProxy::setIsHovered(bool value) {
-   if (_isHovered == value)
-      return;
-   _isHovered = value;
-   emit isHoveredChanged();
-}
+} // namespace clap

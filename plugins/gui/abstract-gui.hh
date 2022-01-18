@@ -21,7 +21,7 @@ namespace clap {
 
       virtual bool attachCocoa(void *nsView) = 0;
       virtual bool attachWin32(clap_hwnd window) = 0;
-      virtual bool attachX11(const char *display_name, unsigned long window) = 0;
+      virtual bool attachX11(const char *displayName, unsigned long window) = 0;
 
       virtual bool size(uint32_t *width, uint32_t *height) = 0;
       virtual bool setScale(double scale) = 0;

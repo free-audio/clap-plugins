@@ -29,10 +29,7 @@ add_library(
   path-provider.hh
   path-provider.cc
 
-  abstract-gui.hh
-  remote-gui.hh
-  remote-gui.cc
-  ${gui_sources}
+  #${gui_sources}
 
   plugs/dc-offset/dc-offset.hh
   plugs/dc-offset/dc-offset.cc

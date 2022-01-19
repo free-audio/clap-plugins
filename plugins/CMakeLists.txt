@@ -3,11 +3,9 @@ set(CLAP_PLUGIN_GUI_MODEL "" CACHE STRING "remote, local")
 if(CLAP_PLUGIN_GUI_MODEL STREQUAL "local")
   set(use_local_gui TRUE)
   set(use_remote_gui FALSE)
-  set(gui_sources local-gui-proxy.hh local-gui-proxy.cc)
 elseif(CLAP_PLUGIN_GUI_MODEL STREQUAL "remote")
   set(use_local_gui FALSE)
   set(use_remote_gui TRUE)
-  set(gui_sources remote-gui-proxy.hh remote-gui-proxy.cc)
 endif()
 
 find_package(Boost REQUIRED COMPONENTS serialization iostreams)
@@ -28,8 +26,6 @@ add_library(
 
   path-provider.hh
   path-provider.cc
-
-  #${gui_sources}
 
   plugs/dc-offset/dc-offset.hh
   plugs/dc-offset/dc-offset.cc

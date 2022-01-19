@@ -71,7 +71,7 @@ namespace clap {
 
    bool GuiClient::attachCocoa(void *nsView) {
 #ifdef Q_OS_MACOS
-      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.nsView)));
+      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(nsView)));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          _quickView->show();
@@ -83,7 +83,7 @@ namespace clap {
 
    bool GuiClient::attachWin32(clap_hwnd window) {
 #ifdef Q_OS_WIN
-      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(rq.hwnd)));
+      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(window)));
       if (_hostWindow) {
          return false;
          _quickView->setParent(_hostWindow.get());

@@ -8,7 +8,7 @@ namespace clap {
    // Beaware that the callbacks happen on the plugin's GUI thread, not the host's main thread.
    class AbstractGuiListener {
    public:
-      virtual ~AbstractGuiListener() = 0;
+      virtual ~AbstractGuiListener();
 
       // timer based polling of new parameter changes, transport value, ...
       // the plugin shall transmit them via

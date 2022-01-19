@@ -110,9 +110,13 @@ namespace clap {
    bool CorePlugin::guiCreate() noexcept {
 #if defined(CLAP_LOCAL_GUI)
       _guiFactory = LocalGuiClientFactory::getInstance();
+#elif defined(CLAP_REMOTE_GUI)
+      _guiFactory = RemoteGuiClientFactoryProxy::getInstance();
 #endif
 
-      _gui.reset(_guiFactory->createGuiClient(*this));
+      _gui.reset(_guiFactory->createGuiClient(*this,
+                                              {_pathProvider->getQmlLibDirectory()},
+                                              _pathProvider->getSkinDirectory() + "/main.qml"));
 
       if (!_gui->spawn()) {
          _gui.reset();

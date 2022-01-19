@@ -10,8 +10,6 @@ namespace clap {
 
    LocalGuiProxy::~LocalGuiProxy() {}
 
-   bool LocalGuiProxy::spawn() { throw std::logic_error("should not be called"); }
-
    void clap::LocalGuiProxy::defineParameter(const clap_param_info &paramInfo) {
       QMetaObject::invokeMethod(
          &_guiClient, [=, this] { _guiClient.defineParameter(paramInfo); }, Qt::QueuedConnection);

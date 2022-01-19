@@ -37,8 +37,6 @@ namespace clap {
       _quickView->setSource(qmlSkin);
    }
 
-   bool GuiClient::spawn() { throw std::logic_error("should not called"); }
-
    void GuiClient::defineParameter(const clap_param_info &paramInfo) {
       _pluginProxy->defineParameter(paramInfo);
    }

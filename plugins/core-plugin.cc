@@ -1,9 +1,11 @@
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-
 #include <chrono>
 #include <sstream>
 #include <thread>
+#include <vector>
+#include <string>
+
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
 #include <clap/helpers/host-proxy.hxx>
 #include <clap/helpers/plugin.hxx>
@@ -114,14 +116,11 @@ namespace clap {
       _guiFactory = RemoteGuiClientFactoryProxy::getInstance();
 #endif
 
-      _gui.reset(_guiFactory->createGuiClient(*this,
-                                              {_pathProvider->getQmlLibDirectory()},
-                                              _pathProvider->getSkinDirectory() + "/main.qml"));
+      std::vector<std::string> qmlPath;
+      qmlPath.push_back(_pathProvider->getQmlLibDirectory());
 
-      if (!_gui->spawn()) {
-         _gui.reset();
-         return false;
-      }
+      _gui = _guiFactory->createGuiClient(
+         *this, qmlPath, _pathProvider->getSkinDirectory() + "/main.qml");
 
       if (!_gui)
          return false;

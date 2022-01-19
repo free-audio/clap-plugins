@@ -35,17 +35,17 @@ add_library(
   plugs/transport/transport-info.cc)
 
 if(use_local_gui)
-  target_compile_definitions(clap-plugins CLAP_LOCAL_GUI)
+  target_compile_definitions(clap-plugins PUBLIC CLAP_LOCAL_GUI)
   target_link_libraries(clap-plugins PUBLIC clap-plugin-local-gui)
 elseif(use_remote_gui)
-  target_compile_definitions(clap-plugins CLAP_REMOTE_GUI)
+  target_compile_definitions(clap-plugins PUBLIC CLAP_REMOTE_GUI)
   target_link_libraries(clap-plugins PUBLIC clap-plugin-remote-gui)
   add_dependencies(clap-plugins clap-gui)
 endif()
 
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20 SUFFIX ".clap" PREFIX "")
 
-target_link_libraries(clap-plugins clap-helpers clap-io Boost::serialization Boost::iostreams)
+target_link_libraries(clap-plugins PUBLIC clap-helpers clap-io Boost::serialization Boost::iostreams)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)

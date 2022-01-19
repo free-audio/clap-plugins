@@ -25,8 +25,6 @@ namespace clap {
                 const QStringList &qmlImportPath,
                 const QUrl &qmlSkin);
 
-      bool spawn() override;
-
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;
 

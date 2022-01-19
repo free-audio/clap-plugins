@@ -27,6 +27,10 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": false
+                },
+                "CLAP_PLUGIN_GUI_MODEL": {
+                    "type": "string",
+                    "value": "local"
                 }
             }
         },
@@ -51,6 +55,10 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": false
+                },
+                "CLAP_PLUGIN_GUI_MODEL": {
+                    "type": "string",
+                    "value": "local"
                 }
             }
         },
@@ -75,6 +83,10 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": false
+                },
+                "CLAP_PLUGIN_GUI_MODEL": {
+                    "type": "string",
+                    "value": "local"
                 }
             }
         },
@@ -99,6 +111,10 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": false
+                },
+                "CLAP_PLUGIN_GUI_MODEL": {
+                    "type": "string",
+                    "value": "local"
                 }
             }
         },
@@ -115,6 +131,10 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": true
+                },
+                "CLAP_PLUGIN_GUI_MODEL": {
+                    "type": "string",
+                    "value": "remote"
                 }
             }
         },
@@ -130,6 +150,10 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": true
+                },
+                "CLAP_PLUGIN_GUI_MODEL": {
+                    "type": "string",
+                    "value": "remote"
                 }
             }
         }

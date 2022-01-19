@@ -17,8 +17,6 @@ namespace clap {
       RemoteGui(AbstractGuiListener &listener);
       ~RemoteGui();
 
-      bool spawn() noexcept override;
-
       void defineParameter(const clap_param_info &) noexcept override;
       void updateParameter(clap_id paramId, double value, double modAmount) noexcept override;
 

@@ -10,8 +10,6 @@ namespace clap {
       LocalGuiProxy(AbstractGuiListener &listener, GuiClient &);
       ~LocalGuiProxy() override;
 
-      bool spawn() override;
-
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;
 

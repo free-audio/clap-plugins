@@ -11,8 +11,6 @@ namespace clap {
       AbstractGui(AbstractGuiListener &listener) : _listener(listener) {}
       virtual ~AbstractGui() = default;
 
-      virtual bool spawn() = 0;
-
       virtual void defineParameter(const clap_param_info &paramInfo) = 0;
       virtual void updateParameter(clap_id paramId, double value, double modAmount) = 0;
 

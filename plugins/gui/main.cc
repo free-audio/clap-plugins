@@ -16,9 +16,9 @@ int main(int argc, char **argv) {
 
    QGuiApplication app(argc, argv);
 
-   qmlRegisterType<ParameterProxy>("org.clap", 1, 0, "ParameterProxy");
-   qmlRegisterType<TransportProxy>("org.clap", 1, 0, "TransportProxy");
-   qmlRegisterType<PluginProxy>("org.clap", 1, 0, "PluginProxy");
+   qmlRegisterType<clap::ParameterProxy>("org.clap", 1, 0, "ParameterProxy");
+   qmlRegisterType<clap::TransportProxy>("org.clap", 1, 0, "TransportProxy");
+   qmlRegisterType<clap::PluginProxy>("org.clap", 1, 0, "PluginProxy");
 
    QCommandLineParser parser;
 
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 
 #if defined(Q_OS_UNIX)
    auto socket = parser.value(socketOpt).toULongLong();
-   GuiClient client(socket, parser.values(qmlLibOpt), QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
+   clap::GuiClient client(socket, parser.values(qmlLibOpt), QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
 #elif defined(Q_OS_WINDOWS)
    auto pipeInName = parser.value(pipeInOpt).toStdString();
    auto pipeOutName = parser.value(pipeOutOpt).toStdString();

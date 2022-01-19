@@ -14,21 +14,6 @@ set_property(TARGET clap-plugin-gui-common PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-gui-common PROPERTY POSITION_INDEPENDENT_CODE true)
 target_link_libraries(clap-plugin-gui-common PUBLIC clap-core)
 
-add_library(clap-plugin-local-gui
-    local-gui-client-factory.hh
-    local-gui-client-factory.cc
-    local-gui-proxy.hh
-    local-gui-proxy.cc)
-set_property(TARGET clap-plugin-local-gui PROPERTY CXX_STANDARD 20)
-set_property(TARGET clap-plugin-local-gui PROPERTY POSITION_INDEPENDENT_CODE true)
-target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-gui-common)
-
-add_library(clap-plugin-remote-gui
-    remote-gui-client-factory-proxy.hh
-    remote-gui-client-factory-proxy.cc)
-set_property(TARGET clap-plugin-remote-gui PROPERTY CXX_STANDARD 20)
-target_link_libraries(clap-plugin-remote-gui PUBLIC clap-plugin-gui-common)
-
 add_library(clap-plugin-gui
     gui-client.hh
     gui-client.cc
@@ -41,15 +26,8 @@ add_library(clap-plugin-gui
     transport-proxy.cc
 )
 set_property(TARGET clap-plugin-gui PROPERTY CXX_STANDARD 20)
-
-if(use_remote_gui)
-    target_link_libraries(clap-plugin-gui PUBLIC clap-plugin-remote-gui)
-elseif(use_local_gui)
-    set_property(TARGET clap-plugin-gui PROPERTY POSITION_INDEPENDENT_CODE true)
-    target_link_libraries(clap-plugin-gui PUBLIC clap-plugin-local-gui)
-endif()
-
-target_link_libraries(clap-plugin-gui PUBLIC clap-io Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Core )
+target_link_libraries(clap-plugin-gui PUBLIC clap-io clap-core Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Core)
+set_property(TARGET clap-plugin-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 qt6_import_qml_plugins(clap-plugin-gui)
 
 if(false)
@@ -62,6 +40,21 @@ if(false)
             qml/clap/Knob.qml
     )
 endif()
+
+add_library(clap-plugin-local-gui
+    local-gui-client-factory.hh
+    local-gui-client-factory.cc
+    local-gui-proxy.hh
+    local-gui-proxy.cc)
+set_property(TARGET clap-plugin-local-gui PROPERTY CXX_STANDARD 20)
+set_property(TARGET clap-plugin-local-gui PROPERTY POSITION_INDEPENDENT_CODE true)
+target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-gui clap-plugin-gui-common)
+
+add_library(clap-plugin-remote-gui
+    remote-gui-client-factory-proxy.hh
+    remote-gui-client-factory-proxy.cc)
+set_property(TARGET clap-plugin-remote-gui PROPERTY CXX_STANDARD 20)
+target_link_libraries(clap-plugin-remote-gui PUBLIC clap-plugin-gui-common clap-io)
 
 add_executable(clap-gui
     main.cc

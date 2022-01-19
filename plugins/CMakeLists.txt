@@ -35,8 +35,9 @@ add_library(
   plugs/transport/transport-info.cc)
 
 if(use_local_gui)
-  target_link_libraries(clap-plugins PUBLIC clap-plugin-gui)
+  target_link_libraries(clap-plugins PUBLIC clap-plugin-local-gui)
 elseif(use_remote_gui)
+  target_link_libraries(clap-plugins PUBLIC clap-plugin-remote-gui)
   add_dependencies(clap-plugins clap-gui)
 endif()
 

@@ -11,7 +11,14 @@
 #include "core-plugin.hh"
 #include "stream-helper.hh"
 
-#include "gui/remote-gui.hh"
+#include "gui/abstract-gui.hh"
+#include "gui/abstract-gui-client-factory.hh"
+
+#ifdef CLAP_LOCAL_GUI
+#   include "gui/local-gui-client-factory.hh"
+#elif defined(CLAP_REMOTE_GUI)
+#   include "gui/remote-gui-client-factory-proxy.hh"
+#endif
 
 namespace clap {
 
@@ -101,7 +108,11 @@ namespace clap {
    }
 
    bool CorePlugin::guiCreate() noexcept {
-      _gui.reset(new RemoteGui(*this));
+#if defined(CLAP_LOCAL_GUI)
+      _guiFactory = LocalGuiClientFactory::getInstance();
+#endif
+
+      _gui.reset(_guiFactory->createGuiClient(*this));
 
       if (!_gui->spawn()) {
          _gui.reset();

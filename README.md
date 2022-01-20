@@ -1,6 +1,8 @@
-# Minimal Clap Host
+# Minimal Clap Host and Plugins
 
 This repo serves as an example to demonstrate how to create a CLAP host and plugins.
+
+The plugins are under heavy refactoring and are not working yet.
 
 ## Building on various platforms
 

@@ -29,6 +29,8 @@ namespace clap {
       void modifyFd(int flags) override;
       void removeFd() override;
 
+      friend class RemoteGuiListener;
+
       std::unordered_map<uint32_t, std::unique_ptr<GuiClient>> _guiClients;
 
       std::unique_ptr<clap::RemoteChannel> _channel;

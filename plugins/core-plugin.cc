@@ -113,7 +113,7 @@ namespace clap {
 #if defined(CLAP_LOCAL_GUI)
       _guiFactory = LocalGuiClientFactory::getInstance();
 #elif defined(CLAP_REMOTE_GUI)
-      _guiFactory = RemoteGuiClientFactoryProxy::getInstance();
+      _guiFactory = RemoteGuiClientFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
 #endif
 
       std::vector<std::string> qmlPath;

@@ -6,8 +6,7 @@
 #include <QThread>
 #include <QCommandLineParser>
 
-#include "gui-client.hh"
-#include "remote-gui-listener.hh"
+#include "remote-gui-client-factory.hh"
 
 int main(int argc, char **argv) {
    /* Useful to attach child process with debuggers which don't support follow childs */
@@ -35,15 +34,13 @@ int main(int argc, char **argv) {
    parser.addOption(pipeOutOpt);
 #endif
 
-   parser.addOption(skinOpt);
-   parser.addOption(qmlLibOpt);
    parser.addHelpOption();
 
    parser.process(app);
 
 #if defined(Q_OS_UNIX)
    auto socket = parser.value(socketOpt).toULongLong();
-   remoteGuiListener = std::make_unique<clap::RemoteGuiListener>(socket);
+   clap::RemoteGuiClientFactory factory(socket);
 #elif defined(Q_OS_WINDOWS)
    auto pipeInName = parser.value(pipeInOpt).toStdString();
    auto pipeOutName = parser.value(pipeOutOpt).toStdString();
@@ -63,10 +60,8 @@ int main(int argc, char **argv) {
                                     OPEN_EXISTING,
                                     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
                                     NULL);
-   remoteGuiListener = std::make_unique<clap::RemoteGuiListener>(pipeInHandle, pipeOutHandle);
+   clap::RemoteGuiClientFactory factory(pipeInHandle, pipeOutHandle);
 #endif
-
-   clap::GuiClient client(*remoteGuiListener, parser.values(qmlLibOpt), QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
 
    /* Run the app */
    return app.exec();

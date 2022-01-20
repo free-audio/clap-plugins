@@ -13,9 +13,9 @@ namespace clap {
       RemoteGuiListener(RemoteGuiClientFactory& clientFactory, uint32_t clientId);
       ~RemoteGuiListener() override;
 
-      virtual void onGuiPoll() override {}
+      void onGuiPoll() override;
 
-      virtual void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
+      void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
 
    protected:

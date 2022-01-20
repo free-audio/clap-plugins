@@ -1,18 +1,6 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-if(UsePkgConfig)
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(RtMidi REQUIRED IMPORTED_TARGET rtmidi)
-  pkg_check_modules(RtAudio REQUIRED IMPORTED_TARGET rtaudio)
-else()
-  find_package(RtMidi CONFIG REQUIRED)
-  find_package(RtAudio CONFIG REQUIRED)
-endif()
-
-find_package(Qt6Core CONFIG REQUIRED)
-find_package(Qt6Widgets CONFIG REQUIRED)
-
 add_executable(clap-host
   application.cc
   application.hh

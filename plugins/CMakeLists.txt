@@ -8,8 +8,6 @@ elseif(CLAP_PLUGIN_GUI_MODEL STREQUAL "remote")
   set(use_remote_gui TRUE)
 endif()
 
-find_package(Boost REQUIRED COMPONENTS serialization iostreams)
-
 add_subdirectory(io)
 add_subdirectory(gui)
 

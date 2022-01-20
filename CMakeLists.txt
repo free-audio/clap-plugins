@@ -10,11 +10,22 @@ project(CLAP_EXAMPLES C CXX)
 
 set(UsePkgConfig TRUE CACHE BOOL "Use PkgConfig to find RtMidi and RtAudio dependencies")
 
+find_package(Boost REQUIRED COMPONENTS serialization iostreams)
+
 find_package(Qt6Core CONFIG REQUIRED)
 find_package(Qt6Widgets CONFIG REQUIRED)
 find_package(Qt6Qml CONFIG REQUIRED)
 find_package(Qt6Quick CONFIG REQUIRED)
 find_package(Qt6QuickControls2 CONFIG REQUIRED)
+
+if(UsePkgConfig)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(RtMidi REQUIRED IMPORTED_TARGET rtmidi)
+  pkg_check_modules(RtAudio REQUIRED IMPORTED_TARGET rtaudio)
+else()
+  find_package(RtMidi CONFIG REQUIRED)
+  find_package(RtAudio CONFIG REQUIRED)
+endif()
 
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)

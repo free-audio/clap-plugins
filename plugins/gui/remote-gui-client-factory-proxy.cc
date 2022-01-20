@@ -6,6 +6,11 @@
 #   include <Windows.h>
 #endif
 
+#include <cassert>
+#include <iostream>
+#include <regex>
+#include <sstream>
+
 #include "../io/messages.hh"
 #include "../io/remote-channel.hh"
 
@@ -13,6 +18,17 @@
 #include "remote-gui-client-proxy.hh"
 
 namespace clap {
+#ifdef _WIN32
+   struct RemoteGuiWin32Data final {
+      STARTUPINFO _si;
+      PROCESS_INFORMATION _childInfo;
+   };
+
+   std::string escapeArg(const std::string &s) {
+      return "\"" + std::regex_replace(s, std::regex("\""), "\\\"") + "\"";
+   }
+#endif
+
    RemoteGuiClientFactoryProxy::RemoteGuiClientFactoryProxy(const std::string &guiPath)
       : _guiPath(guiPath) {}
 
@@ -182,8 +198,7 @@ namespace clap {
 #endif
    }
 
-   void RemoteGuiClientFactoryProxy::onMessage(const RemoteChannel::Message &msg)
-   {
+   void RemoteGuiClientFactoryProxy::onMessage(const RemoteChannel::Message &msg) {
       auto it = _clientIdMap.find(msg.clientId);
       if (it == _clientIdMap.end())
          return;

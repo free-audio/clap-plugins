@@ -56,10 +56,6 @@ namespace clap {
 
       messages::DestroyRequest request;
       _clientFactory._channel->sendRequestAsync(_clientId, request);
-      _channel->close();
-      _channel.reset();
-
-      waitChild();
    }
 
    bool RemoteGuiClientProxy::attachCocoa(void *nsView) {

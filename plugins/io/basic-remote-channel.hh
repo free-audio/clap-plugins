@@ -76,12 +76,17 @@ namespace clap {
       template <typename Request>
       bool sendRequestAsync(uint32_t clientId, const Request &request) {
          return sendMessageAsync(
-            BasicRemoteChannel::Message(clientId, request, computeNextCookie()));
+            BasicRemoteChannel::Message(clientId, computeNextCookie(), request));
       }
 
       template <typename Response>
       bool sendResponseAsync(uint32_t clientId, uint32_t cookie, const Response &response) {
          return sendMessageAsync(BasicRemoteChannel::Message(clientId, cookie, response));
+      }
+
+      template <typename Response>
+      bool sendResponseAsync(const BasicRemoteChannel::Message& rqMsg, const Response &response) {
+         return sendMessageAsync(BasicRemoteChannel::Message(rqMsg.clientId, rqMsg.cookie, response));
       }
 
       template <typename Request, typename Response>

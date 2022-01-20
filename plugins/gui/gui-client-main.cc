@@ -7,7 +7,7 @@
 #include <QCommandLineParser>
 
 #include "gui-client.hh"
-#include "remote-gui-listener.h"
+#include "remote-gui-listener.hh"
 
 int main(int argc, char **argv) {
    /* Useful to attach child process with debuggers which don't support follow childs */
@@ -17,17 +17,11 @@ int main(int argc, char **argv) {
 
    QGuiApplication app(argc, argv);
 
-   std::unique_ptr<clap::RemoteGuiListener> remoteGuiListener;
-
-
    qmlRegisterType<clap::ParameterProxy>("org.clap", 1, 0, "ParameterProxy");
    qmlRegisterType<clap::TransportProxy>("org.clap", 1, 0, "TransportProxy");
    qmlRegisterType<clap::PluginProxy>("org.clap", 1, 0, "PluginProxy");
 
    QCommandLineParser parser;
-
-   QCommandLineOption skinOpt("skin", QObject::tr("path to the skin directory"), QObject::tr("path"));
-   QCommandLineOption qmlLibOpt("qml-import", QObject::tr("QML import path"), QObject::tr("path"));
 
 #ifdef Q_OS_UNIX
    QCommandLineOption socketOpt("socket", QObject::tr("socket fd"), QObject::tr("path"));

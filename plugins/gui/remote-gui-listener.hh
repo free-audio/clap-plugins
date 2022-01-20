@@ -2,24 +2,27 @@
 
 #include <memory>
 
+#include "../io/remote-channel.hh"
+
 #include "abstract-gui-listener.hh"
 
 namespace clap {
-
-   class RemoteChannel;
+   class RemoteGuiClientFactory;
    class RemoteGuiListener : public AbstractGuiListener {
    public:
-      RemoteGuiListener(int socket);
-      RemoteGuiListener(void *pipeIn, void *pipeOut);
+      RemoteGuiListener(RemoteGuiClientFactory& clientFactory, uint32_t clientId);
       ~RemoteGuiListener() override;
 
-      virtual void onGuiPoll() override;
+      virtual void onGuiPoll() override {}
 
       virtual void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
 
    protected:
-      std::unique_ptr<clap::RemoteChannel> _remoteChannel;
+      friend class RemoteGuiClientFactory;
+
+      RemoteGuiClientFactory& _clientFactory;
+      const uint32_t _clientId;
    };
 
 } // namespace clap

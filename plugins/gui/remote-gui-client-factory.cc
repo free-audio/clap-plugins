@@ -66,17 +66,17 @@ namespace clap {
    }
 
    void RemoteGuiClientFactory::onMessage(const RemoteChannel::Message &msg) {
+      auto c = getClient(msg.clientId);
+
       switch (msg.type) {
       case messages::kDestroyRequest:
          messages::DestroyResponse rp;
-         _channel->sendResponseAsync(rp, msg.cookie);
-         QGuiApplication::quit();
+         _channel->sendResponseAsync(msg, rp);
          break;
 
       case messages::kUpdateTransportRequest: {
          messages::UpdateTransportRequest rq;
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             c->updateTransport(rq.transport);
          break;
@@ -85,7 +85,6 @@ namespace clap {
       case messages::kDefineParameterRequest: {
          messages::DefineParameterRequest rq;
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             c->defineParameter(rq.info);
          break;
@@ -94,7 +93,6 @@ namespace clap {
       case messages::kParameterValueRequest: {
          messages::ParameterValueRequest rq;
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             c->updateParameter(rq.paramId, rq.value, rq.modulation);
          break;
@@ -102,12 +100,11 @@ namespace clap {
 
       case messages::kSizeRequest: {
          messages::SizeRequest rq;
-         messages::SizeResponse rp;
+         messages::SizeResponse rp{0, 0, false};
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             rp.succeed = c->size(&rp.width, &rp.height);
-         _channel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(msg, rp);
          break;
       }
 
@@ -115,10 +112,9 @@ namespace clap {
          messages::SetScaleRequest rq;
          messages::SetScaleResponse rp{false};
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             rp.succeed = c->setScale(rq.scale);
-         _channel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(msg, rp);
          break;
       }
 
@@ -126,10 +122,9 @@ namespace clap {
          messages::AttachX11Request rq;
          messages::AttachResponse rp{false};
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             rp.succeed = c->attachX11(rq.display, rq.window);
-         _channel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(msg, rp);
          break;
       }
 
@@ -137,10 +132,9 @@ namespace clap {
          messages::AttachWin32Request rq;
          messages::AttachResponse rp{false};
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             rp.succeed = c->attachWin32(rq.hwnd);
-         _channel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(msg, rp);
          break;
       }
 
@@ -148,10 +142,9 @@ namespace clap {
          messages::AttachCocoaRequest rq;
          messages::AttachResponse rp{false};
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             rp.succeed = c->attachCocoa(rq.nsView);
-         _channel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(msg, rp);
          break;
       }
 
@@ -159,10 +152,9 @@ namespace clap {
          messages::ShowRequest rq;
          messages::ShowResponse rp;
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             rp.succeed = c->show();
-         _channel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(msg, rp);
          break;
       }
 
@@ -170,10 +162,9 @@ namespace clap {
          messages::HideRequest rq;
          messages::HideResponse rp;
          msg.get(rq);
-         auto c = getClient(rq);
          if (c)
             rp.succeed = c->hide();
-         _channel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(msg, rp);
          break;
       }
       }

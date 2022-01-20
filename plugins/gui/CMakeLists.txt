@@ -59,7 +59,7 @@ set_property(TARGET clap-plugin-remote-gui PROPERTY CXX_STANDARD 20)
 target_link_libraries(clap-plugin-remote-gui PUBLIC clap-plugin-gui-common clap-io)
 
 add_executable(clap-gui
-    main.cc
+    gui-client-main.cc
     remote-gui-client-factory.hh
     remote-gui-client-factory.cc
     remote-gui-listener.hh

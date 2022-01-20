@@ -3,7 +3,8 @@
 
 namespace clap {
 
-   RemoteGuiListener::RemoteGuiListener(int socket) {}
-   RemoteGuiListener::RemoteGuiListener(void *pipeIn, void *pipeOut) {}
+   RemoteGuiListener::RemoteGuiListener(RemoteGuiClientFactory &clientFactory, uint32_t clientId)
+      : _clientFactory(clientFactory), _clientId(clientId) {}
+
    RemoteGuiListener::~RemoteGuiListener() = default;
 } // namespace clap

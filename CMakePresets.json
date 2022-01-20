@@ -178,7 +178,7 @@
             "description": "Build using Ninja and VCPKG",
             "configurePreset": "ninja-vcpkg",
             "targets": [
-                "all", "clap-host", "clap-plugins"
+                "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
             ]
         },
         {
@@ -186,7 +186,7 @@
             "description": "Build using Ninja and system libraries",
             "configurePreset": "ninja-system",
             "targets": [
-                "all", "clap-host", "clap-plugins", "run-host"
+                "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
             ]
         }
     ],

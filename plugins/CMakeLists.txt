@@ -48,8 +48,8 @@ set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20 SUFFIX ".clap" PRE
 target_link_libraries(clap-plugins PUBLIC clap-helpers clap-io Boost::serialization Boost::iostreams)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  target_link_libraries(clap-plugins -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)
-  target_link_libraries(clap-plugins -Wl,-z,defs)
+  target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)
+  target_link_libraries(clap-plugins PRIVATE -Wl,-z,defs)
 endif()
 
 install(TARGETS clap-plugins DESTINATION "lib/clap" COMPONENT plugins)

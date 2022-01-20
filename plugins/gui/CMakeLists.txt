@@ -7,7 +7,8 @@ add_library(clap-plugin-gui-common
     abstract-gui.hh
     abstract-gui-listener.hh
     abstract-gui-listener.cc
-    abstract-gui-client-factory.hh)
+    abstract-gui-client-factory.hh
+    abstract-gui-client-factory.cc)
 set_property(TARGET clap-plugin-gui-common PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-gui-common PROPERTY POSITION_INDEPENDENT_CODE true)
 target_link_libraries(clap-plugin-gui-common PUBLIC clap-core)
@@ -25,7 +26,7 @@ add_library(clap-plugin-gui
 )
 set_property(TARGET clap-plugin-gui PROPERTY CXX_STANDARD 20)
 target_link_libraries(clap-plugin-gui PUBLIC clap-io clap-plugin-gui-common)
-target_link_libraries(clap-plugin-gui PRIVATE Qt6::QuickControls2 Qt6::Quick Qt6::Qml Qt6::Widgets Qt6::Core)
+target_link_libraries(clap-plugin-gui PUBLIC Qt6::QuickControls2 Qt6::Quick Qt6::Qml Qt6::Widgets Qt6::Gui)
 set_property(TARGET clap-plugin-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 qt6_import_qml_plugins(clap-plugin-gui)
 

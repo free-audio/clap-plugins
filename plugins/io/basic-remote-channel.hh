@@ -15,6 +15,8 @@ namespace clap {
    public:
       class EventControl {
       public:
+         virtual ~EventControl() = default;
+
          virtual void modifyFd(int flags) = 0;
          virtual void removeFd() = 0;
       };
@@ -23,12 +25,13 @@ namespace clap {
          uint32_t type = 0;
          uint32_t cookie = 0;
          uint32_t size = 0;
+         uint32_t clientId = 0;
          const void *data = nullptr;
 
          Message() = default;
 
          template <typename T>
-         Message(const T &msg, uint32_t c) : cookie(c) {
+         Message(uint32_t cid, uint32_t cki, const T &msg) : cookie(cki), clientId(cid) {
             set(msg);
          }
 
@@ -71,18 +74,19 @@ namespace clap {
       uint32_t computeNextCookie() noexcept;
 
       template <typename Request>
-      bool sendRequestAsync(const Request &request) {
-         return sendMessageAsync(BasicRemoteChannel::Message(request, computeNextCookie()));
+      bool sendRequestAsync(uint32_t clientId, const Request &request) {
+         return sendMessageAsync(
+            BasicRemoteChannel::Message(clientId, request, computeNextCookie()));
       }
 
       template <typename Response>
-      bool sendResponseAsync(const Response &response, uint32_t cookie) {
-         return sendMessageAsync(BasicRemoteChannel::Message(response, cookie));
+      bool sendResponseAsync(uint32_t clientId, uint32_t cookie, const Response &response) {
+         return sendMessageAsync(BasicRemoteChannel::Message(clientId, cookie, response));
       }
 
       template <typename Request, typename Response>
-      bool sendRequestSync(const Request &request, Response &response) {
-         sendMessageSync(BasicRemoteChannel::Message(request, computeNextCookie()),
+      bool sendRequestSync(uint32_t clientId, const Request &request, Response &response) {
+         sendMessageSync(BasicRemoteChannel::Message(clientId, computeNextCookie(), request),
                          [&response](const BasicRemoteChannel::Message &m) { m.get(response); });
          return true;
       }

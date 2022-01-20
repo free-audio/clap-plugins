@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../io/remote-channel.hh"
+
 #include "abstract-gui.hh"
 
 namespace clap {
@@ -27,6 +29,10 @@ namespace clap {
       void destroy() override;
 
    private:
+      friend class RemoteGuiClientFactoryProxy;
+
+      void onMessage(const RemoteChannel::Message &msg);
+
       RemoteGuiClientFactoryProxy &_clientFactory;
       const uint32_t _clientId;
    };

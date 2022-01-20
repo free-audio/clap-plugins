@@ -27,6 +27,10 @@ else()
   find_package(RtAudio CONFIG REQUIRED)
 endif()
 
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang|GNU")
+  add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden)
+endif()
+
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)
 add_subdirectory(host)

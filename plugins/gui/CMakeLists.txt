@@ -3,7 +3,11 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6Core CONFIG REQUIRED)
 find_package(Qt6Widgets CONFIG REQUIRED)
-find_package(Qt6 COMPONENTS Qml Quick QuickControls2 REQUIRED)
+find_package(Qt6Qml CONFIG REQUIRED)
+find_package(Qt6Quick CONFIG REQUIRED)
+find_package(Qt6QuickControls2 CONFIG REQUIRED)
+
+#find_package(Qt6 COMPONENTS Core Widget Platform Qml Quick QuickControls2 REQUIRED)
 
 add_library(clap-plugin-gui-common
     abstract-gui.hh
@@ -26,7 +30,7 @@ add_library(clap-plugin-gui
     transport-proxy.cc
 )
 set_property(TARGET clap-plugin-gui PROPERTY CXX_STANDARD 20)
-target_link_libraries(clap-plugin-gui PUBLIC clap-io clap-core Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Core)
+target_link_libraries(clap-plugin-gui PUBLIC clap-io clap-core Qt6::QuickControls2 Qt6::Quick Qt6::Qml Qt6::Widgets Qt6::Core)
 set_property(TARGET clap-plugin-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 qt6_import_qml_plugins(clap-plugin-gui)
 

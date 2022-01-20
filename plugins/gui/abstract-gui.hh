@@ -8,8 +8,8 @@ namespace clap {
    class AbstractGuiListener;
    class AbstractGui {
    public:
-      AbstractGui(AbstractGuiListener &listener) : _listener(listener) {}
-      virtual ~AbstractGui() = default;
+      AbstractGui(AbstractGuiListener &listener);
+      virtual ~AbstractGui();
 
       virtual void defineParameter(const clap_param_info &paramInfo) = 0;
       virtual void updateParameter(clap_id paramId, double value, double modAmount) = 0;

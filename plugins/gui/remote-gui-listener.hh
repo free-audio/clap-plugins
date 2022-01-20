@@ -1,6 +1,6 @@
 #include <memory>
 
-#include "abstract-gui-listener.h"
+#include "abstract-gui-listener.hh"
 
 namespace clap {
 
@@ -11,10 +11,10 @@ namespace clap {
       RemoteGuiListener(void *pipeIn, void *pipeOut);
       ~RemoteGuiListener() override;
 
-      virtual void onGuiPoll() = 0;
+      virtual void onGuiPoll() override;
 
-      virtual void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) = 0;
-      virtual void onGuiSetTransportIsSubscribed(bool isSubscribed) = 0;
+      virtual void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
+      void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
 
    protected:
       std::unique_ptr<clap::RemoteChannel> _remoteChannel;

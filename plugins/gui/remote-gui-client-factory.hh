@@ -29,7 +29,7 @@ namespace clap {
 
       std::unordered_map<uint32_t, std::unique_ptr<GuiClient>> _guiClients;
 
-      std::unique_ptr<clap::RemoteChannel> _remoteChannel;
+      std::unique_ptr<clap::RemoteChannel> _channel;
       std::unique_ptr<QSocketNotifier> _socketReadNotifier;
       std::unique_ptr<QSocketNotifier> _socketWriteNotifier;
    };

@@ -7,6 +7,7 @@
 #include <QCommandLineParser>
 
 #include "gui-client.hh"
+#include "remote-gui-listener.h"
 
 int main(int argc, char **argv) {
    /* Useful to attach child process with debuggers which don't support follow childs */
@@ -15,6 +16,9 @@ int main(int argc, char **argv) {
       QThread::sleep(1);
 
    QGuiApplication app(argc, argv);
+
+   std::unique_ptr<clap::RemoteGuiListener> remoteGuiListener;
+
 
    qmlRegisterType<clap::ParameterProxy>("org.clap", 1, 0, "ParameterProxy");
    qmlRegisterType<clap::TransportProxy>("org.clap", 1, 0, "TransportProxy");
@@ -45,7 +49,7 @@ int main(int argc, char **argv) {
 
 #if defined(Q_OS_UNIX)
    auto socket = parser.value(socketOpt).toULongLong();
-   clap::GuiClient client(socket, parser.values(qmlLibOpt), QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
+   remoteGuiListener = std::make_unique<clap::RemoteGuiListener>(socket);
 #elif defined(Q_OS_WINDOWS)
    auto pipeInName = parser.value(pipeInOpt).toStdString();
    auto pipeOutName = parser.value(pipeOutOpt).toStdString();
@@ -65,8 +69,10 @@ int main(int argc, char **argv) {
                                     OPEN_EXISTING,
                                     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
                                     NULL);
-   GuiClient client(pipeInHandle, pipeOutHandle);
+   remoteGuiListener = std::make_unique<clap::RemoteGuiListener>(pipeInHandle, pipeOutHandle);
 #endif
+
+   clap::GuiClient client(*remoteGuiListener, parser.values(qmlLibOpt), QUrl::fromLocalFile(parser.value(skinOpt) + "/main.qml"));
 
    /* Run the app */
    return app.exec();

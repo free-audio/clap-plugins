@@ -52,14 +52,18 @@ target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-gui)
 
 add_library(clap-plugin-remote-gui
     remote-gui-client-factory-proxy.hh
-    remote-gui-client-factory-proxy.cc)
+    remote-gui-client-factory-proxy.cc
+    remote-gui-client-proxy.hh
+    remote-gui-client-proxy.cc)
 set_property(TARGET clap-plugin-remote-gui PROPERTY CXX_STANDARD 20)
 target_link_libraries(clap-plugin-remote-gui PUBLIC clap-plugin-gui-common clap-io)
 
 add_executable(clap-gui
     main.cc
     remote-gui-client-factory.hh
-    remote-gui-client-factory.cc)
+    remote-gui-client-factory.cc
+    remote-gui-listener.hh
+    remote-gui-listener.cc)
 target_link_libraries(clap-gui PUBLIC clap-plugin-gui)
 set_target_properties(clap-gui PROPERTIES CXX_STANDARD 20)
 

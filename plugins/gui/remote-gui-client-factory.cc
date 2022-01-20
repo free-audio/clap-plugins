@@ -10,7 +10,7 @@ namespace clap {
       ////////////////////////
 
 #if defined(Q_OS_UNIX)
-      _remoteChannel.reset(new clap::RemoteChannel(
+      _channel.reset(new clap::RemoteChannel(
          [this](const clap::RemoteChannel::Message &msg) { onMessage(msg); },
          false,
          *this,
@@ -20,8 +20,8 @@ namespace clap {
       connect(_socketReadNotifier.get(),
               &QSocketNotifier::activated,
               [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
-                 _remoteChannel->tryReceive();
-                 if (!_remoteChannel->isOpen())
+                 _channel->tryReceive();
+                 if (!_channel->isOpen())
                     QCoreApplication::quit();
               });
 
@@ -29,8 +29,8 @@ namespace clap {
       connect(_socketWriteNotifier.get(),
               &QSocketNotifier::activated,
               [this](QSocketDescriptor socket, QSocketNotifier::Type type) {
-                 _remoteChannel->trySend();
-                 if (!_remoteChannel->isOpen()) {
+                 _channel->trySend();
+                 if (!_channel->isOpen()) {
                     QCoreApplication::quit();
                  }
               });
@@ -69,7 +69,7 @@ namespace clap {
       switch (msg.type) {
       case messages::kDestroyRequest:
          messages::DestroyResponse rp;
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          QGuiApplication::quit();
          break;
 
@@ -107,7 +107,7 @@ namespace clap {
          auto c = getClient(rq);
          if (c)
             rp.succeed = c->size(&rp.width, &rp.height);
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          break;
       }
 
@@ -118,7 +118,7 @@ namespace clap {
          auto c = getClient(rq);
          if (c)
             rp.succeed = c->setScale(rq.scale);
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          break;
       }
 
@@ -129,7 +129,7 @@ namespace clap {
          auto c = getClient(rq);
          if (c)
             rp.succeed = c->attachX11(rq.display, rq.window);
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          break;
       }
 
@@ -140,7 +140,7 @@ namespace clap {
          auto c = getClient(rq);
          if (c)
             rp.succeed = c->attachWin32(rq.hwnd);
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          break;
       }
 
@@ -151,7 +151,7 @@ namespace clap {
          auto c = getClient(rq);
          if (c)
             rp.succeed = c->attachCocoa(rq.nsView);
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          break;
       }
 
@@ -162,7 +162,7 @@ namespace clap {
          auto c = getClient(rq);
          if (c)
             rp.succeed = c->show();
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          break;
       }
 
@@ -173,7 +173,7 @@ namespace clap {
          auto c = getClient(rq);
          if (c)
             rp.succeed = c->hide();
-         _remoteChannel->sendResponseAsync(rp, msg.cookie);
+         _channel->sendResponseAsync(rp, msg.cookie);
          break;
       }
       }

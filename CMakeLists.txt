@@ -10,6 +10,12 @@ project(CLAP_EXAMPLES C CXX)
 
 set(UsePkgConfig TRUE CACHE BOOL "Use PkgConfig to find RtMidi and RtAudio dependencies")
 
+find_package(Qt6Core CONFIG REQUIRED)
+find_package(Qt6Widgets CONFIG REQUIRED)
+find_package(Qt6Qml CONFIG REQUIRED)
+find_package(Qt6Quick CONFIG REQUIRED)
+find_package(Qt6QuickControls2 CONFIG REQUIRED)
+
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)
 add_subdirectory(host)

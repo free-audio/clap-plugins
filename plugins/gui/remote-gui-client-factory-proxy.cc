@@ -29,8 +29,12 @@ namespace clap {
    }
 #endif
 
+   std::weak_ptr<RemoteGuiClientFactoryProxy> RemoteGuiClientFactoryProxy::_instance;
+
    RemoteGuiClientFactoryProxy::RemoteGuiClientFactoryProxy(const std::string &guiPath)
-      : _guiPath(guiPath) {}
+      : _guiPath(guiPath) {
+      // TODO: start the thread and the io loop
+   }
 
    RemoteGuiClientFactoryProxy::~RemoteGuiClientFactoryProxy() {}
 

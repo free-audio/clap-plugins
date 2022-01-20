@@ -5,6 +5,7 @@ set(CMAKE_AUTOMOC ON)
 
 add_library(clap-plugin-gui-common
     abstract-gui.hh
+    abstract-gui.cc
     abstract-gui-listener.hh
     abstract-gui-listener.cc
     abstract-gui-client-factory.hh

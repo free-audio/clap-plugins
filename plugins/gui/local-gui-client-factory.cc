@@ -10,6 +10,8 @@
 
 namespace clap {
 
+   std::weak_ptr<LocalGuiClientFactory> LocalGuiClientFactory::_instance;
+
    LocalGuiClientFactory::LocalGuiClientFactory() {
       _thread.reset(new std::thread(&LocalGuiClientFactory::run, this));
    }

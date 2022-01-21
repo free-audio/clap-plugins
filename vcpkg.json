@@ -7,10 +7,17 @@
     "catch2",
     {
       "name": "rtaudio",
-      "features": [
-        "alsa",
-        "asio"
-      ]
+      "features": ["alsa"],
+      "platform": "linux"
+    },
+    {
+      "name": "rtaudio",
+      "features": ["asio"],
+      "platform": "windows"
+    },
+    {
+      "name": "rtaudio",
+      "platform": "osx"
     },
     "rtmidi",
     "harfbuzz",

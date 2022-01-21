@@ -10,6 +10,8 @@ project(CLAP_EXAMPLES C CXX)
 
 set(UsePkgConfig TRUE CACHE BOOL "Use PkgConfig to find RtMidi and RtAudio dependencies")
 
+set(CMAKE_AUTOMOC ON)
+
 find_package(Boost REQUIRED COMPONENTS serialization iostreams)
 
 find_package(Qt6Core CONFIG REQUIRED)

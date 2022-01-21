@@ -1,5 +1,4 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
 
 add_executable(clap-host
   application.cc
@@ -45,7 +44,7 @@ set_target_properties(clap-host PROPERTIES
   WIN32_EXECUTABLE true
   VS_DEBUGGER_COMMAND_ARGUMENTS "-p $<TARGET_FILE:clap-plugins> -i 0")
 
-target_link_libraries(clap-host Qt6::Widgets Qt6::Core clap-core clap-helpers)
+target_link_libraries(clap-host Qt6::Widgets clap-helpers)
 
 if(UsePkgConfig)
   target_link_libraries(clap-host PkgConfig::RtMidi PkgConfig::RtAudio)

@@ -1,4 +1,5 @@
 #include <cassert>
+#include <future>
 
 #include <QGuiApplication>
 #include <QString>
@@ -13,7 +14,23 @@ namespace clap {
    std::weak_ptr<LocalGuiClientFactory> LocalGuiClientFactory::_instance;
 
    LocalGuiClientFactory::LocalGuiClientFactory() {
-      _thread.reset(new std::thread(&LocalGuiClientFactory::run, this));
+      std::promise<bool> initialized;
+      _thread.reset(new std::thread([&initialized, this] {
+         static int argc = 1;
+         char arg0[] = "clap-plugin-gui";
+         static char *argv[] = {arg0, nullptr};
+
+         assert(!_app);
+         _app = std::make_unique<QGuiApplication>(argc, argv);
+         initialized.set_value(true);
+         _app->exec();
+      }));
+
+      if (!initialized.get_future().get()) {
+         // failed to initialized
+         _thread->join();
+         _thread.reset();
+      }
    }
 
    LocalGuiClientFactory::~LocalGuiClientFactory() {
@@ -35,16 +52,6 @@ namespace clap {
       ptr.reset(new LocalGuiClientFactory());
       _instance = ptr;
       return ptr;
-   }
-
-   void LocalGuiClientFactory::run() {
-      static int argc = 1;
-      char arg0[] = "clap-plugin-gui";
-      static char *argv[] = {arg0, nullptr};
-
-      assert(!_app);
-      _app = std::make_unique<QGuiApplication>(argc, argv);
-      _app->exec();
    }
 
    std::shared_ptr<AbstractGui>

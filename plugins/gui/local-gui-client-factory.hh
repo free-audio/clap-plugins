@@ -29,8 +29,6 @@ namespace clap {
    private:
       static std::weak_ptr<LocalGuiClientFactory> _instance;
 
-      void run();
-
       std::unique_ptr<std::thread> _thread;
       std::unique_ptr<QGuiApplication> _app;
       std::unordered_map<AbstractGuiListener *, std::weak_ptr<AbstractGui>> _clients;

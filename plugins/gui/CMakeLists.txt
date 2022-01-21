@@ -43,13 +43,20 @@ if(false)
 endif()
 
 add_library(clap-plugin-local-gui
-    local-gui-client-factory.hh
-    local-gui-client-factory.cc
-    local-gui-proxy.hh
-    local-gui-proxy.cc)
+    local-gui-factory.hh
+    local-gui-factory.cc)
 set_property(TARGET clap-plugin-local-gui PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-local-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-gui)
+
+add_library(clap-plugin-threaded-gui
+    threaded-gui-factory.hh
+    threaded-gui-factory.cc
+    threaded-gui-proxy.hh
+    threaded-gui-proxy.cc)
+set_property(TARGET clap-plugin-threaded-gui PROPERTY CXX_STANDARD 20)
+set_property(TARGET clap-plugin-threaded-gui PROPERTY POSITION_INDEPENDENT_CODE true)
+target_link_libraries(clap-plugin-threaded-gui PUBLIC clap-plugin-gui)
 
 add_library(clap-plugin-remote-gui
     remote-gui-client-factory-proxy.hh
@@ -59,10 +66,6 @@ add_library(clap-plugin-remote-gui
 set_property(TARGET clap-plugin-remote-gui PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-remote-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 target_link_libraries(clap-plugin-remote-gui PUBLIC clap-plugin-gui-common clap-io)
-
-add_library(clap-plugin-threaded-gui
-    threaded-gui-factory.hh
-    threaded-gui-factory.cc)
 
 add_executable(clap-gui
     gui-client-main.cc

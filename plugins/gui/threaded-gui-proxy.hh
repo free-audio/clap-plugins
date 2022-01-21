@@ -7,10 +7,10 @@
 namespace clap {
 
    class GuiClient;
-   class LocalGuiProxy : public AbstractGui {
+   class ThreadedGuiProxy : public AbstractGui {
    public:
-      LocalGuiProxy(AbstractGuiListener &listener, std::shared_ptr<GuiClient>& guiClient);
-      ~LocalGuiProxy() override;
+      ThreadedGuiProxy(AbstractGuiListener &listener, std::shared_ptr<GuiClient>& guiClient);
+      ~ThreadedGuiProxy() override;
 
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;

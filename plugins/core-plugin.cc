@@ -111,7 +111,7 @@ namespace clap {
 
    bool CorePlugin::guiCreate() noexcept {
 #if defined(CLAP_LOCAL_GUI)
-      _guiFactory = LocalGuiClientFactory::getInstance();
+      _guiFactory = LocalGuiFactory::getInstance();
 #elif defined(CLAP_REMOTE_GUI)
       _guiFactory = RemoteGuiClientFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
 #endif

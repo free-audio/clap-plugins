@@ -9,7 +9,6 @@
 #include <QTimer>
 
 #include "gui-client.hh"
-#include "local-gui-proxy.hh"
 #include "threaded-gui-factory.hh"
 #include "abstract-gui-listener.hh"
 

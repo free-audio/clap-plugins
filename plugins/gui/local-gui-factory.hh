@@ -11,12 +11,15 @@ class QGuiApplication;
 class QTimer;
 
 namespace clap {
-   class LocalGuiClientFactory : public AbstractGuiClientFactory {
-   public:
-      LocalGuiClientFactory();
-      ~LocalGuiClientFactory() override;
+   class GuiClient;
 
-      static std::shared_ptr<LocalGuiClientFactory> getInstance();
+   // Creates the QGuiApplication on the host's main thread
+   class LocalGuiFactory : public AbstractGuiClientFactory {
+   public:
+      LocalGuiFactory();
+      ~LocalGuiFactory() override;
+
+      static std::shared_ptr<LocalGuiFactory> getInstance();
 
       virtual std::shared_ptr<AbstractGui>
       createGuiClient(AbstractGuiListener &listener,
@@ -26,11 +29,10 @@ namespace clap {
    private:
       void onTimer();
 
-      static std::weak_ptr<LocalGuiClientFactory> _instance;
+      static std::weak_ptr<LocalGuiFactory> _instance;
 
-      std::unique_ptr<std::thread> _thread;
       std::unique_ptr<QGuiApplication> _app;
-      std::unordered_map<AbstractGuiListener *, std::weak_ptr<AbstractGui>> _clients;
+      std::unordered_map<AbstractGuiListener *, std::weak_ptr<GuiClient>> _clients;
       std::unique_ptr<QTimer> _timer;
    };
 } // namespace clap

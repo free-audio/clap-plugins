@@ -1,38 +1,38 @@
 #include <exception>
 
 #include "gui-client.hh"
-#include "local-gui-proxy.hh"
+#include "threaded-gui-proxy.hh"
 
 namespace clap {
 
-   LocalGuiProxy::LocalGuiProxy(AbstractGuiListener &listener, std::shared_ptr<GuiClient>& guiClient)
+   ThreadedGuiProxy::ThreadedGuiProxy(AbstractGuiListener &listener, std::shared_ptr<GuiClient>& guiClient)
       : AbstractGui(listener), _guiClient(guiClient) {}
 
-   LocalGuiProxy::~LocalGuiProxy() {}
+   ThreadedGuiProxy::~ThreadedGuiProxy() {}
 
-   void clap::LocalGuiProxy::defineParameter(const clap_param_info &paramInfo) {
+   void clap::ThreadedGuiProxy::defineParameter(const clap_param_info &paramInfo) {
       QMetaObject::invokeMethod(
          _guiClient.get(), [=, this] { _guiClient->defineParameter(paramInfo); }, Qt::QueuedConnection);
    }
 
-   void LocalGuiProxy::updateParameter(clap_id paramId, double value, double modAmount) {
+   void ThreadedGuiProxy::updateParameter(clap_id paramId, double value, double modAmount) {
       QMetaObject::invokeMethod(
          _guiClient.get(),
          [=, this] { _guiClient->updateParameter(paramId, value, modAmount); },
          Qt::QueuedConnection);
    }
 
-   void LocalGuiProxy::clearTransport() {
+   void ThreadedGuiProxy::clearTransport() {
       QMetaObject::invokeMethod(
          _guiClient.get(), [=, this] { _guiClient->clearTransport(); }, Qt::QueuedConnection);
    }
 
-   void LocalGuiProxy::updateTransport(const clap_event_transport &transport) {
+   void ThreadedGuiProxy::updateTransport(const clap_event_transport &transport) {
       QMetaObject::invokeMethod(
          _guiClient.get(), [=, this] { _guiClient->updateTransport(transport); }, Qt::QueuedConnection);
    }
 
-   bool LocalGuiProxy::attachCocoa(void *nsView) {
+   bool ThreadedGuiProxy::attachCocoa(void *nsView) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _guiClient.get(),
@@ -41,7 +41,7 @@ namespace clap {
       return succeed;
    }
 
-   bool LocalGuiProxy::attachWin32(clap_hwnd window) {
+   bool ThreadedGuiProxy::attachWin32(clap_hwnd window) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _guiClient.get(),
@@ -50,7 +50,7 @@ namespace clap {
       return succeed;
    }
 
-   bool LocalGuiProxy::attachX11(const char *displayName, unsigned long window) {
+   bool ThreadedGuiProxy::attachX11(const char *displayName, unsigned long window) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _guiClient.get(),
@@ -59,7 +59,7 @@ namespace clap {
       return succeed;
    }
 
-   bool LocalGuiProxy::size(uint32_t *width, uint32_t *height) {
+   bool ThreadedGuiProxy::size(uint32_t *width, uint32_t *height) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _guiClient.get(),
@@ -68,7 +68,7 @@ namespace clap {
       return succeed;
    }
 
-   bool LocalGuiProxy::setScale(double scale) {
+   bool ThreadedGuiProxy::setScale(double scale) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _guiClient.get(),
@@ -77,21 +77,21 @@ namespace clap {
       return succeed;
    }
 
-   bool LocalGuiProxy::show() {
+   bool ThreadedGuiProxy::show() {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _guiClient.get(), [=, this, &succeed] { succeed = _guiClient->show(); }, Qt::BlockingQueuedConnection);
       return succeed;
    }
 
-   bool LocalGuiProxy::hide() {
+   bool ThreadedGuiProxy::hide() {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _guiClient.get(), [=, this, &succeed] { succeed = _guiClient->hide(); }, Qt::BlockingQueuedConnection);
       return succeed;
    }
 
-   void LocalGuiProxy::destroy() {
+   void ThreadedGuiProxy::destroy() {
       // todo
    }
 } // namespace clap

@@ -2,6 +2,7 @@
 #   include <fcntl.h>
 #   include <sys/socket.h>
 #   include <sys/wait.h>
+#   include <unistd.h>
 #elif defined(_WIN32)
 #   include <Windows.h>
 #endif

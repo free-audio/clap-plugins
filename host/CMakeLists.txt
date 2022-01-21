@@ -70,4 +70,10 @@ if (APPLE)
   target_link_libraries(clap-host PRIVATE ${CARBON} ${AUDIO_UNIT} ${AUDIO_TOOLBOX} ${CORE_MIDI} ${CORE_AUDIO} ${CORE_SERVICES} ${CORE_FOUNDATION})
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  target_link_libraries(clap-host PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-host.version)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  #target_link_options(clap-plugins PRIVATE -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/macos-symbols.txt)
+endif()
+
 install(TARGETS clap-host DESTINATION "bin" COMPONENT host)

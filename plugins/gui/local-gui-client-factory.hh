@@ -4,17 +4,14 @@
 #include <thread>
 #include <unordered_map>
 
-#include <QObject>
-
 #include "abstract-gui-client-factory.hh"
 
 class QThread;
 class QGuiApplication;
+class QTimer;
 
 namespace clap {
-   class LocalGuiClientFactory : public QObject, public AbstractGuiClientFactory {
-      Q_OBJECT
-
+   class LocalGuiClientFactory : public AbstractGuiClientFactory {
    public:
       LocalGuiClientFactory();
       ~LocalGuiClientFactory() override;
@@ -27,10 +24,13 @@ namespace clap {
                       const std::string &qmlUrl) override;
 
    private:
+      void onTimer();
+
       static std::weak_ptr<LocalGuiClientFactory> _instance;
 
       std::unique_ptr<std::thread> _thread;
       std::unique_ptr<QGuiApplication> _app;
       std::unordered_map<AbstractGuiListener *, std::weak_ptr<AbstractGui>> _clients;
+      std::unique_ptr<QTimer> _timer;
    };
 } // namespace clap

@@ -1,0 +1,4 @@
+CLAP_HOST_ABI_1.0 {
+  local:
+    *;
+};

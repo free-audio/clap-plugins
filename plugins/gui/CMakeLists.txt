@@ -27,7 +27,7 @@ add_library(clap-plugin-gui
 )
 set_property(TARGET clap-plugin-gui PROPERTY CXX_STANDARD 20)
 target_link_libraries(clap-plugin-gui PUBLIC clap-io clap-plugin-gui-common)
-target_link_libraries(clap-plugin-gui PUBLIC Qt6::QuickControls2 Qt6::Quick Qt6::Qml Qt6::Widgets Qt6::Gui)
+target_link_libraries(clap-plugin-gui PUBLIC Qt6::Quick)
 set_property(TARGET clap-plugin-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 qt6_import_qml_plugins(clap-plugin-gui)
 

@@ -13,7 +13,7 @@ set(UsePkgConfig TRUE CACHE BOOL "Use PkgConfig to find RtMidi and RtAudio depen
 set(CMAKE_AUTOMOC ON)
 
 find_package(Boost COMPONENTS serialization iostreams REQUIRED)
-find_package(Qt6 COMPONENTS Core Gui Widgets Qml Quick QuickControls2 REQUIRED)
+find_package(Qt6 COMPONENTS Widgets Qml Quick REQUIRED)
 
 if(UsePkgConfig)
   find_package(PkgConfig REQUIRED)

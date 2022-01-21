@@ -8,9 +8,9 @@ namespace clap {
 
    class AbstractGui;
    class AbstractGuiListener;
-   class AbstractGuiClientFactory {
+   class AbstractGuiFactory {
    public:
-      virtual ~AbstractGuiClientFactory();
+      virtual ~AbstractGuiFactory();
 
       virtual std::shared_ptr<AbstractGui>
       createGuiClient(AbstractGuiListener &listener,

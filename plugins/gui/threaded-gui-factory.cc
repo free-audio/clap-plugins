@@ -11,6 +11,7 @@
 #include "gui-client.hh"
 #include "threaded-gui-factory.hh"
 #include "abstract-gui-listener.hh"
+#include "threaded-gui-proxy.hh"
 
 namespace clap {
 
@@ -93,7 +94,7 @@ namespace clap {
          },
          Qt::BlockingQueuedConnection);
 
-      return std::make_shared<LocalGuiProxy>(listener, ptr);
+      return std::make_shared<ThreadedGuiProxy>(listener, ptr);
    }
 
    void ThreadedGuiClientFactory::onTimer()

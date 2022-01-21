@@ -4,7 +4,7 @@
 #include <thread>
 #include <unordered_map>
 
-#include "abstract-gui-client-factory.hh"
+#include "abstract-gui-factory.hh"
 
 class QThread;
 class QGuiApplication;
@@ -14,7 +14,7 @@ namespace clap {
    class GuiClient;
 
    // Creates the QGuiApplication on the host's main thread
-   class LocalGuiFactory : public AbstractGuiClientFactory {
+   class LocalGuiFactory : public AbstractGuiFactory {
    public:
       LocalGuiFactory();
       ~LocalGuiFactory() override;

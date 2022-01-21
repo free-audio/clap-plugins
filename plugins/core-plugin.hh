@@ -9,7 +9,7 @@
 #include "parameters.hh"
 #include "path-provider.hh"
 #include "gui/abstract-gui-listener.hh"
-#include "gui/abstract-gui-client-factory.hh"
+#include "gui/abstract-gui-factory.hh"
 
 namespace clap {
 
@@ -17,7 +17,7 @@ namespace clap {
    extern template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
 
    class AbstractGui;
-   class AbstractGuiClientFactory;
+   class AbstractGuiFactory;
 
    class CorePlugin : public PluginGlue, public AbstractGuiListener {
       using super = PluginGlue;
@@ -188,7 +188,7 @@ namespace clap {
       std::vector<clap_audio_ports_config> _audioConfigs;
 
       clap_id _guiTimerId = CLAP_INVALID_ID;
-      std::shared_ptr<AbstractGuiClientFactory> _guiFactory;
+      std::shared_ptr<AbstractGuiFactory> _guiFactory;
       std::shared_ptr<AbstractGui> _gui;
 
       Parameters _parameters;

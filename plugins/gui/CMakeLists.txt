@@ -8,8 +8,8 @@ add_library(clap-plugin-gui-common
     abstract-gui.cc
     abstract-gui-listener.hh
     abstract-gui-listener.cc
-    abstract-gui-client-factory.hh
-    abstract-gui-client-factory.cc)
+    abstract-gui-factory.hh
+    abstract-gui-factory.cc)
 set_property(TARGET clap-plugin-gui-common PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-gui-common PROPERTY POSITION_INDEPENDENT_CODE true)
 target_link_libraries(clap-plugin-gui-common PUBLIC clap-core)

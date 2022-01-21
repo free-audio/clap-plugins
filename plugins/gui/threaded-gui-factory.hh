@@ -4,7 +4,7 @@
 #include <thread>
 #include <unordered_map>
 
-#include "abstract-gui-client-factory.hh"
+#include "abstract-gui-factory.hh"
 
 class QThread;
 class QGuiApplication;
@@ -12,7 +12,7 @@ class QTimer;
 
 namespace clap {
    // Has a dedicated thread for running QGuiApplication
-   class ThreadedGuiClientFactory : public AbstractGuiClientFactory {
+   class ThreadedGuiClientFactory : public AbstractGuiFactory {
    public:
       ThreadedGuiClientFactory();
       ~ThreadedGuiClientFactory() override;

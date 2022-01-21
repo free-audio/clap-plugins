@@ -63,10 +63,11 @@ namespace clap {
       QUrl qtQmlUrl(QString::fromStdString(qmlUrl));
       ptr = std::make_shared<GuiClient>(listener, qtQmlImportPath, qtQmlUrl);
 
-      if (ptr)
-         _clients.emplace(&listener, ptr);
+      if (!ptr)
+         return nullptr;
 
-      return std::make_shared<GuiClient>(listener, ptr);
+      _clients.emplace(&listener, ptr);
+      return ptr;
    }
 
    void LocalGuiFactory::onTimer() {

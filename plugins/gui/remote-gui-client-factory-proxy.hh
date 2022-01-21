@@ -4,13 +4,13 @@
 
 #include "../io/remote-channel.hh"
 
-#include "abstract-gui-client-factory.hh"
+#include "abstract-gui-factory.hh"
 
 namespace clap {
 
    class RemoteGuiClientProxy;
 
-   class RemoteGuiClientFactoryProxy : public AbstractGuiClientFactory, public RemoteChannel::EventControl {
+   class RemoteGuiClientFactoryProxy : public AbstractGuiFactory, public RemoteChannel::EventControl {
    public:
       RemoteGuiClientFactoryProxy(const std::string& guiPath);
       ~RemoteGuiClientFactoryProxy() override;

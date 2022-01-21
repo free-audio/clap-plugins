@@ -1,8 +1,8 @@
 #include <chrono>
 #include <sstream>
+#include <string>
 #include <thread>
 #include <vector>
-#include <string>
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -14,10 +14,11 @@
 #include "stream-helper.hh"
 
 #include "gui/abstract-gui.hh"
-#include "gui/abstract-gui-client-factory.hh"
 
 #ifdef CLAP_LOCAL_GUI
-#   include "gui/local-gui-client-factory.hh"
+#   include "gui/local-gui-factory.hh"
+#elif defined(CLAP_THREADED_GUI)
+#   include "gui/threaded-gui-factory.hh"
 #elif defined(CLAP_REMOTE_GUI)
 #   include "gui/remote-gui-client-factory-proxy.hh"
 #endif
@@ -112,6 +113,8 @@ namespace clap {
    bool CorePlugin::guiCreate() noexcept {
 #if defined(CLAP_LOCAL_GUI)
       _guiFactory = LocalGuiFactory::getInstance();
+#elif defined(CLAP_THREADED_GUI)
+      _guiFactory = ThreadedGuiFactory::getInstance();
 #elif defined(CLAP_REMOTE_GUI)
       _guiFactory = RemoteGuiClientFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
 #endif

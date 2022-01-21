@@ -9,6 +9,7 @@
 #include <QTimer>
 
 #include "gui-client.hh"
+#include "local-gui-proxy.hh"
 #include "local-gui-client-factory.hh"
 #include "abstract-gui-listener.hh"
 
@@ -30,9 +31,11 @@ namespace clap {
 
          _timer = std::make_unique<QTimer>();
          _timer->setInterval(1000 / 60);
+         _timer->setTimerType(Qt::CoarseTimer);
          _timer->callOnTimeout([this] {
             onTimer();
          });
+         _timer->start();
 
          initialized.set_value(true);
 
@@ -74,7 +77,7 @@ namespace clap {
       assert(_app);
       assert(_thread);
 
-      std::shared_ptr<AbstractGui> ptr;
+      std::shared_ptr<GuiClient> ptr;
       QMetaObject::invokeMethod(
          _app.get(),
          [&] {
@@ -91,7 +94,7 @@ namespace clap {
          },
          Qt::BlockingQueuedConnection);
 
-      return ptr;
+      return std::make_shared<LocalGuiProxy>(listener, ptr);
    }
 
    void LocalGuiClientFactory::onTimer()

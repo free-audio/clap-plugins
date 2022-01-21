@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "abstract-gui.hh"
 
 namespace clap {
@@ -7,7 +9,7 @@ namespace clap {
    class GuiClient;
    class LocalGuiProxy : public AbstractGui {
    public:
-      LocalGuiProxy(AbstractGuiListener &listener, GuiClient &);
+      LocalGuiProxy(AbstractGuiListener &listener, std::shared_ptr<GuiClient>& guiClient);
       ~LocalGuiProxy() override;
 
       void defineParameter(const clap_param_info &paramInfo) override;
@@ -29,6 +31,6 @@ namespace clap {
       void destroy() override;
 
    private:
-      GuiClient &_guiClient;
+      std::shared_ptr<GuiClient> _guiClient;
    };
 } // namespace clap

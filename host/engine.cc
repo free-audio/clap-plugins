@@ -36,7 +36,11 @@ Engine::Engine(Application &application)
    _midiIn = std::make_unique<RtMidiIn>();
    _midiInBuffer.reserve(512);
 
+#ifdef Q_OS_LINUX
+   _audio = std::make_unique<RtAudio>(RtAudio::LINUX_PULSE);
+#else
    _audio = std::make_unique<RtAudio>();
+#endif
 }
 
 Engine::~Engine() {

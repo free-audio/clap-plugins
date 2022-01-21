@@ -38,6 +38,10 @@ Engine::Engine(Application &application)
 
 #ifdef Q_OS_LINUX
    _audio = std::make_unique<RtAudio>(RtAudio::LINUX_PULSE);
+#elif defined(Q_OS_MACOS)
+   _audio = std::make_unique<RtAudio>(RtAudio::MACOSX_CORE);
+#elif Q_OS_WINDOWS
+   _audio = std::make_unique<RtAudio>(RtAudio::WINDOWS_WASAPI);
 #else
    _audio = std::make_unique<RtAudio>();
 #endif

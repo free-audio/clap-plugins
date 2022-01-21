@@ -7,6 +7,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QUrl>
+#include <QBasicTimer>
 
 #include "abstract-gui-listener.hh"
 #include "gui-client.hh"
@@ -25,12 +26,10 @@ namespace clap {
       static char *argv[] = {arg0, nullptr};
 
       _app = std::make_unique<QGuiApplication>(argc, argv);
+      _clock = std::make_unique<Clock>(*this);
+      _clock->start();
 
-      _timer = std::make_unique<QTimer>();
-      _timer->setInterval(1000 / 60);
-      _timer->setTimerType(Qt::CoarseTimer);
-      _timer->callOnTimeout([this] { onTimer(); });
-      _timer->start();
+      _app->processEvents();
    }
 
    LocalGuiFactory::~LocalGuiFactory() {
@@ -73,8 +72,22 @@ namespace clap {
    void LocalGuiFactory::onTimer() {
       assert(_app->thread() == QThread::currentThread());
 
+      _app->processEvents();
       for (auto &it : _clients)
          it.first->onGuiPoll();
    }
 
+   Clock::Clock(LocalGuiFactory &factory) : QObject(), _factory(factory), _timer(new QBasicTimer()) {
+   }
+
+   void Clock::start()
+   {
+      _timer->start(1000/60, this);
+   }
+
+   Clock::~Clock() = default;
+
+   void Clock::timerEvent(QTimerEvent *event) {
+      _factory.onTimer();
+   }
 } // namespace clap

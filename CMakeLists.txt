@@ -14,11 +14,7 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Boost REQUIRED COMPONENTS serialization iostreams)
 
-find_package(Qt6Core CONFIG REQUIRED)
-find_package(Qt6Widgets CONFIG REQUIRED)
-find_package(Qt6Qml CONFIG REQUIRED)
-find_package(Qt6Quick CONFIG REQUIRED)
-find_package(Qt6QuickControls2 CONFIG REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets Qml Quick QuickControls2 REQUIRED)
 
 if(UsePkgConfig)
   find_package(PkgConfig REQUIRED)

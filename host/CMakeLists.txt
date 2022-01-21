@@ -44,16 +44,16 @@ set_target_properties(clap-host PROPERTIES
   WIN32_EXECUTABLE true
   VS_DEBUGGER_COMMAND_ARGUMENTS "-p $<TARGET_FILE:clap-plugins> -i 0")
 
-target_link_libraries(clap-host Qt6::Widgets clap-helpers)
+target_link_libraries(clap-host PRIVATE Qt6::Widgets harfbuzz clap-helpers)
 
 if(UsePkgConfig)
-  target_link_libraries(clap-host PkgConfig::RtMidi PkgConfig::RtAudio)
+  target_link_libraries(clap-host PRIVATE PkgConfig::RtMidi PkgConfig::RtAudio)
 else()
-  target_link_libraries(clap-host RtAudio::rtaudio RtMidi::rtmidi)
+  target_link_libraries(clap-host PRIVATE RtAudio::rtaudio RtMidi::rtmidi)
 endif()
 
 if (LINUX)
-  target_link_libraries(clap-host dl pthread)
+  target_link_libraries(clap-host PRIVATE dl pthread)
 endif()
 
 if (APPLE)
@@ -67,7 +67,7 @@ if (APPLE)
   find_library(AUDIO_UNIT AudioUnit)
   find_library(AUDIO_TOOLBOX AudioToolbox)
   find_library(CARBON Carbon)
-  target_link_libraries(clap-host ${CARBON} ${AUDIO_UNIT} ${AUDIO_TOOLBOX} ${CORE_MIDI} ${CORE_AUDIO} ${CORE_SERVICES} ${CORE_FOUNDATION})
+  target_link_libraries(clap-host PRIVATE ${CARBON} ${AUDIO_UNIT} ${AUDIO_TOOLBOX} ${CORE_MIDI} ${CORE_AUDIO} ${CORE_SERVICES} ${CORE_FOUNDATION})
 endif()
 
 install(TARGETS clap-host DESTINATION "bin" COMPONENT host)

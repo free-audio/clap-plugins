@@ -15,9 +15,9 @@
 
 namespace clap {
 
-   std::weak_ptr<ThreadedGuiClientFactory> ThreadedGuiClientFactory::_instance;
+   std::weak_ptr<ThreadedGuiFactory> ThreadedGuiFactory::_instance;
 
-   ThreadedGuiClientFactory::ThreadedGuiClientFactory() {
+   ThreadedGuiFactory::ThreadedGuiFactory() {
       std::promise<bool> initialized;
       _thread.reset(new std::thread([&initialized, this] {
          assert(!_app);
@@ -49,7 +49,7 @@ namespace clap {
       }
    }
 
-   ThreadedGuiClientFactory::~ThreadedGuiClientFactory() {
+   ThreadedGuiFactory::~ThreadedGuiFactory() {
       if (_app) {
          assert(_thread);
       }
@@ -61,17 +61,17 @@ namespace clap {
       }
    }
 
-   std::shared_ptr<ThreadedGuiClientFactory> ThreadedGuiClientFactory::getInstance() {
+   std::shared_ptr<ThreadedGuiFactory> ThreadedGuiFactory::getInstance() {
       auto ptr = _instance.lock();
       if (ptr)
          return ptr;
-      ptr.reset(new ThreadedGuiClientFactory());
+      ptr.reset(new ThreadedGuiFactory());
       _instance = ptr;
       return ptr;
    }
 
    std::shared_ptr<AbstractGui>
-   ThreadedGuiClientFactory::createGuiClient(AbstractGuiListener &listener,
+   ThreadedGuiFactory::createGuiClient(AbstractGuiListener &listener,
                                           const std::vector<std::string> &qmlImportPath,
                                           const std::string &qmlUrl) {
       assert(_app);
@@ -97,7 +97,7 @@ namespace clap {
       return std::make_shared<ThreadedGuiProxy>(listener, ptr);
    }
 
-   void ThreadedGuiClientFactory::onTimer()
+   void ThreadedGuiFactory::onTimer()
    {
       assert(_app->thread() == QThread::currentThread());
 

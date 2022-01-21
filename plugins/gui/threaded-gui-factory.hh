@@ -12,12 +12,12 @@ class QTimer;
 
 namespace clap {
    // Has a dedicated thread for running QGuiApplication
-   class ThreadedGuiClientFactory : public AbstractGuiFactory {
+   class ThreadedGuiFactory : public AbstractGuiFactory {
    public:
-      ThreadedGuiClientFactory();
-      ~ThreadedGuiClientFactory() override;
+      ThreadedGuiFactory();
+      ~ThreadedGuiFactory() override;
 
-      static std::shared_ptr<ThreadedGuiClientFactory> getInstance();
+      static std::shared_ptr<ThreadedGuiFactory> getInstance();
 
       virtual std::shared_ptr<AbstractGui>
       createGuiClient(AbstractGuiListener &listener,
@@ -27,7 +27,7 @@ namespace clap {
    private:
       void onTimer();
 
-      static std::weak_ptr<ThreadedGuiClientFactory> _instance;
+      static std::weak_ptr<ThreadedGuiFactory> _instance;
 
       std::unique_ptr<std::thread> _thread;
       std::unique_ptr<QGuiApplication> _app;

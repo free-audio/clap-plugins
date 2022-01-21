@@ -45,10 +45,6 @@
                     "type": "boolean",
                     "value": true
                 },
-                "CMAKE_BUILD_TYPE": {
-                    "type": "string",
-                    "value": "Release"
-                },
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "FILEPATH",
                     "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"

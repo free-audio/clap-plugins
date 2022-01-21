@@ -11,6 +11,7 @@
             "description": "Configuration used by Github Actions",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja",
+            "hidden": true,
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
                     "type": "boolean",
@@ -122,7 +123,7 @@
             "name": "ninja-system",
             "description": "Ninja + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Ninja",
+            "generator": "Ninja Multi-Config",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
                     "type": "boolean",
@@ -140,6 +141,7 @@
         },
         {
             "name": "xcode-system",
+            "description": "Xcode + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Xcode",
             "cacheVariables": {
@@ -213,12 +215,21 @@
         },
         {
             "name": "ninja-system",
+            "inherits": "base",
             "description": "Build using Ninja and system libraries",
-            "configurePreset": "ninja-system",
-            "configuration": "Debug",
-            "targets": [
-                "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
-            ]
+            "configurePreset": "ninja-system"
+        },
+        {
+            "name": "ninja-system-debug",
+            "displayName": "debug",
+            "inherits": "ninja-system",
+            "configuration": "Debug"
+        },
+        {
+            "name": "ninja-system-release",
+            "displayName": "release",
+            "inherits": "ninja-system",
+            "configuration": "Release"
         }
     ],
     "testPresets": [

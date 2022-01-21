@@ -1,11 +1,11 @@
 #include "../io/remote-channel.hh"
 
-#include "remote-gui-client-factory.hh"
+#include "remote-gui-factory.hh"
 #include "remote-gui-listener.hh"
 
 namespace clap {
 
-   RemoteGuiListener::RemoteGuiListener(RemoteGuiClientFactory &clientFactory, uint32_t clientId)
+   RemoteGuiListener::RemoteGuiListener(RemoteGuiFactory &clientFactory, uint32_t clientId)
       : _clientFactory(clientFactory), _clientId(clientId) {}
 
    RemoteGuiListener::~RemoteGuiListener() = default;

@@ -7,10 +7,10 @@
 #include "abstract-gui-listener.hh"
 
 namespace clap {
-   class RemoteGuiClientFactory;
+   class RemoteGuiFactory;
    class RemoteGuiListener : public AbstractGuiListener {
    public:
-      RemoteGuiListener(RemoteGuiClientFactory& clientFactory, uint32_t clientId);
+      RemoteGuiListener(RemoteGuiFactory& clientFactory, uint32_t clientId);
       ~RemoteGuiListener() override;
 
       void onGuiPoll() override;
@@ -19,9 +19,9 @@ namespace clap {
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
 
    protected:
-      friend class RemoteGuiClientFactory;
+      friend class RemoteGuiFactory;
 
-      RemoteGuiClientFactory& _clientFactory;
+      RemoteGuiFactory& _clientFactory;
       const uint32_t _clientId;
    };
 

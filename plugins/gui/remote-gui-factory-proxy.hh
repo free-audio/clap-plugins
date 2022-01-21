@@ -8,14 +8,14 @@
 
 namespace clap {
 
-   class RemoteGuiClientProxy;
+   class RemoteGuiProxy;
 
-   class RemoteGuiClientFactoryProxy : public AbstractGuiFactory, public RemoteChannel::EventControl {
+   class RemoteGuiFactoryProxy : public AbstractGuiFactory, public RemoteChannel::EventControl {
    public:
-      RemoteGuiClientFactoryProxy(const std::string& guiPath);
-      ~RemoteGuiClientFactoryProxy() override;
+      RemoteGuiFactoryProxy(const std::string& guiPath);
+      ~RemoteGuiFactoryProxy() override;
 
-      static std::shared_ptr<RemoteGuiClientFactoryProxy> getInstance(const std::string& guiPath);
+      static std::shared_ptr<RemoteGuiFactoryProxy> getInstance(const std::string& guiPath);
 
       virtual std::shared_ptr<AbstractGui>
       createGuiClient(AbstractGuiListener &listener,
@@ -23,9 +23,9 @@ namespace clap {
                       const std::string &qmlUrl) override;
 
    private:
-      friend class RemoteGuiClientProxy;
+      friend class RemoteGuiProxy;
 
-      static std::weak_ptr<RemoteGuiClientFactoryProxy> _instance;
+      static std::weak_ptr<RemoteGuiFactoryProxy> _instance;
 
       void run();
 
@@ -42,8 +42,8 @@ namespace clap {
       std::unique_ptr<std::thread> _thread;
       std::unique_ptr<RemoteChannel> _channel;
 
-      std::unordered_map<AbstractGuiListener *, std::weak_ptr<RemoteGuiClientProxy>> _clients;
-      std::unordered_map<uint32_t /* clientId */, std::weak_ptr<RemoteGuiClientProxy>> _clientIdMap;
+      std::unordered_map<AbstractGuiListener *, std::weak_ptr<RemoteGuiProxy>> _clients;
+      std::unordered_map<uint32_t /* clientId */, std::weak_ptr<RemoteGuiProxy>> _clientIdMap;
 
 #if (defined(__unix__) || defined(__APPLE__))
       pid_t _child = -1;

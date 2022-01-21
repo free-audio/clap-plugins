@@ -5,10 +5,10 @@
 #include "abstract-gui.hh"
 
 namespace clap {
-   class RemoteGuiClientFactoryProxy;
-   class RemoteGuiClientProxy : public AbstractGui {
+   class RemoteGuiFactoryProxy;
+   class RemoteGuiProxy : public AbstractGui {
    public:
-      RemoteGuiClientProxy(RemoteGuiClientFactoryProxy &factory, uint32_t clientId);
+      RemoteGuiProxy(RemoteGuiFactoryProxy &factory, uint32_t clientId);
 
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;
@@ -29,11 +29,11 @@ namespace clap {
       void destroy() override;
 
    private:
-      friend class RemoteGuiClientFactoryProxy;
+      friend class RemoteGuiFactoryProxy;
 
       void onMessage(const RemoteChannel::Message &msg);
 
-      RemoteGuiClientFactoryProxy &_clientFactory;
+      RemoteGuiFactoryProxy &_clientFactory;
       const uint32_t _clientId;
    };
 } // namespace clap

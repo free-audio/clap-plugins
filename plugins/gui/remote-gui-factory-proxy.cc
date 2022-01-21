@@ -15,8 +15,8 @@
 #include "../io/messages.hh"
 #include "../io/remote-channel.hh"
 
-#include "remote-gui-client-factory-proxy.hh"
-#include "remote-gui-client-proxy.hh"
+#include "remote-gui-factory-proxy.hh"
+#include "remote-gui-proxy.hh"
 
 namespace clap {
 #ifdef _WIN32
@@ -30,26 +30,26 @@ namespace clap {
    }
 #endif
 
-   std::weak_ptr<RemoteGuiClientFactoryProxy> RemoteGuiClientFactoryProxy::_instance;
+   std::weak_ptr<RemoteGuiFactoryProxy> RemoteGuiFactoryProxy::_instance;
 
-   RemoteGuiClientFactoryProxy::RemoteGuiClientFactoryProxy(const std::string &guiPath)
+   RemoteGuiFactoryProxy::RemoteGuiFactoryProxy(const std::string &guiPath)
       : _guiPath(guiPath) {
       // TODO: start the thread and the io loop
    }
 
-   RemoteGuiClientFactoryProxy::~RemoteGuiClientFactoryProxy() {}
+   RemoteGuiFactoryProxy::~RemoteGuiFactoryProxy() {}
 
-   std::shared_ptr<RemoteGuiClientFactoryProxy>
-   RemoteGuiClientFactoryProxy::getInstance(const std::string &guiPath) {
+   std::shared_ptr<RemoteGuiFactoryProxy>
+   RemoteGuiFactoryProxy::getInstance(const std::string &guiPath) {
       auto ptr = _instance.lock();
       if (ptr)
          return ptr;
-      ptr.reset(new RemoteGuiClientFactoryProxy(guiPath));
+      ptr.reset(new RemoteGuiFactoryProxy(guiPath));
       _instance = ptr;
       return ptr;
    }
 
-   bool RemoteGuiClientFactoryProxy::spawnChild() {
+   bool RemoteGuiFactoryProxy::spawnChild() {
 #if (defined(__unix__) || defined(__APPLE__))
       assert(_child == -1);
 #elif defined(_WIN32)
@@ -180,7 +180,7 @@ namespace clap {
 #endif
    }
 
-   void RemoteGuiClientFactoryProxy::waitChild() {
+   void RemoteGuiFactoryProxy::waitChild() {
 #ifdef __unix__
       if (_child == -1)
          return;
@@ -203,7 +203,7 @@ namespace clap {
 #endif
    }
 
-   void RemoteGuiClientFactoryProxy::onMessage(const RemoteChannel::Message &msg) {
+   void RemoteGuiFactoryProxy::onMessage(const RemoteChannel::Message &msg) {
       auto it = _clientIdMap.find(msg.clientId);
       if (it == _clientIdMap.end())
          return;

@@ -1,10 +1,10 @@
 #include <QSocketNotifier>
 
-#include "remote-gui-client-factory.hh"
+#include "remote-gui-factory.hh"
 
 namespace clap {
 
-   RemoteGuiClientFactory::RemoteGuiClientFactory(int socket) {
+   RemoteGuiFactory::RemoteGuiFactory(int socket) {
       ////////////////////////
       // I/O initialization //
       ////////////////////////
@@ -47,25 +47,25 @@ namespace clap {
 #endif
    }
 
-   void RemoteGuiClientFactory::modifyFd(int flags) {
+   void RemoteGuiFactory::modifyFd(int flags) {
       _socketReadNotifier->setEnabled(flags & CLAP_POSIX_FD_READ);
       _socketWriteNotifier->setEnabled(flags & CLAP_POSIX_FD_WRITE);
    }
 
-   void RemoteGuiClientFactory::removeFd() {
+   void RemoteGuiFactory::removeFd() {
       _socketReadNotifier.reset();
       _socketWriteNotifier.reset();
       QCoreApplication::quit();
    }
 
-   GuiClient *RemoteGuiClientFactory::getClient(uint32_t clientId) const {
+   GuiClient *RemoteGuiFactory::getClient(uint32_t clientId) const {
       auto it = _guiClients.find(clientId);
       if (it != _guiClients.end())
          return it->second.get();
       return nullptr;
    }
 
-   void RemoteGuiClientFactory::onMessage(const RemoteChannel::Message &msg) {
+   void RemoteGuiFactory::onMessage(const RemoteChannel::Message &msg) {
       auto c = getClient(msg.clientId);
 
       switch (msg.type) {

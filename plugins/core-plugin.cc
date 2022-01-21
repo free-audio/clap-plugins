@@ -20,7 +20,7 @@
 #elif defined(CLAP_THREADED_GUI)
 #   include "gui/threaded-gui-factory.hh"
 #elif defined(CLAP_REMOTE_GUI)
-#   include "gui/remote-gui-client-factory-proxy.hh"
+#   include "gui/remote-gui-factory-proxy.hh"
 #endif
 
 namespace clap {
@@ -116,7 +116,7 @@ namespace clap {
 #elif defined(CLAP_THREADED_GUI)
       _guiFactory = ThreadedGuiFactory::getInstance();
 #elif defined(CLAP_REMOTE_GUI)
-      _guiFactory = RemoteGuiClientFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
+      _guiFactory = RemoteGuiFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
 #endif
 
       std::vector<std::string> qmlPath;

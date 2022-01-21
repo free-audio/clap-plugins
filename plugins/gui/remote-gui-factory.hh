@@ -10,11 +10,11 @@
 #include "gui-client.hh"
 
 namespace clap {
-   class RemoteGuiClientFactory : public QObject, public BasicRemoteChannel::EventControl {
+   class RemoteGuiFactory : public QObject, public BasicRemoteChannel::EventControl {
    public:
-      RemoteGuiClientFactory(int socket);
+      RemoteGuiFactory(int socket);
 
-      RemoteGuiClientFactory(void *pipeIn, void *pipeOut);
+      RemoteGuiFactory(void *pipeIn, void *pipeOut);
 
       GuiClient *getClient(uint32_t clientId) const;
 

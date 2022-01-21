@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include "../io/messages.hh"
-#include "core-plugin.hh"
+#include "../core-plugin.hh"
 #include "path-provider.hh"
 #include "remote-gui.hh"
 

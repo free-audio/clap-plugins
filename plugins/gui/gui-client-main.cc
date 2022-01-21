@@ -6,7 +6,7 @@
 #include <QThread>
 #include <QCommandLineParser>
 
-#include "remote-gui-client-factory.hh"
+#include "remote-gui-factory.hh"
 
 int main(int argc, char **argv) {
    /* Useful to attach child process with debuggers which don't support follow childs */
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 
 #if defined(Q_OS_UNIX)
    auto socket = parser.value(socketOpt).toULongLong();
-   clap::RemoteGuiClientFactory factory(socket);
+   clap::RemoteGuiFactory factory(socket);
 #elif defined(Q_OS_WINDOWS)
    auto pipeInName = parser.value(pipeInOpt).toStdString();
    auto pipeOutName = parser.value(pipeOutOpt).toStdString();

@@ -38,7 +38,7 @@
             "name": "ninja-vcpkg",
             "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Ninja",
+            "generator": "Ninja Multi-Config",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
                     "type": "boolean",
@@ -160,28 +160,56 @@
     ],
     "buildPresets": [
         {
+            "name": "base",
+            "hidden": true,
+            "targets": [
+                "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
+            ]
+        },
+        {
             "name": "github",
             "configurePreset": "github",
+            "hidden": true,
             "description": "Build used by Github Actions",
             "configuration": "RelWithDebInfo"
         },
         {
             "name": "vs-vcpkg",
+            "inherits": "base",
+            "hidden": true,
             "description": "Build using Visual Studio and VCPKG",
-            "configurePreset": "vs-vcpkg",
-            "configuration": "Debug",
-            "targets": [
-                "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
-            ]
+            "configurePreset": "vs-vcpkg"
+        },
+        {
+            "name": "vs-vcpkg-debug",
+            "displayName": "debug",
+            "inherits": "vs-vcpkg",
+            "configuration": "Debug"
+        },
+        {
+            "name": "vs-vcpkg-release",
+            "displayName": "release",
+            "inherits": "vs-vcpkg",
+            "configuration": "Release"
         },
         {
             "name": "ninja-vcpkg",
             "description": "Build using Ninja and VCPKG",
             "configurePreset": "ninja-vcpkg",
-            "configuration": "Debug",
-            "targets": [
-                "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
-            ]
+            "hidden": true,
+            "inherits": "base"
+        },
+        {
+            "name": "ninja-vcpkg-debug",
+            "displayName": "debug",
+            "inherits": "ninja-vcpkg",
+            "configuration": "Debug"
+        },
+        {
+            "name": "ninja-vcpkg-release",
+            "displayName": "release",
+            "inherits": "ninja-vcpkg",
+            "configuration": "Release"
         },
         {
             "name": "ninja-system",

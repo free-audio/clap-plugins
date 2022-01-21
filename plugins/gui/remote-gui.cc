@@ -17,7 +17,6 @@
 
 namespace clap {
 
-
    RemoteGui::RemoteGui(CorePlugin &plugin) : AbstractGui(plugin) {}
 
    RemoteGui::~RemoteGui() {
@@ -35,7 +34,5 @@ namespace clap {
       if (flags & CLAP_POSIX_FD_ERROR)
          _channel->onError();
    }
-
-
 
 } // namespace clap

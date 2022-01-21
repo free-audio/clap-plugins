@@ -60,6 +60,10 @@ set_property(TARGET clap-plugin-remote-gui PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-remote-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 target_link_libraries(clap-plugin-remote-gui PUBLIC clap-plugin-gui-common clap-io)
 
+add_library(clap-plugin-threaded-gui
+    threaded-gui-factory.hh
+    threaded-gui-factory.cc)
+
 add_executable(clap-gui
     gui-client-main.cc
     remote-gui-client-factory.hh

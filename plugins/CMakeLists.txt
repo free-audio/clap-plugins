@@ -49,7 +49,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)
   target_link_libraries(clap-plugins PRIVATE -Wl,-z,defs)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  #target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)
+  target_link_options(clap-plugins PRIVATE -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/macos-symbols.txt)
   #target_link_libraries(clap-plugins PRIVATE -Wl,-z,defs)
 endif()
 

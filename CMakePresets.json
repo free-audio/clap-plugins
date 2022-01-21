@@ -169,6 +169,7 @@
             "name": "vs-vcpkg",
             "description": "Build using Visual Studio and VCPKG",
             "configurePreset": "vs-vcpkg",
+            "configuration": "Debug",
             "targets": [
                 "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
             ]
@@ -177,6 +178,7 @@
             "name": "ninja-vcpkg",
             "description": "Build using Ninja and VCPKG",
             "configurePreset": "ninja-vcpkg",
+            "configuration": "Debug",
             "targets": [
                 "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
             ]
@@ -185,6 +187,7 @@
             "name": "ninja-system",
             "description": "Build using Ninja and system libraries",
             "configurePreset": "ninja-system",
+            "configuration": "Debug",
             "targets": [
                 "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
             ]

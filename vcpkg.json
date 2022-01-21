@@ -5,7 +5,13 @@
     "boost-iostreams",
     "boost-serialization",
     "catch2",
-    "rtaudio",
+    {
+      "name": "rtaudio",
+      "features": [
+        "alsa",
+        "asio"
+      ]
+    },
     "rtmidi",
     "harfbuzz",
     {

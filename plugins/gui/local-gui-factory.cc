@@ -26,8 +26,9 @@ namespace clap {
       static char *argv[] = {arg0, nullptr};
 
       _app = std::make_unique<QGuiApplication>(argc, argv);
-      _clock = std::make_unique<Clock>(*this);
-      _clock->start();
+      _timer = std::make_unique<NativeTimer>(1000 / 60, [this] {
+         onTimer();
+      });
 
       _app->processEvents();
    }
@@ -75,19 +76,5 @@ namespace clap {
       _app->processEvents();
       for (auto &it : _clients)
          it.first->onGuiPoll();
-   }
-
-   Clock::Clock(LocalGuiFactory &factory) : QObject(), _factory(factory), _timer(new QBasicTimer()) {
-   }
-
-   void Clock::start()
-   {
-      _timer->start(1000/60, this);
-   }
-
-   Clock::~Clock() = default;
-
-   void Clock::timerEvent(QTimerEvent *event) {
-      _factory.onTimer();
    }
 } // namespace clap

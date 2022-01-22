@@ -15,7 +15,7 @@ namespace clap {
       _ctx.version = 0;
 
       _timer =
-         CFRunLoopTimerCreate(kCFAllocatorDefault, 0, 1000.0 / 60, 0, 0, &CFTimer::onTimer, &_ctx);
+         CFRunLoopTimerCreate(kCFAllocatorDefault, 0, durationMs * 0.0001, 0, 0, &CFTimer::onTimer, &_ctx);
       if (_timer)
          CFRunLoopAddTimer(runLoop, _timer, kCFRunLoopCommonModes);
    }

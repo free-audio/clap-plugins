@@ -76,6 +76,13 @@ add_executable(clap-gui
 target_link_libraries(clap-gui PUBLIC clap-plugin-gui)
 set_target_properties(clap-gui PROPERTIES CXX_STANDARD 20)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_library(clap-plugin-cf-timer cf-timer.hh cf-timer.cc)
+    set_property(TARGET clap-plugin-cf-timer PROPERTY CXX_STANDARD 20)
+    set_property(TARGET clap-plugin-cf-timer PROPERTY POSITION_INDEPENDENT_CODE true)
+    target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-cf-timer)
+endif()
+
 if (use_remote_gui)
     install(TARGETS clap-gui DESTINATION "bin")
 endif()

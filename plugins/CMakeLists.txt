@@ -18,7 +18,7 @@ add_subdirectory(io)
 add_subdirectory(gui)
 
 add_library(
-  clap-plugins SHARED
+  clap-plugins MODULE
   clap-entry.cc
   parameters.cc
   parameters.hh
@@ -50,16 +50,27 @@ elseif(use_remote_gui)
   add_dependencies(clap-plugins clap-gui)
 endif()
 
-set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20 SUFFIX ".clap" PREFIX "")
+set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 
 target_link_libraries(clap-plugins PUBLIC clap-helpers clap-io Boost::serialization Boost::iostreams)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)
   target_link_libraries(clap-plugins PRIVATE -Wl,-z,defs)
+  set_target_properties(clap-plugins PROPERTIES SUFFIX ".clap" PREFIX "")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   target_link_options(clap-plugins PRIVATE -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/macos-symbols.txt)
   #target_link_libraries(clap-plugins PRIVATE -Wl,-z,defs)
+
+  set_target_properties(clap-plugins PROPERTIES
+            BUNDLE True
+            BUNDLE_EXTENSION clap
+            MACOSX_BUNDLE_GUI_IDENTIFIER org.clap.example-plugins
+            MACOSX_BUNDLE_BUNDLE_NAME clap-example-plugins
+            MACOSX_BUNDLE_BUNDLE_VERSION "1"
+            MACOSX_BUNDLE_SHORT_VERSION_STRING "1"
+            MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/plugins.plist.in
+            )
 endif()
 
 install(TARGETS clap-plugins DESTINATION "lib/clap" COMPONENT plugins)

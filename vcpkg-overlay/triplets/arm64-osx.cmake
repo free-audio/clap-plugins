@@ -7,8 +7,11 @@ set(VCPKG_LIBRARY_LINKAGE static)
 set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
 set(VCPKG_OSX_ARCHITECTURES arm64)
 
-if(NOT PORT MATCHES "harfbuzz")
-    # harfbuzz is badly packaged for now, so we also make the debug build
-    # https://github.com/microsoft/vcpkg/issues/22680
-    set(VCPKG_BUILD_TYPE release)
-endif()
+set(VCPKG_C_FLAGS "-fvisibility=hidden")
+set(VCPKG_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
+
+# if(NOT PORT MATCHES "harfbuzz")
+#     # harfbuzz is badly packaged for now, so we also make the debug build
+#     # https://github.com/microsoft/vcpkg/issues/22680
+#     set(VCPKG_BUILD_TYPE release)
+# endif()

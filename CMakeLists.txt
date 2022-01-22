@@ -50,7 +50,14 @@ set(CPACK_NSIS_plugins_INSTALL_DIRECTORY "$COMMONPROGRAMDATA/CLAP")
 
 include(CPack)
 
-add_custom_target(run-host
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  add_custom_target(run-host
+    COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_BUNDLE_DIR:clap-plugins> -i 0
+    DEPENDS clap-host clap-plugins
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")
+else()
+  add_custom_target(run-host
     COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_FILE:clap-plugins> -i 0
     DEPENDS clap-host clap-plugins
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")
+endif()

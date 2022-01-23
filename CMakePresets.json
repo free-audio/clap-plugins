@@ -64,6 +64,38 @@
             }
         },
         {
+            "name": "plugins",
+            "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "generator": "Ninja Multi-Config",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": {
+                    "type": "boolean",
+                    "value": true
+                },
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "FILEPATH",
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                },
+                "VCPKG_OVERLAY_TRIPLETS": {
+                    "type": "FILEPATH",
+                    "value": "${sourceDir}/vcpkg-overlay/triplets"
+                },
+                "VCPKG_TARGET_TRIPLET": {
+                    "type": "string",
+                    "value": "arm64-osx-clap-plugins"
+                },
+                "UsePkgConfig": {
+                    "type": "boolean",
+                    "value": false
+                },
+                "CLAP_PLUGIN_GUI_MODEL": {
+                    "type": "string",
+                    "value": "local"
+                }
+            }
+        },
+        {
             "name": "vs-vcpkg",
             "description": "Configure with vcpkg toolchain and generate VS project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",

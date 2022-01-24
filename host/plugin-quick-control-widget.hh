@@ -4,8 +4,11 @@
 
 #include <clap/clap.h>
 
+QT_BEGIN_NAMESPACE
 class QDial;
 class QLabel;
+QT_END_NAMESPACE
+
 class PluginHost;
 class PluginParam;
 class PluginQuickControlWidget : public QWidget {

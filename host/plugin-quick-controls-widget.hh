@@ -4,7 +4,10 @@
 
 #include <clap/clap.h>
 
+QT_BEGIN_NAMESPACE
 class QComboBox;
+QT_END_NAMESPACE
+
 class PluginHost;
 class PluginQuickControlWidget;
 class PluginQuickControlsWidget : public QWidget {

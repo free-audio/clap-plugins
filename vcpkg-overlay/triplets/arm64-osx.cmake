@@ -15,3 +15,5 @@ set(VCPKG_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 #     # https://github.com/microsoft/vcpkg/issues/22680
 #     set(VCPKG_BUILD_TYPE release)
 # endif()
+
+SET(QT_NAMESPACE ClapQt)

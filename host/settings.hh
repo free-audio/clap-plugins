@@ -3,7 +3,9 @@
 #include "audio-settings.hh"
 #include "midi-settings.hh"
 
+QT_BEGIN_NAMESPACE
 class QSettings;
+QT_END_NAMESPACE
 
 class Settings {
 public:

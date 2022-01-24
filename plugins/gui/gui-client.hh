@@ -8,8 +8,10 @@
 #include "plugin-proxy.hh"
 #include "transport-proxy.hh"
 
+QT_BEGIN_NAMESPACE
 class QQuickView;
 class QUrl;
+QT_END_NAMESPACE
 
 namespace clap {
 

@@ -37,6 +37,8 @@ add_executable(clap-host
   settings.hh
   settings-widget.cc
   settings-widget.hh
+
+  precompiled-header.hh
   )
 
 set_target_properties(clap-host PROPERTIES
@@ -45,6 +47,7 @@ set_target_properties(clap-host PROPERTIES
   VS_DEBUGGER_COMMAND_ARGUMENTS "-p $<TARGET_FILE:clap-plugins> -i 0")
 
 target_link_libraries(clap-host PRIVATE Qt6::Widgets clap-helpers)
+target_precompile_headers(clap-host PRIVATE precompiled-header.hh)
 
 if(UsePkgConfig)
   target_link_libraries(clap-host PRIVATE PkgConfig::RtMidi PkgConfig::RtAudio)

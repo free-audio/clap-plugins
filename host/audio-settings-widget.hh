@@ -3,7 +3,10 @@
 #include <QWidget>
 
 class AudioSettings;
+
+QT_BEGIN_NAMESPACE
 class QComboBox;
+QT_END_NAMESPACE
 
 class AudioSettingsWidget : public QWidget {
    Q_OBJECT

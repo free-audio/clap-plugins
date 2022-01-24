@@ -2,7 +2,9 @@
 
 #include "device-reference.hh"
 
+QT_BEGIN_NAMESPACE
 class QSettings;
+QT_END_NAMESPACE
 
 class AudioSettings {
 public:

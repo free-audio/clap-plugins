@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <QHash>
 #include <QList>
 #include <QTreeWidgetItem>
@@ -7,13 +9,16 @@
 
 #include <clap/clap.h>
 
+QT_BEGIN_NAMESPACE
 class QTreeWidget;
 class QTreeWidgetItem;
-class PluginHost;
-class PluginParam;
 class QLabel;
 class QDial;
 class QSlider;
+QT_END_NAMESPACE
+
+class PluginHost;
+class PluginParam;
 
 class PluginParametersWidget : public QWidget {
    Q_OBJECT

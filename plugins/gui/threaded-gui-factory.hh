@@ -4,11 +4,15 @@
 #include <thread>
 #include <unordered_map>
 
+#include <QtGlobal>
+
 #include "abstract-gui-factory.hh"
 
+QT_BEGIN_NAMESPACE
 class QThread;
 class QGuiApplication;
 class QTimer;
+QT_END_NAMESPACE
 
 namespace clap {
    // Has a dedicated thread for running QGuiApplication

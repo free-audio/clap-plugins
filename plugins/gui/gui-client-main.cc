@@ -5,6 +5,7 @@
 #include <QQuickView>
 #include <QThread>
 #include <QCommandLineParser>
+#include <QSocketNotifier>
 
 #include "remote-gui-factory.hh"
 

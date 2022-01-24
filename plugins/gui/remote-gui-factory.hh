@@ -9,6 +9,10 @@
 
 #include "gui-client.hh"
 
+QT_BEGIN_NAMESPACE
+class QSocketNotifier;
+QT_END_NAMESPACE
+
 namespace clap {
    class RemoteGuiFactory : public QObject, public BasicRemoteChannel::EventControl {
    public:

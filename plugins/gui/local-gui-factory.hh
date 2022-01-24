@@ -9,9 +9,11 @@
 #include "abstract-gui-factory.hh"
 #include "native-timer.hh"
 
+QT_BEGIN_NAMESPACE
 class QThread;
 class QGuiApplication;
 class QBasicTimer;
+QT_END_NAMESPACE
 
 namespace clap {
    class GuiClient;

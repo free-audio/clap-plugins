@@ -1,4 +1,5 @@
 #include <QSocketNotifier>
+#include <QCoreApplication>
 
 #include "remote-gui-factory.hh"
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QGuiApplication>
-#include <QSocketNotifier>
 #include <QWindow>
 
 #include "abstract-gui.hh"
@@ -11,6 +9,7 @@
 QT_BEGIN_NAMESPACE
 class QQuickView;
 class QUrl;
+class QWindow;
 QT_END_NAMESPACE
 
 namespace clap {
@@ -20,12 +19,17 @@ namespace clap {
 
    class GuiClient : public QObject, public AbstractGui {
       Q_OBJECT;
-      using super = QGuiApplication;
 
    public:
       GuiClient(AbstractGuiListener &listener,
                 const QStringList &qmlImportPath,
                 const QUrl &qmlSkin);
+      ~GuiClient() override;
+
+      GuiClient(const GuiClient&) = delete;
+      GuiClient(GuiClient&&) = delete;
+      GuiClient& operator=(const GuiClient&) = delete;
+      GuiClient& operator=(GuiClient&&) = delete;
 
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;

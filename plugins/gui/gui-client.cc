@@ -37,6 +37,10 @@ namespace clap {
       _quickView->setSource(qmlSkin);
    }
 
+   GuiClient::~GuiClient()
+   {
+   }
+
    void GuiClient::defineParameter(const clap_param_info &paramInfo) {
       _pluginProxy->defineParameter(paramInfo);
    }

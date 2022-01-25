@@ -63,7 +63,7 @@ namespace clap {
 
       uint32_t paramsCount() const noexcept override { return _parameters.count(); }
 
-      bool paramsInfo(int32_t paramIndex, clap_param_info *info) const noexcept override {
+      bool paramsInfo(uint32_t paramIndex, clap_param_info *info) const noexcept override {
          *info = _parameters.getByIndex(paramIndex)->info();
          return true;
       }
@@ -154,8 +154,8 @@ namespace clap {
          return _hasTrackInfo ? _trackInfo.channel_count : 2;
       }
 
-      clap_chmap trackChannelMap() const noexcept {
-         return _hasTrackInfo ? _trackInfo.channel_map : CLAP_CHMAP_STEREO;
+      const char *trackAudioPortType() const noexcept {
+         return _hasTrackInfo ? _trackInfo.audio_port_type : CLAP_PORT_STEREO;
       }
 
    protected:

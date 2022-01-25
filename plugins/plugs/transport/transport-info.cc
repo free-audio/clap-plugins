@@ -5,8 +5,9 @@
 
 namespace clap {
    const clap_plugin_descriptor *TransportInfo::descriptor() {
-      static const clap_plugin_descriptor desc = {
+      static const char *features[] = {"utility", "analyzer", nullptr};
 
+      static const clap_plugin_descriptor desc = {
          CLAP_VERSION,
          "com.github.free-audio.clap.transport-info",
          "Transport Info",
@@ -16,8 +17,9 @@ namespace clap {
          nullptr,
          "0.1",
          "Displays transport info",
-         "utility;analyzer"
+         features
       };
+
       return &desc;
    }
 

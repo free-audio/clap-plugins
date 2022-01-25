@@ -4,6 +4,10 @@
 
 namespace clap {
    const clap_plugin_descriptor *Gain::descriptor() {
+      static const char *features[] = {
+         "mix", "gain", "audio_effect", nullptr
+      };
+
       static const clap_plugin_descriptor desc = {
 
          CLAP_VERSION,
@@ -15,7 +19,7 @@ namespace clap {
          nullptr,
          "0.1",
          "example gain plugin",
-         "mix;gain;audio_effect"
+         features
       };
       return &desc;
    }
@@ -54,12 +58,10 @@ namespace clap {
       clap_audio_port_info info;
       info.id = 0;
       strncpy(info.name, "main", sizeof(info.name));
-      info.is_main = true;
-      info.is_cv = false;
-      info.sample_size = 32;
-      info.in_place = true;
+      info.flags = CLAP_AUDIO_PORT_IS_MAIN;
+      info.in_place_pair = 0;
       info.channel_count = _channelCount;
-      info.channel_map = CLAP_CHMAP_UNSPECIFIED;
+      info.port_type = nullptr;
 
       _audioInputs.clear();
       _audioInputs.push_back(info);

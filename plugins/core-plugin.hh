@@ -2,19 +2,21 @@
 
 #include <memory>
 
-#include <clap/helpers/plugin.hh>
 #include <clap/helpers/param-queue.hh>
+#include <clap/helpers/plugin.hh>
 #include <clap/helpers/reducing-param-queue.hxx>
 
+#include "gui/abstract-gui-factory.hh"
+#include "gui/abstract-gui-listener.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
-#include "gui/abstract-gui-listener.hh"
-#include "gui/abstract-gui-factory.hh"
 
 namespace clap {
 
-   using PluginGlue = helpers::Plugin<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
-   extern template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
+   using PluginGlue =
+      helpers::Plugin<helpers::MisbehaviourHandler::Terminate, helpers::CheckingLevel::Maximal>;
+   extern template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate,
+                                         helpers::CheckingLevel::Maximal>;
 
    class AbstractGui;
    class AbstractGuiFactory;
@@ -86,6 +88,9 @@ namespace clap {
          // TODO
          return false;
       }
+
+      virtual void paramsFlush(const clap_input_events *in,
+                               const clap_output_events *out) noexcept override;
 
       //-------------------//
       // clap_plugin_state //
@@ -161,6 +166,8 @@ namespace clap {
    protected:
       void guiAdjust(clap_id paramId, double value, uint32_t flags);
       void processGuiEvents(const clap_process *process);
+      void processInputParameterChange(const clap_event_header *hdr);
+      void processGuiParameterChange(const clap_output_events *out);
       uint32_t
       processEvents(const clap_process *process, uint32_t &index, uint32_t count, uint32_t time);
 

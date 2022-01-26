@@ -218,6 +218,9 @@ namespace clap {
 
          std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
+
+      if (!isProcessing())
+         _host.paramsRequestFlush();
    }
 
    void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {}

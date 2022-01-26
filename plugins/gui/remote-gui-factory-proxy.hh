@@ -35,8 +35,8 @@ namespace clap {
       void onMessage(const RemoteChannel::Message &msg);
 
       // RemoteChannel::EventControl
-      void modifyFd(int flags) override;
-      void removeFd() override;
+      void modifyFd(int flags) override { _pollFlags = flags; }
+      void removeFd() override {}
 
       const std::string _guiPath;
       std::unique_ptr<std::thread> _thread;
@@ -47,6 +47,7 @@ namespace clap {
 
 #if (defined(__unix__) || defined(__APPLE__))
       pid_t _child = -1;
+      int _pollFlags = 0;
 #elif defined(_WIN32)
       std::unique_ptr<RemoteGuiWin32Data> _data;
 #endif

@@ -219,7 +219,7 @@ namespace clap {
          std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
 
-      if (!isProcessing())
+      if (!isProcessing() && _host.canUseParams())
          _host.paramsRequestFlush();
    }
 

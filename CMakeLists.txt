@@ -5,6 +5,8 @@ cmake_policy(SET CMP0100 NEW) # handle .hh files
 enable_testing()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
+set(CLAP_ENABLE_HOST TRUE CACHE BOOL "Enable example host")
+set(CLAP_ENABLE_PLUGINS TRUE CACHE BOOL "Enable example plugins")
 
 project(CLAP_EXAMPLES C CXX)
 
@@ -12,26 +14,35 @@ set(UsePkgConfig TRUE CACHE BOOL "Use PkgConfig to find RtMidi and RtAudio depen
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Boost COMPONENTS serialization iostreams REQUIRED)
 find_package(Qt6 COMPONENTS Widgets Qml Quick REQUIRED)
 
-if(UsePkgConfig)
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(RtMidi REQUIRED IMPORTED_TARGET rtmidi)
-  pkg_check_modules(RtAudio REQUIRED IMPORTED_TARGET rtaudio)
-else()
-  find_package(RtMidi CONFIG REQUIRED)
-  find_package(RtAudio CONFIG REQUIRED)
-endif()
-
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang|GNU")
-  add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden)
+  add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden
+    -Werror=return-type -Werror=unused-result -Wno-unused-parameter
+    -Wuninitialized -Wvla -Wmultichar -Werror=non-virtual-dtor -Wmost
+    -Wsuper-class-method-mismatch -Woverloaded-virtual)
 endif()
 
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)
-add_subdirectory(host)
-add_subdirectory(plugins)
+
+if(CLAP_ENABLE_HOST)
+  if(UsePkgConfig)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(RtMidi REQUIRED IMPORTED_TARGET rtmidi)
+    pkg_check_modules(RtAudio REQUIRED IMPORTED_TARGET rtaudio)
+  else()
+    find_package(RtMidi CONFIG REQUIRED)
+    find_package(RtAudio CONFIG REQUIRED)
+  endif()
+
+  add_subdirectory(host)
+endif()
+
+if(CLAP_ENABLE_PLUGINS)
+  find_package(Boost COMPONENTS serialization iostreams REQUIRED)
+  add_subdirectory(plugins)
+endif()
 
 ###########
 ## CPACK ##
@@ -50,14 +61,16 @@ set(CPACK_NSIS_plugins_INSTALL_DIRECTORY "$COMMONPROGRAMDATA/CLAP")
 
 include(CPack)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  add_custom_target(run-host
-    COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_BUNDLE_DIR:clap-plugins> -i 0
-    DEPENDS clap-host clap-plugins
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")
-else()
-  add_custom_target(run-host
-    COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_FILE:clap-plugins> -i 0
-    DEPENDS clap-host clap-plugins
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")
+if(CLAP_ENABLE_HOST AND CLAP_ENABLE_PLUGINS)
+  if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_custom_target(run-host
+      COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_BUNDLE_DIR:clap-plugins> -i 0
+      DEPENDS clap-host clap-plugins
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")
+  else()
+    add_custom_target(run-host
+      COMMAND $<TARGET_FILE:clap-host> -p $<TARGET_FILE:clap-plugins> -i 0
+      DEPENDS clap-host clap-plugins
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIRECTORY}")
+  endif()
 endif()

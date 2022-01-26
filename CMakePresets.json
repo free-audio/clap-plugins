@@ -36,10 +36,8 @@
             }
         },
         {
-            "name": "ninja-vcpkg",
-            "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Ninja Multi-Config",
+            "name": "vcpkg",
+            "hidden": true,
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
                     "type": "boolean",
@@ -64,34 +62,49 @@
             }
         },
         {
-            "name": "plugins",
+            "name": "ninja-vcpkg",
             "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja Multi-Config",
+            "inherits": "vcpkg"
+        },
+        {
+            "name": "macos-arm64-plugins",
+            "inherits": "ninja-vcpkg",
+            "description": "macOS plugins built with vcpkg",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
             "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": {
-                    "type": "boolean",
+                "CLAP_ENABLE_HOST": {
+                    "type": "bool",
+                    "value": false
+                },
+                "CLAP_ENABLE_PLUGINS": {
+                    "type": "bool",
                     "value": true
-                },
-                "CMAKE_TOOLCHAIN_FILE": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-                },
-                "VCPKG_OVERLAY_TRIPLETS": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg-overlay/triplets"
                 },
                 "VCPKG_TARGET_TRIPLET": {
                     "type": "string",
                     "value": "arm64-osx-clap-plugins"
+                }
+            }
+        },
+        {
+            "name": "macos-arm64-host",
+            "inherits": "ninja-vcpkg",
+            "description": "macOS host built with vcpkg",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "cacheVariables": {
+                "CLAP_ENABLE_HOST": {
+                    "type": "bool",
+                    "value": true
                 },
-                "UsePkgConfig": {
-                    "type": "boolean",
+                "CLAP_ENABLE_PLUGINS": {
+                    "type": "bool",
                     "value": false
                 },
-                "CLAP_PLUGIN_GUI_MODEL": {
+                "VCPKG_TARGET_TRIPLET": {
                     "type": "string",
-                    "value": "local"
+                    "value": "arm64-osx-clap-host"
                 }
             }
         },
@@ -164,10 +177,6 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": true
-                },
-                "CLAP_PLUGIN_GUI_MODEL": {
-                    "type": "string",
-                    "value": "remote"
                 }
             }
         },
@@ -184,10 +193,6 @@
                 "UsePkgConfig": {
                     "type": "boolean",
                     "value": true
-                },
-                "CLAP_PLUGIN_GUI_MODEL": {
-                    "type": "string",
-                    "value": "remote"
                 }
             }
         }
@@ -262,6 +267,14 @@
             "displayName": "release",
             "inherits": "ninja-system",
             "configuration": "Release"
+        },
+        {
+            "name": "macos-arm64-host",
+            "configuration": "macos-arm64-host"
+        },
+        {
+            "name": "macos-arm64-plugins",
+            "configuration": "macos-arm64-plugins"
         }
     ],
     "testPresets": [

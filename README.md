@@ -10,11 +10,11 @@ The plugins are under heavy refactoring and are not working yet.
 
 ```shell
 # Install dependencies
-brew install qt6 pkgconfig rtaudio rtmidi
+brew install boost qt6 pkgconfig rtaudio rtmidi
 
 # Checkout the code
 git clone --recurse-submodules https://github.com/free-audio/clap-examples
-cd clap-plugins
+cd clap-examples
 
 # Build
 cmake --preset xcode-system

@@ -19,8 +19,11 @@ find_package(Qt6 COMPONENTS Widgets Qml Quick REQUIRED)
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang|GNU")
   add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden
     -Werror=return-type -Werror=unused-result -Wno-unused-parameter
-    -Wuninitialized -Wvla -Wmultichar -Werror=non-virtual-dtor -Wmost
-    -Wsuper-class-method-mismatch -Woverloaded-virtual)
+    -Wuninitialized -Wvla -Wmultichar -Werror=non-virtual-dtor -Woverloaded-virtual)
+endif()
+
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang")
+  add_compile_options(-Wmost -Wsuper-class-method-mismatch)
 endif()
 
 add_subdirectory(clap EXCLUDE_FROM_ALL)

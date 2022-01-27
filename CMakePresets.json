@@ -271,6 +271,14 @@
             "name": "ninja-system",
             "description": "Test using Ninja and system libraries",
             "configurePreset": "ninja-system"
+        },
+        {
+            "name": "macos-arm64-host",
+            "configurePreset": "macos-arm64-host"
+        },
+        {
+            "name": "macos-arm64-plugins",
+            "configurePreset": "macos-arm64-plugins"
         }
     ]
 }

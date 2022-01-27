@@ -39,7 +39,6 @@
             "description": "Configuration used by Github Actions",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja",
-            "hidden": true,
             "inherits": "ninja-vcpkg"
         },
         {

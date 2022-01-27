@@ -40,7 +40,7 @@
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja",
             "hidden": true,
-            "inherits": "vcpkg"
+            "inherits": "ninja-vcpkg"
         },
         {
             "name": "macos-arm64-plugins",

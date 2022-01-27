@@ -11,3 +11,7 @@ if(NOT PORT MATCHES "harfbuzz")
     # https://github.com/microsoft/vcpkg/issues/22680
     set(VCPKG_BUILD_TYPE release)
 endif()
+
+if(PORT MATCHES "alsa")
+    set(VCPKG_LIBRARY_LINKAGE dynamic)
+endif()

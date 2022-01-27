@@ -80,9 +80,18 @@ git clone --recurse-submodules https://github.com/free-audio/clap-examples clap
 cd clap
 
 # Build
-cmake --preset vs-vcpkg
-cmake --build builds/vs-vcpkg --config Release
+cmake --preset ninja-vcpkg
+cmake --build builds/ninja-vcpkg --config Release
 
 # Build installer
-cmake --build builds/vs-vcpkg --target PACKAGE --config Release
+cmake --build builds/ninaj-vcpkg --target PACKAGE --config Release
+```
+
+### Linux
+
+### Using vcpkg
+
+```bash
+cmake --preset ninja-vcpkg -DCLAP_PLUGIN_GUI_MODEL=threaded
+cmake --build --preset ninja-vcpkg-debug --target run-host
 ```

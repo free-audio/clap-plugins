@@ -87,7 +87,6 @@
             "name": "ninja-system",
             "description": "Ninja + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Ninja Multi-Config",
             "inherits": ["base"],
             "cacheVariables": {
                 "UsePkgConfig": {
@@ -153,11 +152,6 @@
         }
     ],
     "testPresets": [
-        {
-            "name": "github",
-            "configurePreset": "github",
-            "configuration": "RelWithDebInfo"
-        },
         {
             "name": "ninja-vcpkg",
             "description": "Test using Ninja and VCPKG",

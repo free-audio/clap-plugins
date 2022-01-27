@@ -6,4 +6,4 @@
 	url = ../clap-helpers
 [submodule "vcpkg"]
 	path = vcpkg
-	url = ../../microsoft/vcpkg
+	url = ../../abique/vcpkg

@@ -77,7 +77,7 @@ jobs:
         with:
           vcpkgJsonGlob: "vcpkg.json"
 
-      - name: Build
+      - name: Build (Windows and Linux)
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'win')
         uses: lukka/run-cmake@v10
         id: runcmake
@@ -86,7 +86,7 @@ jobs:
           buildPreset: "ninja-vcpkg"
           testPreset: "ninja-vcpkg"
 
-      - name: Build Host
+      - name: Build Host (macOS)
         if: startsWith(matrix.os, 'macOS')
         uses: lukka/run-cmake@v10
         id: runcmake-macos-host
@@ -95,7 +95,7 @@ jobs:
           buildPreset: "macos-arm64-host"
           testPreset: "macos-arm64-host"
 
-      - name: Build Plugins
+      - name: Build Plugins (macOS)
         if: startsWith(matrix.os, 'macOS')
         uses: lukka/run-cmake@v10
         id: runcmake-macos-plugins

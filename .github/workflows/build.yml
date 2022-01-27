@@ -82,9 +82,9 @@ jobs:
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
-          configurePreset: "github"
-          buildPreset: "github"
-          testPreset: "github"
+          configurePreset: "ninja-vcpkg"
+          buildPreset: "ninja-vcpkg"
+          testPreset: "ninja-vcpkg"
 
       - name: Build Host
         if: startsWith(matrix.os, 'macOS')

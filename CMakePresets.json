@@ -7,15 +7,21 @@
     },
     "configurePresets": [
         {
-            "name": "ninja-vcpkg",
-            "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
+            "name": "base",
+            "hidden": true,
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja Multi-Config",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": {
                     "type": "BOOL",
                     "value": true
-                },
+                }
+            }
+        },
+        {
+            "name": "vcpkg",
+            "hidden": true,
+            "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "FILEPATH",
                     "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
@@ -35,17 +41,14 @@
             }
         },
         {
-            "name": "github",
-            "description": "Configuration used by Github Actions",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Ninja",
-            "inherits": "ninja-vcpkg"
+            "name": "ninja-vcpkg",
+            "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
+            "inherits": ["base", "vcpkg"]
         },
         {
             "name": "macos-arm64-plugins",
             "inherits": ["ninja-vcpkg"],
             "description": "macOS plugins built with vcpkg",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
             "cacheVariables": {
                 "CLAP_ENABLE_HOST": {
                     "type": "BOOL",
@@ -65,7 +68,6 @@
             "name": "macos-arm64-host",
             "inherits": ["ninja-vcpkg"],
             "description": "macOS host built with vcpkg",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
             "cacheVariables": {
                 "CLAP_ENABLE_HOST": {
                     "type": "BOOL",
@@ -82,87 +84,12 @@
             }
         },
         {
-            "name": "vs-vcpkg",
-            "description": "Configure with vcpkg toolchain and generate VS project files for all configurations",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Visual Studio 17 2022",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": {
-                    "type": "BOOL",
-                    "value": true
-                },
-                "CMAKE_TOOLCHAIN_FILE": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-                },
-                "VCPKG_OVERLAY_TRIPLETS": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg-overlay/triplets"
-                },
-                "UsePkgConfig": {
-                    "type": "BOOL",
-                    "value": false
-                },
-                "CLAP_PLUGIN_GUI_MODEL": {
-                    "type": "STRING",
-                    "value": "local"
-                }
-            }
-        },
-        {
-            "name": "xcode-vcpkg",
-            "description": "Configure with vcpkg toolchain and generate XCode project files for all configurations",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Xcode",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": {
-                    "type": "BOOL",
-                    "value": true
-                },
-                "CMAKE_TOOLCHAIN_FILE": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-                },
-                "VCPKG_OVERLAY_TRIPLETS": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg-overlay/triplets"
-                },
-                "UsePkgConfig": {
-                    "type": "BOOL",
-                    "value": false
-                },
-                "CLAP_PLUGIN_GUI_MODEL": {
-                    "type": "STRING",
-                    "value": "local"
-                }
-            }
-        },
-        {
             "name": "ninja-system",
             "description": "Ninja + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "generator": "Ninja Multi-Config",
+            "inherits": ["base"],
             "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": {
-                    "type": "BOOL",
-                    "value": true
-                },
-                "UsePkgConfig": {
-                    "type": "BOOL",
-                    "value": true
-                }
-            }
-        },
-        {
-            "name": "xcode-system",
-            "description": "Xcode + System Libraries",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
-            "generator": "Xcode",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": {
-                    "type": "BOOL",
-                    "value": true
-                },
                 "UsePkgConfig": {
                     "type": "BOOL",
                     "value": true
@@ -177,32 +104,6 @@
             "targets": [
                 "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
             ]
-        },
-        {
-            "name": "github",
-            "configurePreset": "github",
-            "hidden": true,
-            "description": "Build used by Github Actions",
-            "configuration": "RelWithDebInfo"
-        },
-        {
-            "name": "vs-vcpkg",
-            "inherits": "base",
-            "hidden": true,
-            "description": "Build using Visual Studio and VCPKG",
-            "configurePreset": "vs-vcpkg"
-        },
-        {
-            "name": "vs-vcpkg-debug",
-            "displayName": "debug",
-            "inherits": "vs-vcpkg",
-            "configuration": "Debug"
-        },
-        {
-            "name": "vs-vcpkg-release",
-            "displayName": "release",
-            "inherits": "vs-vcpkg",
-            "configuration": "Release"
         },
         {
             "name": "ninja-vcpkg",
@@ -227,7 +128,8 @@
             "name": "ninja-system",
             "inherits": "base",
             "description": "Build using Ninja and system libraries",
-            "configurePreset": "ninja-system"
+            "configurePreset": "ninja-system",
+            "hidden": true
         },
         {
             "name": "ninja-system-debug",
@@ -255,11 +157,6 @@
             "name": "github",
             "configurePreset": "github",
             "configuration": "RelWithDebInfo"
-        },
-        {
-            "name": "vs-vcpkg",
-            "description": "Test using Visual Studio and VCPKG",
-            "configurePreset": "vs-vcpkg"
         },
         {
             "name": "ninja-vcpkg",

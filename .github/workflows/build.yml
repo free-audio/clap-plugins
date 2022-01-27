@@ -89,7 +89,7 @@ jobs:
       - name: Build Host
         if: startsWith(matrix.os, 'macOS')
         uses: lukka/run-cmake@v10
-        id: runcmake
+        id: runcmake-macos-host
         with:
           configurePreset: "macos-arm64-host"
           buildPreset: "macos-arm64-host"
@@ -98,7 +98,7 @@ jobs:
       - name: Build Plugins
         if: startsWith(matrix.os, 'macOS')
         uses: lukka/run-cmake@v10
-        id: runcmake
+        id: runcmake-macos-plugins
         with:
           configurePreset: "macos-arm64-plugins"
           buildPreset: "macos-arm64-plugins"

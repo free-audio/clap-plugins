@@ -21,7 +21,7 @@ else
 fi
 
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --recurse \
-  rtmidi rtaudio "qtbase[core,png,widgets,doubleconversion,concurrent,appstore-compliant${QT_FEATURES}]"
+  boost "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant${QT_FEATURES}]"
 
 cmake --preset $cmake_preset $cmake_triplet
 cmake --build --preset $cmake_preset --config Release --target clap-host

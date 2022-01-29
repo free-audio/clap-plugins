@@ -6,7 +6,7 @@ This is not ready yet. Pass your way unless you know what your are doing.
 
 This repo serves as an example to demonstrate how to create a CLAP plugin.
 
-# Notes on GUI, static build vs dynamic build and symbols
+## Notes on GUI, static build vs dynamic build and symbols
 
 The plugins use Qt for the GUI.
 
@@ -19,7 +19,7 @@ and it should export only one symbol: `clap_entry`.
 You should be aware that even if you hide all your symbols some may still remain visible
 at unexpected places. Objective-C seems to register every classes including those coming from
 plugins in a **flat namespace**. Which means that if two plugins define two different
-Objective-C but with the same, they will clash which will result in undeflined behavior.
+Objective-C classes but with the same, they will clash which will result in undeflined behavior.
 
 Qt uses a few Objective-C classes on macOS. So it is crucial to use `QT_NAMESPACE`.
 There is a pending VCPKG [PR](https://github.com/microsoft/vcpkg/pull/22713).
@@ -51,9 +51,9 @@ Dynamic builds will get your started quickly if your system provides Qt6,
 and you have an host that do not expose the Qt symbols.
 Static builds will require more time and space.
 
-## Building on various platforms
+# Building on various platforms
 
-### macOS, dynamic build with brew
+## macOS, dynamic build with brew
 
 ```shell
 # Install dependencies
@@ -68,7 +68,7 @@ cmake --preset ninja-system
 cmake --build --preset ninja-system
 ```
 
-### macOS with vcpkg
+## macOS with vcpkg
 
 ```shell
 # Install build tools
@@ -80,9 +80,9 @@ cd clap-plugins
 scripts/build.sh
 ```
 
-### Windows
+## Windows
 
-#### Enable long path support
+### Enable long path support
 
 Make sure your system supports long paths. Run this in an administrator PowerShell:
 
@@ -92,7 +92,7 @@ New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name
 
 Reference: https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=powershell
 
-#### Build
+### Build
 
 Install **Visual Studio 2022**; you can install it from the **Microsoft Store**. It can also install **git** and **CMake** for you.
 
@@ -106,7 +106,7 @@ cd c-p
 scripts/build.sh
 ```
 
-### Linux, using system libraries (dynamic)
+## Linux, using system libraries (dynamic)
 
 ```bash
 # on archlinux, adapt to your distribution and package manager
@@ -118,7 +118,7 @@ cmake --preset ninja-system
 cmake --build --preset ninja-system
 ```
 
-### Linux, using vcpkg (static)
+## Linux, using vcpkg (static)
 
 ```bash
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins

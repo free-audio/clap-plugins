@@ -2,7 +2,7 @@
 
 This is not ready yet. Pass your way unless you know what your are doing.
 
-# Minimal Clap Plugins
+# Example Clap Plugins
 
 This repo serves as an example to demonstrate how to create a CLAP plugin.
 

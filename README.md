@@ -33,12 +33,13 @@ We have two different strategies to work with that.
 - if the GUI crash, the audio engine does not
 - the GUI can use any libraries, etc...
 
-We abstracted the relation between the plugin and the GUI: `AbstractGui` and `AbstractGuiListener`
+We abstracted the relation between the plugin and the GUI:
+[`AbstractGui`](plugins/gui/abstract-gui.hh) and [`AbstractGuiListener`](plugins/gui/abstract-gui-listener.hh)
 which lets us transparently insert proxies to support the **remote** model.
 
 The GUI itself work with proxy objects to the parameters, transport info, ...
 They are then bound into QML objects.
-See [Knob.qml](plugins/gui/qml/clap/Knob.qml) and [parameter-proxy.hh](plugins/gui/parameter-proxy.hh).
+See [`Knob.qml`](plugins/gui/qml/clap/Knob.qml) and [`parameter-proxy.hh`](plugins/gui/parameter-proxy.hh).
 
 We offer two options:
 - static build, cmake preset: `ninja-vcpkg` or `vs-vcpkg` on Windows.

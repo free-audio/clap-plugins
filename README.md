@@ -1,59 +1,82 @@
-# Minimal Clap Host and Plugins
+# WARNING UNDER CONSTRUCTION!
 
-This repo serves as an example to demonstrate how to create a CLAP host and plugins.
+This is not ready yet. Pass your way unless you know what your are doing.
 
-The plugins are under heavy refactoring and are not working yet.
+# Minimal Clap Plugins
+
+This repo serves as an example to demonstrate how to create a CLAP plugin.
+
+# Notes on GUI, static build vs dynamic build and symbols
+
+The plugins use Qt for the GUI.
+
+It is fine to dynamically link to Qt for a host, but it is very dangerous for a plugin.
+
+Also one very important aspect of the plugin is the distribution.
+Ideally a clap plugin should be self contained: it should not rely upon symbols from the host,
+and it should export only one symbol: `clap_entry`.
+
+You should be aware that even if you hide all your symbols some may still remain visible
+at unexpected places. Objective-C seems to register every classes including those coming from
+plugins in a **flat namespace**. Which means that if two plugins define two different
+Objective-C but with the same, they will clash which will result in undeflined behavior.
+
+Qt uses a few Objective-C classes on macOS. So it is crucial to use `QT_NAMESPACE`.
+There is a pending VCPKG [PR](https://github.com/microsoft/vcpkg/pull/22713).
+
+We have two different strategies to work with that.
+1. **local**: statically link every thing
+2. **remote**: start the gui in a child process
+
+**1.** has the advantage of being simple to deploy.
+**2.** is more complex due to its inter-process nature. It has a few advantages:
+- if the GUI crash, the audio engine does not
+- the GUI can use any libraries, etc...
+
+We abstracted the relation between the plugin and the GUI: `AbstractGui` and `AbstractGuiListener`
+which lets us transparently insert proxies to support the **remote** model.
+
+The GUI itself work with proxy objects to the parameters, transport info, ...
+They are then bound into QML objects.
+See [Knob.qml](plugins/gui/qml/clap/Knob.qml) and [parameter-proxy.hh](plugins/gui/parameter-proxy.hh).
+
+We offer two options:
+- static build, cmake preset: `ninja-vcpkg` or `vs-vcpkg` on Windows.
+- dynamic builg, cmake preset: `ninja-system`
+
+Static builds are convenient for deployment as they are self containded. They use the **local** gui model.
+
+Dynamic builds will get your started quickly if your system provides Qt6,
+and you have an host that do not expose the Qt symbols.
+Static builds will require more time and space.
 
 ## Building on various platforms
 
-### macOS with brew
-
-This options is the quickest to play with the examples, but it wont let you run the
-example host and plugin together, for that see the vcpkg option.
-
-Choose this option if you want to test your plugin with clap-host or if you want to
-test the clap-plugins with your host.
-
-Note that the resulting build should not be distributed.
+### macOS, dynamic build with brew
 
 ```shell
 # Install dependencies
-brew install boost qt6 pkgconfig rtaudio rtmidi ninja cmake
+brew install qt6 boost ninja cmake
 
 # Checkout the code
-git clone --recurse-submodules https://github.com/free-audio/clap-examples
-cd clap-examples
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins
+cd clap-plugins
 
 # Build
-cmake --preset ninja-system -DCLAP_PLUGIN_GUI_MODEL=local
-cmake --build builds/ninja-system --config Release
+cmake --preset ninja-system
+cmake --build --preset ninja-system
 ```
 
 ### macOS with vcpkg
-
-This option takes the longuest to build as it requires to build Qt twice.
-Even if Qt is built statically and all symbols are hidden, there will still
-be a symbol clash due to objective-c's runtime which registers all classes
-into a flat namespace. For that we must rely upon `QT_NAMESPACE` which puts
-every symbols from Qt in the namespace specified by `QT_NAMESPACE`.
-
-Wait for this [PR](https://github.com/microsoft/vcpkg/pull/22713) to complete before trying it.
 
 ```shell
 # Install build tools
 brew install cmake ninja
 
 # Checkout the code
-git clone --recurse-submodules https://github.com/free-audio/clap-examples
-cd clap-examples
-
-# Build the host
-cmake --preset macos-arm64-host
-cmake --build --preset macos-arm64-host --config Release
-
-# Build the plugins
-cmake --preset macos-arm64-plugins
-cmake --build --preset macos-arm64-plugins --config Release
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins
+cd clap-plugins
+scripts/build.sh
 ```
 
 ### Windows
@@ -76,22 +99,28 @@ Use the following command inside `Developer PowerShell For VS 2022`:
 ```powershell
 # Checkout the code very close to the root to avoid windows long path issues...
 cd c:\
-git clone --recurse-submodules https://github.com/free-audio/clap-examples clap
-cd clap
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins c-p
+cd c-p
 
-# Build
-cmake --preset ninja-vcpkg
-cmake --build builds/ninja-vcpkg --config Release
-
-# Build installer
-cmake --build builds/ninaj-vcpkg --target PACKAGE --config Release
+scripts/build.sh
 ```
 
-### Linux
-
-### Using vcpkg
+### Linux, using system libraries (dynamic)
 
 ```bash
-cmake --preset ninja-vcpkg -DCLAP_PLUGIN_GUI_MODEL=threaded
-cmake --build --preset ninja-vcpkg-debug --target run-host
+# on archlinux, adapt to your distribution and package manager
+sudo pacman -S qt boost git ninja cmake
+
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins
+cd clap-plugins
+cmake --preset ninja-system
+cmake --build --preset ninja-system
+```
+
+### Linux, using vcpkg (static)
+
+```bash
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins
+cd clap-plugins
+scripts/build.sh
 ```

@@ -26,17 +26,9 @@
                     "type": "FILEPATH",
                     "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
-                "VCPKG_OVERLAY_TRIPLETS": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg-overlay/triplets"
-                },
                 "UsePkgConfig": {
                     "type": "BOOL",
                     "value": false
-                },
-                "CLAP_PLUGIN_GUI_MODEL": {
-                    "type": "STRING",
-                    "value": "local"
                 }
             }
         },
@@ -46,42 +38,11 @@
             "inherits": ["base", "vcpkg"]
         },
         {
-            "name": "macos-arm64-plugins",
-            "inherits": ["ninja-vcpkg"],
-            "description": "macOS plugins built with vcpkg",
-            "cacheVariables": {
-                "CLAP_ENABLE_HOST": {
-                    "type": "BOOL",
-                    "value": false
-                },
-                "CLAP_ENABLE_PLUGINS": {
-                    "type": "BOOL",
-                    "value": true
-                },
-                "VCPKG_TARGET_TRIPLET": {
-                    "type": "STRING",
-                    "value": "arm64-osx-clap-plugins"
-                }
-            }
-        },
-        {
-            "name": "macos-arm64-host",
-            "inherits": ["ninja-vcpkg"],
-            "description": "macOS host built with vcpkg",
-            "cacheVariables": {
-                "CLAP_ENABLE_HOST": {
-                    "type": "BOOL",
-                    "value": true
-                },
-                "CLAP_ENABLE_PLUGINS": {
-                    "type": "BOOL",
-                    "value": false
-                },
-                "VCPKG_TARGET_TRIPLET": {
-                    "type": "STRING",
-                    "value": "arm64-osx-clap-host"
-                }
-            }
+            "name": "vs-vcpkg",
+            "description": "Configure with vcpkg toolchain and generate Visual Studio project files for all configurations",
+            "inherits": ["base", "vcpkg"],
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64"
         },
         {
             "name": "ninja-system",
@@ -101,54 +62,26 @@
             "name": "base",
             "hidden": true,
             "targets": [
-                "all", "clap-host", "clap-plugins", "clap-gui", "clap-io", "run-host"
+                "clap-plugins"
             ]
         },
         {
             "name": "ninja-vcpkg",
             "description": "Build using Ninja and VCPKG",
             "configurePreset": "ninja-vcpkg",
-            "hidden": true,
             "inherits": "base"
-        },
-        {
-            "name": "ninja-vcpkg-debug",
-            "displayName": "debug",
-            "inherits": "ninja-vcpkg",
-            "configuration": "Debug"
-        },
-        {
-            "name": "ninja-vcpkg-release",
-            "displayName": "release",
-            "inherits": "ninja-vcpkg",
-            "configuration": "Release"
         },
         {
             "name": "ninja-system",
             "inherits": "base",
             "description": "Build using Ninja and system libraries",
-            "configurePreset": "ninja-system",
-            "hidden": true
+            "configurePreset": "ninja-system"
         },
         {
-            "name": "ninja-system-debug",
-            "displayName": "debug",
-            "inherits": "ninja-system",
-            "configuration": "Debug"
-        },
-        {
-            "name": "ninja-system-release",
-            "displayName": "release",
-            "inherits": "ninja-system",
-            "configuration": "Release"
-        },
-        {
-            "name": "macos-arm64-host",
-            "configurePreset": "macos-arm64-host"
-        },
-        {
-            "name": "macos-arm64-plugins",
-            "configurePreset": "macos-arm64-plugins"
+            "name": "vs-vcpkg",
+            "inherits": "base",
+            "description": "Build using Visual Studio and VCPKG",
+            "configurePreset": "vs-vcpkg"
         }
     ],
     "testPresets": [
@@ -161,14 +94,6 @@
             "name": "ninja-system",
             "description": "Test using Ninja and system libraries",
             "configurePreset": "ninja-system"
-        },
-        {
-            "name": "macos-arm64-host",
-            "configurePreset": "macos-arm64-host"
-        },
-        {
-            "name": "macos-arm64-plugins",
-            "configurePreset": "macos-arm64-plugins"
         }
     ]
 }

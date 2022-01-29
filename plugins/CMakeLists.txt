@@ -52,7 +52,7 @@ endif()
 
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 
-target_link_libraries(clap-plugins PUBLIC clap-helpers clap-io Boost::serialization Boost::iostreams)
+target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common clap-helpers clap-io Boost::serialization Boost::iostreams)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)

@@ -21,7 +21,7 @@ else
 fi
 
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --recurse \
-  boost "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant${QT_FEATURES}]" \
+  msgpack "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant${QT_FEATURES}]" \
   qtdeclarative
 
 cmake --preset $cmake_preset $cmake_triplet

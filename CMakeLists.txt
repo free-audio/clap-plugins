@@ -27,7 +27,8 @@ endif()
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)
 
-find_package(Boost COMPONENTS serialization iostreams REQUIRED)
+include_directories(yas/include)
+
 add_subdirectory(plugins)
 
 ###########

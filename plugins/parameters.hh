@@ -3,11 +3,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/version.hpp>
+#include <yas/serialize.hpp>
+#include <yas/types/std/pair.hpp>
+#include <yas/types/std/vector.hpp>
 
 #include <clap/clap.h>
 
@@ -29,25 +27,29 @@ namespace clap {
 
       Parameter *getById(clap_id id) const noexcept;
 
-   private:
-      friend class boost::serialization::access;
+      void reset()
+      {
+         for (auto &p : _params)
+            p->setDefaultValue();
+      }
+
 
       template <class Archive>
-      void save(Archive &ar, const unsigned int version) const {
+      void serialize(Archive &ar) const {
          std::vector<std::pair<clap_id, double>> values;
          for (auto &p : _params)
             values.emplace_back(p->info().id, p->value());
 
-         ar << values;
+         ar & YAS_OBJECT(nullptr, values);
       }
 
       template <class Archive>
-      void load(Archive &ar, const unsigned int version) {
+      void serialize(Archive &ar) {
          std::vector<std::pair<clap_id, double>> values;
-         ar >> values;
 
-         for (auto &p : _params)
-            p->setDefaultValue();
+         ar & YAS_OBJECT(nullptr, values);
+
+         reset();
 
          for (auto &v : values) {
             auto *p = getById(v.first);
@@ -57,12 +59,9 @@ namespace clap {
          }
       }
 
-      BOOST_SERIALIZATION_SPLIT_MEMBER()
-
+   private:
       std::vector<std::unique_ptr<Parameter>> _params;
       std::unordered_map<clap_id, Parameter *> _id2param;
    };
 
 } // namespace clap
-
-BOOST_CLASS_VERSION(clap::Parameters, 1)

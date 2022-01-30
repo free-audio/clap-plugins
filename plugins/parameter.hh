@@ -3,12 +3,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/version.hpp>
-
 #include <clap/clap.h>
 
 #include "parameter-interpolator.hh"

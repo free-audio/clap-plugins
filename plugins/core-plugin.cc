@@ -4,8 +4,8 @@
 #include <thread>
 #include <vector>
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
+#include <yas/binary_iarchive.hpp>
+#include <yas/binary_oarchive.hpp>
 
 #include <clap/helpers/host-proxy.hxx>
 #include <clap/helpers/plugin.hxx>
@@ -90,9 +90,9 @@ namespace clap {
 
    bool CorePlugin::stateSave(clap_ostream *stream) noexcept {
       try {
-         OStream os(stream);
-         boost::archive::text_oarchive ar(os);
-         ar << _parameters;
+         ClapOStream os(stream);
+         yas::binary_oarchive<ClapOStream> ar(os);
+         ar & _parameters;
       } catch (...) {
          return false;
       }
@@ -101,9 +101,9 @@ namespace clap {
 
    bool CorePlugin::stateLoad(clap_istream *stream) noexcept {
       try {
-         IStream is(stream);
-         boost::archive::text_iarchive ar(is);
-         ar >> _parameters;
+         ClapIStream is(stream);
+         yas::binary_iarchive<ClapIStream> ar(is);
+         ar & _parameters;
       } catch (...) {
          return false;
       }
@@ -239,7 +239,7 @@ namespace clap {
                   std::terminate();
                }
 
-               if (_isProcessing)
+               if (isProcessing())
                   p->setValueSmoothed(ev->value, _paramSmoothingDuration);
                else
                   p->setValueImmediately(ev->value);
@@ -276,7 +276,7 @@ namespace clap {
          if (!p)
             return;
 
-         if (_isProcessing)
+         if (isProcessing())
             p->setValueSmoothed(value.value, _paramSmoothingDuration);
          else
             p->setValueImmediately(value.value);

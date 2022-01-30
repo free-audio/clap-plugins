@@ -7,3 +7,6 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = ../../abique/vcpkg
+[submodule "yas"]
+	path = yas
+	url = git@github.com:niXman/yas.git

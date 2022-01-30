@@ -1,34 +1,27 @@
 #pragma once
 
-#include <boost/iostreams/concepts.hpp>
-#include <boost/iostreams/stream.hpp>
-
 #include <clap/stream.h>
 
 namespace clap {
-   class Source : public boost::iostreams::source {
+   class ClapIStream {
    public:
-      explicit Source(clap_istream *is) : _is(is) {}
+      explicit ClapIStream(clap_istream *is) : _is(is) {}
 
-      std::streamsize read(char *s, std::streamsize n) noexcept { return _is->read(_is, s, n); }
+      auto read(void *s, uint64_t n) noexcept { return _is->read(_is, s, n); }
 
    private:
-      clap_istream *_is;
+      clap_istream * const _is;
    };
 
-   using IStream = boost::iostreams::stream<Source>;
-
-   class Sink : public boost::iostreams::sink {
+   class ClapOStream {
    public:
-      explicit Sink(clap_ostream *os) : _os(os) {}
+      explicit ClapOStream(clap_ostream *os) : _os(os) {}
 
-      std::streamsize write(const char *s, std::streamsize n) noexcept {
+      auto write(const void *s, uint64_t n) noexcept {
          return _os->write(_os, s, n);
       }
 
    private:
-      clap_ostream *_os;
+      clap_ostream * const _os;
    };
-
-   using OStream = boost::iostreams::stream<Sink>;
 } // namespace clap

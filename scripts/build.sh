@@ -21,8 +21,16 @@ else
 fi
 
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --recurse \
-  boost-serialization boost-iostreams "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant${QT_FEATURES}]" \
+  "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant,network,freetype,testlib${QT_FEATURES}]"
+
+# save space
+rm -rf vcpkg/buildtrees
+
+vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --recurse \
   qtdeclarative
+
+# save space
+rm -rf vcpkg/buildtrees
 
 cmake --preset $cmake_preset $cmake_triplet
 cmake --build --preset $cmake_preset --config Release --target clap-plugins

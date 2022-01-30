@@ -19,9 +19,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-2022]
+        include:
+          - os: 'ubuntu-latest'
+            mono: 'mono'
+            triplet: 'x64-linux'
+            artifact: 'x86_64-linux'
+            exe_ext: ''
+            build_dir: ninja-vcpkg
+          - os: 'windows-2022'
+            mono: ''
+            triplet: 'x64-windows'
+            artifact: 'x86_64-windows'
+            exe_ext: '.exe'
+            build_dir: vs-vcpkg
+          - os: 'macos-latest'
+            mono: 'mono'
+            triplet: 'x64-osx'
+            artifact: 'x86_64-macos'
+            exe_ext: ''
+            build_dir: ninja-vcpkg
+
+    env:
+      VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
 
     steps:
+      - name: 'Remove old VCPKG'
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')
+        shell: 'bash'
+        run: sudo rm -rf "$VCPKG_INSTALLATION_ROOT"
+
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -29,6 +56,21 @@ jobs:
       - uses: seanmiddleditch/gha-setup-ninja@master
 
       - uses: lukka/get-cmake@latest
+
+      - name: 'Bootstrap VCPKG'
+        shell: bash
+        run: vcpkg/bootstrap-vcpkg.sh
+
+      - name: 'Setup NuGet Credentials'
+        shell: 'bash'
+        run: >
+          ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1`
+          sources add
+          -source "https://nuget.pkg.github.com/free-audio/index.json"
+          -storepasswordincleartext
+          -name "GitHub"
+          -username "free-audio"
+          -password "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Setup MacOS
         if: startsWith(matrix.os, 'macOS')
@@ -71,35 +113,11 @@ jobs:
           libxrender-dev
           libatspi2.0-dev
 
-      - name: Restore artifacts, or setup vcpkg for building artifacts
-        uses: lukka/run-vcpkg@v10
-        id: runvcpkg
-        with:
-          vcpkgJsonGlob: "vcpkg.json"
+      - name: Build
+        shell: bash
+        run: scripts/build.sh ${{ matrix.triplet }}
 
-      - name: Build (Windows and Linux)
-        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'win')
-        uses: lukka/run-cmake@v10
-        id: runcmake
+      - uses: actions/upload-artifact@v2
         with:
-          configurePreset: "ninja-vcpkg"
-          buildPreset: "ninja-vcpkg"
-          testPreset: "ninja-vcpkg"
-
-      - name: Build Host (macOS)
-        if: startsWith(matrix.os, 'macOS')
-        uses: lukka/run-cmake@v10
-        id: runcmake-macos-host
-        with:
-          configurePreset: "macos-arm64-host"
-          buildPreset: "macos-arm64-host"
-          testPreset: "macos-arm64-host"
-
-      - name: Build Plugins (macOS)
-        if: startsWith(matrix.os, 'macOS')
-        uses: lukka/run-cmake@v10
-        id: runcmake-macos-plugins
-        with:
-          configurePreset: "macos-arm64-plugins"
-          buildPreset: "macos-arm64-plugins"
-          testPreset: "macos-arm64-plugins"
+          name: clap-host-${{ matrix.artifact }}
+          path: builds/${{matrix.build_dir}}/host/Release/clap-host${{matrix.exe_ext}}

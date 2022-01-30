@@ -119,5 +119,5 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: clap-host-${{ matrix.artifact }}
-          path: builds/${{matrix.build_dir}}/host/Release/clap-host${{matrix.exe_ext}}
+          name: clap-plugins-${{ matrix.artifact }}
+          path: builds/${{matrix.build_dir}}/plugins/Release/clap-plugins.clap

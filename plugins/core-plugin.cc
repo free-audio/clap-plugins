@@ -117,6 +117,8 @@ namespace clap {
       _guiFactory = ThreadedGuiFactory::getInstance();
 #elif defined(CLAP_REMOTE_GUI)
       _guiFactory = RemoteGuiFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
+#else
+#error "CLAP_PLUGIN_GUI_MODEL not defined"
 #endif
 
       std::vector<std::string> qmlPath;

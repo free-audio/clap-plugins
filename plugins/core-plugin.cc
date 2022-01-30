@@ -239,7 +239,10 @@ namespace clap {
                   std::terminate();
                }
 
-               p->setValueSmoothed(ev->value, _paramSmoothingDuration);
+               if (_isProcessing)
+                  p->setValueSmoothed(ev->value, _paramSmoothingDuration);
+               else
+                  p->setValueImmediately(ev->value);
                _pluginToGuiQueue.set(p->info().id, {ev->value, p->modulation()});
             }
             break;
@@ -272,7 +275,11 @@ namespace clap {
          auto p = _parameters.getById(value.paramId);
          if (!p)
             return;
-         p->setValueSmoothed(value.value, 128);
+
+         if (_isProcessing)
+            p->setValueSmoothed(value.value, _paramSmoothingDuration);
+         else
+            p->setValueImmediately(value.value);
 
          clap_event_param_value ev;
          ev.header.time = 0;

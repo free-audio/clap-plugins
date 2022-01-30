@@ -12,12 +12,15 @@ fi
 if [[ $(uname) = Linux ]] ; then
   QT_FEATURES=",xcb,xcb-xlib,xkb,xkbcommon-x11,xlib,xrender,fontconfig,freetype,harfbuzz"
   cmake_preset="ninja-vcpkg"
+  gui_model=threaded
 elif [[ $(uname) = Darwin ]] ; then
   QT_FEATURES=""
   cmake_preset="ninja-vcpkg"
+  gui_model=local
 else
   QT_FEATURES=""
   cmake_preset="vs-vcpkg"
+  gui_model=local
 fi
 
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --recurse \
@@ -32,5 +35,5 @@ vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --r
 # save space
 rm -rf vcpkg/buildtrees
 
-cmake --preset $cmake_preset $cmake_triplet
+cmake --preset $cmake_preset $cmake_triplet -DCLAP_PLUGIN_GUI_MODEL=$gui_model
 cmake --build --preset $cmake_preset --config Release --target clap-plugins

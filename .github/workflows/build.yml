@@ -117,7 +117,11 @@ jobs:
         shell: bash
         run: scripts/build.sh ${{ matrix.triplet }}
 
+      - name: Archive artifact
+        shell: bash
+        run: tar -cvf clap-plugins.clap.tar --strip-components 4 builds/${{matrix.build_dir}}/plugins/Release/clap-plugins.clap
+
       - uses: actions/upload-artifact@v2
         with:
-          name: clap-plugins-${{ matrix.artifact }}
-          path: builds/${{matrix.build_dir}}/plugins/Release/clap-plugins.clap
+          name: clap-plugins-${{ matrix.artifact }}.tar
+          path: clap-plugins.clap.tar

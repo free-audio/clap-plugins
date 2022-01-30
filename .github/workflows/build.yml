@@ -115,7 +115,7 @@ jobs:
 
       - name: Build
         shell: bash
-        run: scripts/build.sh ${{ matrix.triplet }}
+        run: scripts/build.sh
 
       - name: Archive artifact
         shell: bash

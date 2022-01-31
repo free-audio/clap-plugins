@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
       QThread::sleep(1);
 
    QGuiApplication app(argc, argv);
+   app.setAttribute(Qt::AA_PluginApplication);
 
    qmlRegisterType<clap::ParameterProxy>("org.clap", 1, 0, "ParameterProxy");
    qmlRegisterType<clap::TransportProxy>("org.clap", 1, 0, "TransportProxy");

@@ -26,6 +26,7 @@ namespace clap {
       static char *argv[] = {arg0, nullptr};
 
       _app = std::make_unique<QGuiApplication>(argc, argv);
+      _app->setAttribute(Qt::AA_PluginApplication);
       _timer = std::make_unique<NativeTimer>(1000 / 60, [this] {
          onTimer();
       });

@@ -15,8 +15,8 @@ int main(int argc, char **argv) {
    while (waitForDebbugger)
       QThread::sleep(1);
 
+   QGuiApplication::setAttribute(Qt::AA_PluginApplication);
    QGuiApplication app(argc, argv);
-   app.setAttribute(Qt::AA_PluginApplication);
 
    qmlRegisterType<clap::ParameterProxy>("org.clap", 1, 0, "ParameterProxy");
    qmlRegisterType<clap::TransportProxy>("org.clap", 1, 0, "TransportProxy");

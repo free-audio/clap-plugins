@@ -25,8 +25,8 @@ namespace clap {
       char arg0[] = "clap-plugin-gui";
       static char *argv[] = {arg0, nullptr};
 
+      QGuiApplication::setAttribute(Qt::AA_PluginApplication);
       _app = std::make_unique<QGuiApplication>(argc, argv);
-      _app->setAttribute(Qt::AA_PluginApplication);
       _timer = std::make_unique<NativeTimer>(1000 / 60, [this] {
          onTimer();
       });

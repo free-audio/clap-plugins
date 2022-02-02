@@ -5,12 +5,12 @@ if [[ ! -x vcpkg/vcpkg ]] ; then
 fi
 
 if [[ $(uname) = Linux ]] ; then
-  QT_FEATURES=",xcb,xcb-xlib,xkb,xkbcommon-x11,xlib,xrender,fontconfig"
+  QT_FEATURES=",xcb,xcb-xlib,xkb,xkbcommon-x11,xlib,xrender,fontconfig,harfbuzz"
   cmake_preset="ninja-vcpkg"
   gui_model=threaded
   triplet=$(uname -m)-linux
 elif [[ $(uname) = Darwin ]] ; then
-  QT_FEATURES=""
+  QT_FEATURES="harfbuzz"
   cmake_preset="ninja-vcpkg"
   gui_model=local
   triplet=$(uname -m)-osx
@@ -29,7 +29,7 @@ vcpkg_triplet="--triplet ${triplet}-clap-plugins --host-triplet ${triplet}-clap-
 cmake_triplet="-DVCPKG_TARGET_TRIPLET=${triplet}-clap-plugins -DCMAKE_VCPKG_HOST_TRIPLET=${triplet}-clap-plugins"
 
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --recurse \
-  "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant,network,freetype,testlib,freetype,harfbuzz${QT_FEATURES}]"
+  "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant,network,freetype,testlib,freetype${QT_FEATURES}]"
 
 # save space
 rm -rf vcpkg/buildtrees

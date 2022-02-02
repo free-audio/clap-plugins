@@ -6,7 +6,7 @@
 	url = ../clap-helpers
 [submodule "vcpkg"]
 	path = vcpkg
-	url = ../../abique/vcpkg
+	url = ../../microsoft/vcpkg
 [submodule "yas"]
 	path = yas
 	url = git@github.com:niXman/yas.git

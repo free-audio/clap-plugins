@@ -22,7 +22,6 @@ plugins in a **flat namespace**. Which means that if two plugins define two diff
 Objective-C classes but with the same, they will clash which will result in undeflined behavior.
 
 Qt uses a few Objective-C classes on macOS. So it is crucial to use `QT_NAMESPACE`.
-There is a pending VCPKG [PR](https://github.com/microsoft/vcpkg/pull/22713).
 
 We have two different strategies to work with that.
 1. **local**: statically link every thing

@@ -119,9 +119,10 @@ jobs:
 
       - name: Archive artifact
         shell: bash
-        run: tar -cvf clap-plugins.clap.tar --strip-components 4 builds/${{matrix.build_dir}}/plugins/Release/clap-plugins.clap
+        run: tar -cvJf clap-plugins.clap.tar.xz --strip-components 4 builds/${{matrix.build_dir}}/plugins/Release/clap-plugins.clap
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: clap-plugins-${{ matrix.artifact }}.tar
-          path: clap-plugins.clap.tar
+          name: clap-plugins-${{ matrix.artifact }}.tar.xz
+          path: clap-plugins.clap.tar.xz

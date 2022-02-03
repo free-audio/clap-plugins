@@ -18,7 +18,7 @@ else
   QT_FEATURES=""
   cmake_preset="vs-vcpkg"
   gui_model=local
-  triplet=$(uname -m)-windows
+  triplet=$(uname -m)-win
 fi
 
 if [[ "$1" != "" ]]; then

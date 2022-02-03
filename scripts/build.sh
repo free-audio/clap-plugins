@@ -25,8 +25,8 @@ if [[ "$1" != "" ]]; then
   triplet="$1"
 fi
 
-vcpkg_triplet="--triplet ${triplet}-clap-plugins --host-triplet ${triplet}-clap-plugins"
-cmake_triplet="-DVCPKG_TARGET_TRIPLET=${triplet}-clap-plugins -DCMAKE_VCPKG_HOST_TRIPLET=${triplet}-clap-plugins"
+vcpkg_triplet="--triplet ${triplet}-cp --host-triplet ${triplet}-cp"
+cmake_triplet="-DVCPKG_TARGET_TRIPLET=${triplet}-cp -DCMAKE_VCPKG_HOST_TRIPLET=${triplet}-cp"
 
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_triplet install --recurse \
   "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant,network,freetype,testlib,freetype${QT_FEATURES}]"

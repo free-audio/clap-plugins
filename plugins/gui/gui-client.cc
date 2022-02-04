@@ -89,7 +89,8 @@ namespace clap {
       if (_hostWindow) {
          return false;
          _quickView->setParent(_hostWindow.get());
-         return showLater();
+         showLater();
+         return true;
       }
 #endif
       return false;

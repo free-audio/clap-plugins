@@ -1,8 +1,8 @@
-set(CLAP_PLUGIN_REMOTE_GUI TRUE CACHE BOOL "Should the GUI be ran from another process?")
-set(CLAP_PLUGIN_EMBED_QML TRUE CACHE BOOL "Embed QML resources into the plugin")
+set(CLAP_PLUGINS_REMOTE_GUI TRUE CACHE BOOL "Should the GUI be ran from another process?")
+set(CLAP_PLUGINS_EMBED_QML TRUE CACHE BOOL "Embed QML resources into the plugin")
 
-if(CLAP_PLUGIN_EMBED_QML)
-  add_compile_definitions(CLAP_PLUGIN_EMBED_QML)
+if(CLAP_PLUGINS_EMBED_QML)
+  add_compile_definitions(CLAP_PLUGINS_EMBED_QML)
 endif()
 
 add_subdirectory(io)
@@ -29,7 +29,7 @@ add_library(
   plugs/transport/transport-info.hh
   plugs/transport/transport-info.cc)
 
-if(CLAP_PLUGIN_REMOTE_GUI)
+if(CLAP_PLUGINS_REMOTE_GUI)
   target_compile_definitions(clap-plugins PUBLIC CLAP_REMOTE_GUI)
   target_link_libraries(clap-plugins PUBLIC clap-plugin-remote-gui)
 add_dependencies(clap-plugins clap-gui)

@@ -7,7 +7,7 @@
 #include <QObject>
 
 #include "abstract-gui-factory.hh"
-#include "native-timer.hh"
+#include "timer.hh"
 
 QT_BEGIN_NAMESPACE
 class QThread;
@@ -38,7 +38,7 @@ namespace clap {
 
       std::unique_ptr<QGuiApplication> _app;
       std::unordered_map<AbstractGuiListener *, std::weak_ptr<GuiClient>> _clients;
-      std::unique_ptr<NativeTimer> _timer;
+      std::unique_ptr<Timer> _timer;
    };
 
 } // namespace clap

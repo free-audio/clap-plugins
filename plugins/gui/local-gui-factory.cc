@@ -27,7 +27,7 @@ namespace clap {
 
       QGuiApplication::setAttribute(Qt::AA_PluginApplication);
       _app = std::make_unique<QGuiApplication>(argc, argv);
-      _timer = std::make_unique<NativeTimer>(1000 / 60, [this] {
+      _timer = Timer::createNative(1000 / 60, [this] {
          onTimer();
       });
 

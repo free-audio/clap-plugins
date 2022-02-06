@@ -15,12 +15,11 @@
 
 #include "gui/abstract-gui.hh"
 
-#ifdef CLAP_LOCAL_GUI
-#   include "gui/local-gui-factory.hh"
-#elif defined(CLAP_THREADED_GUI)
-#   include "gui/threaded-gui-factory.hh"
-#elif defined(CLAP_REMOTE_GUI)
+#ifdef CLAP_REMOTE_GUI
 #   include "gui/remote-gui-factory-proxy.hh"
+#else
+#   include "gui/local-gui-factory.hh"
+#   include "gui/threaded-gui-factory.hh"
 #endif
 
 namespace clap {
@@ -92,7 +91,7 @@ namespace clap {
       try {
          ClapOStream os(stream);
          yas::binary_oarchive<ClapOStream> ar(os);
-         ar & _parameters;
+         ar &_parameters;
       } catch (...) {
          return false;
       }
@@ -103,7 +102,7 @@ namespace clap {
       try {
          ClapIStream is(stream);
          yas::binary_iarchive<ClapIStream> ar(is);
-         ar & _parameters;
+         ar &_parameters;
       } catch (...) {
          return false;
       }
@@ -111,21 +110,18 @@ namespace clap {
    }
 
    bool CorePlugin::guiCreate() noexcept {
-#if defined(CLAP_LOCAL_GUI)
-      _guiFactory = LocalGuiFactory::getInstance();
-#elif defined(CLAP_THREADED_GUI)
-      _guiFactory = ThreadedGuiFactory::getInstance();
-#elif defined(CLAP_REMOTE_GUI)
+#ifdef CLAP_REMOTE_GUI
       _guiFactory = RemoteGuiFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
 #else
-#error "CLAP_PLUGIN_GUI_MODEL not defined"
+      _guiFactory = LocalGuiFactory::getInstance();
+      if (!_guiFactory)
+         _guiFactory = ThreadedGuiFactory::getInstance();
 #endif
 
       std::vector<std::string> qmlPath;
       qmlPath.push_back(_pathProvider->getQmlLibraryPath());
 
-      _gui = _guiFactory->createGuiClient(
-         *this, qmlPath, _pathProvider->getQmlSkinPath());
+      _gui = _guiFactory->createGuiClient(*this, qmlPath, _pathProvider->getQmlSkinPath());
 
       if (!_gui)
          return false;
@@ -270,8 +266,7 @@ namespace clap {
       }
    }
 
-   void CorePlugin::processGuiParameterChange(const clap_output_events *out)
-   {
+   void CorePlugin::processGuiParameterChange(const clap_output_events *out) {
       GuiToPluginValue value;
       while (_guiToPluginQueue.tryPop(value)) {
          auto p = _parameters.getById(value.paramId);

@@ -1,4 +1,6 @@
-#include "cf-timer.hh"
+#ifdef __APPLE__
+
+#   include "cf-timer.hh"
 
 namespace clap {
 
@@ -6,18 +8,27 @@ namespace clap {
       if (!_cb)
          throw std::invalid_argument("callback can't be null");
 
-      auto runLoop = CFRunLoopGetCurrent();
-
       _ctx.copyDescription = nullptr;
       _ctx.info = this;
       _ctx.release = nullptr;
       _ctx.retain = nullptr;
       _ctx.version = 0;
+   }
 
-      _timer =
-         CFRunLoopTimerCreate(kCFAllocatorDefault, 0, durationMs * 0.0001, 0, 0, &CFTimer::onTimer, &_ctx);
+   void CFTimer::start() {
+      auto runLoop = CFRunLoopGetCurrent();
+
+      _timer = CFRunLoopTimerCreate(
+         kCFAllocatorDefault, 0, durationMs * 0.0001, 0, 0, &CFTimer::onTimer, &_ctx);
       if (_timer)
          CFRunLoopAddTimer(runLoop, _timer, kCFRunLoopCommonModes);
+   }
+
+   void CFTimer::stop() {
+      auto runLoop = CFRunLoopGetCurrent();
+
+      if (_timer)
+         CFRunLoopRemoveTimer(runLoop, _timer, kCFRunLoopCommonModes);
    }
 
    CFTimer::~CFTimer() {
@@ -32,3 +43,5 @@ namespace clap {
       self->_cb();
    }
 } // namespace clap
+
+#endif

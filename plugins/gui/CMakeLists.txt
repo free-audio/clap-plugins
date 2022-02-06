@@ -1,8 +1,6 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-#find_package(Qt6 COMPONENTS Core Widget Platform Qml Quick QuickControls2 REQUIRED)
-
 add_library(clap-plugin-gui-common
     abstract-gui.hh
     abstract-gui.cc
@@ -31,7 +29,7 @@ target_link_libraries(clap-plugin-gui PUBLIC Qt6::Quick)
 set_property(TARGET clap-plugin-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 qt6_import_qml_plugins(clap-plugin-gui)
 
-if(false)
+if(CLAP_PLUGIN_EMBED_QML)
     # Static link of qml gui
     qt6_add_qml_module(clap-plugin-gui
         URI clap
@@ -39,24 +37,22 @@ if(false)
         RESOURCE_PREFIX /clap/imports
         QML_FILES
             qml/clap/Knob.qml
+            qml/dc-offset/main.qml
+            qml/transport-info/main.qml
     )
 endif()
 
 add_library(clap-plugin-local-gui
     local-gui-factory.hh
-    local-gui-factory.cc)
-set_property(TARGET clap-plugin-local-gui PROPERTY CXX_STANDARD 20)
-set_property(TARGET clap-plugin-local-gui PROPERTY POSITION_INDEPENDENT_CODE true)
-target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-gui)
+    local-gui-factory.cc
 
-add_library(clap-plugin-threaded-gui
     threaded-gui-factory.hh
     threaded-gui-factory.cc
     threaded-gui-proxy.hh
     threaded-gui-proxy.cc)
-set_property(TARGET clap-plugin-threaded-gui PROPERTY CXX_STANDARD 20)
-set_property(TARGET clap-plugin-threaded-gui PROPERTY POSITION_INDEPENDENT_CODE true)
-target_link_libraries(clap-plugin-threaded-gui PUBLIC clap-plugin-gui)
+set_property(TARGET clap-plugin-local-gui PROPERTY CXX_STANDARD 20)
+set_property(TARGET clap-plugin-local-gui PROPERTY POSITION_INDEPENDENT_CODE true)
+target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-gui)
 
 add_library(clap-plugin-remote-gui
     remote-gui-factory-proxy.hh

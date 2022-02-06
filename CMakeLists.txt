@@ -8,8 +8,6 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
 
 project(CLAP_EXAMPLES C CXX)
 
-set(UsePkgConfig TRUE CACHE BOOL "Use PkgConfig to find RtMidi and RtAudio dependencies")
-
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 COMPONENTS Gui Qml Quick REQUIRED)

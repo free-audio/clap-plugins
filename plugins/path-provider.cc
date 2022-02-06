@@ -2,10 +2,30 @@
 #include <cstring>
 #include <filesystem>
 #include <regex>
+#include <sstream>
 
 #include "path-provider.hh"
 
 namespace clap {
+
+   std::string PathProvider::getQmlLibraryPath() const {
+#ifdef CLAP_PLUGINS_EMBED_QML
+      return "/clap/imports/qml/";
+#else
+      return getQmlLibDirectory();
+#endif
+   }
+
+   std::string PathProvider::getQmlSkinPath() const {
+      std::ostringstream os;
+#ifdef CLAP_PLUGINS_EMBED_QML
+      os << "/clap/imports/skin/" << pluginName_;
+#else
+      os << getSkinDirectory();
+#endif
+      os << "/main.qml";
+      return os.str();
+   }
 
    class LinuxPathProvider final : public PathProvider {
    public:
@@ -25,15 +45,20 @@ namespace clap {
          return (prefix_ / "bin/clap-gui").generic_string();
       }
 
+      bool isValid() const noexcept override { return !prefix_.empty(); }
+
+   protected:
       std::string getSkinDirectory() const override {
+#ifdef CLAP_PLUGINS_EMBED_QML
+         return ("/clap/imports" / pluginName_).generic_string();
+#else
          return (prefix_ / "lib/clap/qml" / pluginName_).generic_string();
+#endif
       }
 
       std::string getQmlLibDirectory() const override {
          return (prefix_ / "lib/clap/qml").generic_string();
       }
-
-      bool isValid() const noexcept override { return !prefix_.empty(); }
 
    private:
       const std::filesystem::path prefix_;
@@ -105,13 +130,11 @@ namespace clap {
 
 #ifdef __unix
 
-     auto ptr = std::make_unique<LinuxPathProvider>(pluginPath, pluginName);
+      auto ptr = std::make_unique<LinuxPathProvider>(pluginPath, pluginName);
       if (ptr->isValid())
          return std::move(ptr);
 
 #elif defined(_WIN32)
-
-      
 
 #endif
 

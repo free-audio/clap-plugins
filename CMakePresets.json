@@ -26,9 +26,13 @@
                     "type": "FILEPATH",
                     "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
-                "UsePkgConfig": {
+                "CLAP_PLUGINS_REMOTE_GUI": {
                     "type": "BOOL",
                     "value": false
+                },
+                "CLAP_PLUGINS_EMBED_QML": {
+                    "type": "BOOL",
+                    "value": true
                 }
             }
         },
@@ -50,9 +54,13 @@
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": ["base"],
             "cacheVariables": {
-                "UsePkgConfig": {
+                "CLAP_PLUGINS_REMOTE_GUI": {
                     "type": "BOOL",
                     "value": true
+                },
+                "CLAP_PLUGINS_EMBED_QML": {
+                    "type": "BOOL",
+                    "value": false
                 }
             }
         }

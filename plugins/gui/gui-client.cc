@@ -117,8 +117,9 @@ namespace clap {
       if (!rootItem)
          return false;
 
-      *width = rootItem->width();
-      *height = rootItem->height();
+      auto ratio = _quickView->devicePixelRatio();
+      *width = rootItem->width() * ratio;
+      *height = rootItem->height() * ratio;
       return true;
    }
 

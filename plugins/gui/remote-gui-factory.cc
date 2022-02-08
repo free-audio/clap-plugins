@@ -73,6 +73,8 @@ namespace clap {
       return clientId;
    }
 
+   void RemoteGuiFactory::destroyClient(uint32_t clientId) { _guiClients.erase(clientId); }
+
    GuiClient *RemoteGuiFactory::getClient(uint32_t clientId) const {
       auto it = _guiClients.find(clientId);
       if (it != _guiClients.end())
@@ -102,10 +104,17 @@ namespace clap {
          break;
       }
 
-      case messages::kDestroyClientResponse:
+      case messages::kDestroyClientResponse: {
+         messages::DestroyClientRequest rq;
+         messages::DestroyClientResponse rp;
+         msg.get(rq);
+
          assert(c);
-         // TODO
+         destroyClient(msg.clientId);
+
+         _channel->sendResponseAsync(msg, rp);
          break;
+      }
 
       case messages::kDestroyRequest:
          messages::DestroyResponse rp;

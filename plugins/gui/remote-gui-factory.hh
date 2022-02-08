@@ -22,10 +22,13 @@ namespace clap {
 
       RemoteGuiFactory(void *pipeIn, void *pipeOut);
 
+   private:
+
       uint32_t createClient(const QStringList &qmlImportPath, const QUrl &qmlSkin);
+      void destroyClient(uint32_t clientId);
+
       GuiClient *getClient(uint32_t clientId) const;
 
-   private:
       template <class T>
       GuiClient *getClient(const T &msg) const {
          return getClient(msg.clientId);

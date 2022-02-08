@@ -67,8 +67,18 @@ namespace clap {
    RemoteGuiFactoryProxy::createGuiClient(AbstractGuiListener &listener,
                                           const std::vector<std::string> &qmlImportPath,
                                           const std::string &qmlUrl) {
-      // TODO
-      return {};
+      assert(qmlImportPath.size() == 1); // for now
+
+      messages::CreateClientRequest rq;
+      messages::CreateClientResponse rp;
+
+      snprintf(rq.qmlImportPath, sizeof (rq.qmlImportPath), "%s", qmlImportPath[0].c_str());
+      snprintf(rq.qmlSkinUrl, sizeof (rq.qmlSkinUrl), "%s", qmlUrl.c_str());
+      if (!_channel->sendRequestSync(0, rq, rp))
+         return {};
+
+      // TODO: proxy to abstract gui
+      return std::make_shared<RemoteGuiProxy>(*this, rp.clientId);
    }
 
    bool RemoteGuiFactoryProxy::spawnChild() {

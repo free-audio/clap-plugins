@@ -75,10 +75,9 @@ namespace clap {
       snprintf(rq.qmlImportPath, sizeof (rq.qmlImportPath), "%s", qmlImportPath[0].c_str());
       snprintf(rq.qmlSkinUrl, sizeof (rq.qmlSkinUrl), "%s", qmlUrl.c_str());
       if (!_channel->sendRequestSync(0, rq, rp))
-         return {};
+         return nullptr;
 
-      // TODO: proxy to abstract gui
-      return std::make_shared<RemoteGuiProxy>(*this, rp.clientId);
+      return std::make_shared<RemoteGuiProxy>(listener, *this, rp.clientId);
    }
 
    bool RemoteGuiFactoryProxy::spawnChild() {
@@ -270,10 +269,14 @@ namespace clap {
             pfd.events |= POLLERR;
 
          auto ret = poll(&pfd, 1, 0);
-         if (ret == 1) {
+         if (ret < 0) {
             std::cerr << "[clap-plugins] poll(): " << strerror(errno) << std::endl;
             return;
          }
+
+         if (ret == 0)
+            // hmmm why?
+            continue;
 
          if (pfd.revents & POLLIN)
             _channel->tryReceive();

@@ -6,6 +6,11 @@
 #include "remote-gui-proxy.hh"
 
 namespace clap {
+   RemoteGuiProxy::RemoteGuiProxy(AbstractGuiListener &listener,
+                                  RemoteGuiFactoryProxy &factory,
+                                  uint32_t clientId)
+      : super(listener), _clientFactory(factory), _clientId(clientId) {}
+
    void RemoteGuiProxy::defineParameter(const clap_param_info &info) {
       messages::DefineParameterRequest rq{info};
       _clientFactory._channel->sendRequestAsync(_clientId, rq);

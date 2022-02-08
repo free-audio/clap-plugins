@@ -7,8 +7,11 @@
 namespace clap {
    class RemoteGuiFactoryProxy;
    class RemoteGuiProxy : public AbstractGui {
+      using super = AbstractGui;
    public:
-      RemoteGuiProxy(RemoteGuiFactoryProxy &factory, uint32_t clientId);
+      RemoteGuiProxy(AbstractGuiListener &listener,
+                     RemoteGuiFactoryProxy &factory,
+                     uint32_t clientId);
 
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;

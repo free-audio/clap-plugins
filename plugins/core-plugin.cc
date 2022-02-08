@@ -111,7 +111,8 @@ namespace clap {
 
    bool CorePlugin::guiCreate() noexcept {
 #ifdef CLAP_REMOTE_GUI
-      _guiFactory = RemoteGuiFactoryProxy::getInstance(_pathProvider->getGuiExecutable());
+      auto guiPath = _pathProvider->getGuiExecutable();
+      _guiFactory = RemoteGuiFactoryProxy::getInstance(guiPath);
 #else
       _guiFactory = LocalGuiFactory::getInstance();
       if (!_guiFactory)
@@ -121,7 +122,8 @@ namespace clap {
       std::vector<std::string> qmlPath;
       qmlPath.push_back(_pathProvider->getQmlLibraryPath());
 
-      _gui = _guiFactory->createGuiClient(*this, qmlPath, _pathProvider->getQmlSkinPath());
+      auto skinPath = _pathProvider->getQmlSkinPath();
+      _gui = _guiFactory->createGuiClient(*this, qmlPath, skinPath);
 
       if (!_gui)
          return false;

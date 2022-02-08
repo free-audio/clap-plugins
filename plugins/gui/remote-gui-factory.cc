@@ -1,7 +1,9 @@
-#include <QSocketNotifier>
 #include <QCoreApplication>
+#include <QSocketNotifier>
+#include <QUrl>
 
 #include "remote-gui-factory.hh"
+#include "remote-gui-listener.hh"
 
 namespace clap {
 
@@ -59,10 +61,22 @@ namespace clap {
       QCoreApplication::quit();
    }
 
+   uint32_t RemoteGuiFactory::createClient(const QStringList &qmlImportPath, const QUrl &qmlSkin) {
+      if (!qmlSkin.isValid())
+         return 0;
+
+      const uint32_t clientId = ++_nextClientId;
+      auto context = std::make_unique<ClientContext>(clientId);
+      context->listenner = std::make_unique<RemoteGuiListener>(*this, clientId);
+      context->client = std::make_unique<GuiClient>(*context->listenner, qmlImportPath, qmlSkin);
+      _guiClients.emplace(clientId, std::move(context));
+      return clientId;
+   }
+
    GuiClient *RemoteGuiFactory::getClient(uint32_t clientId) const {
       auto it = _guiClients.find(clientId);
       if (it != _guiClients.end())
-         return it->second.get();
+         return it->second->client.get();
       return nullptr;
    }
 
@@ -70,6 +84,29 @@ namespace clap {
       auto c = getClient(msg.clientId);
 
       switch (msg.type) {
+      case messages::kCreateClientRequest: {
+         assert(!c);
+         messages::CreateClientRequest rq;
+         messages::CreateClientResponse rp;
+         msg.get(rq);
+
+         QStringList importPath;
+         importPath << rq.qmlImportPath;
+
+         QUrl skin(rq.qmlSkinUrl);
+
+         auto clientId = createClient(importPath, skin);
+         rp.clientId = clientId;
+
+         _channel->sendResponseAsync(msg, rp);
+         break;
+      }
+
+      case messages::kDestroyClientResponse:
+         assert(c);
+         // TODO
+         break;
+
       case messages::kDestroyRequest:
          messages::DestroyResponse rp;
          _channel->sendResponseAsync(msg, rp);
@@ -170,4 +207,7 @@ namespace clap {
       }
       }
    }
+
+   RemoteGuiFactory::ClientContext::ClientContext(uint32_t cId) : clientId(cId) {}
+   RemoteGuiFactory::ClientContext::~ClientContext() = default;
 } // namespace clap

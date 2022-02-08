@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <memory>
 
 #include <QObject>
 
@@ -14,12 +15,14 @@ class QSocketNotifier;
 QT_END_NAMESPACE
 
 namespace clap {
+   class RemoteGuiListener;
    class RemoteGuiFactory : public QObject, public BasicRemoteChannel::EventControl {
    public:
       RemoteGuiFactory(int socket);
 
       RemoteGuiFactory(void *pipeIn, void *pipeOut);
 
+      uint32_t createClient(const QStringList &qmlImportPath, const QUrl &qmlSkin);
       GuiClient *getClient(uint32_t clientId) const;
 
    private:
@@ -35,7 +38,17 @@ namespace clap {
 
       friend class RemoteGuiListener;
 
-      std::unordered_map<uint32_t, std::unique_ptr<GuiClient>> _guiClients;
+      struct ClientContext {
+         ClientContext(uint32_t cId);
+         ~ClientContext();
+
+         const uint32_t clientId = 0;
+         std::unique_ptr<RemoteGuiListener> listenner;
+         std::unique_ptr<GuiClient> client;
+      };
+
+      uint32_t _nextClientId = 0;
+      std::unordered_map<uint32_t, std::unique_ptr<ClientContext>> _guiClients;
 
       std::unique_ptr<clap::RemoteChannel> _channel;
       std::unique_ptr<QSocketNotifier> _socketReadNotifier;

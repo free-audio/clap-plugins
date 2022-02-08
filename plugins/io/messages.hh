@@ -5,6 +5,12 @@
 namespace clap::messages {
 
    enum Type : uint32_t {
+      // Client
+      kCreateClientRequest,
+      kCreateClientResponse,
+      kDestroyClientRequest,
+      kDestroyClientResponse,
+
       // DSP->GUI
       kDefineParameterRequest,
       kParameterValueRequest,
@@ -37,6 +43,27 @@ namespace clap::messages {
       // Gui, Plugin->Host
       kResizeRequest,
       kResizeResponse,
+   };
+
+   struct CreateClientRequest final {
+      static const constexpr Type type = clap::messages::kCreateClientRequest;
+
+      char qmlImportPath[4096];
+      char qmlSkinUrl[4096];
+   };
+
+   struct CreateClientResponse final {
+      static const constexpr Type type = clap::messages::kCreateClientResponse;
+
+      uint32_t clientId;
+   };
+
+   struct DestroyClientRequest final {
+      static const constexpr Type type = clap::messages::kDestroyClientRequest;
+   };
+
+   struct DestroyClientResponse final {
+      static const constexpr Type type = clap::messages::kCreateClientResponse;
    };
 
    struct ParamAdjustRequest final {

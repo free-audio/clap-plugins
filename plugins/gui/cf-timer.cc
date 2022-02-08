@@ -4,7 +4,8 @@
 
 namespace clap {
 
-   CFTimer::CFTimer(uint32_t durationMs, const std::function<void()> &callback) : _cb(callback) {
+   CFTimer::CFTimer(uint32_t durationMs, const std::function<void()> &callback)
+      : _durationMs(durationMs), _cb(callback) {
       if (!_cb)
          throw std::invalid_argument("callback can't be null");
 
@@ -19,7 +20,7 @@ namespace clap {
       auto runLoop = CFRunLoopGetCurrent();
 
       _timer = CFRunLoopTimerCreate(
-         kCFAllocatorDefault, 0, durationMs * 0.0001, 0, 0, &CFTimer::onTimer, &_ctx);
+         kCFAllocatorDefault, 0, _durationMs * 0.0001, 0, 0, &CFTimer::onTimer, &_ctx);
       if (_timer)
          CFRunLoopAddTimer(runLoop, _timer, kCFRunLoopCommonModes);
    }

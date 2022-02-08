@@ -6,7 +6,8 @@
 namespace clap {
    class PathProvider {
    public:
-      virtual ~PathProvider() = default;
+      PathProvider(std::string pluginName);
+      virtual ~PathProvider();
 
       static std::unique_ptr<PathProvider> create(const std::string &pluginPath,
                                                   const std::string &pluginName);
@@ -20,5 +21,7 @@ namespace clap {
    protected:
       virtual std::string getSkinDirectory() const = 0;
       virtual std::string getQmlLibDirectory() const = 0;
+
+      const std::string _pluginName;
    };
 } // namespace clap

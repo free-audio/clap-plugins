@@ -29,18 +29,8 @@ set_property(TARGET clap-plugin-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 qt6_import_qml_plugins(clap-plugin-gui)
 
 if(CLAP_PLUGINS_EMBED_QML)
-    # Static link of qml gui
-    qt6_add_qml_module(clap-plugin-gui
-        URI clap.lib
-        VERSION 1.0
-        RESOURCE_PREFIX /clap/imports/lib
-        QML_FILES qml/clap/Knob.qml)
-
-    qt6_add_qml_module(clap-plugin-gui
-        URI clap.dc_offset
-        VERSION 1.0
-        RESOURCE_PREFIX /clap/imports/skins/dc_offset
-        QML_FILES qml/dc-offset/main.qml)
+  add_subdirectory(qml)
+  target_link_libraries(clap-plugin-gui PUBLIC clap-qml-skins clap-qml-lib)
 endif()
 
 if(CLAP_PLUGINS_REMOTE_GUI)

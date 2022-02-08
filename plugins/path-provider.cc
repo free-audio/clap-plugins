@@ -10,7 +10,7 @@ namespace clap {
 
    std::string PathProvider::getQmlLibraryPath() const {
 #ifdef CLAP_PLUGINS_EMBED_QML
-      return "/clap/imports/qml/";
+      return "qrc:/qml/clap/lib/";
 #else
       return getQmlLibDirectory();
 #endif
@@ -19,7 +19,7 @@ namespace clap {
    std::string PathProvider::getQmlSkinPath() const {
       std::ostringstream os;
 #ifdef CLAP_PLUGINS_EMBED_QML
-      os << "/clap/imports/skin/" << pluginName_;
+      os << "qrc:/qml/clap/skins/" << _pluginName;
 #else
       os << getSkinDirectory();
 #endif
@@ -30,7 +30,7 @@ namespace clap {
    class LinuxPathProvider final : public PathProvider {
    public:
       LinuxPathProvider(const std::string &pluginPath, const std::string &pluginName)
-         : prefix_(computePrefix(pluginPath)), pluginName_(pluginName) {}
+         : PathProvider(pluginName), prefix_(computePrefix(pluginPath)) {}
 
       static std::string computePrefix(const std::string &pluginPath) {
          static const std::regex r("(/.*)/lib/clap/.*$", std::regex::optimize);
@@ -49,27 +49,22 @@ namespace clap {
 
    protected:
       std::string getSkinDirectory() const override {
-#ifdef CLAP_PLUGINS_EMBED_QML
-         return ("/clap/imports" / pluginName_).generic_string();
-#else
-         return (prefix_ / "lib/clap/qml" / pluginName_).generic_string();
-#endif
+         return (prefix_ / "lib/clap/qml" / _pluginName).generic_string();
       }
 
       std::string getQmlLibDirectory() const override {
-         return (prefix_ / "lib/clap/qml").generic_string();
+         return (prefix_ / "lib/clap/qml/lib").generic_string();
       }
 
    private:
       const std::filesystem::path prefix_;
-      const std::string pluginName_;
    };
 
    class DevelopmentPathProvider final : public PathProvider {
    public:
       DevelopmentPathProvider(const std::string &pluginPath, const std::string &pluginName)
-         : srcRoot_(computeSrcRoot(pluginPath)), buildRoot_(computeBuildRoot(pluginPath)),
-           pluginName_(pluginName), _multiPrefix(computeMultiPrefix(pluginPath)) {}
+         : PathProvider(pluginName), _srcRoot(computeSrcRoot(pluginPath)),
+           _buildRoot(computeBuildRoot(pluginPath)), _multiPrefix(computeMultiPrefix(pluginPath)) {}
 
       static std::string computeSrcRoot(const std::string &pluginPath) {
          static const std::regex r("^(.*)/builds/.*$", std::regex::optimize);
@@ -99,25 +94,31 @@ namespace clap {
       }
 
       std::string getGuiExecutable() const override {
-         return (buildRoot_ / "plugins/gui" / _multiPrefix / "clap-gui").generic_string();
+         return (_buildRoot / "plugins/gui" / _multiPrefix / "clap-gui").generic_string();
       }
 
       std::string getSkinDirectory() const override {
-         return (srcRoot_ / "plugins/gui/qml" / pluginName_).generic_string();
+         return (_srcRoot / "plugins/gui/qml" / _pluginName).generic_string();
       }
 
       std::string getQmlLibDirectory() const override {
-         return (srcRoot_ / "plugins/gui/qml").generic_string();
+         return (_srcRoot / "plugins/gui/qml/lib").generic_string();
       }
 
-      bool isValid() const noexcept override { return !srcRoot_.empty() && !buildRoot_.empty(); }
+      bool isValid() const noexcept override { return !_srcRoot.empty() && !_buildRoot.empty(); }
 
    private:
-      const std::filesystem::path srcRoot_;
-      const std::filesystem::path buildRoot_;
-      const std::string pluginName_;
+      const std::filesystem::path _srcRoot;
+      const std::filesystem::path _buildRoot;
       const std::string _multiPrefix;
    };
+
+   PathProvider::PathProvider(std::string pluginName)
+      : _pluginName(std::move(pluginName))
+   {
+   }
+
+   PathProvider::~PathProvider() = default;
 
    std::unique_ptr<PathProvider> PathProvider::create(const std::string &_pluginPath,
                                                       const std::string &pluginName) {

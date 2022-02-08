@@ -1,6 +1,5 @@
 import QtQuick 2.1
 import QtQuick.Controls 2.1
-import clap 1.0
 
 Rectangle {
     width: 450

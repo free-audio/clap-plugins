@@ -10,7 +10,7 @@ namespace clap {
 
    std::string PathProvider::getQmlLibraryPath() const {
 #ifdef CLAP_PLUGINS_EMBED_QML
-      return "qrc:/qml/clap/lib/";
+      return "qrc:/qml";
 #else
       return getQmlLibDirectory();
 #endif

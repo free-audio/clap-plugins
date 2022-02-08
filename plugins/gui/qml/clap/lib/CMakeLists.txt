@@ -4,5 +4,6 @@ qt6_add_qml_module(clap-qml-lib
         STATIC
         RESOURCE_PREFIX /qml
         QML_FILES
+                qmldir
                 Knob.qml
 )

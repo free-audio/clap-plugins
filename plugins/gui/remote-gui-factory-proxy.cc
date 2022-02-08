@@ -1,5 +1,6 @@
 #if (defined(__unix__) || defined(__APPLE__))
 #   include <fcntl.h>
+#   include <poll.h>
 #   include <sys/socket.h>
 #   include <sys/wait.h>
 #   include <unistd.h>
@@ -33,10 +34,24 @@ namespace clap {
    std::weak_ptr<RemoteGuiFactoryProxy> RemoteGuiFactoryProxy::_instance;
 
    RemoteGuiFactoryProxy::RemoteGuiFactoryProxy(const std::string &guiPath) : _guiPath(guiPath) {
-      // TODO: start the thread and the io loop
+
+      if (!spawnChild()) {
+         _quit = true;
+         return;
+      }
+
+      assert(!_thread);
+      _thread = std::make_unique<std::thread>([this] { run(); });
    }
 
-   RemoteGuiFactoryProxy::~RemoteGuiFactoryProxy() {}
+   RemoteGuiFactoryProxy::~RemoteGuiFactoryProxy() {
+      _quit = true;
+
+      if (_thread && _thread->joinable()) {
+         _thread->join();
+         _thread.reset();
+      }
+   }
 
    std::shared_ptr<RemoteGuiFactoryProxy>
    RemoteGuiFactoryProxy::getInstance(const std::string &guiPath) {
@@ -221,4 +236,42 @@ namespace clap {
 
       proxy->onMessage(msg);
    }
+
+   void RemoteGuiFactoryProxy::run() {
+#if (defined(__unix__) || defined(__APPLE__))
+      posixLoop();
+#elif defined(_WIN32)
+      windowsLoop();
+#else
+#   error "unsupported target"
+#endif
+   }
+
+#if (defined(__unix__) || defined(__APPLE__))
+   void RemoteGuiFactoryProxy::posixLoop() {
+      pollfd pfd;
+      pfd.fd = _channel->fd();
+
+      while (!_quit) {
+         pfd.events = POLLIN;
+         if (_pollFlags & CLAP_POSIX_FD_WRITE)
+            pfd.events |= POLLOUT;
+         if (_pollFlags & CLAP_POSIX_FD_ERROR)
+            pfd.events |= POLLERR;
+
+         auto ret = poll(&pfd, 1, 0);
+         if (ret == 1) {
+            std::cerr << "[clap-plugins] poll(): " << strerror(errno) << std::endl;
+            return;
+         }
+
+         if (pfd.revents & POLLIN)
+            _channel->tryReceive();
+         if (pfd.revents & POLLOUT)
+            _channel->trySend();
+         if (pfd.revents & POLLERR)
+            _channel->onError();
+      }
+   }
+#endif
 } // namespace clap

@@ -42,13 +42,19 @@ namespace clap {
       std::unique_ptr<std::thread> _thread;
       std::unique_ptr<RemoteChannel> _channel;
 
+      bool _quit = false;
+
       std::unordered_map<AbstractGuiListener *, std::weak_ptr<RemoteGuiProxy>> _clients;
       std::unordered_map<uint32_t /* clientId */, std::weak_ptr<RemoteGuiProxy>> _clientIdMap;
 
 #if (defined(__unix__) || defined(__APPLE__))
+      void posixLoop();
+
       pid_t _child = -1;
       int _pollFlags = 0;
 #elif defined(_WIN32)
+      void windowsLoop();
+
       std::unique_ptr<RemoteGuiWin32Data> _data;
 #endif
    };

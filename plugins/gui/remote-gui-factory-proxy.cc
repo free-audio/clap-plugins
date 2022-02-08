@@ -32,8 +32,7 @@ namespace clap {
 
    std::weak_ptr<RemoteGuiFactoryProxy> RemoteGuiFactoryProxy::_instance;
 
-   RemoteGuiFactoryProxy::RemoteGuiFactoryProxy(const std::string &guiPath)
-      : _guiPath(guiPath) {
+   RemoteGuiFactoryProxy::RemoteGuiFactoryProxy(const std::string &guiPath) : _guiPath(guiPath) {
       // TODO: start the thread and the io loop
    }
 
@@ -47,6 +46,14 @@ namespace clap {
       ptr.reset(new RemoteGuiFactoryProxy(guiPath));
       _instance = ptr;
       return ptr;
+   }
+
+   std::shared_ptr<AbstractGui>
+   RemoteGuiFactoryProxy::createGuiClient(AbstractGuiListener &listener,
+                                          const std::vector<std::string> &qmlImportPath,
+                                          const std::string &qmlUrl) {
+      // TODO
+      return {};
    }
 
    bool RemoteGuiFactoryProxy::spawnChild() {

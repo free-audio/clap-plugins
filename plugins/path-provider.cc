@@ -98,11 +98,11 @@ namespace clap {
       }
 
       std::string getSkinDirectory() const override {
-         return (_srcRoot / "plugins/gui/qml" / _pluginName).generic_string();
+         return (_srcRoot / "plugins/gui/qml/clap/skins" / _pluginName).generic_string();
       }
 
       std::string getQmlLibDirectory() const override {
-         return (_srcRoot / "plugins/gui/qml/lib").generic_string();
+         return (_srcRoot / "plugins/gui/qml/clap/lib").generic_string();
       }
 
       bool isValid() const noexcept override { return !_srcRoot.empty() && !_buildRoot.empty(); }

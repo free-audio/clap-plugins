@@ -39,7 +39,7 @@ namespace clap {
          avail = std::min<size_t>(size, avail);
          auto end = data + avail;
          std::copy(data, end, writePtr());
-         wrote(size);
+         wrote(avail);
          data = end;
          size -= avail;
       }

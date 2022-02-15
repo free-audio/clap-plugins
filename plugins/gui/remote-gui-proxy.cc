@@ -30,7 +30,7 @@ namespace clap {
 
       *width = response.width;
       *height = response.height;
-      return true;
+      return response.succeed;
    }
 
    bool RemoteGuiProxy::setScale(double scale) {

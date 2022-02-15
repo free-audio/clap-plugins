@@ -11,6 +11,14 @@ namespace clap {
                                   uint32_t clientId)
       : super(listener), _clientFactory(factory), _clientId(clientId) {}
 
+   void RemoteGuiProxy::setSkin(const std::string &skinUrl)
+   {
+      messages::SetSkinRequest rq;
+
+      snprintf(rq.skinUrl, sizeof (rq.skinUrl), "%s", skinUrl.c_str());
+      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+   }
+
    void RemoteGuiProxy::defineParameter(const clap_param_info &info) {
       messages::DefineParameterRequest rq{info};
       _clientFactory._channel->sendRequestAsync(_clientId, rq);

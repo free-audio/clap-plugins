@@ -65,19 +65,22 @@ namespace clap {
 
    std::shared_ptr<AbstractGui>
    RemoteGuiFactoryProxy::createGuiClient(AbstractGuiListener &listener,
-                                          const std::vector<std::string> &qmlImportPath,
-                                          const std::string &qmlUrl) {
+                                          const std::vector<std::string> &qmlImportPath) {
       assert(qmlImportPath.size() == 1); // for now
 
       messages::CreateClientRequest rq;
       messages::CreateClientResponse rp;
 
       snprintf(rq.qmlImportPath, sizeof (rq.qmlImportPath), "%s", qmlImportPath[0].c_str());
-      snprintf(rq.qmlSkinUrl, sizeof (rq.qmlSkinUrl), "%s", qmlUrl.c_str());
       if (!_channel->sendRequestSync(0, rq, rp))
          return nullptr;
 
-      return std::make_shared<RemoteGuiProxy>(listener, *this, rp.clientId);
+      auto ptr = std::make_shared<RemoteGuiProxy>(listener, *this, rp.clientId);
+
+      _clientIdMap.emplace(rp.clientId, ptr);
+      _clients.emplace(&listener, ptr);
+
+      return ptr;
    }
 
    bool RemoteGuiFactoryProxy::spawnChild() {

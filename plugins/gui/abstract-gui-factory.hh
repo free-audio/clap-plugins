@@ -14,8 +14,7 @@ namespace clap {
 
       virtual std::shared_ptr<AbstractGui>
       createGuiClient(AbstractGuiListener &listener,
-                      const std::vector<std::string> &qmlImportPath,
-                      const std::string &qmlUrl) = 0;
+                      const std::vector<std::string> &qmlImportPath) = 0;
    };
 
 } // namespace clap

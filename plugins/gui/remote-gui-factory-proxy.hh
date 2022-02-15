@@ -19,8 +19,7 @@ namespace clap {
 
       virtual std::shared_ptr<AbstractGui>
       createGuiClient(AbstractGuiListener &listener,
-                      const std::vector<std::string> &qmlImportPath,
-                      const std::string &qmlUrl) override;
+                      const std::vector<std::string> &qmlImportPath) override;
 
    private:
       friend class RemoteGuiProxy;

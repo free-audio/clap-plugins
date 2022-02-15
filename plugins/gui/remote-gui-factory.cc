@@ -61,14 +61,11 @@ namespace clap {
       QCoreApplication::quit();
    }
 
-   uint32_t RemoteGuiFactory::createClient(const QStringList &qmlImportPath, const QUrl &qmlSkin) {
-      if (!qmlSkin.isValid())
-         return 0;
-
+   uint32_t RemoteGuiFactory::createClient(const QStringList &qmlImportPath) {
       const uint32_t clientId = ++_nextClientId;
       auto context = std::make_unique<ClientContext>(clientId);
       context->listenner = std::make_unique<RemoteGuiListener>(*this, clientId);
-      context->client = std::make_unique<GuiClient>(*context->listenner, qmlImportPath, qmlSkin);
+      context->client = std::make_unique<GuiClient>(*context->listenner, qmlImportPath);
       _guiClients.emplace(clientId, std::move(context));
       return clientId;
    }
@@ -95,9 +92,7 @@ namespace clap {
          QStringList importPath;
          importPath << rq.qmlImportPath;
 
-         QUrl skin(rq.qmlSkinUrl);
-
-         auto clientId = createClient(importPath, skin);
+         auto clientId = createClient(importPath);
          rp.clientId = clientId;
 
          _channel->sendResponseAsync(msg, rp);
@@ -126,6 +121,15 @@ namespace clap {
          msg.get(rq);
          if (c)
             c->updateTransport(rq.transport);
+         break;
+      }
+
+      case messages::kSetSkinRequest:
+      {
+         messages::SetSkinRequest rq;
+         msg.get(rq);
+         if (c)
+            c->setSkin(rq.skinUrl);
          break;
       }
 

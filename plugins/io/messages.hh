@@ -11,6 +11,9 @@ namespace clap::messages {
       kDestroyClientRequest,
       kDestroyClientResponse,
 
+      kSetSkinRequest,
+      kSetSkinResponse,
+
       // DSP->GUI
       kDefineParameterRequest,
       kParameterValueRequest,
@@ -49,13 +52,21 @@ namespace clap::messages {
       static const constexpr Type type = clap::messages::kCreateClientRequest;
 
       char qmlImportPath[4096];
-      char qmlSkinUrl[4096];
    };
 
    struct CreateClientResponse final {
       static const constexpr Type type = clap::messages::kCreateClientResponse;
 
       uint32_t clientId;
+   };
+
+   struct SetSkinRequest final {
+      static const constexpr Type type = clap::messages::kSetSkinRequest;
+      char skinUrl[4096];
+   };
+
+   struct SetSkinResponse final {
+      static const constexpr Type type = clap::messages::kSetSkinResponse;
    };
 
    struct DestroyClientRequest final {

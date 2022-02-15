@@ -13,6 +13,8 @@ namespace clap {
                      RemoteGuiFactoryProxy &factory,
                      uint32_t clientId);
 
+      void setSkin(const std::string& skinPath) override;
+
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;
 

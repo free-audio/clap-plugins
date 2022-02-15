@@ -1,5 +1,6 @@
 #include <stdexcept>
 
+#include <QGuiApplication>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickItem>
@@ -17,8 +18,7 @@
 namespace clap {
 
    GuiClient::GuiClient(AbstractGuiListener &listener,
-                        const QStringList &qmlImportPath,
-                        const QUrl &qmlSkin)
+                        const QStringList &qmlImportPath)
       : AbstractGui(listener), _quickView(new QQuickView()) {
 
       _pluginProxy = new PluginProxy(*this);
@@ -29,16 +29,19 @@ namespace clap {
       ////////////////////////
 
       auto qmlContext = _quickView->engine()->rootContext();
+
       for (const auto &str : qmlImportPath)
          _quickView->engine()->addImportPath(str);
+
       qmlContext->setContextProperty("plugin", _pluginProxy);
       qmlContext->setContextProperty("transport", _transportProxy);
-
-      _quickView->setSource(qmlSkin);
    }
 
-   GuiClient::~GuiClient()
+   GuiClient::~GuiClient() {}
+
+   void GuiClient::setSkin(const std::string& skinUrl)
    {
+      _quickView->setSource(QUrl(skinUrl.c_str()));
    }
 
    void GuiClient::defineParameter(const clap_param_info &paramInfo) {
@@ -103,6 +106,7 @@ namespace clap {
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          _quickView->show();
+         qGuiApp->sync();
          return true;
       }
 #endif

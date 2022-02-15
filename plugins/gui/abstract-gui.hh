@@ -2,6 +2,8 @@
 
 #include <clap/clap.h>
 
+#include <string>
+
 namespace clap {
 
    class CorePlugin;
@@ -10,6 +12,8 @@ namespace clap {
    public:
       AbstractGui(AbstractGuiListener &listener);
       virtual ~AbstractGui();
+
+      virtual void setSkin(const std::string& skinUrl) = 0;
 
       virtual void defineParameter(const clap_param_info &paramInfo) = 0;
       virtual void updateParameter(clap_id paramId, double value, double modAmount) = 0;

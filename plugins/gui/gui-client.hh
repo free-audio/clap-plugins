@@ -21,15 +21,15 @@ namespace clap {
       Q_OBJECT;
 
    public:
-      GuiClient(AbstractGuiListener &listener,
-                const QStringList &qmlImportPath,
-                const QUrl &qmlSkin);
+      GuiClient(AbstractGuiListener &listener, const QStringList &qmlImportPath);
       ~GuiClient() override;
 
-      GuiClient(const GuiClient&) = delete;
-      GuiClient(GuiClient&&) = delete;
-      GuiClient& operator=(const GuiClient&) = delete;
-      GuiClient& operator=(GuiClient&&) = delete;
+      GuiClient(const GuiClient &) = delete;
+      GuiClient(GuiClient &&) = delete;
+      GuiClient &operator=(const GuiClient &) = delete;
+      GuiClient &operator=(GuiClient &&) = delete;
+
+      void setSkin(const std::string &skinPath) override;
 
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;

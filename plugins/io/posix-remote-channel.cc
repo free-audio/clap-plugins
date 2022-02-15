@@ -78,7 +78,7 @@ namespace clap {
       pfd.events = POLLIN | (_ioFlags & CLAP_POSIX_FD_WRITE ? POLLOUT : 0);
       pfd.revents = 0;
 
-      int ret = ::poll(&pfd, 1, -1);
+      int ret = ::poll(&pfd, 1, 10);
       if (ret < 1) {
          if (errno == EAGAIN || errno == EINTR)
             return;

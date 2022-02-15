@@ -24,7 +24,7 @@ namespace clap {
 
    private:
 
-      uint32_t createClient(const QStringList &qmlImportPath, const QUrl &qmlSkin);
+      uint32_t createClient(const QStringList &qmlImportPath);
       void destroyClient(uint32_t clientId);
 
       GuiClient *getClient(uint32_t clientId) const;

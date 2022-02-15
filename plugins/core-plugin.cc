@@ -122,13 +122,15 @@ namespace clap {
       std::vector<std::string> qmlPath;
       qmlPath.push_back(_pathProvider->getQmlLibraryPath());
 
-      auto skinPath = _pathProvider->getQmlSkinPath();
-      _gui = _guiFactory->createGuiClient(*this, qmlPath, skinPath);
+      _gui = _guiFactory->createGuiClient(*this, qmlPath);
 
       if (!_gui)
          return false;
 
       guiDefineParameters();
+
+      auto skinPath = _pathProvider->getQmlSkinPath();
+      _gui->setSkin(skinPath);
       return true;
    }
 

@@ -30,7 +30,7 @@ qt6_import_qml_plugins(clap-plugin-gui)
 
 if(CLAP_PLUGINS_EMBED_QML)
   add_subdirectory(qml)
-  target_link_libraries(clap-plugin-gui PUBLIC clap-qml-skins clap-qml-lib)
+  target_link_libraries(clap-plugin-gui PUBLIC clap-qml-skins clap-qml-lib clap-qml-libplugin)
 endif()
 
 if(CLAP_PLUGINS_REMOTE_GUI)

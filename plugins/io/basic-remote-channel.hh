@@ -22,16 +22,22 @@ namespace clap {
       };
 
       struct Message final {
-         uint32_t type = 0;
-         uint32_t cookie = 0;
-         uint32_t size = 0;
-         uint32_t clientId = 0;
+         struct Header {
+            Header() = default;
+            Header(uint32_t cid, uint32_t cki) : cookie(cki), clientId(cid) {}
+            uint32_t type = 0;
+            uint32_t cookie = 0;
+            uint32_t size = 0;
+            uint32_t clientId = 0;
+         };
+
+         Header header;
          const void *data = nullptr;
 
          Message() = default;
 
          template <typename T>
-         Message(uint32_t cid, uint32_t cki, const T &msg) : cookie(cki), clientId(cid) {
+         Message(uint32_t cid, uint32_t cki, const T &msg) : header(cid, cki) {
             set(msg);
          }
 
@@ -39,10 +45,10 @@ namespace clap {
          void get(T &obj) const noexcept {
             constexpr const auto sz = sizeof(T);
 
-            if (size != sz)
+            if (header.size != sz)
                std::terminate();
 
-            if (type != T::type)
+            if (header.type != T::type)
                std::terminate();
 
             std::memcpy(&obj, data, sizeof(obj));
@@ -55,9 +61,9 @@ namespace clap {
 
          template <typename T>
          void set(const T &msg) noexcept {
-            type = T::type;
+            header.type = T::type;
             data = &msg;
-            size = sizeof(T);
+            header.size = sizeof(T);
          }
       };
 
@@ -85,8 +91,9 @@ namespace clap {
       }
 
       template <typename Response>
-      bool sendResponseAsync(const BasicRemoteChannel::Message& rqMsg, const Response &response) {
-         return sendMessageAsync(BasicRemoteChannel::Message(rqMsg.clientId, rqMsg.cookie, response));
+      bool sendResponseAsync(const BasicRemoteChannel::Message &rqMsg, const Response &response) {
+         return sendMessageAsync(
+            BasicRemoteChannel::Message(rqMsg.header.clientId, rqMsg.header.cookie, response));
       }
 
       template <typename Request, typename Response>

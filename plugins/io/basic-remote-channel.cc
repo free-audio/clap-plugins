@@ -50,20 +50,18 @@ namespace clap {
    }
 
    void BasicRemoteChannel::processInput() {
-      while (_inputBuffer.readAvail() >= 12) {
+      while (_inputBuffer.readAvail() >= sizeof (Message::Header)) {
          const auto *data = _inputBuffer.readPtr();
          Message msg;
 
-         std::memcpy(&msg.type, data, 4);
-         std::memcpy(&msg.cookie, data + 4, 4);
-         std::memcpy(&msg.size, data + 8, 4);
-         msg.data = data + 12;
+         std::memcpy(&msg.header, data, sizeof (msg.header));
+         msg.data = data + sizeof (msg.header);
 
-         uint32_t totalSize = 12 + msg.size;
+         uint32_t totalSize = sizeof (msg.header) + msg.header.size;
          if (_inputBuffer.readAvail() < totalSize)
             return;
 
-         auto it = _syncHandlers.find(msg.cookie);
+         auto it = _syncHandlers.find(msg.header.cookie);
          if (it != _syncHandlers.end()) {
             it->second(msg);
             _syncHandlers.erase(it);
@@ -76,10 +74,8 @@ namespace clap {
    }
 
    bool BasicRemoteChannel::sendMessageAsync(const Message &msg) {
-      write(&msg.type, sizeof(msg.type));
-      write(&msg.cookie, sizeof(msg.cookie));
-      write(&msg.size, sizeof(msg.size));
-      write(msg.data, msg.size);
+      write(&msg.header, sizeof(msg.header));
+      write(msg.data, msg.header.size);
       trySend();
       return true;
    }
@@ -88,15 +84,15 @@ namespace clap {
       if (!sendMessageAsync(msg))
          return false;
 
-      auto it = _syncHandlers.emplace(msg.cookie, handler);
+      auto it = _syncHandlers.emplace(msg.header.cookie, handler);
       assert(it.second);
       if (!it.second)
          return false;
 
-      while (isOpen() && _syncHandlers.count(msg.cookie) > 0)
+      while (isOpen() && _syncHandlers.count(msg.header.cookie) > 0)
          runOnce();
 
-      _syncHandlers.erase(msg.cookie);
+      _syncHandlers.erase(msg.header.cookie);
       return true;
    }
 } // namespace clap

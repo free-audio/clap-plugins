@@ -83,9 +83,9 @@ namespace clap {
    }
 
    void RemoteGuiFactory::onMessage(const RemoteChannel::Message &msg) {
-      auto c = getClient(msg.clientId);
+      auto c = getClient(msg.header.clientId);
 
-      switch (msg.type) {
+      switch (msg.header.type) {
       case messages::kCreateClientRequest: {
          assert(!c);
          messages::CreateClientRequest rq;
@@ -110,7 +110,7 @@ namespace clap {
          msg.get(rq);
 
          assert(c);
-         destroyClient(msg.clientId);
+         destroyClient(msg.header.clientId);
 
          _channel->sendResponseAsync(msg, rp);
          break;

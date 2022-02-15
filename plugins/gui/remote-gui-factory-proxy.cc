@@ -235,7 +235,7 @@ namespace clap {
    }
 
    void RemoteGuiFactoryProxy::onMessage(const RemoteChannel::Message &msg) {
-      auto it = _clientIdMap.find(msg.clientId);
+      auto it = _clientIdMap.find(msg.header.clientId);
       if (it == _clientIdMap.end())
          return;
 

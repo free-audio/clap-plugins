@@ -98,9 +98,9 @@ namespace clap {
    }
 
    void RemoteGuiProxy::onMessage(const RemoteChannel::Message &msg) {
-      assert(msg.clientId == _clientId);
+      assert(msg.header.clientId == _clientId);
 
-      switch (msg.type) {
+      switch (msg.header.type) {
       case messages::kParamAdjustRequest: {
          messages::ParamAdjustRequest rq;
          msg.get(rq);

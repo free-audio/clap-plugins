@@ -117,6 +117,11 @@ namespace clap {
       if (!_quickView)
          return false;
 
+      while (_quickView->status() == QQuickView::Status::Loading) {
+         QThread::sleep(10);
+         qGuiApp->processEvents();
+      }
+
       auto rootItem = _quickView->rootObject();
       if (!rootItem)
          return false;

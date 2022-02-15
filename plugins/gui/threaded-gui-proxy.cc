@@ -10,7 +10,13 @@ namespace clap {
 
    ThreadedGuiProxy::~ThreadedGuiProxy() {}
 
-   void clap::ThreadedGuiProxy::defineParameter(const clap_param_info &paramInfo) {
+   void ThreadedGuiProxy::setSkin(const std::string &skinUrl)
+   {
+      QMetaObject::invokeMethod(
+         _guiClient.get(), [=, this] { _guiClient->setSkin(skinUrl); }, Qt::QueuedConnection);
+   }
+
+   void ThreadedGuiProxy::defineParameter(const clap_param_info &paramInfo) {
       QMetaObject::invokeMethod(
          _guiClient.get(), [=, this] { _guiClient->defineParameter(paramInfo); }, Qt::QueuedConnection);
    }

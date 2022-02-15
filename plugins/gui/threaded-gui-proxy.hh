@@ -12,6 +12,8 @@ namespace clap {
       ThreadedGuiProxy(AbstractGuiListener &listener, std::shared_ptr<GuiClient>& guiClient);
       ~ThreadedGuiProxy() override;
 
+      void setSkin(const std::string& skinUrl) override;
+
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;
 

@@ -73,8 +73,7 @@ namespace clap {
 
    std::shared_ptr<AbstractGui>
    ThreadedGuiFactory::createGuiClient(AbstractGuiListener &listener,
-                                          const std::vector<std::string> &qmlImportPath,
-                                          const std::string &qmlUrl) {
+                                       const std::vector<std::string> &qmlImportPath) {
       assert(_app);
       assert(_thread);
 
@@ -87,8 +86,7 @@ namespace clap {
             QStringList qtQmlImportPath;
             for (auto &s : qmlImportPath)
                qtQmlImportPath.append(QString::fromStdString(s));
-            QUrl qtQmlUrl(QString::fromStdString(qmlUrl));
-            ptr = std::make_shared<GuiClient>(listener, qtQmlImportPath, qtQmlUrl);
+            ptr = std::make_shared<GuiClient>(listener, qtQmlImportPath);
 
             if (ptr)
                _clients.emplace(&listener, ptr);

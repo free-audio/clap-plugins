@@ -36,9 +36,12 @@ namespace clap {
       if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
          return false;
 
+      if (!response.succeed)
+         return false;
+
       *width = response.width;
       *height = response.height;
-      return response.succeed;
+      return true;
    }
 
    bool RemoteGuiProxy::setScale(double scale) {

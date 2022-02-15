@@ -102,7 +102,7 @@ namespace clap {
       }
 
       std::string getQmlLibDirectory() const override {
-         return (_srcRoot / "plugins/gui/qml/clap/lib").generic_string();
+         return (_srcRoot / "plugins/gui/qml").generic_string();
       }
 
       bool isValid() const noexcept override { return !_srcRoot.empty() && !_buildRoot.empty(); }

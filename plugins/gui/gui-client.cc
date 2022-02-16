@@ -113,6 +113,11 @@ namespace clap {
       return false;
    }
 
+   bool GuiClient::canResize()
+   {
+      return true;
+   }
+
    bool GuiClient::size(uint32_t *width, uint32_t *height) {
       if (!_quickView)
          return false;
@@ -129,6 +134,25 @@ namespace clap {
       auto ratio = _quickView->devicePixelRatio();
       *width = rootItem->width() * ratio;
       *height = rootItem->height() * ratio;
+      return true;
+   }
+
+   bool GuiClient::roundSize(uint32_t *width, uint32_t *height)
+   {
+      uint32_t w, h;
+      if (!size(&w, &h))
+         return false;
+
+      if (*width < w)
+         *width = w;
+      if (*height < h)
+         *height = h;
+
+      double rw = *width / double(w);
+      double rh = *height / double(h);
+      double r = std::min(rw, rh);
+      *width = r * w;
+      *height = r * h;
       return true;
    }
 

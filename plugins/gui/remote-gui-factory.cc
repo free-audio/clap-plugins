@@ -124,8 +124,7 @@ namespace clap {
          break;
       }
 
-      case messages::kSetSkinRequest:
-      {
+      case messages::kSetSkinRequest: {
          messages::SetSkinRequest rq;
          msg.get(rq);
          if (c)
@@ -149,12 +148,37 @@ namespace clap {
          break;
       }
 
+      case messages::kCanResizeRequest: {
+         messages::CanResizeRequest rq;
+         messages::CanResizeResponse rp{false};
+         msg.get(rq);
+         if (c)
+            rp.succeed = c->canResize();
+         _channel->sendResponseAsync(msg, rp);
+         break;
+      }
+
       case messages::kSizeRequest: {
          messages::SizeRequest rq;
          messages::SizeResponse rp{0, 0, false};
          msg.get(rq);
          if (c)
             rp.succeed = c->size(&rp.width, &rp.height);
+         _channel->sendResponseAsync(msg, rp);
+         break;
+      }
+
+      case messages::kRoundSizeRequest: {
+         messages::RoundSizeRequest rq;
+         messages::RoundSizeResponse rp{0, 0, false};
+
+         if (c) {
+            msg.get(rq);
+            rp.width = rq.width;
+            rp.height = rq.height;
+            rp.succeed = c->roundSize(&rp.width, &rp.height);
+         }
+
          _channel->sendResponseAsync(msg, rp);
          break;
       }

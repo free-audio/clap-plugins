@@ -29,9 +29,37 @@ namespace clap {
       _clientFactory._channel->sendRequestAsync(_clientId, rq);
    }
 
+   bool RemoteGuiProxy::canResize() {
+      messages::CanResizeRequest request;
+      messages::CanResizeResponse response;
+
+      if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
+         return false;
+
+      return response.succeed;
+   }
+
    bool RemoteGuiProxy::size(uint32_t *width, uint32_t *height) {
       messages::SizeRequest request;
       messages::SizeResponse response;
+
+      if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
+         return false;
+
+      if (!response.succeed)
+         return false;
+
+      *width = response.width;
+      *height = response.height;
+      return true;
+   }
+
+   bool RemoteGuiProxy::roundSize(uint32_t *width, uint32_t *height) {
+      messages::RoundSizeRequest request;
+      messages::RoundSizeResponse response;
+
+      request.width = *width;
+      request.height = *height;
 
       if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
          return false;

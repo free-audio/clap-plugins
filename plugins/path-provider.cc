@@ -27,6 +27,19 @@ namespace clap {
       return os.str();
    }
 
+   class DummyPathProvider final : public PathProvider {
+   public:
+      DummyPathProvider(std::string pluginName) : PathProvider(std::move(pluginName)) {}
+
+      virtual std::string getGuiExecutable() const { std::terminate(); }
+
+      virtual bool isValid() const { return true; }
+
+   protected:
+      virtual std::string getSkinDirectory() const { std::terminate(); }
+      virtual std::string getQmlLibDirectory() const { std::terminate(); }
+   };
+
    class LinuxPathProvider final : public PathProvider {
    public:
       LinuxPathProvider(const std::string &pluginPath, const std::string &pluginName)
@@ -125,6 +138,10 @@ namespace clap {
 
       auto pluginPath = std::filesystem::absolute(_pluginPath).generic_string();
 
+#ifdef CLAP_PLUGINS_EMBED_QML
+      return std::make_unique<DummyPathProvider>(pluginName);
+#else
+
       auto devPtr = std::make_unique<DevelopmentPathProvider>(pluginPath, pluginName);
       if (devPtr->isValid())
          return std::move(devPtr);
@@ -138,7 +155,7 @@ namespace clap {
 #elif defined(_WIN32)
 
 #endif
-
+#endif
       // TODO
       return nullptr;
    }

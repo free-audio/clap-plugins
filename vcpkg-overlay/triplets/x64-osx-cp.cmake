@@ -16,4 +16,4 @@ if(NOT PORT MATCHES "harfbuzz")
     set(VCPKG_BUILD_TYPE release)
 endif()
 
-set(QT_NAMESPACE ClapPlugins)
+set(VCPKG_QT_NAMESPACE ClapPlugins)

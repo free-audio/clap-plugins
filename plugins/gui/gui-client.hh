@@ -56,6 +56,8 @@ namespace clap {
    private:
       void showLater();
 
+      static bool wantsLogicalSize() noexcept;
+
       // Qt windows
       QQuickView *_quickView = nullptr;
       std::unique_ptr<QWindow> _hostWindow = nullptr;

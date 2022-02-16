@@ -113,6 +113,14 @@ namespace clap {
       return false;
    }
 
+   bool GuiClient::wantsLogicalSize() noexcept {
+#ifdef Q_OS_MACOS
+      return true;
+#else
+      return false;
+#endif
+   }
+
    bool GuiClient::canResize()
    {
       return true;
@@ -131,7 +139,7 @@ namespace clap {
       if (!rootItem)
          return false;
 
-      auto ratio = _quickView->devicePixelRatio();
+      auto ratio = wantsLogicalSize() ? 1 : _quickView->devicePixelRatio();
       *width = rootItem->width() * ratio;
       *height = rootItem->height() * ratio;
       return true;

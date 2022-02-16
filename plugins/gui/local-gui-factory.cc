@@ -30,6 +30,7 @@ namespace clap {
       _timer = Timer::createNative(1000 / 60, [this] {
          onTimer();
       });
+      _timer->start();
 
       _app->processEvents();
    }

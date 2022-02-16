@@ -59,6 +59,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             MACOSX_BUNDLE_SHORT_VERSION_STRING "1"
             MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/plugins.plist.in
             )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  set_target_properties(clap-plugins PROPERTIES SUFFIX ".clap" PREFIX "")
 endif()
 
 install(TARGETS clap-plugins DESTINATION "lib/clap" COMPONENT plugins)

@@ -23,25 +23,24 @@ namespace clap {
       size_t writeAvail() const noexcept { return CAPACITY - _woff; }
 
       /* Consume nbytes from the buffer */
-      void read(size_t nbytes) noexcept {
-         _roff += nbytes;
+      void read(size_t n) noexcept {
+         _roff += n;
          assert(checkInvariants());
       }
 
       /* Produce nbytes into the buffer */
-      void wrote(size_t nbytes) noexcept {
-         _woff += nbytes;
+      void wrote(size_t n) noexcept {
+         _woff += n;
          assert(checkInvariants());
       }
 
       void write(const T *&data, size_t &size) {
-         size_t avail = writeAvail();
-         avail = std::min<size_t>(size, avail);
-         auto end = data + avail;
-         std::copy(data, end, writePtr());
-         wrote(avail);
-         data = end;
-         size -= avail;
+         const size_t avail = writeAvail();
+         const size_t n = std::min<size_t>(size, avail);
+         std::copy_n(data, n, writePtr());
+         wrote(n);
+         data += n;
+         size -= n;
       }
 
       void rewind() noexcept {
@@ -52,7 +51,7 @@ namespace clap {
          // TODO: use scatter/gather IO
          auto rptr = readPtr();
          auto avail = readAvail();
-         std::copy(rptr, rptr + avail, &_data[0]);
+         std::copy_n(rptr, avail, &_data[0]);
 
          _woff -= _roff;
          _roff = 0;

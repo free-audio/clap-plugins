@@ -158,7 +158,7 @@ namespace clap {
 
       double rw = *width / double(w);
       double rh = *height / double(h);
-      double r = std::min(rw, rh);
+      double r = std::min<double>(rw, rh);
       *width = r * w;
       *height = r * h;
       return true;

@@ -90,7 +90,6 @@ namespace clap {
 #ifdef Q_OS_WIN
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(window)));
       if (_hostWindow) {
-         return false;
          _quickView->setParent(_hostWindow.get());
          showLater();
          return true;

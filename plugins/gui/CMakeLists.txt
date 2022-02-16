@@ -66,7 +66,9 @@ else()
     timer.hh
     timer.cc
     cf-timer.hh
-    cf-timer.cc)
+    cf-timer.cc
+    win32-timer.hh
+    win32-timer.cc)
   set_property(TARGET clap-plugin-local-gui PROPERTY CXX_STANDARD 20)
   set_property(TARGET clap-plugin-local-gui PROPERTY POSITION_INDEPENDENT_CODE true)
   target_link_libraries(clap-plugin-local-gui PUBLIC clap-plugin-gui)

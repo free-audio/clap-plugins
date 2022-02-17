@@ -21,8 +21,8 @@ namespace clap {
                         const QStringList &qmlImportPath)
       : AbstractGui(listener), _quickView(new QQuickView()) {
 
-      _pluginProxy = new PluginProxy(*this);
-      _transportProxy = new TransportProxy(*this);
+      _pluginProxy = std::make_unique<PluginProxy>(*this);
+      _transportProxy = std::make_unique<TransportProxy>(*this);
 
       ////////////////////////
       // QML initialization //
@@ -33,8 +33,8 @@ namespace clap {
       for (const auto &str : qmlImportPath)
          _quickView->engine()->addImportPath(str);
 
-      qmlContext->setContextProperty("plugin", _pluginProxy);
-      qmlContext->setContextProperty("transport", _transportProxy);
+      qmlContext->setContextProperty("plugin", _pluginProxy.get());
+      qmlContext->setContextProperty("transport", _transportProxy.get());
    }
 
    Gui::~Gui() {}
@@ -175,5 +175,10 @@ namespace clap {
       return true;
    }
 
-   void Gui::destroy() {}
+   void Gui::destroy() {
+      _quickView.reset();
+      _hostWindow.reset();
+      _transportProxy.reset();
+      _pluginProxy.reset();
+   }
 } // namespace clap

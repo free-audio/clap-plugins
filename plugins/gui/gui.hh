@@ -59,12 +59,12 @@ namespace clap {
       static bool wantsLogicalSize() noexcept;
 
       // Qt windows
-      QQuickView *_quickView = nullptr;
-      std::unique_ptr<QWindow> _hostWindow = nullptr;
+      std::unique_ptr<QQuickView> _quickView;
+      std::unique_ptr<QWindow> _hostWindow;
 
       // QML proxy objects
-      PluginProxy *_pluginProxy = nullptr;
-      TransportProxy *_transportProxy = nullptr;
+      std::unique_ptr<PluginProxy> _pluginProxy;
+      std::unique_ptr<TransportProxy> _transportProxy;
    };
 
 } // namespace clap

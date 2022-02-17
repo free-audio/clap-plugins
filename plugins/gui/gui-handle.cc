@@ -8,6 +8,9 @@ namespace clap {
                         const std::shared_ptr<AbstractGui> &gui)
       : _factory(factory), _gui(gui) {}
 
-   GuiHandle::~GuiHandle() { _factory->releaseGui(*this); }
+   GuiHandle::~GuiHandle() {
+      _gui->destroy();
+      _factory->releaseGui(*this);
+   }
 
 } // namespace clap

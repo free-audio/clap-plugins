@@ -232,17 +232,17 @@ namespace clap {
          case CLAP_EVENT_PARAM_VALUE: {
             auto ev = reinterpret_cast<const clap_event_param_value *>(hdr);
             auto p = reinterpret_cast<Parameter *>(ev->cookie);
-            if (!p)
+            if (!p) [[unlikely]]
                p = _parameters.getById(ev->param_id);
-            if (p) {
-               if (p->info().id != ev->param_id) {
+            if (p) [[likely]] {
+               if (p->info().id != ev->param_id) [[unlikely]] {
                   std::ostringstream os;
                   os << "Host provided invalid cookie for param id: " << ev->param_id;
                   hostMisbehaving(os.str());
                   std::terminate();
                }
 
-               if (isProcessing())
+               if (isProcessing()) [[likely]]
                   p->setValueSmoothed(ev->value, _paramSmoothingDuration);
                else
                   p->setValueImmediately(ev->value);
@@ -254,10 +254,10 @@ namespace clap {
          case CLAP_EVENT_PARAM_MOD: {
             auto ev = reinterpret_cast<const clap_event_param_mod *>(hdr);
             auto p = reinterpret_cast<Parameter *>(ev->cookie);
-            if (!p)
+            if (!p) [[unlikely]]
                p = _parameters.getById(ev->param_id);
-            if (p) {
-               if (p->info().id != ev->param_id) {
+            if (p) [[likely]] {
+               if (p->info().id != ev->param_id) [[unlikely]] {
                   std::ostringstream os;
                   os << "Host provided invalid cookie for param id: " << ev->param_id;
                   hostMisbehaving(os.str());

@@ -65,14 +65,14 @@ namespace clap {
       const uint32_t clientId = ++_nextClientId;
       auto context = std::make_unique<ClientContext>(clientId);
       context->listenner = std::make_unique<RemoteGuiListener>(*this, clientId);
-      context->client = std::make_unique<GuiClient>(*context->listenner, qmlImportPath);
+      context->client = std::make_unique<Gui>(*context->listenner, qmlImportPath);
       _guiClients.emplace(clientId, std::move(context));
       return clientId;
    }
 
    void RemoteGuiFactory::destroyClient(uint32_t clientId) { _guiClients.erase(clientId); }
 
-   GuiClient *RemoteGuiFactory::getClient(uint32_t clientId) const {
+   Gui *RemoteGuiFactory::getClient(uint32_t clientId) const {
       auto it = _guiClients.find(clientId);
       if (it != _guiClients.end())
          return it->second->client.get();

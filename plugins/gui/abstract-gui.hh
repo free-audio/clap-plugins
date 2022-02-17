@@ -35,6 +35,8 @@ namespace clap {
 
       virtual void destroy() = 0;
 
+      AbstractGuiListener& listener() const { return _listener; }
+
    protected:
       AbstractGuiListener &_listener;
 

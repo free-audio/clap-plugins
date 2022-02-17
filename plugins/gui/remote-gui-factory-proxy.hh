@@ -12,14 +12,15 @@ namespace clap {
 
    class RemoteGuiFactoryProxy : public AbstractGuiFactory, public RemoteChannel::EventControl {
    public:
-      RemoteGuiFactoryProxy(const std::string& guiPath);
+      RemoteGuiFactoryProxy(const std::string &guiPath);
       ~RemoteGuiFactoryProxy() override;
 
-      static std::shared_ptr<RemoteGuiFactoryProxy> getInstance(const std::string& guiPath);
+      static std::shared_ptr<RemoteGuiFactoryProxy> getInstance(const std::string &guiPath);
 
-      virtual std::shared_ptr<AbstractGui>
-      createGuiClient(AbstractGuiListener &listener,
-                      const std::vector<std::string> &qmlImportPath) override;
+      std::unique_ptr<GuiHandle> createGui(AbstractGuiListener &listener,
+                                           const std::vector<std::string> &qmlImportPath) override;
+
+      void releaseGui(GuiHandle &handle) override;
 
    private:
       friend class RemoteGuiProxy;
@@ -51,6 +52,7 @@ namespace clap {
 
       pid_t _child = -1;
       int _pollFlags = 0;
+
 #elif defined(_WIN32)
       void windowsLoop();
 

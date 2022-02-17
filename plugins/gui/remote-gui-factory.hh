@@ -1,14 +1,14 @@
 #pragma once
 
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 
 #include <QObject>
 
 #include "../io/messages.hh"
 #include "../io/remote-channel.hh"
 
-#include "gui-client.hh"
+#include "gui.hh"
 
 QT_BEGIN_NAMESPACE
 class QSocketNotifier;
@@ -23,14 +23,13 @@ namespace clap {
       RemoteGuiFactory(void *pipeIn, void *pipeOut);
 
    private:
-
       uint32_t createClient(const QStringList &qmlImportPath);
       void destroyClient(uint32_t clientId);
 
-      GuiClient *getClient(uint32_t clientId) const;
+      Gui *getClient(uint32_t clientId) const;
 
       template <class T>
-      GuiClient *getClient(const T &msg) const {
+      Gui *getClient(const T &msg) const {
          return getClient(msg.clientId);
       }
 
@@ -47,7 +46,7 @@ namespace clap {
 
          const uint32_t clientId = 0;
          std::unique_ptr<RemoteGuiListener> listenner;
-         std::unique_ptr<GuiClient> client;
+         std::unique_ptr<Gui> client;
       };
 
       uint32_t _nextClientId = 0;

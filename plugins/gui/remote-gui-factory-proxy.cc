@@ -63,15 +63,15 @@ namespace clap {
       return ptr;
    }
 
-   std::shared_ptr<AbstractGui>
-   RemoteGuiFactoryProxy::createGuiClient(AbstractGuiListener &listener,
-                                          const std::vector<std::string> &qmlImportPath) {
+   std::unique_ptr<GuiHandle>
+   RemoteGuiFactoryProxy::createGui(AbstractGuiListener &listener,
+                                    const std::vector<std::string> &qmlImportPath) {
       assert(qmlImportPath.size() == 1); // for now
 
       messages::CreateClientRequest rq;
       messages::CreateClientResponse rp;
 
-      snprintf(rq.qmlImportPath, sizeof (rq.qmlImportPath), "%s", qmlImportPath[0].c_str());
+      snprintf(rq.qmlImportPath, sizeof(rq.qmlImportPath), "%s", qmlImportPath[0].c_str());
       if (!_channel->sendRequestSync(0, rq, rp))
          return nullptr;
 
@@ -80,7 +80,16 @@ namespace clap {
       _clientIdMap.emplace(rp.clientId, ptr);
       _clients.emplace(&listener, ptr);
 
-      return ptr;
+      return std::make_unique<GuiHandle>(_instance.lock(), ptr);
+   }
+
+   void RemoteGuiFactoryProxy::releaseGui(GuiHandle &handle)
+   {
+      auto g = dynamic_cast<RemoteGuiProxy *>(&handle.gui());
+      auto l = &g->listener();
+
+      _clients.erase(l);
+      _clientIdMap.erase(g->_clientId);
    }
 
    bool RemoteGuiFactoryProxy::spawnChild() {

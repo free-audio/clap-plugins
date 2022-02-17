@@ -232,6 +232,8 @@ namespace clap {
          case CLAP_EVENT_PARAM_VALUE: {
             auto ev = reinterpret_cast<const clap_event_param_value *>(hdr);
             auto p = reinterpret_cast<Parameter *>(ev->cookie);
+            if (!p)
+               p = _parameters.getById(ev->param_id);
             if (p) {
                if (p->info().id != ev->param_id) {
                   std::ostringstream os;
@@ -252,6 +254,8 @@ namespace clap {
          case CLAP_EVENT_PARAM_MOD: {
             auto ev = reinterpret_cast<const clap_event_param_mod *>(hdr);
             auto p = reinterpret_cast<Parameter *>(ev->cookie);
+            if (!p)
+               p = _parameters.getById(ev->param_id);
             if (p) {
                if (p->info().id != ev->param_id) {
                   std::ostringstream os;

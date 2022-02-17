@@ -5,7 +5,8 @@ set(CMAKE_AUTOMOC ON)
 add_library(
   clap-plugin-gui-common
   abstract-gui.hh abstract-gui.cc abstract-gui-listener.hh
-  abstract-gui-listener.cc abstract-gui-factory.hh abstract-gui-factory.cc)
+  abstract-gui-listener.cc abstract-gui-factory.hh abstract-gui-factory.cc
+  gui-handle.hh gui-handle.cc)
 set_property(TARGET clap-plugin-gui-common PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-gui-common PROPERTY POSITION_INDEPENDENT_CODE
                                                     true)

@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "gui-handle.hh"
+
 namespace clap {
 
    class AbstractGui;
@@ -12,9 +14,10 @@ namespace clap {
    public:
       virtual ~AbstractGuiFactory();
 
-      virtual std::shared_ptr<AbstractGui>
-      createGuiClient(AbstractGuiListener &listener,
-                      const std::vector<std::string> &qmlImportPath) = 0;
+      virtual std::unique_ptr<GuiHandle>
+      createGui(AbstractGuiListener &listener, const std::vector<std::string> &qmlImportPath) = 0;
+
+      virtual void releaseGui(GuiHandle &handle) = 0;
    };
 
 } // namespace clap

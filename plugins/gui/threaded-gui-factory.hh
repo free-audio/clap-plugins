@@ -23,9 +23,10 @@ namespace clap {
 
       static std::shared_ptr<ThreadedGuiFactory> getInstance();
 
-      virtual std::shared_ptr<AbstractGui>
-      createGuiClient(AbstractGuiListener &listener,
-                      const std::vector<std::string> &qmlImportPath) override;
+      std::unique_ptr<GuiHandle> createGui(AbstractGuiListener &listener,
+                                           const std::vector<std::string> &qmlImportPath) override;
+
+      void releaseGui(GuiHandle &handle) override;
 
    private:
       void onTimer();

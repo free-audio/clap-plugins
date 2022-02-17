@@ -122,15 +122,15 @@ namespace clap {
       std::vector<std::string> qmlPath;
       qmlPath.push_back(_pathProvider->getQmlLibraryPath());
 
-      _gui = _guiFactory->createGuiClient(*this, qmlPath);
+      _guiHandle = _guiFactory->createGui(*this, qmlPath);
 
-      if (!_gui)
+      if (!_guiHandle)
          return false;
 
       guiDefineParameters();
 
       auto skinPath = _pathProvider->getQmlSkinPath();
-      _gui->setSkin(skinPath);
+      _guiHandle->gui().setSkin(skinPath);
       return true;
    }
 
@@ -138,55 +138,55 @@ namespace clap {
       for (int i = 0; i < paramsCount(); ++i) {
          clap_param_info info;
          paramsInfo(i, &info);
-         _gui->defineParameter(info);
+         _guiHandle->gui().defineParameter(info);
       }
    }
 
    void CorePlugin::guiDestroy() noexcept {
-      if (_gui)
-         _gui.reset();
+      if (_guiHandle)
+         _guiHandle.reset();
    }
 
    bool CorePlugin::guiSize(uint32_t *width, uint32_t *height) noexcept {
-      if (!_gui)
+      if (!_guiHandle)
          return false;
 
-      return _gui->size(width, height);
+      return _guiHandle->gui().size(width, height);
    }
 
    bool CorePlugin::guiSetScale(double scale) noexcept {
-      if (_gui)
-         return _gui->setScale(scale);
+      if (_guiHandle)
+         return _guiHandle->gui().setScale(scale);
       return false;
    }
 
    void CorePlugin::guiShow() noexcept {
-      if (_gui)
-         _gui->show();
+      if (_guiHandle)
+         _guiHandle->gui().show();
    }
 
    void CorePlugin::guiHide() noexcept {
-      if (_gui)
-         _gui->hide();
+      if (_guiHandle)
+         _guiHandle->gui().hide();
    }
 
    bool CorePlugin::guiX11Attach(const char *displayName, unsigned long window) noexcept {
-      if (_gui)
-         return _gui->attachX11(displayName, window);
+      if (_guiHandle)
+         return _guiHandle->gui().attachX11(displayName, window);
 
       return false;
    }
 
    bool CorePlugin::guiWin32Attach(clap_hwnd window) noexcept {
-      if (_gui)
-         return _gui->attachWin32(window);
+      if (_guiHandle)
+         return _guiHandle->gui().attachWin32(window);
 
       return false;
    }
 
    bool CorePlugin::guiCocoaAttach(void *nsView) noexcept {
-      if (_gui)
-         return _gui->attachCocoa(nsView);
+      if (_guiHandle)
+         return _guiHandle->gui().attachCocoa(nsView);
 
       return false;
    }
@@ -201,11 +201,11 @@ namespace clap {
    //---------------------//
    void CorePlugin::onGuiPoll() {
       _pluginToGuiQueue.consume([this](clap_id paramId, const CorePlugin::PluginToGuiValue &value) {
-         _gui->updateParameter(paramId, value.value, value.mod);
+         _guiHandle->gui().updateParameter(paramId, value.value, value.mod);
       });
 
       if (_isGuiTransportSubscribed && _hasTransportCopy) {
-         _gui->updateTransport(_transportCopy);
+         _guiHandle->gui().updateTransport(_transportCopy);
          _hasTransportCopy = false;
       }
    }

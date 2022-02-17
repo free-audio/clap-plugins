@@ -196,7 +196,7 @@ namespace clap {
 
       clap_id _guiTimerId = CLAP_INVALID_ID;
       std::shared_ptr<AbstractGuiFactory> _guiFactory;
-      std::shared_ptr<AbstractGui> _gui;
+      std::unique_ptr<GuiHandle> _guiHandle;
 
       Parameters _parameters;
 

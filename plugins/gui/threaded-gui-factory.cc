@@ -71,9 +71,9 @@ namespace clap {
       return ptr;
    }
 
-   std::shared_ptr<AbstractGui>
-   ThreadedGuiFactory::createGuiClient(AbstractGuiListener &listener,
-                                       const std::vector<std::string> &qmlImportPath) {
+   std::unique_ptr<GuiHandle>
+   ThreadedGuiFactory::createGui(AbstractGuiListener &listener,
+                                 const std::vector<std::string> &qmlImportPath) {
       assert(_app);
       assert(_thread);
 
@@ -93,7 +93,25 @@ namespace clap {
          },
          Qt::BlockingQueuedConnection);
 
-      return std::make_shared<ThreadedGuiProxy>(listener, ptr);
+      return std::make_unique<GuiHandle>(_instance.lock(), std::make_shared<ThreadedGuiProxy>(listener, ptr));
+   }
+
+   void ThreadedGuiFactory::releaseGui(GuiHandle &handle)
+   {
+      assert(_app);
+      assert(_thread);
+
+      auto g = dynamic_cast<GuiClient *>(&handle.gui());
+      auto l = &g->guiListener();
+
+      QMetaObject::invokeMethod(
+         _app.get(),
+         [&] {
+            assert(_app->thread() == QThread::currentThread());
+
+            _clients.erase(l);
+         },
+         Qt::BlockingQueuedConnection);
    }
 
    void ThreadedGuiFactory::onTimer()

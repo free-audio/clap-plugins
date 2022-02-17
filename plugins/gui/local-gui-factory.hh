@@ -26,11 +26,14 @@ namespace clap {
 
       static std::shared_ptr<LocalGuiFactory> getInstance();
 
-      virtual std::shared_ptr<AbstractGui>
-      createGuiClient(AbstractGuiListener &listener,
+      std::unique_ptr<GuiHandle>
+      createGui(AbstractGuiListener &listener,
                       const std::vector<std::string> &qmlImportPath) override;
 
+      void releaseGui(GuiHandle &gui) override;
+
    private:
+      bool isValid() const;
       void onTimer();
 
       static std::weak_ptr<LocalGuiFactory> _instance;

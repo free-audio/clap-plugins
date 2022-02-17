@@ -9,7 +9,7 @@
 #include <QWindow>
 
 #include "../io/messages.hh"
-#include "gui-client.hh"
+#include "gui.hh"
 
 #ifdef _WIN32
 #   include <windows.h>
@@ -17,7 +17,7 @@
 
 namespace clap {
 
-   GuiClient::GuiClient(AbstractGuiListener &listener,
+   Gui::Gui(AbstractGuiListener &listener,
                         const QStringList &qmlImportPath)
       : AbstractGui(listener), _quickView(new QQuickView()) {
 
@@ -37,18 +37,18 @@ namespace clap {
       qmlContext->setContextProperty("transport", _transportProxy);
    }
 
-   GuiClient::~GuiClient() {}
+   Gui::~Gui() {}
 
-   void GuiClient::setSkin(const std::string& skinUrl)
+   void Gui::setSkin(const std::string& skinUrl)
    {
       _quickView->setSource(QUrl(skinUrl.c_str()));
    }
 
-   void GuiClient::defineParameter(const clap_param_info &paramInfo) {
+   void Gui::defineParameter(const clap_param_info &paramInfo) {
       _pluginProxy->defineParameter(paramInfo);
    }
 
-   void GuiClient::updateParameter(clap_id paramId, double value, double modAmount) {
+   void Gui::updateParameter(clap_id paramId, double value, double modAmount) {
       auto p = _pluginProxy->param(paramId);
       assert(p);
       if (!p)
@@ -58,13 +58,13 @@ namespace clap {
       p->setModulationFromPlugin(modAmount);
    }
 
-   void GuiClient::clearTransport() { _transportProxy->clear(); }
+   void Gui::clearTransport() { _transportProxy->clear(); }
 
-   void GuiClient::updateTransport(const clap_event_transport &transport) {
+   void Gui::updateTransport(const clap_event_transport &transport) {
       _transportProxy->update(transport);
    }
 
-   void GuiClient::showLater() {
+   void Gui::showLater() {
       QMetaObject::invokeMethod(
          this,
          [this] {
@@ -74,7 +74,7 @@ namespace clap {
          Qt::QueuedConnection);
    }
 
-   bool GuiClient::attachCocoa(void *nsView) {
+   bool Gui::attachCocoa(void *nsView) {
 #ifdef Q_OS_MACOS
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(nsView)));
       if (_hostWindow) {
@@ -86,7 +86,7 @@ namespace clap {
       return false;
    }
 
-   bool GuiClient::attachWin32(clap_hwnd window) {
+   bool Gui::attachWin32(clap_hwnd window) {
 #ifdef Q_OS_WIN
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(window)));
       if (_hostWindow) {
@@ -98,7 +98,7 @@ namespace clap {
       return false;
    }
 
-   bool GuiClient::attachX11(const char *displayName, unsigned long window) {
+   bool Gui::attachX11(const char *displayName, unsigned long window) {
 #ifdef Q_OS_LINUX
       // TODO: check the displayName
       _hostWindow.reset(QWindow::fromWinId(window));
@@ -112,7 +112,7 @@ namespace clap {
       return false;
    }
 
-   bool GuiClient::wantsLogicalSize() noexcept {
+   bool Gui::wantsLogicalSize() noexcept {
 #ifdef Q_OS_MACOS
       return true;
 #else
@@ -120,12 +120,12 @@ namespace clap {
 #endif
    }
 
-   bool GuiClient::canResize()
+   bool Gui::canResize()
    {
       return true;
    }
 
-   bool GuiClient::size(uint32_t *width, uint32_t *height) {
+   bool Gui::size(uint32_t *width, uint32_t *height) {
       if (!_quickView)
          return false;
 
@@ -144,7 +144,7 @@ namespace clap {
       return true;
    }
 
-   bool GuiClient::roundSize(uint32_t *width, uint32_t *height)
+   bool Gui::roundSize(uint32_t *width, uint32_t *height)
    {
       uint32_t w, h;
       if (!size(&w, &h))
@@ -163,17 +163,17 @@ namespace clap {
       return true;
    }
 
-   bool GuiClient::setScale(double scale) { return false; }
+   bool Gui::setScale(double scale) { return false; }
 
-   bool GuiClient::show() {
+   bool Gui::show() {
       _quickView->show();
       return true;
    }
 
-   bool GuiClient::hide() {
+   bool Gui::hide() {
       _quickView->hide();
       return true;
    }
 
-   void GuiClient::destroy() {}
+   void Gui::destroy() {}
 } // namespace clap

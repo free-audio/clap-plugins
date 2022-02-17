@@ -1,12 +1,12 @@
 #include <exception>
 
-#include "gui-client.hh"
+#include "gui.hh"
 #include "threaded-gui-proxy.hh"
 
 namespace clap {
 
    ThreadedGuiProxy::ThreadedGuiProxy(AbstractGuiListener &listener,
-                                      std::shared_ptr<GuiClient> &guiClient)
+                                      std::shared_ptr<Gui> &guiClient)
       : AbstractGui(listener), _guiClient(guiClient) {}
 
    ThreadedGuiProxy::~ThreadedGuiProxy() {}

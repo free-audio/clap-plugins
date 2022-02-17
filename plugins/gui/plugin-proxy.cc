@@ -1,8 +1,8 @@
 #include "plugin-proxy.hh"
-#include "gui-client.hh"
+#include "gui.hh"
 
 namespace clap {
-   PluginProxy::PluginProxy(GuiClient &client) : super(&client), _client(client) {}
+   PluginProxy::PluginProxy(Gui &client) : super(&client), _client(client) {}
 
    ParameterProxy *PluginProxy::param(clap_id paramId) {
       auto it = _parameters.find(paramId);

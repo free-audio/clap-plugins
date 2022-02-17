@@ -10,7 +10,7 @@
 #include <QBasicTimer>
 
 #include "abstract-gui-listener.hh"
-#include "gui-client.hh"
+#include "gui.hh"
 #include "local-gui-factory.hh"
 
 namespace clap {
@@ -74,13 +74,13 @@ namespace clap {
                               const std::vector<std::string> &qmlImportPath) {
       assert(_app);
 
-      std::shared_ptr<GuiClient> ptr;
+      std::shared_ptr<Gui> ptr;
       assert(_app->thread() == QThread::currentThread());
 
       QStringList qtQmlImportPath;
       for (auto &s : qmlImportPath)
          qtQmlImportPath.append(QString::fromStdString(s));
-      ptr = std::make_shared<GuiClient>(listener, qtQmlImportPath);
+      ptr = std::make_shared<Gui>(listener, qtQmlImportPath);
 
       if (!ptr)
          return nullptr;
@@ -92,7 +92,7 @@ namespace clap {
    void
    LocalGuiFactory::releaseGui(GuiHandle& handle)
    {
-      auto g = dynamic_cast<GuiClient *>(&handle.gui());
+      auto g = dynamic_cast<Gui *>(&handle.gui());
       assert(g);
       if (!g)
          return;

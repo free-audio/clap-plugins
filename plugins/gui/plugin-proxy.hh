@@ -10,14 +10,14 @@
 
 namespace clap {
 
-   class GuiClient;
+   class Gui;
    class PluginProxy : public QObject {
       using super = QObject;
 
       Q_OBJECT
 
    public:
-      explicit PluginProxy(GuiClient &client);
+      explicit PluginProxy(Gui &client);
 
       void defineParameter(const clap_param_info &info);
 
@@ -25,7 +25,7 @@ namespace clap {
       Q_INVOKABLE QString toString() const;
 
    private:
-      GuiClient &_client;
+      Gui &_client;
       std::unordered_map<clap_id, ParameterProxy *> _parameters;
    };
 

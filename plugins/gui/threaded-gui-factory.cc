@@ -8,7 +8,7 @@
 #include <QThread>
 #include <QTimer>
 
-#include "gui-client.hh"
+#include "gui.hh"
 #include "threaded-gui-factory.hh"
 #include "abstract-gui-listener.hh"
 #include "threaded-gui-proxy.hh"
@@ -77,7 +77,7 @@ namespace clap {
       assert(_app);
       assert(_thread);
 
-      std::shared_ptr<GuiClient> ptr;
+      std::shared_ptr<Gui> ptr;
       QMetaObject::invokeMethod(
          _app.get(),
          [&] {
@@ -86,7 +86,7 @@ namespace clap {
             QStringList qtQmlImportPath;
             for (auto &s : qmlImportPath)
                qtQmlImportPath.append(QString::fromStdString(s));
-            ptr = std::make_shared<GuiClient>(listener, qtQmlImportPath);
+            ptr = std::make_shared<Gui>(listener, qtQmlImportPath);
 
             if (ptr)
                _clients.emplace(&listener, ptr);
@@ -101,7 +101,7 @@ namespace clap {
       assert(_app);
       assert(_thread);
 
-      auto g = dynamic_cast<GuiClient *>(&handle.gui());
+      auto g = dynamic_cast<Gui *>(&handle.gui());
       auto l = &g->guiListener();
 
       QMetaObject::invokeMethod(

@@ -16,7 +16,7 @@ class QBasicTimer;
 QT_END_NAMESPACE
 
 namespace clap {
-   class GuiClient;
+   class Gui;
 
    // Creates the QGuiApplication on the host's main thread
    class LocalGuiFactory : public AbstractGuiFactory {
@@ -39,7 +39,7 @@ namespace clap {
       static std::weak_ptr<LocalGuiFactory> _instance;
 
       std::unique_ptr<QGuiApplication> _app;
-      std::unordered_map<AbstractGuiListener *, std::weak_ptr<GuiClient>> _clients;
+      std::unordered_map<AbstractGuiListener *, std::weak_ptr<Gui>> _clients;
       std::unique_ptr<Timer> _timer;
    };
 

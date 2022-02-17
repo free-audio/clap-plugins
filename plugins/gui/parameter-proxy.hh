@@ -8,7 +8,7 @@
 
 namespace clap {
 
-   class GuiClient;
+   class Gui;
    class ParameterProxy : public QObject {
       using super = QObject;
 
@@ -30,8 +30,8 @@ namespace clap {
       Q_PROPERTY(bool isHovered READ isHovered WRITE setIsHovered NOTIFY isHoveredChanged)
 
    public:
-      explicit ParameterProxy(GuiClient &client, const clap_param_info &info);
-      explicit ParameterProxy(GuiClient &client, clap_id param_id);
+      explicit ParameterProxy(Gui &client, const clap_param_info &info);
+      explicit ParameterProxy(Gui &client, clap_id param_id);
 
       void redefine(const clap_param_info &info);
 
@@ -99,7 +99,7 @@ namespace clap {
       void isAdjustingChanged();
 
    private:
-      GuiClient &_client;
+      Gui &_client;
       const uint32_t _id;
       QString _name;
       QString _module;

@@ -1,15 +1,15 @@
 #include "parameter-proxy.hh"
 #include "../io/messages.hh"
 #include "abstract-gui-listener.hh"
-#include "gui-client.hh"
+#include "gui.hh"
 
 namespace clap {
-   ParameterProxy::ParameterProxy(GuiClient &client, const clap_param_info &info)
+   ParameterProxy::ParameterProxy(Gui &client, const clap_param_info &info)
       : super(&client), _client(client), _id(info.id), _name(info.name), _module(info.module),
         _value(info.default_value), _minValue(info.min_value), _maxValue(info.max_value),
         _defaultValue(info.default_value) {}
 
-   ParameterProxy::ParameterProxy(GuiClient &client, clap_id param_id)
+   ParameterProxy::ParameterProxy(Gui &client, clap_id param_id)
       : super(&client), _client(client), _id(param_id) {}
 
    void ParameterProxy::redefine(const clap_param_info &info) {

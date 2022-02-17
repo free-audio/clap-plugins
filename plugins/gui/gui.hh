@@ -17,17 +17,17 @@ namespace clap {
    class AbstractGui;
    class AbstractGuiListener;
 
-   class GuiClient : public QObject, public AbstractGui {
+   class Gui : public QObject, public AbstractGui {
       Q_OBJECT;
 
    public:
-      GuiClient(AbstractGuiListener &listener, const QStringList &qmlImportPath);
-      ~GuiClient() override;
+      Gui(AbstractGuiListener &listener, const QStringList &qmlImportPath);
+      ~Gui() override;
 
-      GuiClient(const GuiClient &) = delete;
-      GuiClient(GuiClient &&) = delete;
-      GuiClient &operator=(const GuiClient &) = delete;
-      GuiClient &operator=(GuiClient &&) = delete;
+      Gui(const Gui &) = delete;
+      Gui(Gui &&) = delete;
+      Gui &operator=(const Gui &) = delete;
+      Gui &operator=(Gui &&) = delete;
 
       void setSkin(const std::string &skinPath) override;
 

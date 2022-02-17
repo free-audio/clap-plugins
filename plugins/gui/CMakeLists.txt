@@ -15,8 +15,8 @@ target_link_libraries(clap-plugin-gui-common PUBLIC clap-core)
 # Actual GUI implementation and display
 add_library(
   clap-plugin-gui
-  gui-client.hh
-  gui-client.cc
+  gui.hh
+  gui.cc
   parameter-proxy.hh
   parameter-proxy.cc
   plugin-proxy.hh
@@ -48,7 +48,7 @@ if(CLAP_PLUGINS_REMOTE_GUI)
   endif()
 
   add_executable(
-    clap-gui gui-client-main.cc remote-gui-factory.hh remote-gui-factory.cc
+    clap-gui gui-main.cc remote-gui-factory.hh remote-gui-factory.cc
              remote-gui-listener.hh remote-gui-listener.cc)
   target_link_libraries(clap-gui PUBLIC clap-plugin-gui)
   set_target_properties(clap-gui PROPERTIES CXX_STANDARD 20)

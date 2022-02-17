@@ -6,10 +6,10 @@
 
 namespace clap {
 
-   class GuiClient;
+   class Gui;
    class ThreadedGuiProxy : public AbstractGui {
    public:
-      ThreadedGuiProxy(AbstractGuiListener &listener, std::shared_ptr<GuiClient>& guiClient);
+      ThreadedGuiProxy(AbstractGuiListener &listener, std::shared_ptr<Gui>& guiClient);
       ~ThreadedGuiProxy() override;
 
       void setSkin(const std::string& skinUrl) override;
@@ -35,6 +35,6 @@ namespace clap {
       void destroy() override;
 
    private:
-      std::shared_ptr<GuiClient> _guiClient;
+      std::shared_ptr<Gui> _guiClient;
    };
 } // namespace clap

@@ -1,10 +1,10 @@
 #include "transport-proxy.hh"
 #include "../io/messages.hh"
-#include "gui-client.hh"
 #include "abstract-gui-listener.hh"
+#include "gui.hh"
 
 namespace clap {
-   TransportProxy::TransportProxy(GuiClient &client) : super(&client), _client(client) {}
+   TransportProxy::TransportProxy(Gui &client) : super(&client), _client(client) {}
 
    void TransportProxy::clear() {
       update<bool>(_hasTransport, false, &TransportProxy::hasTransportChanged);

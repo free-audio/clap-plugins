@@ -5,7 +5,7 @@
 #include <clap/clap.h>
 
 namespace clap {
-   class GuiClient;
+   class Gui;
    class TransportProxy : public QObject {
       using super = QObject;
 
@@ -43,7 +43,7 @@ namespace clap {
                     timeSignatureDenominatorChanged)
 
    public:
-      explicit TransportProxy(GuiClient &client);
+      explicit TransportProxy(Gui &client);
 
       void clear();
       void update(const clap_event_transport &transport);
@@ -138,7 +138,7 @@ namespace clap {
          (this->*notify)();
       }
 
-      GuiClient &_client;
+      Gui &_client;
 
       bool _isSubscribed = false;
       bool _hasTransport = false;

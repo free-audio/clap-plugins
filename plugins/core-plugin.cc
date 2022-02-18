@@ -142,9 +142,7 @@ namespace clap {
       }
    }
 
-   void CorePlugin::guiDestroy() noexcept {
-      _guiHandle.reset();
-   }
+   void CorePlugin::guiDestroy() noexcept { _guiHandle.reset(); }
 
    bool CorePlugin::guiSize(uint32_t *width, uint32_t *height) noexcept {
       if (!_guiHandle)
@@ -232,41 +230,49 @@ namespace clap {
          case CLAP_EVENT_PARAM_VALUE: {
             auto ev = reinterpret_cast<const clap_event_param_value *>(hdr);
             auto p = reinterpret_cast<Parameter *>(ev->cookie);
-            if (!p) [[unlikely]]
+            if (!p) [[unlikely]] {
                p = _parameters.getById(ev->param_id);
-            if (p) [[likely]] {
-               if (p->info().id != ev->param_id) [[unlikely]] {
-                  std::ostringstream os;
-                  os << "Host provided invalid cookie for param id: " << ev->param_id;
-                  hostMisbehaving(os.str());
-                  std::terminate();
-               }
-
-               if (isProcessing()) [[likely]]
-                  p->setValueSmoothed(ev->value, _paramSmoothingDuration);
-               else
-                  p->setValueImmediately(ev->value);
-               _pluginToGuiQueue.set(p->info().id, {ev->value, p->modulation()});
+               if (!p) [[unlikely]]
+                  break;
             }
+
+            if (p->info().id != ev->param_id) [[unlikely]] {
+               std::ostringstream os;
+               os << "Host provided invalid cookie for param id: " << ev->param_id;
+               hostMisbehaving(os.str());
+               std::terminate();
+            }
+
+            if (isProcessing()) [[likely]]
+               p->setValueSmoothed(ev->value, _paramSmoothingDuration);
+            else
+               p->setValueImmediately(ev->value);
+            _pluginToGuiQueue.set(p->info().id, {ev->value, p->modulation()});
             break;
          }
 
          case CLAP_EVENT_PARAM_MOD: {
             auto ev = reinterpret_cast<const clap_event_param_mod *>(hdr);
             auto p = reinterpret_cast<Parameter *>(ev->cookie);
-            if (!p) [[unlikely]]
-               p = _parameters.getById(ev->param_id);
-            if (p) [[likely]] {
-               if (p->info().id != ev->param_id) [[unlikely]] {
-                  std::ostringstream os;
-                  os << "Host provided invalid cookie for param id: " << ev->param_id;
-                  hostMisbehaving(os.str());
-                  std::terminate();
-               }
+            if (!p) [[unlikely]] {
 
-               p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
-               _pluginToGuiQueue.set(p->info().id, {p->value(), ev->amount});
+               p = _parameters.getById(ev->param_id);
+               if (!p) [[unlikely]]
+                  break;
             }
+
+            if (p->info().id != ev->param_id) [[unlikely]] {
+               std::ostringstream os;
+               os << "Host provided invalid cookie for param id: " << ev->param_id;
+               hostMisbehaving(os.str());
+               std::terminate();
+            }
+
+            if (isProcessing()) [[likely]]
+               p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
+            else
+               p->setModulationImmediately(ev->amount);
+            _pluginToGuiQueue.set(p->info().id, {p->value(), ev->amount});
             break;
          }
          }

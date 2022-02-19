@@ -268,9 +268,8 @@ namespace clap {
 
 #if (defined(__unix__) || defined(__APPLE__))
    void RemoteGuiFactoryProxy::posixLoop() {
-      pollfd pfd;
-
       while (!_quit && _channel->isOpen()) {
+         pollfd pfd;
          pfd.fd = _channel->fd();
          pfd.events = POLLIN;
          pfd.revents = 0;
@@ -282,6 +281,8 @@ namespace clap {
 
          auto ret = poll(&pfd, 1, 0);
          if (ret < 0) {
+            if (errno == EAGAIN || errno == EINTR)
+               continue;
             std::cerr << "[clap-plugins] poll(): " << strerror(errno) << std::endl;
             return;
          }

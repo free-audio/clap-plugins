@@ -64,4 +64,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 install(TARGETS clap-plugins DESTINATION "lib/clap" COMPONENT plugins)
-install(DIRECTORY gui/qml DESTINATION "lib/clap-examples")
+
+if(NOT CLAP_PLUGINS_EMBED_QML)
+  install(DIRECTORY gui/qml
+    DESTINATION "lib/clap-plugins"
+    PATTERN CMakeLists.txt EXCLUDE)
+endif()

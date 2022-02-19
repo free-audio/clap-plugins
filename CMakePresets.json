@@ -39,12 +39,18 @@
         {
             "name": "ninja-vcpkg",
             "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
-            "inherits": ["base", "vcpkg"]
+            "inherits": [
+                "base",
+                "vcpkg"
+            ]
         },
         {
             "name": "vs-vcpkg",
             "description": "Configure with vcpkg toolchain and generate Visual Studio project files for all configurations",
-            "inherits": ["base", "vcpkg"],
+            "inherits": [
+                "base",
+                "vcpkg"
+            ],
             "generator": "Visual Studio 17 2022",
             "architecture": "x64"
         },
@@ -52,7 +58,9 @@
             "name": "ninja-system",
             "description": "Ninja + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
-            "inherits": ["base"],
+            "inherits": [
+                "base"
+            ],
             "cacheVariables": {
                 "CLAP_PLUGINS_REMOTE_GUI": {
                     "type": "BOOL",
@@ -70,7 +78,8 @@
             "name": "base",
             "hidden": true,
             "targets": [
-                "clap-plugins"
+                "clap-plugins",
+                "install"
             ]
         },
         {

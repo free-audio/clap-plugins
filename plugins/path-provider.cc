@@ -62,11 +62,11 @@ namespace clap {
 
    protected:
       std::string getSkinDirectory() const override {
-         return (prefix_ / "lib/clap/qml" / _pluginName).generic_string();
+         return (prefix_ / "lib/clap-plugins/qml/clap/skins" / _pluginName).generic_string();
       }
 
       std::string getQmlLibDirectory() const override {
-         return (prefix_ / "lib/clap/qml/lib").generic_string();
+         return (prefix_ / "lib/clap-plugins/qml").generic_string();
       }
 
    private:
@@ -138,10 +138,6 @@ namespace clap {
 
       auto pluginPath = std::filesystem::absolute(_pluginPath).generic_string();
 
-#ifdef CLAP_PLUGINS_EMBED_QML
-      return std::make_unique<DummyPathProvider>(pluginName);
-#else
-
       auto devPtr = std::make_unique<DevelopmentPathProvider>(pluginPath, pluginName);
       if (devPtr->isValid())
          return std::move(devPtr);
@@ -155,8 +151,7 @@ namespace clap {
 #elif defined(_WIN32)
 
 #endif
-#endif
-      // TODO
-      return nullptr;
+
+      return std::make_unique<DummyPathProvider>(pluginName);
    }
 } // namespace clap

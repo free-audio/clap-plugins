@@ -269,7 +269,7 @@ namespace clap {
       pollfd pfd;
       pfd.fd = _channel->fd();
 
-      while (!_quit) {
+      while (!_quit && _channel->isOpen()) {
          pfd.events = POLLIN;
          if (_pollFlags & CLAP_POSIX_FD_WRITE)
             pfd.events |= POLLOUT;

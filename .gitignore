@@ -60,3 +60,5 @@ vsb/
 # A place to store stuff and get it git ignored
 ignore/*
 deploy.sh
+
+BITWIG_ENGINE_CRASH.txt

@@ -125,25 +125,25 @@ namespace clap {
       //---------------------//
       // clap_plugin_gui_x11 //
       //---------------------//
-      bool implementsGuiX11() const noexcept override { return true; }
+      bool implementsGuiX11() const noexcept override;
       bool guiX11Attach(const char *displayName, unsigned long window) noexcept override;
 
       //-----------------------//
       // clap_plugin_gui_win32 //
       //-----------------------//
-      bool implementsGuiWin32() const noexcept override { return true; }
+      bool implementsGuiWin32() const noexcept override;
       bool guiWin32Attach(clap_hwnd window) noexcept override;
 
       //-----------------------//
       // clap_plugin_gui_cocoa //
       //-----------------------//
-      bool implementsGuiCocoa() const noexcept override { return true; }
+      bool implementsGuiCocoa() const noexcept override;
       bool guiCocoaAttach(void *nsView) noexcept override;
 
       //-------------------------------//
       // clap_plugin_gui_free_standing //
       //-------------------------------//
-      bool implementsGuiFreeStanding() const noexcept override { return true; }
+      bool implementsGuiFreeStanding() const noexcept override;
       bool guiFreeStandingOpen() noexcept override;
 
       //////////////////////

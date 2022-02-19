@@ -165,11 +165,19 @@ namespace clap {
          _guiHandle->gui().hide();
    }
 
+   bool CorePlugin::implementsGuiX11() const noexcept {
+      return true;
+   }
+
    bool CorePlugin::guiX11Attach(const char *displayName, unsigned long window) noexcept {
       if (_guiHandle)
          return _guiHandle->gui().attachX11(displayName, window);
 
       return false;
+   }
+
+   bool CorePlugin::implementsGuiWin32() const noexcept {
+      return true;
    }
 
    bool CorePlugin::guiWin32Attach(clap_hwnd window) noexcept {
@@ -179,6 +187,14 @@ namespace clap {
       return false;
    }
 
+   bool CorePlugin::implementsGuiCocoa() const noexcept {
+#if defined(CLAP_REMOTE_GUI)
+      return false;
+#else
+      return true;
+#endif
+   }
+
    bool CorePlugin::guiCocoaAttach(void *nsView) noexcept {
       if (_guiHandle)
          return _guiHandle->gui().attachCocoa(nsView);
@@ -186,8 +202,14 @@ namespace clap {
       return false;
    }
 
+   bool CorePlugin::implementsGuiFreeStanding() const noexcept {
+      return true;
+   }
+
    bool CorePlugin::guiFreeStandingOpen() noexcept {
-      // TODO
+      if (_guiHandle)
+         return _guiHandle->gui().openWindow();
+
       return false;
    }
 

@@ -134,9 +134,9 @@ namespace clap {
 
    void CorePlugin::guiDefineParameters() {
       for (int i = 0; i < paramsCount(); ++i) {
-         clap_param_info info;
-         paramsInfo(i, &info);
-         _guiHandle->gui().defineParameter(info);
+         auto p = _parameters.getByIndex(i);
+         _guiHandle->gui().defineParameter(p->info());
+         _guiHandle->gui().updateParameter(p->info().id, p->value(), p->modulatedValue());
       }
    }
 

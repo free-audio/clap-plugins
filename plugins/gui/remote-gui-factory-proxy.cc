@@ -262,6 +262,8 @@ namespace clap {
 #else
 #   error "unsupported target"
 #endif
+
+      waitChild();
    }
 
 #if (defined(__unix__) || defined(__APPLE__))

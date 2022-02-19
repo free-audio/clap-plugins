@@ -15,7 +15,7 @@
 
 namespace clap {
 
-   std::weak_ptr<LocalGuiFactory> LocalGuiFactory::_instance;
+   std::shared_ptr<LocalGuiFactory> LocalGuiFactory::_instance;
 
    LocalGuiFactory::LocalGuiFactory() {
       assert(!_app);
@@ -55,14 +55,18 @@ namespace clap {
    bool LocalGuiFactory::isValid() const { return _timer && _app; }
 
    std::shared_ptr<LocalGuiFactory> LocalGuiFactory::getInstance() {
-      auto ptr = _instance.lock();
-      if (ptr)
-         return ptr;
-      ptr = std::make_shared<LocalGuiFactory>();
+#if defined(Q_OS_LINUX)
+      /* Linux does not have native timer */
+      return nullptr;
+#else
+      if (_instance)
+         return _instance;
+      auto ptr = std::make_shared<LocalGuiFactory>();
       if (!ptr->isValid())
          return nullptr;
       _instance = ptr;
       return ptr;
+#endif
    }
 
    std::unique_ptr<GuiHandle> LocalGuiFactory::createGui(AbstractGuiListener &listener) {
@@ -73,7 +77,7 @@ namespace clap {
          return nullptr;
 
       _clients.emplace(&listener, ptr);
-      return std::make_unique<GuiHandle>(_instance.lock(), ptr);
+      return std::make_unique<GuiHandle>(_instance, ptr);
    }
 
    void LocalGuiFactory::releaseGui(GuiHandle &handle) {

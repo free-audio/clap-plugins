@@ -35,7 +35,9 @@ namespace clap {
 
       void destroy() override;
 
+      auto gui() { return _gui; }
+
    private:
-      std::shared_ptr<Gui> _guiClient;
+      std::shared_ptr<Gui> _gui;
    };
 } // namespace clap

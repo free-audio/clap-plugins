@@ -15,7 +15,7 @@
 
 namespace clap {
 
-   std::weak_ptr<ThreadedGuiFactory> ThreadedGuiFactory::_instance;
+   std::shared_ptr<ThreadedGuiFactory> ThreadedGuiFactory::_instance;
 
    ThreadedGuiFactory::ThreadedGuiFactory() {
       std::promise<bool> initialized;
@@ -63,12 +63,10 @@ namespace clap {
    }
 
    std::shared_ptr<ThreadedGuiFactory> ThreadedGuiFactory::getInstance() {
-      auto ptr = _instance.lock();
-      if (ptr)
-         return ptr;
-      ptr.reset(new ThreadedGuiFactory());
-      _instance = ptr;
-      return ptr;
+      if (_instance)
+         return _instance;
+      _instance = std::make_shared<ThreadedGuiFactory>();
+      return _instance;
    }
 
    std::unique_ptr<GuiHandle>
@@ -88,7 +86,7 @@ namespace clap {
          },
          Qt::BlockingQueuedConnection);
 
-      return std::make_unique<GuiHandle>(_instance.lock(), std::make_shared<ThreadedGuiProxy>(listener, ptr));
+      return std::make_unique<GuiHandle>(_instance, std::make_shared<ThreadedGuiProxy>(listener, ptr));
    }
 
    void ThreadedGuiFactory::releaseGui(GuiHandle &handle)
@@ -96,8 +94,8 @@ namespace clap {
       assert(_app);
       assert(_thread);
 
-      auto g = dynamic_cast<Gui *>(&handle.gui());
-      auto l = &g->guiListener();
+      auto p = dynamic_cast<ThreadedGuiProxy *>(&handle.gui());
+      auto l = &p->gui()->guiListener();
 
       QMetaObject::invokeMethod(
          _app.get(),

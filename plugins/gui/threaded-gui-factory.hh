@@ -30,7 +30,7 @@ namespace clap {
    private:
       void onTimer();
 
-      static std::weak_ptr<ThreadedGuiFactory> _instance;
+      static std::shared_ptr<ThreadedGuiFactory> _instance;
 
       std::unique_ptr<std::thread> _thread;
       std::unique_ptr<QGuiApplication> _app;

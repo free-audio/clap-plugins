@@ -34,7 +34,7 @@ namespace clap {
       bool isValid() const;
       void onTimer();
 
-      static std::weak_ptr<LocalGuiFactory> _instance;
+      static std::shared_ptr<LocalGuiFactory> _instance;
 
       std::unique_ptr<QGuiApplication> _app;
       std::unordered_map<AbstractGuiListener *, std::weak_ptr<Gui>> _clients;

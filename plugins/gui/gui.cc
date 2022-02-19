@@ -19,6 +19,8 @@ namespace clap {
 
    Gui::Gui(AbstractGuiListener &listener) : AbstractGui(listener), _quickView(new QQuickView()) {
 
+      qDebug() << "clap-gui: created gui";
+
       _pluginProxy = std::make_unique<PluginProxy>(*this);
       _transportProxy = std::make_unique<TransportProxy>(*this);
 
@@ -32,21 +34,25 @@ namespace clap {
       qmlContext->setContextProperty("transport", _transportProxy.get());
    }
 
-   Gui::~Gui() {
-      destroy();
-   }
+   Gui::~Gui() { destroy(); }
 
    void Gui::addImportPath(const std::string &importPath) {
+      qDebug() << "clap-gui: addImportPath(" << importPath.c_str() << ")";
       _quickView->engine()->addImportPath(QString::fromStdString(importPath));
    }
 
-   void Gui::setSkin(const std::string &skinUrl) { _quickView->setSource(QUrl(skinUrl.c_str())); }
+   void Gui::setSkin(const std::string &skinUrl) {
+      qDebug() << "clap-gui: skinUrl(" << skinUrl.c_str() << ")";
+      _quickView->setSource(QUrl(skinUrl.c_str()));
+   }
 
    void Gui::defineParameter(const clap_param_info &paramInfo) {
+      qDebug() << "clap-gui: defineParam(" << paramInfo.id << ")";
       _pluginProxy->defineParameter(paramInfo);
    }
 
    void Gui::updateParameter(clap_id paramId, double value, double modAmount) {
+      qDebug() << "clap-gui: updateParam(" << paramId << ")";
       auto p = _pluginProxy->param(paramId);
       assert(p);
       if (!p)
@@ -99,6 +105,7 @@ namespace clap {
    bool Gui::attachX11(const char *displayName, unsigned long window) {
 #ifdef Q_OS_LINUX
       // TODO: check the displayName
+      qDebug() << "clap-gui: attachX11(" << displayName << ", " << window << ")";
       _hostWindow.reset(QWindow::fromWinId(window));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());

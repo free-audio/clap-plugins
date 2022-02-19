@@ -97,11 +97,13 @@ namespace clap {
       }
 
       case messages::kDestroyClientResponse: {
+         if (!c)
+            return;
+
          messages::DestroyClientRequest rq;
          messages::DestroyClientResponse rp;
          msg.get(rq);
 
-         assert(c);
          destroyClient(msg.header.clientId);
 
          _channel->sendResponseAsync(msg, rp);
@@ -109,47 +111,58 @@ namespace clap {
       }
 
       case messages::kDestroyRequest:
+         assert(!c);
          messages::DestroyResponse rp;
          _channel->sendResponseAsync(msg, rp);
          break;
 
       case messages::kUpdateTransportRequest: {
+         if (!c)
+            return;
+
          messages::UpdateTransportRequest rq;
          msg.get(rq);
-         if (c)
-            c->updateTransport(rq.transport);
+         c->updateTransport(rq.transport);
          break;
       }
 
       case messages::kAddImportPathRequest: {
+         if (!c)
+            return;
+
          messages::AddImportPathRequest rq;
          msg.get(rq);
-         if (c)
-            c->addImportPath(rq.importPath);
+         c->addImportPath(rq.importPath);
          break;
       }
 
       case messages::kSetSkinRequest: {
+         if (!c)
+            return;
+
          messages::SetSkinRequest rq;
          msg.get(rq);
-         if (c)
-            c->setSkin(rq.skinUrl);
+         c->setSkin(rq.skinUrl);
          break;
       }
 
       case messages::kDefineParameterRequest: {
+         if (!c)
+            return;
+
          messages::DefineParameterRequest rq;
          msg.get(rq);
-         if (c)
-            c->defineParameter(rq.info);
+         c->defineParameter(rq.info);
          break;
       }
 
       case messages::kParameterValueRequest: {
+         if (!c)
+            return;
+
          messages::ParameterValueRequest rq;
          msg.get(rq);
-         if (c)
-            c->updateParameter(rq.paramId, rq.value, rq.modulation);
+         c->updateParameter(rq.paramId, rq.value, rq.modulation);
          break;
       }
 

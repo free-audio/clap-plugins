@@ -40,6 +40,7 @@ namespace clap::messages {
       kHideResponse,
       kDestroyRequest,
       kDestroyResponse,
+      kOpenWindowRequest,
       kAttachWin32Request,
       kAttachCocoaRequest,
       kAttachX11Request,
@@ -196,6 +197,10 @@ namespace clap::messages {
 
    struct ResizeResponse final {
       static const constexpr Type type = kResizeResponse;
+   };
+
+   struct OpenWindowRequest final {
+      static const constexpr Type type = kOpenWindowRequest;
    };
 
    struct AttachWin32Request final {

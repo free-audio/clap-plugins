@@ -110,6 +110,13 @@ namespace clap {
       _clientFactory._channel->sendRequestAsync(_clientId, request);
    }
 
+   bool RemoteGuiProxy::openWindow() {
+      messages::OpenWindowRequest request;
+      messages::AttachResponse response;
+
+      return _clientFactory._channel->sendRequestSync(_clientId, request, response);
+   }
+
    bool RemoteGuiProxy::attachCocoa(void *nsView) {
       messages::AttachCocoaRequest request{nsView};
       messages::AttachResponse response;

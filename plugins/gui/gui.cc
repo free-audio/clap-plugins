@@ -78,6 +78,11 @@ namespace clap {
          Qt::QueuedConnection);
    }
 
+   bool Gui::openWindow() {
+      _quickView->show();
+      return true;
+   }
+
    bool Gui::attachCocoa(void *nsView) {
 #ifdef Q_OS_MACOS
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(nsView)));

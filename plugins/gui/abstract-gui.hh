@@ -22,6 +22,7 @@ namespace clap {
       virtual void clearTransport() = 0;
       virtual void updateTransport(const clap_event_transport &transport) = 0;
 
+      [[nodiscard]] virtual bool openWindow() = 0;
       [[nodiscard]] virtual bool attachCocoa(void *nsView) = 0;
       [[nodiscard]] virtual bool attachWin32(clap_hwnd window) = 0;
       [[nodiscard]] virtual bool attachX11(const char *displayName, unsigned long window) = 0;

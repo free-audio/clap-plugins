@@ -49,6 +49,15 @@ namespace clap {
          Qt::QueuedConnection);
    }
 
+   bool ThreadedGuiProxy::openWindow() {
+      bool succeed = false;
+      QMetaObject::invokeMethod(
+         _gui.get(),
+         [=, this, &succeed] { succeed = _gui->openWindow(); },
+         Qt::BlockingQueuedConnection);
+      return succeed;
+   }
+
    bool ThreadedGuiProxy::attachCocoa(void *nsView) {
       bool succeed = false;
       QMetaObject::invokeMethod(

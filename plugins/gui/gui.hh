@@ -17,7 +17,7 @@ namespace clap {
    class AbstractGui;
    class AbstractGuiListener;
 
-   class Gui : public QObject, public AbstractGui {
+   class Gui final : public QObject, public AbstractGui {
       Q_OBJECT;
 
    public:

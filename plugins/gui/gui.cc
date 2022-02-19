@@ -17,9 +17,7 @@
 
 namespace clap {
 
-   Gui::Gui(AbstractGuiListener &listener,
-                        const QStringList &qmlImportPath)
-      : AbstractGui(listener), _quickView(new QQuickView()) {
+   Gui::Gui(AbstractGuiListener &listener) : AbstractGui(listener), _quickView(new QQuickView()) {
 
       _pluginProxy = std::make_unique<PluginProxy>(*this);
       _transportProxy = std::make_unique<TransportProxy>(*this);
@@ -30,19 +28,17 @@ namespace clap {
 
       auto qmlContext = _quickView->engine()->rootContext();
 
-      for (const auto &str : qmlImportPath)
-         _quickView->engine()->addImportPath(str);
-
       qmlContext->setContextProperty("plugin", _pluginProxy.get());
       qmlContext->setContextProperty("transport", _transportProxy.get());
    }
 
    Gui::~Gui() {}
 
-   void Gui::setSkin(const std::string& skinUrl)
-   {
-      _quickView->setSource(QUrl(skinUrl.c_str()));
+   void Gui::addImportPath(const std::string &importPath) {
+      _quickView->engine()->addImportPath(QString::fromStdString(importPath));
    }
+
+   void Gui::setSkin(const std::string &skinUrl) { _quickView->setSource(QUrl(skinUrl.c_str())); }
 
    void Gui::defineParameter(const clap_param_info &paramInfo) {
       _pluginProxy->defineParameter(paramInfo);
@@ -120,10 +116,7 @@ namespace clap {
 #endif
    }
 
-   bool Gui::canResize()
-   {
-      return true;
-   }
+   bool Gui::canResize() { return true; }
 
    bool Gui::size(uint32_t *width, uint32_t *height) {
       if (!_quickView)
@@ -144,8 +137,7 @@ namespace clap {
       return true;
    }
 
-   bool Gui::roundSize(uint32_t *width, uint32_t *height)
-   {
+   bool Gui::roundSize(uint32_t *width, uint32_t *height) {
       uint32_t w, h;
       if (!size(&w, &h))
          return false;

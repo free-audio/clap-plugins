@@ -119,10 +119,7 @@ namespace clap {
          _guiFactory = ThreadedGuiFactory::getInstance();
 #endif
 
-      std::vector<std::string> qmlPath;
-      qmlPath.push_back(_pathProvider->getQmlLibraryPath());
-
-      _guiHandle = _guiFactory->createGui(*this, qmlPath);
+      _guiHandle = _guiFactory->createGui(*this);
 
       if (!_guiHandle)
          return false;
@@ -130,6 +127,7 @@ namespace clap {
       guiDefineParameters();
 
       auto skinPath = _pathProvider->getQmlSkinPath();
+      _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
       _guiHandle->gui().setSkin(skinPath);
       return true;
    }

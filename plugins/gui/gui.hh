@@ -21,7 +21,7 @@ namespace clap {
       Q_OBJECT;
 
    public:
-      Gui(AbstractGuiListener &listener, const QStringList &qmlImportPath);
+      Gui(AbstractGuiListener &listener);
       ~Gui() override;
 
       Gui(const Gui &) = delete;
@@ -29,6 +29,7 @@ namespace clap {
       Gui &operator=(const Gui &) = delete;
       Gui &operator=(Gui &&) = delete;
 
+      void addImportPath(const std::string &importPath) override;
       void setSkin(const std::string &skinPath) override;
 
       void defineParameter(const clap_param_info &paramInfo) override;

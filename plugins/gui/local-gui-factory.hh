@@ -26,9 +26,7 @@ namespace clap {
 
       static std::shared_ptr<LocalGuiFactory> getInstance();
 
-      std::unique_ptr<GuiHandle>
-      createGui(AbstractGuiListener &listener,
-                      const std::vector<std::string> &qmlImportPath) override;
+      std::unique_ptr<GuiHandle> createGui(AbstractGuiListener &listener) override;
 
       void releaseGui(GuiHandle &gui) override;
 

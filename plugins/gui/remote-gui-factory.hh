@@ -23,7 +23,7 @@ namespace clap {
       RemoteGuiFactory(void *pipeIn, void *pipeOut);
 
    private:
-      uint32_t createClient(const QStringList &qmlImportPath);
+      uint32_t createClient();
       void destroyClient(uint32_t clientId);
 
       Gui *getClient(uint32_t clientId) const;

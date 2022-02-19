@@ -13,6 +13,7 @@ namespace clap {
       AbstractGui(AbstractGuiListener &listener);
       virtual ~AbstractGui();
 
+      virtual void addImportPath(const std::string& importPath) = 0;
       virtual void setSkin(const std::string& skinUrl) = 0;
 
       virtual void defineParameter(const clap_param_info &paramInfo) = 0;

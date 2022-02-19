@@ -72,8 +72,7 @@ namespace clap {
    }
 
    std::unique_ptr<GuiHandle>
-   ThreadedGuiFactory::createGui(AbstractGuiListener &listener,
-                                 const std::vector<std::string> &qmlImportPath) {
+   ThreadedGuiFactory::createGui(AbstractGuiListener &listener) {
       assert(_app);
       assert(_thread);
 
@@ -83,11 +82,7 @@ namespace clap {
          [&] {
             assert(_app->thread() == QThread::currentThread());
 
-            QStringList qtQmlImportPath;
-            for (auto &s : qmlImportPath)
-               qtQmlImportPath.append(QString::fromStdString(s));
-            ptr = std::make_shared<Gui>(listener, qtQmlImportPath);
-
+            ptr = std::make_shared<Gui>(listener);
             if (ptr)
                _clients.emplace(&listener, ptr);
          },

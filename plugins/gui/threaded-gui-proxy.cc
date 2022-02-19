@@ -11,6 +11,13 @@ namespace clap {
 
    ThreadedGuiProxy::~ThreadedGuiProxy() {}
 
+   void ThreadedGuiProxy::addImportPath(const std::string &importPath) {
+      QMetaObject::invokeMethod(
+         _guiClient.get(),
+         [=, this] { _guiClient->addImportPath(importPath); },
+         Qt::QueuedConnection);
+   }
+
    void ThreadedGuiProxy::setSkin(const std::string &skinUrl) {
       QMetaObject::invokeMethod(
          _guiClient.get(), [=, this] { _guiClient->setSkin(skinUrl); }, Qt::QueuedConnection);

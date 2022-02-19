@@ -64,14 +64,10 @@ namespace clap {
    }
 
    std::unique_ptr<GuiHandle>
-   RemoteGuiFactoryProxy::createGui(AbstractGuiListener &listener,
-                                    const std::vector<std::string> &qmlImportPath) {
-      assert(qmlImportPath.size() == 1); // for now
-
+   RemoteGuiFactoryProxy::createGui(AbstractGuiListener &listener) {
       messages::CreateClientRequest rq;
       messages::CreateClientResponse rp;
 
-      snprintf(rq.qmlImportPath, sizeof(rq.qmlImportPath), "%s", qmlImportPath[0].c_str());
       if (!_channel->sendRequestSync(0, rq, rp))
          return nullptr;
 

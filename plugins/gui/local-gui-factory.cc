@@ -1,13 +1,13 @@
 #include <cassert>
 #include <future>
 
+#include <QBasicTimer>
 #include <QGuiApplication>
 #include <QString>
 #include <QStringList>
 #include <QThread>
 #include <QTimer>
 #include <QUrl>
-#include <QBasicTimer>
 
 #include "abstract-gui-listener.hh"
 #include "gui.hh"
@@ -21,9 +21,7 @@ namespace clap {
       assert(!_app);
       assert(!QCoreApplication::instance());
 
-      _timer = Timer::createNative(1000 / 60, [this] {
-         onTimer();
-      });
+      _timer = Timer::createNative(1000 / 60, [this] { onTimer(); });
 
       if (!_timer)
          return;
@@ -54,9 +52,7 @@ namespace clap {
       }
    }
 
-   bool LocalGuiFactory::isValid() const {
-      return _timer && _app;
-   }
+   bool LocalGuiFactory::isValid() const { return _timer && _app; }
 
    std::shared_ptr<LocalGuiFactory> LocalGuiFactory::getInstance() {
       auto ptr = _instance.lock();
@@ -69,19 +65,10 @@ namespace clap {
       return ptr;
    }
 
-   std::unique_ptr<GuiHandle>
-   LocalGuiFactory::createGui(AbstractGuiListener &listener,
-                              const std::vector<std::string> &qmlImportPath) {
-      assert(_app);
-
-      std::shared_ptr<Gui> ptr;
+   std::unique_ptr<GuiHandle> LocalGuiFactory::createGui(AbstractGuiListener &listener) {
       assert(_app->thread() == QThread::currentThread());
 
-      QStringList qtQmlImportPath;
-      for (auto &s : qmlImportPath)
-         qtQmlImportPath.append(QString::fromStdString(s));
-      ptr = std::make_shared<Gui>(listener, qtQmlImportPath);
-
+      auto ptr = std::make_shared<Gui>(listener);
       if (!ptr)
          return nullptr;
 
@@ -89,9 +76,7 @@ namespace clap {
       return std::make_unique<GuiHandle>(_instance.lock(), ptr);
    }
 
-   void
-   LocalGuiFactory::releaseGui(GuiHandle& handle)
-   {
+   void LocalGuiFactory::releaseGui(GuiHandle &handle) {
       auto g = dynamic_cast<Gui *>(&handle.gui());
       assert(g);
       if (!g)

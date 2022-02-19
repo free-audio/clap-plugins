@@ -11,6 +11,14 @@ namespace clap {
                                   uint32_t clientId)
       : super(listener), _clientFactory(factory), _clientId(clientId) {}
 
+   void RemoteGuiProxy::addImportPath(const std::string &importPath)
+   {
+      messages::AddImportPathRequest rq;
+
+      snprintf(rq.importPath, sizeof (rq.importPath), "%s", importPath.c_str());
+      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+   }
+
    void RemoteGuiProxy::setSkin(const std::string &skinUrl)
    {
       messages::SetSkinRequest rq;

@@ -61,11 +61,11 @@ namespace clap {
       QCoreApplication::quit();
    }
 
-   uint32_t RemoteGuiFactory::createClient(const QStringList &qmlImportPath) {
+   uint32_t RemoteGuiFactory::createClient() {
       const uint32_t clientId = ++_nextClientId;
       auto context = std::make_unique<ClientContext>(clientId);
       context->listenner = std::make_unique<RemoteGuiListener>(*this, clientId);
-      context->client = std::make_unique<Gui>(*context->listenner, qmlImportPath);
+      context->client = std::make_unique<Gui>(*context->listenner);
       _guiClients.emplace(clientId, std::move(context));
       return clientId;
    }
@@ -89,10 +89,7 @@ namespace clap {
          messages::CreateClientResponse rp;
          msg.get(rq);
 
-         QStringList importPath;
-         importPath << rq.qmlImportPath;
-
-         auto clientId = createClient(importPath);
+         auto clientId = createClient();
          rp.clientId = clientId;
 
          _channel->sendResponseAsync(msg, rp);
@@ -121,6 +118,14 @@ namespace clap {
          msg.get(rq);
          if (c)
             c->updateTransport(rq.transport);
+         break;
+      }
+
+      case messages::kAddImportPathRequest: {
+         messages::AddImportPathRequest rq;
+         msg.get(rq);
+         if (c)
+            c->addImportPath(rq.importPath);
          break;
       }
 

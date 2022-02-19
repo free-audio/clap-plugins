@@ -15,7 +15,7 @@ namespace clap {
       virtual ~AbstractGuiFactory();
 
       virtual std::unique_ptr<GuiHandle>
-      createGui(AbstractGuiListener &listener, const std::vector<std::string> &qmlImportPath) = 0;
+      createGui(AbstractGuiListener &listener) = 0;
 
       virtual void releaseGui(GuiHandle &handle) = 0;
    };

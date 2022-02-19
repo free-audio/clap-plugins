@@ -9,8 +9,8 @@ namespace clap {
       : _factory(factory), _gui(gui) {}
 
    GuiHandle::~GuiHandle() {
-      _gui->destroy();
       _factory->releaseGui(*this);
+      _gui->destroy();
    }
 
 } // namespace clap

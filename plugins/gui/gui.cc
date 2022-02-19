@@ -32,7 +32,9 @@ namespace clap {
       qmlContext->setContextProperty("transport", _transportProxy.get());
    }
 
-   Gui::~Gui() {}
+   Gui::~Gui() {
+      destroy();
+   }
 
    void Gui::addImportPath(const std::string &importPath) {
       _quickView->engine()->addImportPath(QString::fromStdString(importPath));

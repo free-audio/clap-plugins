@@ -269,10 +269,12 @@ namespace clap {
 #if (defined(__unix__) || defined(__APPLE__))
    void RemoteGuiFactoryProxy::posixLoop() {
       pollfd pfd;
-      pfd.fd = _channel->fd();
 
       while (!_quit && _channel->isOpen()) {
+         pfd.fd = _channel->fd();
          pfd.events = POLLIN;
+         pfd.revents = 0;
+
          if (_pollFlags & CLAP_POSIX_FD_WRITE)
             pfd.events |= POLLOUT;
          if (_pollFlags & CLAP_POSIX_FD_ERROR)
@@ -290,9 +292,9 @@ namespace clap {
 
          if (pfd.revents & POLLIN)
             _channel->tryReceive();
-         if (pfd.revents & POLLOUT)
+         if (pfd.revents & POLLOUT && _channel)
             _channel->trySend();
-         if (pfd.revents & POLLERR)
+         if (pfd.revents & POLLERR && _channel)
             _channel->onError();
       }
    }

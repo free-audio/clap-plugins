@@ -32,10 +32,13 @@ namespace clap {
    PosixRemoteChannel::~PosixRemoteChannel() { close(); }
 
    void PosixRemoteChannel::tryReceive() {
-      ssize_t nbytes = ::recv(_socket, _inputBuffer.writePtr(), _inputBuffer.writeAvail(), MSG_NOSIGNAL);
+      ssize_t nbytes =
+         ::recv(_socket, _inputBuffer.writePtr(), _inputBuffer.writeAvail(), MSG_NOSIGNAL);
       if (nbytes < 0) {
          if (errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR)
             return;
+
+         std::cerr << "recv(" << _socket << "): " << strerror(errno) << std::endl;
 
          close();
          return;
@@ -67,7 +70,7 @@ namespace clap {
                   return;
                }
 
-               std::cerr << "could not send to socket(" << _socket << "): " << strerror(errno) << std::endl;
+               std::cerr << "send(" << _socket << "): " << strerror(errno) << std::endl;
 
                close();
                return;
@@ -93,8 +96,11 @@ namespace clap {
 
       int ret = ::poll(&pfd, 1, 10);
       if (ret < 1) {
-         if (errno == EAGAIN || errno == EINTR)
+         if (errno == 0 || errno == EAGAIN || errno == EINTR || errno == ETIMEDOUT)
             return;
+
+         std::cerr << "poll(): " << strerror(errno) << std::endl;
+
          close();
          return;
       }
@@ -115,6 +121,7 @@ namespace clap {
 
       _evControl.removeFd();
 
+      std::cerr << "closing socket(" << _socket << ")" << std::endl;
       ::close(_socket);
       _socket = -1;
    }

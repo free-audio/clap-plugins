@@ -98,8 +98,6 @@ namespace clap {
 
       static const constexpr size_t KPIPE_BUFSZ = 128 * 1024;
 
-      printf("About to start GUI: %s\n", _guiPath.c_str());
-
 #if (defined(__unix__) || defined(__APPLE__))
       /* create a socket pair */
       int sockets[2];
@@ -116,10 +114,12 @@ namespace clap {
 
       if (_child == 0) {
          // Child
+         printf("About to start GUI: %s --socket %d\n", _guiPath.c_str(), sockets[1]);
+
          ::close(sockets[0]);
          char socketStr[16];
          ::snprintf(socketStr, sizeof(socketStr), "%d", sockets[1]);
-         ::execl(_guiPath.c_str(), _guiPath.c_str(), "--socket", socketStr, (const char *)nullptr);
+         ::execl(_guiPath.c_str(), _guiPath.c_str(), "--socket", socketStr, nullptr);
          printf("Failed to start child process: %m\n");
          std::terminate();
       } else {

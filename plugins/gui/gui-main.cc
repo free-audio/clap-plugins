@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 #endif
 
    /* Useful to attach child process with debuggers which don't support follow childs */
-   bool waitForDebbugger = true;
+   bool waitForDebbugger = false;
    while (waitForDebbugger)
       QThread::sleep(1);
 

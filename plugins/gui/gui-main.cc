@@ -1,17 +1,25 @@
+#include <QCommandLineParser>
 #include <QGuiApplication>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QQuickView>
-#include <QThread>
-#include <QCommandLineParser>
 #include <QSocketNotifier>
+#include <QThread>
+
+#ifdef Q_OS_UNIX
+#   include <signal.h>
+#endif
 
 #include "remote-gui-factory.hh"
 
 int main(int argc, char **argv) {
+#ifdef Q_OS_UNIX
+   ::signal(SIGPIPE, SIG_IGN);
+#endif
+
    /* Useful to attach child process with debuggers which don't support follow childs */
-   bool waitForDebbugger = false;
+   bool waitForDebbugger = true;
    while (waitForDebbugger)
       QThread::sleep(1);
 

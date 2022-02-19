@@ -5,7 +5,10 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <sys/socket.h>
 #include <unistd.h>
+
+#include <iostream>
 
 #include "posix-remote-channel.hh"
 
@@ -17,15 +20,19 @@ namespace clap {
       : super(handler, cookieHalf), _evControl(evControl), _socket(socket) {
       int flags = ::fcntl(_socket, F_GETFL);
       ::fcntl(_socket, F_SETFL, flags | O_NONBLOCK);
+
+#if defined(__MACH__) && defined(__APPLE__) || defined(__FreeBSD__)
+      do {
+         int set = 1;
+         ::setsockopt(socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+      } while (0);
+#endif
    }
 
-   PosixRemoteChannel::~PosixRemoteChannel()
-   {
-      close();
-   }
+   PosixRemoteChannel::~PosixRemoteChannel() { close(); }
 
    void PosixRemoteChannel::tryReceive() {
-      ssize_t nbytes = ::read(_socket, _inputBuffer.writePtr(), _inputBuffer.writeAvail());
+      ssize_t nbytes = ::recv(_socket, _inputBuffer.writePtr(), _inputBuffer.writeAvail(), MSG_NOSIGNAL);
       if (nbytes < 0) {
          if (errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR)
             return;
@@ -39,7 +46,7 @@ namespace clap {
          return;
       }
 
-      _inputBuffer.wrote(nbytes);
+      _inputBuffer.append(nbytes);
       processInput();
       _inputBuffer.rewind();
    }
@@ -48,19 +55,25 @@ namespace clap {
       while (!_outputBuffers.empty()) {
          auto &buffer = _outputBuffers.front();
 
-         for (auto avail = buffer.readAvail(); avail > 0; avail = buffer.readAvail()) {
-            auto nbytes = ::write(_socket, buffer.readPtr(), avail);
+         while (isOpen()) {
+            auto avail = buffer.readAvail();
+            if (avail == 0)
+               break;
+
+            auto nbytes = ::send(_socket, buffer.readPtr(), avail, MSG_NOSIGNAL);
             if (nbytes == -1) {
                if (errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR) {
                   modifyFd(CLAP_POSIX_FD_READ | CLAP_POSIX_FD_WRITE);
                   return;
                }
 
+               std::cerr << "could not send to socket(" << _socket << "): " << strerror(errno) << std::endl;
+
                close();
                return;
             }
 
-            buffer.read(nbytes);
+            buffer.consume(nbytes);
          }
 
          _outputBuffers.pop();

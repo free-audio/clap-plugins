@@ -69,7 +69,7 @@ namespace clap {
             _handler(msg);
          }
 
-         _inputBuffer.read(totalSize);
+         _inputBuffer.consume(totalSize);
       }
    }
 

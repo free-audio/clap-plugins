@@ -23,13 +23,13 @@ namespace clap {
       size_t writeAvail() const noexcept { return CAPACITY - _woff; }
 
       /* Consume nbytes from the buffer */
-      void read(size_t n) noexcept {
+      void consume(size_t n) noexcept {
          _roff += n;
          assert(checkInvariants());
       }
 
       /* Produce nbytes into the buffer */
-      void wrote(size_t n) noexcept {
+      void append(size_t n) noexcept {
          _woff += n;
          assert(checkInvariants());
       }
@@ -38,7 +38,7 @@ namespace clap {
          const size_t avail = writeAvail();
          const size_t n = std::min<size_t>(size, avail);
          std::copy_n(data, n, writePtr());
-         wrote(n);
+         append(n);
          data += n;
          size -= n;
       }

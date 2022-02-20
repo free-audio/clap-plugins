@@ -9,14 +9,15 @@
 #endif
 
 #include <cassert>
+#include <future>
 #include <iostream>
 #include <regex>
 #include <sstream>
-#include <future>
 
 #include "../io/messages.hh"
 #include "../io/remote-channel.hh"
 
+#include "abstract-gui-listener.hh"
 #include "remote-gui-factory-proxy.hh"
 #include "remote-gui-proxy.hh"
 
@@ -64,8 +65,7 @@ namespace clap {
       return ptr;
    }
 
-   std::unique_ptr<GuiHandle>
-   RemoteGuiFactoryProxy::createGui(AbstractGuiListener &listener) {
+   std::unique_ptr<GuiHandle> RemoteGuiFactoryProxy::createGui(AbstractGuiListener &listener) {
       messages::CreateClientRequest rq;
       messages::CreateClientResponse rp;
 
@@ -80,8 +80,7 @@ namespace clap {
       return std::make_unique<GuiHandle>(_instance.lock(), ptr);
    }
 
-   void RemoteGuiFactoryProxy::releaseGui(GuiHandle &handle)
-   {
+   void RemoteGuiFactoryProxy::releaseGui(GuiHandle &handle) {
       auto g = dynamic_cast<RemoteGuiProxy *>(&handle.gui());
       auto l = &g->listener();
 
@@ -255,14 +254,12 @@ namespace clap {
       proxy->onMessage(msg);
    }
 
-   void RemoteGuiFactoryProxy::execAsync(std::function<void ()> cb)
-   {
+   void RemoteGuiFactoryProxy::execAsync(std::function<void()> cb) {
       std::lock_guard<std::recursive_mutex> guard(_callbacksLock);
       _callbacks.push(std::move(cb));
    }
 
-   void RemoteGuiFactoryProxy::exec(const std::function<void()> &cb)
-   {
+   void RemoteGuiFactoryProxy::exec(const std::function<void()> &cb) {
       std::promise<void> promise;
       execAsync([&cb, &promise] {
          cb();
@@ -283,8 +280,7 @@ namespace clap {
       waitChild();
    }
 
-   void RemoteGuiFactoryProxy::runCallbacks()
-   {
+   void RemoteGuiFactoryProxy::runCallbacks() {
       std::lock_guard<std::recursive_mutex> guard(_callbacksLock);
       while (!_callbacks.empty()) {
          _callbacks.front()();
@@ -292,10 +288,16 @@ namespace clap {
       }
    }
 
+   void RemoteGuiFactoryProxy::runGuiPoll() {
+      for (auto &client : _clients)
+         client.first->onGuiPoll();
+   }
+
 #if (defined(__unix__) || defined(__APPLE__))
    void RemoteGuiFactoryProxy::posixLoop() {
       while (!_quit && _channel->isOpen()) {
          runCallbacks();
+         runGuiPoll();
 
          pollfd pfd;
          pfd.fd = _channel->fd();

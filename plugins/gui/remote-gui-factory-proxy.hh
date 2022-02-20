@@ -33,6 +33,7 @@ namespace clap {
 
       void run();
       void runCallbacks();
+      void runGuiPoll();
 
       bool spawnChild();
       void waitChild();

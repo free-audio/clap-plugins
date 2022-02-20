@@ -129,7 +129,7 @@ namespace clap {
          return;
 
       _clientFactory.exec([&] {
-         messages::DestroyRequest request;
+         messages::DestroyClientRequest request;
          _clientFactory._channel->sendRequestAsync(_clientId, request);
       });
    }

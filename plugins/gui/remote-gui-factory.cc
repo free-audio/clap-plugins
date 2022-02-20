@@ -211,6 +211,16 @@ namespace clap {
          break;
       }
 
+      case messages::kOpenWindowRequest: {
+         messages::OpenWindowRequest rq;
+         messages::AttachResponse rp{false};
+         msg.get(rq);
+         if (c)
+            rp.succeed = c->openWindow();
+         _channel->sendResponseAsync(msg, rp);
+         break;
+      }
+
       case messages::kAttachX11Request: {
          messages::AttachX11Request rq;
          messages::AttachResponse rp{false};

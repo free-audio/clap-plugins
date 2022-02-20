@@ -91,15 +91,23 @@ namespace clap {
 
       pollfd pfd;
       pfd.fd = _socket;
-      pfd.events = POLLIN | (_ioFlags & CLAP_POSIX_FD_WRITE ? POLLOUT : 0);
+      pfd.events = POLLIN;
       pfd.revents = 0;
 
+      if (_ioFlags & CLAP_POSIX_FD_WRITE)
+         pfd.events |= POLLOUT;
+      if (_ioFlags & CLAP_POSIX_FD_ERROR)
+         pfd.events |= POLLERR;
+
       int ret = ::poll(&pfd, 1, 10);
-      if (ret < 1) {
+      if (ret == 0)
+         return;
+
+      if (ret < 0) {
          if (errno == 0 || errno == EAGAIN || errno == EINTR || errno == ETIMEDOUT)
             return;
 
-         std::cerr << "poll(): " << strerror(errno) << std::endl;
+         std::cerr << "[clap-plugins] poll(): " << strerror(errno) << std::endl;
 
          close();
          return;

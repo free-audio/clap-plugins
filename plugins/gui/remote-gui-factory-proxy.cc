@@ -307,9 +307,9 @@ namespace clap {
          if (_pollFlags & CLAP_POSIX_FD_ERROR)
             pfd.events |= POLLERR;
 
-         auto ret = poll(&pfd, 1, 1);
+         auto ret = poll(&pfd, 1, 10);
          if (ret < 0) {
-            if (errno == EAGAIN || errno == EINTR)
+            if (errno == EAGAIN || errno == EINTR || errno == ETIMEDOUT)
                continue;
             auto errStr = strerror(errno);
             std::cerr << "[clap-plugins] poll(): " << errStr << std::endl;

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <thread>
+#include <queue>
+#include <mutex>
 
 #include "../io/remote-channel.hh"
 
@@ -21,12 +23,16 @@ namespace clap {
 
       void releaseGui(GuiHandle &handle) override;
 
+      void exec(const std::function<void()>& cb);
+      void execAsync(std::function<void()> cb);
+
    private:
       friend class RemoteGuiProxy;
 
       static std::weak_ptr<RemoteGuiFactoryProxy> _instance;
 
       void run();
+      void runCallbacks();
 
       bool spawnChild();
       void waitChild();
@@ -45,6 +51,9 @@ namespace clap {
 
       std::unordered_map<AbstractGuiListener *, std::weak_ptr<RemoteGuiProxy>> _clients;
       std::unordered_map<uint32_t /* clientId */, std::weak_ptr<RemoteGuiProxy>> _clientIdMap;
+
+      std::recursive_mutex _callbacksLock;
+      std::queue<std::function<void()>> _callbacks;
 
 #if (defined(__unix__) || defined(__APPLE__))
       void posixLoop();

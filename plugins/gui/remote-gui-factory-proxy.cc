@@ -12,6 +12,7 @@
 #include <iostream>
 #include <regex>
 #include <sstream>
+#include <future>
 
 #include "../io/messages.hh"
 #include "../io/remote-channel.hh"
@@ -254,6 +255,22 @@ namespace clap {
       proxy->onMessage(msg);
    }
 
+   void RemoteGuiFactoryProxy::execAsync(std::function<void ()> cb)
+   {
+      std::lock_guard<std::recursive_mutex> guard(_callbacksLock);
+      _callbacks.push(std::move(cb));
+   }
+
+   void RemoteGuiFactoryProxy::exec(const std::function<void()> &cb)
+   {
+      std::promise<void> promise;
+      execAsync([&cb, &promise] {
+         cb();
+         promise.set_value();
+      });
+      promise.get_future().wait();
+   }
+
    void RemoteGuiFactoryProxy::run() {
 #if (defined(__unix__) || defined(__APPLE__))
       posixLoop();
@@ -266,9 +283,20 @@ namespace clap {
       waitChild();
    }
 
+   void RemoteGuiFactoryProxy::runCallbacks()
+   {
+      std::lock_guard<std::recursive_mutex> guard(_callbacksLock);
+      while (!_callbacks.empty()) {
+         _callbacks.front()();
+         _callbacks.pop();
+      }
+   }
+
 #if (defined(__unix__) || defined(__APPLE__))
    void RemoteGuiFactoryProxy::posixLoop() {
       while (!_quit && _channel->isOpen()) {
+         runCallbacks();
+
          pollfd pfd;
          pfd.fd = _channel->fd();
          pfd.events = POLLIN;
@@ -279,7 +307,7 @@ namespace clap {
          if (_pollFlags & CLAP_POSIX_FD_ERROR)
             pfd.events |= POLLERR;
 
-         auto ret = poll(&pfd, 1, 10);
+         auto ret = poll(&pfd, 1, 1);
          if (ret < 0) {
             if (errno == EAGAIN || errno == EINTR)
                continue;

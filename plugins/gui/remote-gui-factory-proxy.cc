@@ -255,11 +255,23 @@ namespace clap {
    }
 
    void RemoteGuiFactoryProxy::execAsync(std::function<void()> cb) {
+      if (_thread->get_id() == std::this_thread::get_id())
+      {
+         cb();
+         return;
+      }
+
       std::lock_guard<std::recursive_mutex> guard(_callbacksLock);
       _callbacks.push(std::move(cb));
    }
 
    void RemoteGuiFactoryProxy::exec(const std::function<void()> &cb) {
+      if (_thread->get_id() == std::this_thread::get_id())
+      {
+         cb();
+         return;
+      }
+
       std::promise<void> promise;
       execAsync([&cb, &promise] {
          cb();

@@ -79,7 +79,10 @@ namespace clap {
    }
 
    bool Gui::openWindow() {
+      _hostWindow = std::make_unique<QQuickWindow>();
+      _quickView->setParent(_hostWindow.get());
       _quickView->show();
+      _hostWindow->show();
       return true;
    }
 

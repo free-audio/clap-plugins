@@ -11,47 +11,53 @@ namespace clap {
                                   uint32_t clientId)
       : super(listener), _clientFactory(factory), _clientId(clientId) {}
 
-   void RemoteGuiProxy::addImportPath(const std::string &importPath)
-   {
+   void RemoteGuiProxy::addImportPath(const std::string &importPath) {
       messages::AddImportPathRequest rq;
+      snprintf(rq.importPath, sizeof(rq.importPath), "%s", importPath.c_str());
 
-      snprintf(rq.importPath, sizeof (rq.importPath), "%s", importPath.c_str());
-      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
-   void RemoteGuiProxy::setSkin(const std::string &skinUrl)
-   {
+   void RemoteGuiProxy::setSkin(const std::string &skinUrl) {
       messages::SetSkinRequest rq;
+      snprintf(rq.skinUrl, sizeof(rq.skinUrl), "%s", skinUrl.c_str());
 
-      snprintf(rq.skinUrl, sizeof (rq.skinUrl), "%s", skinUrl.c_str());
-      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
    void RemoteGuiProxy::defineParameter(const clap_param_info &info) {
       messages::DefineParameterRequest rq{info};
-      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
    void RemoteGuiProxy::updateParameter(clap_id paramId, double value, double modAmount) {
       messages::ParameterValueRequest rq{paramId, value, modAmount};
-      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
    bool RemoteGuiProxy::canResize() {
+      bool sent = false;
       messages::CanResizeRequest request;
       messages::CanResizeResponse response;
 
-      if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      if (!sent)
          return false;
 
       return response.succeed;
    }
 
    bool RemoteGuiProxy::size(uint32_t *width, uint32_t *height) {
+      bool sent = false;
       messages::SizeRequest request;
       messages::SizeResponse response;
 
-      if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      if (!sent)
          return false;
 
       if (!response.succeed)
@@ -63,13 +69,17 @@ namespace clap {
    }
 
    bool RemoteGuiProxy::roundSize(uint32_t *width, uint32_t *height) {
+      bool sent = false;
       messages::RoundSizeRequest request;
       messages::RoundSizeResponse response;
 
       request.width = *width;
       request.height = *height;
 
-      if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      if (!sent)
          return false;
 
       if (!response.succeed)
@@ -81,74 +91,105 @@ namespace clap {
    }
 
    bool RemoteGuiProxy::setScale(double scale) {
+      bool sent = false;
       messages::SetScaleRequest request{scale};
       messages::SetScaleResponse response;
 
-      if (!_clientFactory._channel->sendRequestSync(_clientId, request, response))
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      if (!sent)
          return false;
 
       return response.succeed;
    }
 
    bool RemoteGuiProxy::show() {
+      bool sent = false;
       messages::ShowRequest request;
 
-      return _clientFactory._channel->sendRequestAsync(_clientId, request);
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestAsync(_clientId, request); });
+
+      return sent;
    }
 
    bool RemoteGuiProxy::hide() {
+      bool sent = false;
       messages::HideRequest request;
 
-      return _clientFactory._channel->sendRequestAsync(_clientId, request);
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestAsync(_clientId, request); });
+
+      return sent;
    }
 
    void RemoteGuiProxy::destroy() {
       if (!_clientFactory._channel)
          return;
 
-      messages::DestroyRequest request;
-      _clientFactory._channel->sendRequestAsync(_clientId, request);
+      _clientFactory.exec([&] {
+         messages::DestroyRequest request;
+         _clientFactory._channel->sendRequestAsync(_clientId, request);
+      });
    }
 
    bool RemoteGuiProxy::openWindow() {
+      bool sent = false;
       messages::OpenWindowRequest request;
       messages::AttachResponse response;
 
-      return _clientFactory._channel->sendRequestSync(_clientId, request, response);
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      return sent;
    }
 
    bool RemoteGuiProxy::attachCocoa(void *nsView) {
+      bool sent = false;
       messages::AttachCocoaRequest request{nsView};
       messages::AttachResponse response;
 
-      return _clientFactory._channel->sendRequestSync(_clientId, request, response);
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      return sent;
    }
 
    bool RemoteGuiProxy::attachWin32(clap_hwnd window) {
+      bool sent = false;
       messages::AttachWin32Request request{window};
       messages::AttachResponse response;
 
-      return _clientFactory._channel->sendRequestSync(_clientId, request, response);
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      return sent;
    }
 
    bool RemoteGuiProxy::attachX11(const char *display_name, unsigned long window) {
+      bool sent = false;
       messages::AttachX11Request request{window};
       messages::AttachResponse response;
 
       std::snprintf(
          request.display, sizeof(request.display), "%s", display_name ? display_name : "");
 
-      return _clientFactory._channel->sendRequestSync(_clientId, request, response);
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      return sent;
    }
 
    void RemoteGuiProxy::clearTransport() {
       messages::UpdateTransportRequest rq{false};
-      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
    void RemoteGuiProxy::updateTransport(const clap_event_transport &transport) {
       messages::UpdateTransportRequest rq{true, transport};
-      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
    void RemoteGuiProxy::onMessage(const RemoteChannel::Message &msg) {

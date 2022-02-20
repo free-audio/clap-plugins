@@ -114,6 +114,7 @@ namespace clap {
          assert(!c);
          messages::DestroyResponse rp;
          _channel->sendResponseAsync(msg, rp);
+         qApp->quit();
          break;
 
       case messages::kUpdateTransportRequest: {

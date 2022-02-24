@@ -182,6 +182,7 @@ namespace clap {
    }
 
    void Gui::destroy() {
+      qDebug() << "clap-gui: destroy()";
       _quickView.reset();
       _hostWindow.reset();
       _transportProxy.reset();

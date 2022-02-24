@@ -47,9 +47,12 @@ namespace clap {
    }
 
    RemoteGuiFactoryProxy::~RemoteGuiFactoryProxy() {
-      _quit = true;
-
       if (_thread && _thread->joinable()) {
+         exec([this] {
+            messages::DestroyRequest rq;
+            _channel->sendRequestAsync(0, rq);
+         });
+         _quit = true;
          _thread->join();
          _thread.reset();
       }
@@ -289,6 +292,7 @@ namespace clap {
 #   error "unsupported target"
 #endif
 
+      _channel.reset();
       waitChild();
    }
 

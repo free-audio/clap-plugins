@@ -70,7 +70,9 @@ namespace clap {
       return clientId;
    }
 
-   void RemoteGuiFactory::destroyClient(uint32_t clientId) { _guiClients.erase(clientId); }
+   void RemoteGuiFactory::destroyClient(uint32_t clientId) {
+      _guiClients.erase(clientId);
+   }
 
    Gui *RemoteGuiFactory::getClient(uint32_t clientId) const {
       auto it = _guiClients.find(clientId);
@@ -96,7 +98,7 @@ namespace clap {
          break;
       }
 
-      case messages::kDestroyClientResponse: {
+      case messages::kDestroyClientRequest: {
          if (!c)
             return;
 

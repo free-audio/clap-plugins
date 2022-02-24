@@ -1,7 +1,3 @@
-# WARNING UNDER CONSTRUCTION!
-
-This is not ready yet. Pass your way unless you know what your are doing.
-
 # Example Clap Plugins
 
 This repo serves as an example to demonstrate how to create a CLAP plugin.
@@ -30,7 +26,7 @@ We have two different strategies to work with that.
 **1.** has the advantage of being simple to deploy.
 **2.** is more complex due to its inter-process nature. It has a few advantages:
 - if the GUI crash, the audio engine does not
-- the GUI can use any libraries, etc...
+- the GUI can use any libraries, won't be subject to symbol or library clash etc...
 
 We abstracted the relation between the plugin and the GUI:
 [`AbstractGui`](plugins/gui/abstract-gui.hh) and [`AbstractGuiListener`](plugins/gui/abstract-gui-listener.hh)

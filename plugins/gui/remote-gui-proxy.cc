@@ -49,10 +49,10 @@ namespace clap {
       return response.succeed;
    }
 
-   bool RemoteGuiProxy::size(uint32_t *width, uint32_t *height) {
+   bool RemoteGuiProxy::getSize(uint32_t *width, uint32_t *height) {
       bool sent = false;
-      messages::SizeRequest request;
-      messages::SizeResponse response;
+      messages::GetSizeRequest request;
+      messages::GetSizeResponse response;
 
       _clientFactory.exec(
          [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
@@ -66,6 +66,20 @@ namespace clap {
       *width = response.width;
       *height = response.height;
       return true;
+   }
+
+   bool RemoteGuiProxy::setSize(uint32_t width, uint32_t height) {
+      bool sent = false;
+      messages::SetSizeRequest request{width, height};
+      messages::SetSizeResponse response;
+
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      if (!sent)
+         return false;
+
+      return response.succeed;
    }
 
    bool RemoteGuiProxy::roundSize(uint32_t *width, uint32_t *height) {

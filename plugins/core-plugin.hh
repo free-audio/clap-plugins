@@ -106,10 +106,8 @@ namespace clap {
       bool guiCreate() noexcept override;
       void guiDestroy() noexcept override;
       bool guiCanResize() const noexcept override { return true; }
-      bool guiSize(uint32_t *width, uint32_t *height) noexcept override;
-      void guiRoundSize(uint32_t *width, uint32_t *height) noexcept override {
-         guiSize(width, height);
-      }
+      bool guiGetSize(uint32_t *width, uint32_t *height) noexcept override;
+      void guiRoundSize(uint32_t *width, uint32_t *height) noexcept override;
       bool guiSetScale(double scale) noexcept override;
       void guiShow() noexcept override;
       void guiHide() noexcept override;

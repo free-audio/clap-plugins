@@ -132,7 +132,7 @@ namespace clap {
 
    bool Gui::canResize() { return true; }
 
-   bool Gui::size(uint32_t *width, uint32_t *height) {
+   bool Gui::getSize(uint32_t *width, uint32_t *height) {
       if (!_quickView)
          return false;
 
@@ -151,9 +151,20 @@ namespace clap {
       return true;
    }
 
+   bool Gui::setSize(uint32_t width, uint32_t hight) {
+      auto root = _quickView->rootObject();
+      if (!root)
+         return false;
+
+      auto sz = _quickView->initialSize();
+      double scale = width / sz.width();
+      _quickView->rootObject()->setScale(scale);
+      return true;
+   }
+
    bool Gui::roundSize(uint32_t *width, uint32_t *height) {
       uint32_t w, h;
-      if (!size(&w, &h))
+      if (!getSize(&w, &h))
          return false;
 
       if (*width < w)

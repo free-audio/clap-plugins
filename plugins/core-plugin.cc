@@ -142,11 +142,18 @@ namespace clap {
 
    void CorePlugin::guiDestroy() noexcept { _guiHandle.reset(); }
 
-   bool CorePlugin::guiSize(uint32_t *width, uint32_t *height) noexcept {
+   bool CorePlugin::guiGetSize(uint32_t *width, uint32_t *height) noexcept {
       if (!_guiHandle)
          return false;
 
-      return _guiHandle->gui().size(width, height);
+      return _guiHandle->gui().getSize(width, height);
+   }
+
+   void CorePlugin::guiRoundSize(uint32_t *width, uint32_t *height) noexcept {
+      if (!_guiHandle)
+         return;
+
+      (void)_guiHandle->gui().roundSize(width, height);
    }
 
    bool CorePlugin::guiSetScale(double scale) noexcept {

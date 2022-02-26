@@ -28,8 +28,8 @@ namespace clap::messages {
       kSetScaleResponse,
       kCanResizeRequest,
       kCanResizeResponse,
-      kSizeRequest,
-      kSizeResponse,
+      kGetSizeRequest,
+      kGetSizeResponse,
       kRoundSizeRequest,
       kRoundSizeResponse,
       kSetSizeRequest,
@@ -129,14 +129,25 @@ namespace clap::messages {
       bool succeed;
    };
 
-   struct SizeRequest final {
-      static const constexpr Type type = kSizeRequest;
+   struct GetSizeRequest final {
+      static const constexpr Type type = kGetSizeRequest;
    };
 
-   struct SizeResponse final {
-      static const constexpr Type type = kSizeResponse;
+   struct GetSizeResponse final {
+      static const constexpr Type type = kGetSizeResponse;
       uint32_t width;
       uint32_t height;
+      bool succeed;
+   };
+
+   struct SetSizeRequest final {
+      static const constexpr Type type = kSetSizeRequest;
+      uint32_t width;
+      uint32_t height;
+   };
+
+   struct SetSizeResponse final {
+      static const constexpr Type type = kSetSizeResponse;
       bool succeed;
    };
 
@@ -151,16 +162,6 @@ namespace clap::messages {
       uint32_t width;
       uint32_t height;
       bool succeed;
-   };
-
-   struct SetSizeRequest final {
-      static const constexpr Type type = kSetSizeRequest;
-      uint32_t width;
-      uint32_t height;
-   };
-
-   struct SetSizeResponse final {
-      static const constexpr Type type = kSetSizeResponse;
    };
 
    struct ShowRequest final {

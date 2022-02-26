@@ -28,7 +28,8 @@ namespace clap {
       [[nodiscard]] virtual bool attachX11(const char *displayName, unsigned long window) = 0;
 
       [[nodiscard]] virtual bool canResize() = 0;
-      [[nodiscard]] virtual bool size(uint32_t *width, uint32_t *height) = 0;
+      [[nodiscard]] virtual bool getSize(uint32_t *width, uint32_t *height) = 0;
+      [[nodiscard]] virtual bool setSize(uint32_t width, uint32_t height) = 0;
       [[nodiscard]] virtual bool roundSize(uint32_t *width, uint32_t *height) = 0;
       [[nodiscard]] virtual bool setScale(double scale) = 0;
 

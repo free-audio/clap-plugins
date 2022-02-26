@@ -179,12 +179,22 @@ namespace clap {
          break;
       }
 
-      case messages::kSizeRequest: {
-         messages::SizeRequest rq;
-         messages::SizeResponse rp{0, 0, false};
+      case messages::kGetSizeRequest: {
+         messages::GetSizeRequest rq;
+         messages::GetSizeResponse rp{0, 0, false};
          msg.get(rq);
          if (c)
-            rp.succeed = c->size(&rp.width, &rp.height);
+            rp.succeed = c->getSize(&rp.width, &rp.height);
+         _channel->sendResponseAsync(msg, rp);
+         break;
+      }
+
+      case messages::kSetSizeRequest: {
+         messages::SetSizeRequest rq;
+         messages::SetSizeResponse rp{false};
+         msg.get(rq);
+         if (c)
+            rp.succeed = c->setSize(rq.width, rq.height);
          _channel->sendResponseAsync(msg, rp);
          break;
       }

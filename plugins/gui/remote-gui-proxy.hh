@@ -28,7 +28,8 @@ namespace clap {
       bool attachX11(const char *displayName, unsigned long window) override;
 
       bool canResize() override;
-      bool size(uint32_t *width, uint32_t *height) override;
+      bool getSize(uint32_t *width, uint32_t *height) override;
+      bool setSize(uint32_t width, uint32_t height) override;
       bool roundSize(uint32_t *width, uint32_t *height) override;
       bool setScale(double scale) override;
 

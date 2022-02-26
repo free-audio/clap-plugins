@@ -94,11 +94,20 @@ namespace clap {
       return succeed;
    }
 
-   bool ThreadedGuiProxy::size(uint32_t *width, uint32_t *height) {
+   bool ThreadedGuiProxy::getSize(uint32_t *width, uint32_t *height) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _gui.get(),
-         [=, this, &succeed] { succeed = _gui->size(width, height); },
+         [=, this, &succeed] { succeed = _gui->getSize(width, height); },
+         Qt::BlockingQueuedConnection);
+      return succeed;
+   }
+
+   bool ThreadedGuiProxy::setSize(uint32_t width, uint32_t height) {
+      bool succeed = false;
+      QMetaObject::invokeMethod(
+         _gui.get(),
+         [=, this, &succeed] { succeed = _gui->setSize(width, height); },
          Qt::BlockingQueuedConnection);
       return succeed;
    }

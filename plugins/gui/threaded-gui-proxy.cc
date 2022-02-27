@@ -13,9 +13,7 @@ namespace clap {
 
    void ThreadedGuiProxy::addImportPath(const std::string &importPath) {
       QMetaObject::invokeMethod(
-         _gui.get(),
-         [=, this] { _gui->addImportPath(importPath); },
-         Qt::QueuedConnection);
+         _gui.get(), [=, this] { _gui->addImportPath(importPath); }, Qt::QueuedConnection);
    }
 
    void ThreadedGuiProxy::setSkin(const std::string &skinUrl) {
@@ -25,9 +23,7 @@ namespace clap {
 
    void ThreadedGuiProxy::defineParameter(const clap_param_info &paramInfo) {
       QMetaObject::invokeMethod(
-         _gui.get(),
-         [=, this] { _gui->defineParameter(paramInfo); },
-         Qt::QueuedConnection);
+         _gui.get(), [=, this] { _gui->defineParameter(paramInfo); }, Qt::QueuedConnection);
    }
 
    void ThreadedGuiProxy::updateParameter(clap_id paramId, double value, double modAmount) {
@@ -44,9 +40,7 @@ namespace clap {
 
    void ThreadedGuiProxy::updateTransport(const clap_event_transport &transport) {
       QMetaObject::invokeMethod(
-         _gui.get(),
-         [=, this] { _gui->updateTransport(transport); },
-         Qt::QueuedConnection);
+         _gui.get(), [=, this] { _gui->updateTransport(transport); }, Qt::QueuedConnection);
    }
 
    bool ThreadedGuiProxy::openWindow() {
@@ -133,22 +127,19 @@ namespace clap {
    bool ThreadedGuiProxy::show() {
       bool succeed = false;
       QMetaObject::invokeMethod(
-         _gui.get(),
-         [=, this, &succeed] { succeed = _gui->show(); },
-         Qt::BlockingQueuedConnection);
+         _gui.get(), [=, this, &succeed] { succeed = _gui->show(); }, Qt::BlockingQueuedConnection);
       return succeed;
    }
 
    bool ThreadedGuiProxy::hide() {
       bool succeed = false;
       QMetaObject::invokeMethod(
-         _gui.get(),
-         [=, this, &succeed] { succeed = _gui->hide(); },
-         Qt::BlockingQueuedConnection);
+         _gui.get(), [=, this, &succeed] { succeed = _gui->hide(); }, Qt::BlockingQueuedConnection);
       return succeed;
    }
 
    void ThreadedGuiProxy::destroy() {
-      // todo
+      QMetaObject::invokeMethod(
+         _gui.get(), [=, this] { _gui->destroy(); }, Qt::BlockingQueuedConnection);
    }
 } // namespace clap

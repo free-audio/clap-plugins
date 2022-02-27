@@ -7,6 +7,7 @@
 namespace clap {
 
    class Gui;
+
    class ThreadedGuiProxy : public AbstractGui {
    public:
       ThreadedGuiProxy(AbstractGuiListener &listener, std::shared_ptr<Gui> &guiClient);

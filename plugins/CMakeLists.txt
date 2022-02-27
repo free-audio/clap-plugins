@@ -1,12 +1,19 @@
 set(CLAP_PLUGINS_REMOTE_GUI TRUE CACHE BOOL "Should the GUI be ran from another process?")
 set(CLAP_PLUGINS_EMBED_QML TRUE CACHE BOOL "Embed QML resources into the plugin")
+set(CLAP_PLUGINS_HEADLESS FALSE CACHE BOOL "Compile the plugins without a GUI")
+
+if(CLAP_PLUGINS_HEADLESS)
+  add_compile_definitions(CLAP_PLUGINS_HEADLESS)
+endif()
 
 if(CLAP_PLUGINS_EMBED_QML)
   add_compile_definitions(CLAP_PLUGINS_EMBED_QML)
 endif()
 
-add_subdirectory(io)
-add_subdirectory(gui)
+if(NOT CLAP_PLUGINS_HEADLESS)
+  add_subdirectory(io)
+  add_subdirectory(gui)
+endif()
 
 add_library(
   clap-plugins MODULE
@@ -29,18 +36,22 @@ add_library(
   plugs/transport/transport-info.hh
   plugs/transport/transport-info.cc)
 
-if(CLAP_PLUGINS_REMOTE_GUI)
-  target_compile_definitions(clap-plugins PUBLIC CLAP_REMOTE_GUI)
-  target_link_libraries(clap-plugins PUBLIC clap-plugin-remote-gui)
-  add_dependencies(clap-plugins clap-gui)
-else()
-  target_compile_definitions(clap-plugins PUBLIC CLAP_LOCAL_GUI)
-  target_link_libraries(clap-plugins PUBLIC clap-plugin-local-gui)
+if(NOT CLAP_PLUGINS_HEADLESS)
+  if(CLAP_PLUGINS_REMOTE_GUI)
+    target_compile_definitions(clap-plugins PUBLIC CLAP_REMOTE_GUI)
+    target_link_libraries(clap-plugins PUBLIC clap-plugin-remote-gui)
+    add_dependencies(clap-plugins clap-gui)
+  else()
+    target_compile_definitions(clap-plugins PUBLIC CLAP_LOCAL_GUI)
+    target_link_libraries(clap-plugins PUBLIC clap-plugin-local-gui)
+  endif()
+
+  target_link_libraries(clap-plugins PUBLIC clap-io)
 endif()
 
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 
-target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common clap-helpers clap-io)
+target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common clap-helpers)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)
@@ -65,7 +76,7 @@ endif()
 
 install(TARGETS clap-plugins DESTINATION "lib/clap" COMPONENT plugins)
 
-if(NOT CLAP_PLUGINS_EMBED_QML)
+if(NOT CLAP_PLUGINS_HEADLESS AND NOT CLAP_PLUGINS_EMBED_QML)
   install(DIRECTORY gui/qml
     DESTINATION "lib/clap-plugins"
     PATTERN CMakeLists.txt EXCLUDE)

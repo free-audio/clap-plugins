@@ -109,15 +109,26 @@ namespace clap {
       return true;
    }
 
+   bool CorePlugin::implementsGui() const noexcept {
+#ifdef CLAP_PLUGINS_HEADLESS
+      return false;
+#else
+      return true;
+#endif
+   }
+
    bool CorePlugin::guiCreate() noexcept {
-#ifdef CLAP_REMOTE_GUI
+#if defined(CLAP_PLUGINS_HEADLESS)
+      return false;
+#else
+#   ifdef CLAP_REMOTE_GUI
       auto guiPath = _pathProvider->getGuiExecutable();
       _guiFactory = RemoteGuiFactoryProxy::getInstance(guiPath);
-#else
+#   else
       _guiFactory = LocalGuiFactory::getInstance();
       if (!_guiFactory)
          _guiFactory = ThreadedGuiFactory::getInstance();
-#endif
+#   endif
 
       _guiHandle = _guiFactory->createGui(*this);
 
@@ -130,6 +141,7 @@ namespace clap {
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
       _guiHandle->gui().setSkin(skinPath);
       return true;
+#endif
    }
 
    void CorePlugin::guiDefineParameters() {
@@ -172,9 +184,7 @@ namespace clap {
          _guiHandle->gui().hide();
    }
 
-   bool CorePlugin::implementsGuiX11() const noexcept {
-      return true;
-   }
+   bool CorePlugin::implementsGuiX11() const noexcept { return true; }
 
    bool CorePlugin::guiX11Attach(const char *displayName, unsigned long window) noexcept {
       if (_guiHandle)
@@ -183,9 +193,7 @@ namespace clap {
       return false;
    }
 
-   bool CorePlugin::implementsGuiWin32() const noexcept {
-      return true;
-   }
+   bool CorePlugin::implementsGuiWin32() const noexcept { return true; }
 
    bool CorePlugin::guiWin32Attach(clap_hwnd window) noexcept {
       if (_guiHandle)
@@ -209,9 +217,7 @@ namespace clap {
       return false;
    }
 
-   bool CorePlugin::implementsGuiFreeStanding() const noexcept {
-      return true;
-   }
+   bool CorePlugin::implementsGuiFreeStanding() const noexcept { return true; }
 
    bool CorePlugin::guiFreeStandingOpen() noexcept {
       if (_guiHandle)

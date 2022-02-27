@@ -102,7 +102,7 @@ namespace clap {
       //-----------------//
       // clap_plugin_gui //
       //-----------------//
-      bool implementsGui() const noexcept override { return true; }
+      bool implementsGui() const noexcept override;
       bool guiCreate() noexcept override;
       void guiDestroy() noexcept override;
       bool guiCanResize() const noexcept override { return true; }

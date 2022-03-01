@@ -151,14 +151,17 @@ namespace clap {
       return true;
    }
 
-   bool Gui::setSize(uint32_t width, uint32_t hight) {
+   bool Gui::setSize(uint32_t width, uint32_t height) {
       auto root = _quickView->rootObject();
       if (!root)
          return false;
 
       auto sz = _quickView->initialSize();
-      double scale = width / sz.width();
+      double scale = double(width) / sz.width();
       _quickView->rootObject()->setScale(scale);
+      _quickView->setWidth(width);
+      _quickView->setHeight(height);
+
       return true;
    }
 

@@ -157,10 +157,12 @@ namespace clap {
          return false;
 
       auto sz = _quickView->initialSize();
-      double scale = double(width) / sz.width();
-      _quickView->rootObject()->setScale(scale);
       _quickView->setWidth(width);
       _quickView->setHeight(height);
+
+      double scale = double(width) / sz.width();
+      root->setTransformOrigin(QQuickItem::TopLeft);
+      root->setScale(scale);
 
       return true;
    }
@@ -175,11 +177,11 @@ namespace clap {
       if (*height < h)
          *height = h;
 
-      double rw = *width / double(w);
-      double rh = *height / double(h);
+      double rw = double(*width) / double(w);
+      double rh = double(*height) / double(h);
       double r = std::min<double>(rw, rh);
-      *width = r * w;
-      *height = r * h;
+      *width = std::round(r * w);
+      *height = std::round(r * h);
       return true;
    }
 

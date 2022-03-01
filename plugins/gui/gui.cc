@@ -156,11 +156,19 @@ namespace clap {
       if (!root)
          return false;
 
-      auto sz = _quickView->initialSize();
+      if (!wantsLogicalSize())
+      {
+         auto ratio = _quickView->devicePixelRatio();
+         width /= ratio;
+         height /= ratio;
+      }
+
       _quickView->setWidth(width);
       _quickView->setHeight(height);
 
-      double scale = double(width) / sz.width();
+      double rw = double(width) / double(root->width());
+      double rh = double(height) / double(root->height());
+      double scale = std::min<double>(rw, rh);
       root->setTransformOrigin(QQuickItem::TopLeft);
       root->setScale(scale);
 

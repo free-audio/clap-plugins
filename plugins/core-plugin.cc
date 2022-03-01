@@ -168,6 +168,13 @@ namespace clap {
       (void)_guiHandle->gui().roundSize(width, height);
    }
 
+   bool CorePlugin::guiSetSize(uint32_t width, uint32_t height) noexcept {
+      if (!_guiHandle)
+         return false;
+
+      return _guiHandle->gui().setSize(width, height);
+   }
+
    bool CorePlugin::guiSetScale(double scale) noexcept {
       if (_guiHandle)
          return _guiHandle->gui().setScale(scale);

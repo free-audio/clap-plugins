@@ -18,6 +18,10 @@ int main(int argc, char **argv) {
    ::signal(SIGPIPE, SIG_IGN);
 #endif
 
+#ifdef Q_OS_LINUX
+   ::setenv("QT_QPA_PLATFORM", "xcb", 1);
+#endif
+
    /* Useful to attach child process with debuggers which don't support follow childs */
    bool waitForDebbugger = false;
    while (waitForDebbugger)

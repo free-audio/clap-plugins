@@ -27,6 +27,10 @@ namespace clap {
          char arg0[] = "clap-plugin-gui";
          static char *argv[] = {arg0, nullptr};
 
+#ifdef Q_OS_LINUX
+   ::setenv("QT_QPA_PLATFORM", "xcb", 1);
+#endif
+
          QGuiApplication::setAttribute(Qt::AA_PluginApplication);
          _app = std::make_unique<QGuiApplication>(argc, argv);
 

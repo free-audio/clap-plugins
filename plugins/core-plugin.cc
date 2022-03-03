@@ -161,11 +161,11 @@ namespace clap {
       return _guiHandle->gui().getSize(width, height);
    }
 
-   void CorePlugin::guiRoundSize(uint32_t *width, uint32_t *height) noexcept {
+   bool CorePlugin::guiAdjustSize(uint32_t *width, uint32_t *height) noexcept {
       if (!_guiHandle)
-         return;
+         return false;
 
-      (void)_guiHandle->gui().roundSize(width, height);
+      return _guiHandle->gui().roundSize(width, height);
    }
 
    bool CorePlugin::guiSetSize(uint32_t width, uint32_t height) noexcept {
@@ -181,32 +181,16 @@ namespace clap {
       return false;
    }
 
-   void CorePlugin::guiShow() noexcept {
-      if (_guiHandle)
-         _guiHandle->gui().show();
+   bool CorePlugin::guiShow() noexcept {
+      if (!_guiHandle)
+         return false;
+      return _guiHandle->gui().show();
    }
 
-   void CorePlugin::guiHide() noexcept {
-      if (_guiHandle)
-         _guiHandle->gui().hide();
-   }
-
-   bool CorePlugin::implementsGuiX11() const noexcept { return true; }
-
-   bool CorePlugin::guiX11Attach(const char *displayName, unsigned long window) noexcept {
-      if (_guiHandle)
-         return _guiHandle->gui().attachX11(displayName, window);
-
-      return false;
-   }
-
-   bool CorePlugin::implementsGuiWin32() const noexcept { return true; }
-
-   bool CorePlugin::guiWin32Attach(clap_hwnd window) noexcept {
-      if (_guiHandle)
-         return _guiHandle->gui().attachWin32(window);
-
-      return false;
+   bool CorePlugin::guiHide() noexcept {
+      if (!_guiHandle)
+         return false;
+      return _guiHandle->gui().hide();
    }
 
    bool CorePlugin::implementsGuiCocoa() const noexcept {
@@ -321,7 +305,7 @@ namespace clap {
 
    void CorePlugin::processGuiParameterChange(const clap_output_events *out) {
       GuiToPluginValue value;
-      while (_guiToPluginQueue.tryPop(value)) {
+      while (_guiToPluginQueue.tryPeek(value)) {
          auto p = _parameters.getById(value.paramId);
          if (!p)
             return;
@@ -343,7 +327,10 @@ namespace clap {
          ev.key = -1;
          ev.cookie = p;
 
-         out->push_back(out, &ev.header);
+         if (!out->try_push(out, &ev.header))
+            break;
+
+         _guiToPluginQueue.consume();
       }
    }
 

@@ -103,15 +103,16 @@ namespace clap {
       // clap_plugin_gui //
       //-----------------//
       bool implementsGui() const noexcept override;
-      bool guiCreate() noexcept override;
+      bool guiCreate(uint32_t api) noexcept override;
       void guiDestroy() noexcept override;
       bool guiCanResize() const noexcept override { return true; }
       bool guiGetSize(uint32_t *width, uint32_t *height) noexcept override;
       bool guiSetSize(uint32_t width, uint32_t height) noexcept override;
-      void guiRoundSize(uint32_t *width, uint32_t *height) noexcept override;
+      bool guiAdjustSize(uint32_t *width, uint32_t *height) noexcept override;
       bool guiSetScale(double scale) noexcept override;
-      void guiShow() noexcept override;
-      void guiHide() noexcept override;
+      bool guiShow() noexcept override;
+      bool guiHide() noexcept override;
+      bool guiAttach(const clap_gui_window *parentWindow) noexcept override;
       void guiDefineParameters();
 
       //---------------------//
@@ -120,30 +121,6 @@ namespace clap {
       void onGuiPoll() override;
       void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
-
-      //---------------------//
-      // clap_plugin_gui_x11 //
-      //---------------------//
-      bool implementsGuiX11() const noexcept override;
-      bool guiX11Attach(const char *displayName, unsigned long window) noexcept override;
-
-      //-----------------------//
-      // clap_plugin_gui_win32 //
-      //-----------------------//
-      bool implementsGuiWin32() const noexcept override;
-      bool guiWin32Attach(clap_hwnd window) noexcept override;
-
-      //-----------------------//
-      // clap_plugin_gui_cocoa //
-      //-----------------------//
-      bool implementsGuiCocoa() const noexcept override;
-      bool guiCocoaAttach(void *nsView) noexcept override;
-
-      //-------------------------------//
-      // clap_plugin_gui_free_standing //
-      //-------------------------------//
-      bool implementsGuiFreeStanding() const noexcept override;
-      bool guiFreeStandingOpen() noexcept override;
 
       //////////////////////
       // Cached Host Info //

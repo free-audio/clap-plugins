@@ -6,7 +6,7 @@ enable_testing()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
 
-project(CLAP_EXAMPLES C CXX)
+project(CLAP_PLUGINS C CXX)
 
 set(CMAKE_AUTOMOC ON)
 

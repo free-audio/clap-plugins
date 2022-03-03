@@ -117,10 +117,25 @@ namespace clap {
 #endif
    }
 
-   bool CorePlugin::guiCreate() noexcept {
+   bool CorePlugin::guiIsApiSupported(uint32_t api) noexcept {
+      switch (api) {
+      case CLAP_GUI_API_COCOA:
+#if defined(CLAP_REMOTE_GUI)
+         return false;
+#else
+         return true;
+#endif
+
+      default:
+         return true;
+      }
+   }
+
+   bool CorePlugin::guiCreate(uint32_t api) noexcept {
 #if defined(CLAP_PLUGINS_HEADLESS)
       return false;
 #else
+
 #   ifdef CLAP_REMOTE_GUI
       auto guiPath = _pathProvider->getGuiExecutable();
       _guiFactory = RemoteGuiFactoryProxy::getInstance(guiPath);
@@ -193,28 +208,34 @@ namespace clap {
       return _guiHandle->gui().hide();
    }
 
-   bool CorePlugin::implementsGuiCocoa() const noexcept {
-#if defined(CLAP_REMOTE_GUI)
+   bool CorePlugin::guiAttach(const clap_gui_window *parentWindow) noexcept {
+#if defined(CLAP_PLUGINS_HEADLESS)
       return false;
 #else
-      return true;
-#endif
-   }
+      if (!_guiHandle)
+         return false;
 
-   bool CorePlugin::guiCocoaAttach(void *nsView) noexcept {
-      if (_guiHandle)
-         return _guiHandle->gui().attachCocoa(nsView);
+      switch (parentWindow->api) {
+      case CLAP_GUI_API_COCOA:
+         return _guiHandle->gui().attachCocoa(
+            static_cast<const clap_gui_window_cocoa *>(parentWindow->specific)->nsView);
 
-      return false;
-   }
+      case CLAP_GUI_API_WIN32:
+         return _guiHandle->gui().attachWin32(
+            static_cast<const clap_gui_window_win32 *>(parentWindow->specific)->window);
 
-   bool CorePlugin::implementsGuiFreeStanding() const noexcept { return true; }
+      case CLAP_GUI_API_X11: {
+         auto w = static_cast<const clap_gui_window_x11 *>(parentWindow->specific);
+         return _guiHandle->gui().attachX11(w->display, w->window);
+      }
 
-   bool CorePlugin::guiFreeStandingOpen() noexcept {
-      if (_guiHandle)
+      case CLAP_GUI_API_FLOATING:
          return _guiHandle->gui().openWindow();
 
-      return false;
+      default:
+         return false;
+      }
+#endif
    }
 
    //---------------------//

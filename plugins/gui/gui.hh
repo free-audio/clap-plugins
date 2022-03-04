@@ -39,9 +39,9 @@ namespace clap {
       void updateTransport(const clap_event_transport &transport) override;
 
       bool openWindow() override;
-      bool attachCocoa(void *nsView) override;
-      bool attachWin32(void *window) override;
-      bool attachX11(unsigned long window) override;
+      bool attachCocoa(clap_nsview nsView) override;
+      bool attachWin32(clap_hwnd window) override;
+      bool attachX11(clap_xwnd window) override;
 
       bool canResize() override;
       bool getSize(uint32_t *width, uint32_t *height) override;

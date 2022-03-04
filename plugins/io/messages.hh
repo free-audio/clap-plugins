@@ -206,17 +206,17 @@ namespace clap::messages {
 
    struct AttachWin32Request final {
       static const constexpr Type type = kAttachWin32Request;
-      void *hwnd;
+      clap_hwnd hwnd;
    };
 
    struct AttachX11Request final {
       static const constexpr Type type = kAttachX11Request;
-      unsigned long window;
+      clap_xwnd window;
    };
 
    struct AttachCocoaRequest final {
       static const constexpr Type type = kAttachCocoaRequest;
-      void *nsView;
+      clap_nsview nsView;
    };
 
    struct AttachResponse final {

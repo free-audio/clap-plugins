@@ -154,13 +154,13 @@ namespace clap {
          return _guiHandle->gui().openWindow();
 
       if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
-         return _guiHandle->gui().attachCocoa(window->cocoa_nsview);
+         return _guiHandle->gui().attachCocoa(window->cocoa);
 
       if (!strcmp(CLAP_WINDOW_API_WIN32, window->api))
-         return _guiHandle->gui().attachWin32(window->win32_window);
+         return _guiHandle->gui().attachWin32(window->win32);
 
       if (!strcmp(CLAP_WINDOW_API_X11, window->api))
-         return _guiHandle->gui().attachX11(window->x11_window);
+         return _guiHandle->gui().attachX11(window->x11);
 
       return false;
 #endif

@@ -83,7 +83,7 @@ namespace clap {
       return true;
    }
 
-   bool Gui::attachCocoa(void *nsView) {
+   bool Gui::attachCocoa(clap_nsview nsView) {
 #ifdef Q_OS_MACOS
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(nsView)));
       if (_hostWindow) {
@@ -95,7 +95,7 @@ namespace clap {
       return false;
    }
 
-   bool Gui::attachWin32(void *window) {
+   bool Gui::attachWin32(clap_hwnd window) {
 #ifdef Q_OS_WIN
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(window)));
       if (_hostWindow) {
@@ -107,7 +107,7 @@ namespace clap {
       return false;
    }
 
-   bool Gui::attachX11(unsigned long window) {
+   bool Gui::attachX11(clap_xwnd window) {
 #ifdef Q_OS_LINUX
       // TODO: check the displayName
       qDebug() << "clap-gui: attachX11(" << window << ")";

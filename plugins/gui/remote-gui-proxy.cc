@@ -159,7 +159,7 @@ namespace clap {
       return sent;
    }
 
-   bool RemoteGuiProxy::attachCocoa(void *nsView) {
+   bool RemoteGuiProxy::attachCocoa(clap_nsview nsView) {
       bool sent = false;
       messages::AttachCocoaRequest request{nsView};
       messages::AttachResponse response;
@@ -170,7 +170,7 @@ namespace clap {
       return sent;
    }
 
-   bool RemoteGuiProxy::attachWin32(void *window) {
+   bool RemoteGuiProxy::attachWin32(clap_hwnd window) {
       bool sent = false;
       messages::AttachWin32Request request{window};
       messages::AttachResponse response;
@@ -181,7 +181,7 @@ namespace clap {
       return sent;
    }
 
-   bool RemoteGuiProxy::attachX11(unsigned long window) {
+   bool RemoteGuiProxy::attachX11(clap_xwnd window) {
       bool sent = false;
       messages::AttachX11Request request{window};
       messages::AttachResponse response;

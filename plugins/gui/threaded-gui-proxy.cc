@@ -52,7 +52,7 @@ namespace clap {
       return succeed;
    }
 
-   bool ThreadedGuiProxy::attachCocoa(void *nsView) {
+   bool ThreadedGuiProxy::attachCocoa(clap_nsview nsView) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _gui.get(),
@@ -61,7 +61,7 @@ namespace clap {
       return succeed;
    }
 
-   bool ThreadedGuiProxy::attachWin32(void *window) {
+   bool ThreadedGuiProxy::attachWin32(clap_hwnd window) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _gui.get(),
@@ -70,7 +70,7 @@ namespace clap {
       return succeed;
    }
 
-   bool ThreadedGuiProxy::attachX11(unsigned long window) {
+   bool ThreadedGuiProxy::attachX11(clap_xwnd window) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _gui.get(),

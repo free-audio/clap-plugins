@@ -60,6 +60,7 @@ namespace clap {
       void showLater();
 
       static bool wantsLogicalSize() noexcept;
+      void onQuickViewVisibilityChange(bool isVisible);
 
       // Qt windows
       std::unique_ptr<QQuickView> _quickView;

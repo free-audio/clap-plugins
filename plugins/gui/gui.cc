@@ -10,6 +10,7 @@
 
 #include "../io/messages.hh"
 #include "gui.hh"
+#include "abstract-gui-listener.hh"
 
 #ifdef _WIN32
 #   include <windows.h>
@@ -32,6 +33,8 @@ namespace clap {
 
       qmlContext->setContextProperty("plugin", _pluginProxy.get());
       qmlContext->setContextProperty("transport", _transportProxy.get());
+
+      connect(_quickView.get(), &QQuickView::visibleChanged, this, &Gui::onQuickViewVisibilityChange);
    }
 
    Gui::~Gui() { destroy(); }
@@ -79,6 +82,7 @@ namespace clap {
    }
 
    bool Gui::openWindow() {
+      assert(!_hostWindow);
       _quickView->show();
       return true;
    }
@@ -203,6 +207,12 @@ namespace clap {
    bool Gui::hide() {
       _quickView->hide();
       return true;
+   }
+
+   void Gui::onQuickViewVisibilityChange(bool isVisible)
+   {
+      if (!isVisible && !_hostWindow)
+         _listener.onGuiWindowClosed(false);
    }
 
    void Gui::destroy() {

@@ -118,9 +118,12 @@ namespace clap {
    }
 
    bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept {
-#if defined(CLAP_REMOTE_GUI)
+#if defined(CLAP_PLUGINS_HEADLESS)
       return false;
 #else
+#   if defined(__APPLE__) && defined(CLAP_REMOTE_GUI)
+      return isFloating;
+#   endif
       return true;
 #endif
    }

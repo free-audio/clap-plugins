@@ -221,7 +221,9 @@ namespace clap {
       }
 
       case messages::kWindowClosedNotification: {
-         _listener.onGuiWindowClosed();
+         messages::WindowClosedNotification notification;
+         msg.get(notification);
+         _listener.onGuiWindowClosed(notification.wasDestroyed);
          break;
       }
       }

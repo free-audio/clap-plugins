@@ -121,7 +121,7 @@ namespace clap {
       void onGuiPoll() override;
       void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
-      void onGuiWindowClosed() override;
+      void onGuiWindowClosed(bool wasDestroyed) override;
 
       //////////////////////
       // Cached Host Info //

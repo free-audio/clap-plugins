@@ -249,8 +249,8 @@ namespace clap {
 
    void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {}
 
-   void CorePlugin::onGuiWindowClosed() {
-      runOnMainThread([this] { _host.guiWindowClosed(); });
+   void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
+      runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
    }
 
    void CorePlugin::processInputParameterChange(const clap_event_header *hdr) {

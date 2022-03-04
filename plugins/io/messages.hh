@@ -227,5 +227,6 @@ namespace clap::messages {
 
    struct WindowClosedNotification final {
       static const constexpr Type type = kWindowClosedNotification;
+      bool wasDestroyed;
    };
 } // namespace clap::messages

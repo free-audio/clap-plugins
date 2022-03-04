@@ -26,8 +26,8 @@ namespace clap {
       _clientFactory._channel->sendRequestAsync(_clientId, rq);
    }
 
-   void RemoteGuiListener::onGuiWindowClosed() {
-      messages::WindowClosedNotification notification;
+   void RemoteGuiListener::onGuiWindowClosed(bool wasDestroyed) {
+      messages::WindowClosedNotification notification{wasDestroyed};
       _clientFactory._channel->sendRequestAsync(_clientId, notification);
    }
 } // namespace clap

@@ -17,6 +17,6 @@ namespace clap {
       virtual void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) = 0;
       virtual void onGuiSetTransportIsSubscribed(bool isSubscribed) = 0;
 
-      virtual void onGuiWindowClosed() = 0;
+      virtual void onGuiWindowClosed(bool wasDestroyed) = 0;
    };
 } // namespace clap

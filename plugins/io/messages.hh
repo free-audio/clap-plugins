@@ -49,6 +49,7 @@ namespace clap::messages {
       // Gui, Plugin->Host
       kResizeRequest,
       kResizeResponse,
+      kWindowClosedNotification,
    };
 
    struct CreateClientRequest final {
@@ -222,5 +223,9 @@ namespace clap::messages {
    struct AttachResponse final {
       static const constexpr Type type = kAttachResponse;
       bool succeed;
+   };
+
+   struct WindowClosedNotification final {
+      static const constexpr Type type = kWindowClosedNotification;
    };
 } // namespace clap::messages

@@ -36,7 +36,7 @@ namespace clap {
       assert(_pathProvider);
    }
 
-   CorePlugin::~CorePlugin() {}
+   CorePlugin::~CorePlugin() = default;
 
    bool CorePlugin::init() noexcept {
       initTrackInfo();
@@ -248,6 +248,10 @@ namespace clap {
    }
 
    void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {}
+
+   void CorePlugin::onGuiWindowClosed() {
+      runOnMainThread([this] { _host.guiWindowClosed(); });
+   }
 
    void CorePlugin::processInputParameterChange(const clap_event_header *hdr) {
       if (hdr->space_id == CLAP_CORE_EVENT_SPACE_ID) {

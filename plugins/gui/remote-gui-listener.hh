@@ -18,6 +18,8 @@ namespace clap {
       void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
 
+      void onGuiWindowClosed() override;
+
    protected:
       friend class RemoteGuiFactory;
 

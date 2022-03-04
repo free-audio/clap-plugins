@@ -25,4 +25,9 @@ namespace clap {
       rq.isSubscribed = isSubscribed;
       _clientFactory._channel->sendRequestAsync(_clientId, rq);
    }
+
+   void RemoteGuiListener::onGuiWindowClosed() {
+      messages::WindowClosedNotification notification;
+      _clientFactory._channel->sendRequestAsync(_clientId, notification);
+   }
 } // namespace clap

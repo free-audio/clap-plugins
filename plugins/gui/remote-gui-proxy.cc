@@ -219,6 +219,11 @@ namespace clap {
          _listener.onGuiSetTransportIsSubscribed(rq.isSubscribed);
          break;
       }
+
+      case messages::kWindowClosedNotification: {
+         _listener.onGuiWindowClosed();
+         break;
+      }
       }
       }
    }

@@ -39,9 +39,14 @@ namespace clap {
       void updateTransport(const clap_event_transport &transport) override;
 
       bool openWindow() override;
+
       bool attachCocoa(clap_nsview nsView) override;
       bool attachWin32(clap_hwnd window) override;
       bool attachX11(clap_xwnd window) override;
+
+      bool setTransientX11(clap_xwnd window) override;
+      bool setTransientWin32(clap_hwnd window) override;
+      bool setTransientCocoa(clap_nsview nsView) override;
 
       bool canResize() override;
       bool getSize(uint32_t *width, uint32_t *height) override;
@@ -65,6 +70,7 @@ namespace clap {
       // Qt windows
       std::unique_ptr<QQuickView> _quickView;
       std::unique_ptr<QWindow> _hostWindow;
+      bool _isFloating = false;
 
       // QML proxy objects
       std::unique_ptr<PluginProxy> _pluginProxy;

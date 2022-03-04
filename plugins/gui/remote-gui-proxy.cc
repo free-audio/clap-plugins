@@ -192,6 +192,39 @@ namespace clap {
       return sent;
    }
 
+   bool RemoteGuiProxy::setTransientCocoa(clap_nsview nsView) {
+      bool sent = false;
+      messages::SetTransientCocoaRequest request{nsView};
+      messages::SetTransientResponse response;
+
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      return sent;
+   }
+
+   bool RemoteGuiProxy::setTransientWin32(clap_hwnd window) {
+      bool sent = false;
+      messages::SetTransientWin32Request request{window};
+      messages::SetTransientResponse response;
+
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      return sent;
+   }
+
+   bool RemoteGuiProxy::setTransientX11(clap_xwnd window) {
+      bool sent = false;
+      messages::SetTransientX11Request request{window};
+      messages::SetTransientResponse response;
+
+      _clientFactory.exec(
+         [&] { sent = _clientFactory._channel->sendRequestSync(_clientId, request, response); });
+
+      return sent;
+   }
+
    void RemoteGuiProxy::clearTransport() {
       messages::UpdateTransportRequest rq{false};
 

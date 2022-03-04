@@ -45,6 +45,10 @@ namespace clap::messages {
       kAttachCocoaRequest,
       kAttachX11Request,
       kAttachResponse,
+      kSetTransientWin32Request,
+      kSetTransientCocoaRequest,
+      kSetTransientX11Request,
+      kSetTransientResponse,
 
       // Gui, Plugin->Host
       kResizeRequest,
@@ -224,6 +228,27 @@ namespace clap::messages {
       static const constexpr Type type = kAttachResponse;
       bool succeed;
    };
+
+   struct SetTransientWin32Request final {
+      static const constexpr Type type = kSetTransientWin32Request;
+      clap_hwnd hwnd;
+   };
+
+   struct SetTransientX11Request final {
+      static const constexpr Type type = kSetTransientX11Request;
+      clap_xwnd window;
+   };
+
+   struct SetTransientCocoaRequest final {
+      static const constexpr Type type = kSetTransientCocoaRequest;
+      clap_nsview nsView;
+   };
+
+   struct SetTransientResponse final {
+      static const constexpr Type type = kSetTransientResponse;
+      bool succeed;
+   };
+
 
    struct WindowClosedNotification final {
       static const constexpr Type type = kWindowClosedNotification;

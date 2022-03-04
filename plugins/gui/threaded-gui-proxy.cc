@@ -79,6 +79,33 @@ namespace clap {
       return succeed;
    }
 
+   bool ThreadedGuiProxy::setTransientCocoa(clap_nsview nsView) {
+      bool succeed = false;
+      QMetaObject::invokeMethod(
+         _gui.get(),
+         [=, this, &succeed] { succeed = _gui->setTransientCocoa(nsView); },
+         Qt::BlockingQueuedConnection);
+      return succeed;
+   }
+
+   bool ThreadedGuiProxy::setTransientWin32(clap_hwnd window) {
+      bool succeed = false;
+      QMetaObject::invokeMethod(
+         _gui.get(),
+         [=, this, &succeed] { succeed = _gui->setTransientWin32(window); },
+         Qt::BlockingQueuedConnection);
+      return succeed;
+   }
+
+   bool ThreadedGuiProxy::setTransientX11(clap_xwnd window) {
+      bool succeed = false;
+      QMetaObject::invokeMethod(
+         _gui.get(),
+         [=, this, &succeed] { succeed = _gui->setTransientX11(window); },
+         Qt::BlockingQueuedConnection);
+      return succeed;
+   }
+
    bool ThreadedGuiProxy::canResize() {
       bool succeed = false;
       QMetaObject::invokeMethod(

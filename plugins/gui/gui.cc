@@ -9,8 +9,8 @@
 #include <QWindow>
 
 #include "../io/messages.hh"
-#include "gui.hh"
 #include "abstract-gui-listener.hh"
+#include "gui.hh"
 
 #ifdef _WIN32
 #   include <windows.h>
@@ -34,7 +34,8 @@ namespace clap {
       qmlContext->setContextProperty("plugin", _pluginProxy.get());
       qmlContext->setContextProperty("transport", _transportProxy.get());
 
-      connect(_quickView.get(), &QQuickView::visibleChanged, this, &Gui::onQuickViewVisibilityChange);
+      connect(
+         _quickView.get(), &QQuickView::visibleChanged, this, &Gui::onQuickViewVisibilityChange);
    }
 
    Gui::~Gui() { destroy(); }
@@ -84,10 +85,12 @@ namespace clap {
    bool Gui::openWindow() {
       assert(!_hostWindow);
       _quickView->show();
+      _isFloating = true;
       return true;
    }
 
    bool Gui::attachCocoa(clap_nsview nsView) {
+      assert(!_isFloating);
 #ifdef Q_OS_MACOS
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(nsView)));
       if (_hostWindow) {
@@ -100,6 +103,7 @@ namespace clap {
    }
 
    bool Gui::attachWin32(clap_hwnd window) {
+      assert(!_isFloating);
 #ifdef Q_OS_WIN
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(window)));
       if (_hostWindow) {
@@ -112,14 +116,50 @@ namespace clap {
    }
 
    bool Gui::attachX11(clap_xwnd window) {
+      assert(!_isFloating);
 #ifdef Q_OS_LINUX
-      // TODO: check the displayName
       qDebug() << "clap-gui: attachX11(" << window << ")";
       _hostWindow.reset(QWindow::fromWinId(window));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());
          _quickView->show();
          qGuiApp->sync();
+         return true;
+      }
+#endif
+      return false;
+   }
+
+   bool Gui::setTransientCocoa(clap_nsview nsView) {
+      assert(!_isFloating);
+#ifdef Q_OS_MACOS
+      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(nsView)));
+      if (_hostWindow) {
+         _quickView->setTransientParent(_hostWindow.get());
+         return true;
+      }
+#endif
+      return false;
+   }
+
+   bool Gui::setTransientWin32(clap_hwnd window) {
+      assert(!_isFloating);
+#ifdef Q_OS_WIN
+      _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(window)));
+      if (_hostWindow) {
+         _quickView->setTransientParent(_hostWindow.get());
+         return true;
+      }
+#endif
+      return false;
+   }
+
+   bool Gui::setTransientX11(clap_xwnd window) {
+#ifdef Q_OS_LINUX
+      qDebug() << "clap-gui: setTransientX11(" << window << ")";
+      _hostWindow.reset(QWindow::fromWinId(window));
+      if (_hostWindow) {
+         _quickView->setTransientParent(_hostWindow.get());
          return true;
       }
 #endif
@@ -160,8 +200,7 @@ namespace clap {
       if (!root)
          return false;
 
-      if (!wantsLogicalSize())
-      {
+      if (!wantsLogicalSize()) {
          auto ratio = _quickView->devicePixelRatio();
          width /= ratio;
          height /= ratio;
@@ -209,9 +248,8 @@ namespace clap {
       return true;
    }
 
-   void Gui::onQuickViewVisibilityChange(bool isVisible)
-   {
-      if (!isVisible && !_hostWindow)
+   void Gui::onQuickViewVisibilityChange(bool isVisible) {
+      if (!isVisible && _isFloating)
          _listener.onGuiWindowClosed(false);
    }
 
@@ -221,5 +259,6 @@ namespace clap {
       _hostWindow.reset();
       _transportProxy.reset();
       _pluginProxy.reset();
+      _isFloating = false;
    }
 } // namespace clap

@@ -153,8 +153,22 @@ namespace clap {
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
       _guiHandle->gui().setSkin(skinPath);
 
-      if (isFloating)
-         return _guiHandle->gui().openWindow();
+      if (isFloating) {
+         if (!_guiHandle->gui().openWindow())
+            return false;
+
+         if (!window)
+            return true;
+
+         if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
+            _guiHandle->gui().setTransientCocoa(window->cocoa);
+         else if (!strcmp(CLAP_WINDOW_API_WIN32, window->api))
+            _guiHandle->gui().setTransientWin32(window->win32);
+         else if (!strcmp(CLAP_WINDOW_API_X11, window->api))
+            _guiHandle->gui().setTransientX11(window->x11);
+
+         return true;
+      }
 
       if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
          return _guiHandle->gui().attachCocoa(window->cocoa);

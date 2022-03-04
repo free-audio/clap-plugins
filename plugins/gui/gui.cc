@@ -95,7 +95,7 @@ namespace clap {
       return false;
    }
 
-   bool Gui::attachWin32(clap_hwnd window) {
+   bool Gui::attachWin32(void *window) {
 #ifdef Q_OS_WIN
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(window)));
       if (_hostWindow) {
@@ -107,10 +107,10 @@ namespace clap {
       return false;
    }
 
-   bool Gui::attachX11(const char *displayName, unsigned long window) {
+   bool Gui::attachX11(unsigned long window) {
 #ifdef Q_OS_LINUX
       // TODO: check the displayName
-      qDebug() << "clap-gui: attachX11(" << displayName << ", " << window << ")";
+      qDebug() << "clap-gui: attachX11(" << window << ")";
       _hostWindow.reset(QWindow::fromWinId(window));
       if (_hostWindow) {
          _quickView->setParent(_hostWindow.get());

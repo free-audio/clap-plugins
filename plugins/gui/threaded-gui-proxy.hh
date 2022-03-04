@@ -24,8 +24,8 @@ namespace clap {
 
       bool openWindow() override;
       bool attachCocoa(void *nsView) override;
-      bool attachWin32(clap_hwnd window) override;
-      bool attachX11(const char *displayName, unsigned long window) override;
+      bool attachWin32(void *window) override;
+      bool attachX11(unsigned long window) override;
 
       bool canResize() override;
       bool getSize(uint32_t *width, uint32_t *height) override;

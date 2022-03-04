@@ -61,7 +61,7 @@ namespace clap {
       return succeed;
    }
 
-   bool ThreadedGuiProxy::attachWin32(clap_hwnd window) {
+   bool ThreadedGuiProxy::attachWin32(void *window) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _gui.get(),
@@ -70,11 +70,11 @@ namespace clap {
       return succeed;
    }
 
-   bool ThreadedGuiProxy::attachX11(const char *displayName, unsigned long window) {
+   bool ThreadedGuiProxy::attachX11(unsigned long window) {
       bool succeed = false;
       QMetaObject::invokeMethod(
          _gui.get(),
-         [=, this, &succeed] { succeed = _gui->attachX11(displayName, window); },
+         [=, this, &succeed] { succeed = _gui->attachX11(window); },
          Qt::BlockingQueuedConnection);
       return succeed;
    }

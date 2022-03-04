@@ -239,7 +239,7 @@ namespace clap {
          messages::AttachResponse rp{false};
          msg.get(rq);
          if (c)
-            rp.succeed = c->attachX11(rq.display, rq.window);
+            rp.succeed = c->attachX11(rq.window);
          _channel->sendResponseAsync(msg, rp);
          break;
       }

@@ -24,8 +24,8 @@ namespace clap {
 
       [[nodiscard]] virtual bool openWindow() = 0;
       [[nodiscard]] virtual bool attachCocoa(void *nsView) = 0;
-      [[nodiscard]] virtual bool attachWin32(clap_hwnd window) = 0;
-      [[nodiscard]] virtual bool attachX11(const char *displayName, unsigned long window) = 0;
+      [[nodiscard]] virtual bool attachWin32(void *window) = 0;
+      [[nodiscard]] virtual bool attachX11(unsigned long window) = 0;
 
       [[nodiscard]] virtual bool canResize() = 0;
       [[nodiscard]] virtual bool getSize(uint32_t *width, uint32_t *height) = 0;

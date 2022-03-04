@@ -103,8 +103,8 @@ namespace clap {
       // clap_plugin_gui //
       //-----------------//
       bool implementsGui() const noexcept override;
-      bool guiIsApiSupported(uint32_t api) noexcept override;
-      bool guiCreate(uint32_t api) noexcept override;
+      bool guiIsApiSupported(const char *api, bool isFloating) noexcept override;
+      bool guiCreate(const clap_window *window, bool isFloating) noexcept override;
       void guiDestroy() noexcept override;
       bool guiCanResize() const noexcept override { return true; }
       bool guiGetSize(uint32_t *width, uint32_t *height) noexcept override;
@@ -113,7 +113,6 @@ namespace clap {
       bool guiSetScale(double scale) noexcept override;
       bool guiShow() noexcept override;
       bool guiHide() noexcept override;
-      bool guiAttach(const clap_gui_window *parentWindow) noexcept override;
       void guiDefineParameters();
 
       //---------------------//

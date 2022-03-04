@@ -117,21 +117,15 @@ namespace clap {
 #endif
    }
 
-   bool CorePlugin::guiIsApiSupported(uint32_t api) noexcept {
-      switch (api) {
-      case CLAP_GUI_API_COCOA:
+   bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept {
 #if defined(CLAP_REMOTE_GUI)
-         return false;
+      return false;
 #else
-         return true;
+      return true;
 #endif
-
-      default:
-         return true;
-      }
    }
 
-   bool CorePlugin::guiCreate(uint32_t api) noexcept {
+   bool CorePlugin::guiCreate(const clap_window *window, bool isFloating) noexcept {
 #if defined(CLAP_PLUGINS_HEADLESS)
       return false;
 #else
@@ -155,7 +149,20 @@ namespace clap {
       auto skinPath = _pathProvider->getQmlSkinPath();
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
       _guiHandle->gui().setSkin(skinPath);
-      return true;
+
+      if (isFloating)
+         return _guiHandle->gui().openWindow();
+
+      if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
+         return _guiHandle->gui().attachCocoa(window->cocoa_nsview);
+
+      if (!strcmp(CLAP_WINDOW_API_WIN32, window->api))
+         return _guiHandle->gui().attachWin32(window->win32_window);
+
+      if (!strcmp(CLAP_WINDOW_API_X11, window->api))
+         return _guiHandle->gui().attachX11(window->x11_window);
+
+      return false;
 #endif
    }
 
@@ -206,36 +213,6 @@ namespace clap {
       if (!_guiHandle)
          return false;
       return _guiHandle->gui().hide();
-   }
-
-   bool CorePlugin::guiAttach(const clap_gui_window *parentWindow) noexcept {
-#if defined(CLAP_PLUGINS_HEADLESS)
-      return false;
-#else
-      if (!_guiHandle)
-         return false;
-
-      switch (parentWindow->api) {
-      case CLAP_GUI_API_COCOA:
-         return _guiHandle->gui().attachCocoa(
-            static_cast<const clap_gui_window_cocoa *>(parentWindow->specific)->nsView);
-
-      case CLAP_GUI_API_WIN32:
-         return _guiHandle->gui().attachWin32(
-            static_cast<const clap_gui_window_win32 *>(parentWindow->specific)->window);
-
-      case CLAP_GUI_API_X11: {
-         auto w = static_cast<const clap_gui_window_x11 *>(parentWindow->specific);
-         return _guiHandle->gui().attachX11(w->display, w->window);
-      }
-
-      case CLAP_GUI_API_FLOATING:
-         return _guiHandle->gui().openWindow();
-
-      default:
-         return false;
-      }
-#endif
    }
 
    //---------------------//

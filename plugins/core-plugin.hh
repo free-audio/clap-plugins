@@ -104,7 +104,9 @@ namespace clap {
       //-----------------//
       bool implementsGui() const noexcept override;
       bool guiIsApiSupported(const char *api, bool isFloating) noexcept override;
-      bool guiCreate(const clap_window *window, bool isFloating) noexcept override;
+      bool guiCreate(const char *api, bool isFloating) noexcept override;
+      bool guiSetParent(const clap_window *window) noexcept override;
+      bool guiSetTransient(const clap_window *window) noexcept override;
       void guiDestroy() noexcept override;
       bool guiCanResize() const noexcept override { return true; }
       bool guiGetSize(uint32_t *width, uint32_t *height) noexcept override;

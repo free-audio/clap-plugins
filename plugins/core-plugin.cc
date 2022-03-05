@@ -128,7 +128,7 @@ namespace clap {
 #endif
    }
 
-   bool CorePlugin::guiCreate(const clap_window *window, bool isFloating) noexcept {
+   bool CorePlugin::guiCreate(const char *api, bool isFloating) noexcept {
 #if defined(CLAP_PLUGINS_HEADLESS)
       return false;
 #else
@@ -153,23 +153,14 @@ namespace clap {
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
       _guiHandle->gui().setSkin(skinPath);
 
-      if (isFloating) {
-         if (!_guiHandle->gui().openWindow())
-            return false;
+      return true;
+#endif
+   }
 
-         if (!window)
-            return true;
-
-         if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
-            _guiHandle->gui().setTransientCocoa(window->cocoa);
-         else if (!strcmp(CLAP_WINDOW_API_WIN32, window->api))
-            _guiHandle->gui().setTransientWin32(window->win32);
-         else if (!strcmp(CLAP_WINDOW_API_X11, window->api))
-            _guiHandle->gui().setTransientX11(window->x11);
-
-         return true;
-      }
-
+   bool CorePlugin::guiSetParent(const clap_window *window) noexcept {
+#if defined(CLAP_PLUGINS_HEADLESS)
+      return false;
+#else
       if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
          return _guiHandle->gui().attachCocoa(window->cocoa);
 
@@ -180,6 +171,27 @@ namespace clap {
          return _guiHandle->gui().attachX11(window->x11);
 
       return false;
+#endif
+   }
+
+   bool CorePlugin::guiSetTransient(const clap_window *window) noexcept {
+#if defined(CLAP_PLUGINS_HEADLESS)
+      return false;
+#else
+      if (!_guiHandle->gui().openWindow())
+         return false;
+
+      if (!window)
+         return true;
+
+      if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
+         _guiHandle->gui().setTransientCocoa(window->cocoa);
+      else if (!strcmp(CLAP_WINDOW_API_WIN32, window->api))
+         _guiHandle->gui().setTransientWin32(window->win32);
+      else if (!strcmp(CLAP_WINDOW_API_X11, window->api))
+         _guiHandle->gui().setTransientX11(window->x11);
+
+      return true;
 #endif
    }
 

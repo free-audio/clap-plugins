@@ -9,4 +9,4 @@
 	url = ../../microsoft/vcpkg
 [submodule "yas"]
 	path = yas
-	url = git@github.com:niXman/yas.git
+	url = ../../niXman/yas.git

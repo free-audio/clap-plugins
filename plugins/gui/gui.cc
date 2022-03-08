@@ -131,7 +131,7 @@ namespace clap {
    }
 
    bool Gui::setTransientCocoa(clap_nsview nsView) {
-      assert(!_isFloating);
+      assert(_isFloating);
 #ifdef Q_OS_MACOS
       _hostWindow.reset(QWindow::fromWinId(reinterpret_cast<WId>(nsView)));
       if (_hostWindow) {

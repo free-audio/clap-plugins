@@ -273,7 +273,9 @@ namespace clap {
          _host.paramsRequestFlush();
    }
 
-   void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {}
+   void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {
+      _isGuiTransportSubscribed = isSubscribed;
+   }
 
    void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
       runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });

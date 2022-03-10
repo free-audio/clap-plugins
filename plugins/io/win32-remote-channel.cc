@@ -79,7 +79,7 @@ namespace clap {
 
       if (dwErrorCode == 0) {
          assert(c._isReceiving);
-         c._inputBuffer.wrote(dwNumberOfBytesTransfered);
+         c._inputBuffer.append(dwNumberOfBytesTransfered);
          c._isReceiving = false;
          c.processInput();
          c.tryReceive();
@@ -134,7 +134,7 @@ namespace clap {
       if (dwErrorCode == 0) {
          assert(c._isSending);
          auto &buffer = c._outputBuffers.front();
-         buffer.read(dwNumberOfBytesTransfered);
+         buffer.consume(dwNumberOfBytesTransfered);
          c._bytesSent += dwNumberOfBytesTransfered;
          if (c._bytesSent == c._bytesToSend) {
             c._bytesSent = 0;

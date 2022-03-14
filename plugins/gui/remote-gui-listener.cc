@@ -12,9 +12,20 @@ namespace clap {
 
    void RemoteGuiListener::onGuiPoll() {}
 
-   void RemoteGuiListener::onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) {
+   void RemoteGuiListener::onGuiParamBeginAdjust(clap_id paramId) {
+      messages::ParamBeginAdjustRequest rq;
+      rq.paramId = paramId;
+      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+   }
+
+   void RemoteGuiListener::onGuiParamEndAdjust(clap_id paramId) {
+      messages::ParamEndAdjustRequest rq;
+      rq.paramId = paramId;
+      _clientFactory._channel->sendRequestAsync(_clientId, rq);
+   }
+
+   void RemoteGuiListener::onGuiParamAdjust(clap_id paramId, double value) {
       messages::ParamAdjustRequest rq;
-      rq.flags = flags;
       rq.paramId = paramId;
       rq.value = value;
       _clientFactory._channel->sendRequestAsync(_clientId, rq);

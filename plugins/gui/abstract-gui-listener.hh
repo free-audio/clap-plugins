@@ -14,7 +14,10 @@ namespace clap {
       // the plugin shall transmit them via
       virtual void onGuiPoll() = 0;
 
-      virtual void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) = 0;
+      virtual void onGuiParamBeginAdjust(clap_id paramId) = 0;
+      virtual void onGuiParamAdjust(clap_id paramId, double value) = 0;
+      virtual void onGuiParamEndAdjust(clap_id paramId) = 0;
+
       virtual void onGuiSetTransportIsSubscribed(bool isSubscribed) = 0;
 
       virtual void onGuiWindowClosed(bool wasDestroyed) = 0;

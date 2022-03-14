@@ -37,9 +37,10 @@ namespace clap {
          return;
 
       _isAdjusting = isAdjusting;
-      uint32_t flags = CLAP_EVENT_SHOULD_RECORD;
-      flags |= isAdjusting ? CLAP_EVENT_BEGIN_ADJUST : CLAP_EVENT_END_ADJUST;
-      _client.guiListener().onGuiParamAdjust(_id, _value, flags);
+      if (isAdjusting)
+         _client.guiListener().onGuiParamBeginAdjust(_id);
+      else
+         _client.guiListener().onGuiParamEndAdjust(_id);
       emit isAdjustingChanged();
    }
 
@@ -50,7 +51,7 @@ namespace clap {
 
       _value = value;
 
-      _client.guiListener().onGuiParamAdjust(_id, _value, CLAP_EVENT_SHOULD_RECORD);
+      _client.guiListener().onGuiParamAdjust(_id, _value);
       emit valueChanged();
       emit finalValueChanged();
    }

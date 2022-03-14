@@ -240,11 +240,26 @@ namespace clap {
       assert(msg.header.clientId == _clientId);
 
       switch (msg.header.type) {
+      case messages::kParamBeginAdjustRequest: {
+         messages::ParamBeginAdjustRequest rq;
+         msg.get(rq);
+         _listener.onGuiParamBeginAdjust(rq.paramId);
+         break;
+      }
+
+      case messages::kParamEndAdjustRequest: {
+         messages::ParamEndAdjustRequest rq;
+         msg.get(rq);
+         _listener.onGuiParamEndAdjust(rq.paramId);
+         break;
+      }
+
       case messages::kParamAdjustRequest: {
          messages::ParamAdjustRequest rq;
          msg.get(rq);
-         _listener.onGuiParamAdjust(rq.paramId, rq.value, rq.flags);
+         _listener.onGuiParamAdjust(rq.paramId, rq.value);
          break;
+      }
 
       case messages::kSubscribeToTransportRequest: {
          messages::SubscribeToTransportRequest rq;
@@ -258,7 +273,6 @@ namespace clap {
          msg.get(notification);
          _listener.onGuiWindowClosed(notification.wasDestroyed);
          break;
-      }
       }
       }
    }

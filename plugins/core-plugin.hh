@@ -96,8 +96,8 @@ namespace clap {
       // clap_plugin_state //
       //-------------------//
       bool implementsState() const noexcept override { return true; }
-      bool stateSave(clap_ostream *stream) noexcept override;
-      bool stateLoad(clap_istream *stream) noexcept override;
+      bool stateSave(const clap_ostream *stream) noexcept override;
+      bool stateLoad(const clap_istream *stream) noexcept override;
 
       //-----------------//
       // clap_plugin_gui //
@@ -121,7 +121,9 @@ namespace clap {
       // AbstractGuiListener //
       //---------------------//
       void onGuiPoll() override;
-      void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
+      void onGuiParamBeginAdjust(clap_id paramId) override;
+      void onGuiParamAdjust(clap_id paramId, double value) override;
+      void onGuiParamEndAdjust(clap_id paramId) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
       void onGuiWindowClosed(bool wasDestroyed) override;
 
@@ -150,10 +152,12 @@ namespace clap {
       uint32_t
       processEvents(const clap_process *process, uint32_t &index, uint32_t count, uint32_t time);
 
-      struct GuiToPluginValue {
+      struct GuiToPluginEvent {
+         enum Type : uint8_t { Begin, Value, End };
+
          clap_id paramId;
+         Type type;
          double value;
-         uint32_t flags;
       };
 
       struct PluginToGuiValue {
@@ -161,7 +165,9 @@ namespace clap {
          double mod;
       };
 
-      helpers::ParamQueue<GuiToPluginValue, 32> _guiToPluginQueue;
+      void pushGuiToPluginEvent(const GuiToPluginEvent& event);
+
+      helpers::ParamQueue<GuiToPluginEvent, 32> _guiToPluginQueue;
       helpers::ReducingParamQueue<clap_id, PluginToGuiValue> _pluginToGuiQueue;
 
       std::unique_ptr<PathProvider> _pathProvider;

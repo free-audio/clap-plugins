@@ -87,7 +87,7 @@ namespace clap {
 
    bool CorePlugin::audioPortsSetConfig(clap_id config_id) noexcept { return false; }
 
-   bool CorePlugin::stateSave(clap_ostream *stream) noexcept {
+   bool CorePlugin::stateSave(const clap_ostream *stream) noexcept {
       try {
          ClapOStream os(stream);
          yas::binary_oarchive<ClapOStream> ar(os);
@@ -98,7 +98,7 @@ namespace clap {
       return true;
    }
 
-   bool CorePlugin::stateLoad(clap_istream *stream) noexcept {
+   bool CorePlugin::stateLoad(const clap_istream *stream) noexcept {
       try {
          ClapIStream is(stream);
          yas::binary_iarchive<ClapIStream> ar(is);
@@ -258,11 +258,9 @@ namespace clap {
       }
    }
 
-   void CorePlugin::onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) {
-      GuiToPluginValue item{paramId, value, flags};
-
+   void CorePlugin::pushGuiToPluginEvent(const GuiToPluginEvent &event) {
       // very highly likely to succeed
-      while (!_guiToPluginQueue.tryPush(item)) {
+      while (!_guiToPluginQueue.tryPush(event)) {
          if (_host.canUseParams())
             _host.paramsRequestFlush();
 
@@ -275,6 +273,21 @@ namespace clap {
 
    void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {
       _isGuiTransportSubscribed = isSubscribed;
+   }
+
+   void CorePlugin::onGuiParamBeginAdjust(clap_id paramId) {
+      GuiToPluginEvent item{paramId, GuiToPluginEvent::Begin, 0};
+      pushGuiToPluginEvent(item);
+   }
+
+   void CorePlugin::onGuiParamEndAdjust(clap_id paramId) {
+      GuiToPluginEvent item{paramId, GuiToPluginEvent::End, 0};
+      pushGuiToPluginEvent(item);
+   }
+
+   void CorePlugin::onGuiParamAdjust(clap_id paramId, double value) {
+      GuiToPluginEvent item{paramId, GuiToPluginEvent::Value, value};
+      pushGuiToPluginEvent(item);
    }
 
    void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
@@ -337,7 +350,7 @@ namespace clap {
    }
 
    void CorePlugin::processGuiParameterChange(const clap_output_events *out) {
-      GuiToPluginValue value;
+      GuiToPluginEvent value;
       while (_guiToPluginQueue.tryPeek(value)) {
          auto p = _parameters.getById(value.paramId);
          if (!p)
@@ -348,20 +361,41 @@ namespace clap {
          else
             p->setValueImmediately(value.value);
 
-         clap_event_param_value ev;
-         ev.header.time = 0;
-         ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-         ev.header.type = CLAP_EVENT_PARAM_VALUE;
-         ev.header.size = sizeof(ev);
-         ev.header.flags = value.flags;
-         ev.param_id = value.paramId;
-         ev.value = value.value;
-         ev.channel = -1;
-         ev.key = -1;
-         ev.cookie = p;
+         switch (value.type) {
+         case GuiToPluginEvent::Value: {
+            clap_event_param_value ev;
+            ev.header.time = 0;
+            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            ev.header.type = CLAP_EVENT_PARAM_VALUE;
+            ev.header.size = sizeof(ev);
+            ev.header.flags = 0;
+            ev.param_id = value.paramId;
+            ev.value = value.value;
+            ev.channel = -1;
+            ev.key = -1;
+            ev.cookie = p;
 
-         if (!out->try_push(out, &ev.header))
+            if (!out->try_push(out, &ev.header))
+               return;
             break;
+         }
+
+         case GuiToPluginEvent::Begin:
+         case GuiToPluginEvent::End: {
+            clap_event_param_gesture ev;
+            ev.header.time = 0;
+            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+            ev.header.type = value.type == GuiToPluginEvent::Begin ? CLAP_EVENT_PARAM_GESTURE_BEGIN : CLAP_EVENT_PARAM_GESTURE_END;
+            ev.header.size = sizeof(ev);
+            ev.header.flags = 0;
+            ev.param_id = value.paramId;
+            ev.cookie = p;
+
+            if (!out->try_push(out, &ev.header))
+               return;
+            break;
+         }
+         }
 
          _guiToPluginQueue.consume();
       }

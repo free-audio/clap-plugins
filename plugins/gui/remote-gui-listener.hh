@@ -15,7 +15,9 @@ namespace clap {
 
       void onGuiPoll() override;
 
-      void onGuiParamAdjust(clap_id paramId, double value, uint32_t flags) override;
+      void onGuiParamBeginAdjust(clap_id paramId) override;
+      void onGuiParamAdjust(clap_id paramId, double value) override;
+      void onGuiParamEndAdjust(clap_id paramId) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
 
       void onGuiWindowClosed(bool wasDestroyed) override;

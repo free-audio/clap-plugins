@@ -20,7 +20,9 @@ namespace clap::messages {
       kUpdateTransportRequest,
 
       // GUI->DSP
+      kParamBeginAdjustRequest,
       kParamAdjustRequest,
+      kParamEndAdjustRequest,
       kSubscribeToTransportRequest,
 
       // Gui, Host->Plugin
@@ -89,7 +91,18 @@ namespace clap::messages {
 
       clap_id paramId;
       double value;
-      uint32_t flags;
+   };
+
+   struct ParamBeginAdjustRequest final {
+      static const constexpr Type type = clap::messages::kParamBeginAdjustRequest;
+
+      clap_id paramId;
+   };
+
+   struct ParamEndAdjustRequest final {
+      static const constexpr Type type = clap::messages::kParamEndAdjustRequest;
+
+      clap_id paramId;
    };
 
    struct DefineParameterRequest final {

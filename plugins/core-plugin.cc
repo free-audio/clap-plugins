@@ -389,7 +389,6 @@ namespace clap {
             ev.header.size = sizeof(ev);
             ev.header.flags = 0;
             ev.param_id = value.paramId;
-            ev.cookie = p;
 
             if (!out->try_push(out, &ev.header))
                return;

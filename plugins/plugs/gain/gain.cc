@@ -36,8 +36,8 @@ namespace clap {
          nullptr,
          "gain",
          "/",
-         -1,
-         1,
+         -40,
+         40,
          0,
       });
    }
@@ -74,12 +74,28 @@ namespace clap {
    clap_process_status Gain::process(const clap_process *process) noexcept {
       float **in = process->audio_inputs[0].data32;
       float **out = process->audio_outputs[0].data32;
+      const uint32_t evCount = process->in_events->size(process->in_events);
+      uint32_t nextEvIndex = 0;
+      uint32_t N = process->frames_count;
 
-      float k = 1;
-      for (int i = 0; i < process->frames_count; ++i) {
-         for (int c = 0; c < _channelCount; ++c)
-            out[c][i] = k * in[c][i];
+      processGuiEvents(process);
+
+      /* foreach frames */
+      for (uint32_t i = 0; i < process->frames_count;) {
+
+         N = processEvents(process, nextEvIndex, evCount, i);
+
+         /* Process as many samples as possible until the next event */
+         for (; i < N; ++i) {
+            const float gaindB = _gainParam->step();
+            const float gain = std::pow(10.0, gaindB / 20.0);
+
+            for (int c = 0; c < _channelCount; ++c)
+               out[c][i] = gain * in[c][i];
+         }
       }
+
+      _pluginToGuiQueue.producerDone();
 
       return CLAP_PROCESS_CONTINUE_IF_NOT_QUIET;
    }

@@ -21,5 +21,6 @@ namespace clap {
 
    private:
       int _channelCount = 1;
+      Parameter *_gainParam = nullptr;
    };
 } // namespace clap

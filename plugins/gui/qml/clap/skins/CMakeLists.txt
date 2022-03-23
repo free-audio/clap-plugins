@@ -5,5 +5,6 @@ qt6_add_qml_module(clap-qml-skins
         RESOURCE_PREFIX /qml
         QML_FILES
                 dc-offset/main.qml
+                gain/main.qml
                 transport-info/main.qml
 )

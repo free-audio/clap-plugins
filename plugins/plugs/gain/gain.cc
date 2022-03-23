@@ -37,6 +37,8 @@ namespace clap {
          40,
          0,
       });
+
+      _gainParam = _parameters.getById(kParamIdGain);
    }
 
    bool Gain::init() noexcept {

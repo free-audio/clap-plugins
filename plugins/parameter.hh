@@ -17,9 +17,10 @@ namespace clap {
       Parameter &operator=(const Parameter &) = delete;
       Parameter &operator=(Parameter &&) = delete;
 
-      const double value() const noexcept { return _value; }
-      const double modulation() const noexcept { return _modulation; }
-      const double modulatedValue() const noexcept { return _value + _modulation; }
+      double value() const noexcept { return _value; }
+      double modulation() const noexcept { return _modulation; }
+      double modulatedValue() const noexcept { return _value + _modulation; }
+
       const clap_param_info &info() const noexcept { return _info; }
 
       void setDefaultValue() {
@@ -93,5 +94,8 @@ namespace clap {
 
       uint16_t _valueSteps = 0;
       uint16_t _modulationSteps = 0;
+
+      double _modulatedValue = 0;
+      double _convertedModulatedValue = 0;
    };
 } // namespace clap

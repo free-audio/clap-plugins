@@ -3,22 +3,20 @@
 #include "../core-plugin.hh"
 
 namespace clap {
-   class DcOffset final : public CorePlugin {
+   class CharCheck final : public CorePlugin {
    private:
       using super = CorePlugin;
 
    public:
-      DcOffset(const std::string& pluginPath, const clap_host *host);
+      CharCheck(const std::string &pluginPath, const clap_host *host);
 
       static const clap_plugin_descriptor *descriptor();
 
    protected:
-      bool init() noexcept override;
-      void defineAudioPorts() noexcept;
+      void addDumbParam(const char *name);
       clap_process_status process(const clap_process *process) noexcept override;
 
    private:
-      int _channelCount = 2;
-      Parameter *_offsetParam = nullptr;
+      clap_id _nextParamId = 0;
    };
 } // namespace clap

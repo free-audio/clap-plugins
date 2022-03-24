@@ -7,4 +7,5 @@ qt6_add_qml_module(clap-qml-skins
                 dc-offset/main.qml
                 gain/main.qml
                 transport-info/main.qml
+                char-check/main.qml
 )

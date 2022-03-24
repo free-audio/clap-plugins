@@ -10,6 +10,7 @@
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/gain/gain.hh"
 #include "plugs/transport/transport-info.hh"
+#include "plugs/char-check/char-check.hh"
 
 struct PluginEntry {
    using create_func = std::function<const clap_plugin *(const clap_host *)>;
@@ -38,6 +39,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::DcOffset>();
    addPlugin<clap::TransportInfo>();
    addPlugin<clap::Gain>();
+   addPlugin<clap::CharCheck>();
    return true;
 }
 

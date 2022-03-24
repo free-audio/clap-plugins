@@ -34,7 +34,9 @@ add_library(
   plugs/gain/gain.hh
   plugs/gain/gain.cc
   plugs/transport/transport-info.hh
-  plugs/transport/transport-info.cc)
+  plugs/transport/transport-info.cc
+  plugs/char-check/char-check.hh
+  plugs/char-check/char-check.cc)
 
 if(NOT CLAP_PLUGINS_HEADLESS)
   if(CLAP_PLUGINS_REMOTE_GUI)

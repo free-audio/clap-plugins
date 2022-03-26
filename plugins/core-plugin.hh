@@ -185,6 +185,7 @@ namespace clap {
       std::shared_ptr<AbstractGuiFactory> _guiFactory;
       std::unique_ptr<GuiHandle> _guiHandle;
 
+      std::vector<std::unique_ptr<Module>> _modules;
       Parameters _parameters;
 
       static const constexpr uint32_t _paramSmoothingDuration = 64;

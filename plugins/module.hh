@@ -5,6 +5,8 @@
 
 #include <clap/clap.h>
 
+#include "parameter.hh"
+
 namespace clap {
    class CorePlugin;
    class Module {

@@ -26,6 +26,11 @@ add_library(
   core-plugin.cc
   stream-helper.hh
 
+  module.hh
+  module.cc
+  modules/adsr-module.hh
+  modules/adsr-module.cc
+
   path-provider.hh
   path-provider.cc
 

@@ -20,9 +20,11 @@ namespace clap {
 
    class AbstractGui;
    class AbstractGuiFactory;
+   class Module;
 
    class CorePlugin : public PluginGlue, public AbstractGuiListener {
       using super = PluginGlue;
+      friend class Module;
 
    public:
       CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,

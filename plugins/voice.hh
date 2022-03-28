@@ -5,6 +5,8 @@
 namespace clap {
    class Voice {
    public:
+      static constexpr const uint32_t max_voices = 16;
+
       [[nodiscard]] uint32_t voiceIndex() const noexcept;
       [[nodiscard]] bool isAssigned() const noexcept;
 

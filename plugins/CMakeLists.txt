@@ -17,6 +17,7 @@ endif()
 
 add_library(
   clap-plugins MODULE
+
   clap-entry.cc
   parameters.cc
   parameters.hh
@@ -25,9 +26,11 @@ add_library(
   core-plugin.hh
   core-plugin.cc
   stream-helper.hh
-
+  voice.hh
   module.hh
   module.cc
+  smoothed-value.hh
+
   modules/adsr-module.hh
   modules/adsr-module.cc
 

@@ -60,8 +60,5 @@ namespace clap {
 
       SmoothedValue _value;
       SmoothedValue _modulation;
-
-      double _modulatedValue = 0;
-      double _convertedModulatedValue = 0;
    };
 } // namespace clap

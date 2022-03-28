@@ -1,6 +1,5 @@
 #include <cstring>
 
-#include "../../parameter-interpolator.hh"
 #include "char-check.hh"
 
 namespace clap {

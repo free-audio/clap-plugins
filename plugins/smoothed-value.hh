@@ -6,22 +6,23 @@
 
 namespace clap {
    class SmoothedValue {
+   public:
       double value() const noexcept { return _value; }
 
-      void setValueImmediately(double val) {
+      void setImmediately(double val) noexcept {
          _value = val;
          _ramp = 0;
          _steps = 0;
       }
 
-      void setValueSmoothed(double val, uint16_t steps) {
+      void setSmoothed(double val, uint16_t steps) noexcept {
          assert(steps > 0);
          _ramp = (val - _value) / steps;
          _steps = steps;
       }
 
       // Advances the value by 1 samples and return the new value + modulation
-      double step() {
+      double step() noexcept {
          if (_steps > 0) [[unlikely]] {
             _value += _ramp;
             --_steps;
@@ -31,7 +32,7 @@ namespace clap {
       }
 
       // Advances the value by n samples and return the new value + modulation
-      double step(uint32_t n) {
+      double step(uint32_t n) noexcept {
          if (_steps > 0) [[unlikely]] {
             auto k = std::min<uint32_t>(_steps, n);
             _value += k * _ramp;

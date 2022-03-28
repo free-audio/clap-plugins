@@ -22,7 +22,6 @@ add_library(
   parameters.cc
   parameters.hh
   parameter.hh
-  parameter-interpolator.hh
   core-plugin.hh
   core-plugin.cc
   stream-helper.hh

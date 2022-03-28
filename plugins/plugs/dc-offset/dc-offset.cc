@@ -1,6 +1,5 @@
 #include <cstring>
 
-#include "../../parameter-interpolator.hh"
 #include "dc-offset.hh"
 
 namespace clap {

@@ -1,6 +1,5 @@
 #include <cstring>
 
-#include "../../parameter-interpolator.hh"
 #include "transport-info.hh"
 
 namespace clap {

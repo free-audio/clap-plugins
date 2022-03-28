@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -5,7 +7,7 @@
 
 #include <clap/clap.h>
 
-#include "parameter-interpolator.hh"
+#include "smoothed-value.hh"
 
 namespace clap {
    class Parameter {
@@ -17,83 +19,47 @@ namespace clap {
       Parameter &operator=(const Parameter &) = delete;
       Parameter &operator=(Parameter &&) = delete;
 
-      double value() const noexcept { return _value; }
-      double modulation() const noexcept { return _modulation; }
-      double modulatedValue() const noexcept { return _value + _modulation; }
+      double value() const noexcept { return _value.value(); }
+      double modulation() const noexcept { return _modulation.value(); }
+      double modulatedValue() const noexcept { return _value.value() + _modulation.value(); }
 
       const clap_param_info &info() const noexcept { return _info; }
 
       void setDefaultValue() {
-         _value = _info.default_value;
-         _modulation = 0;
+         _value.setImmediately(_info.default_value);
+         _modulation.setImmediately(0);
       }
 
-      void setValueImmediately(double val) {
-         _value = val;
-         _valueRamp = 0;
-         _valueSteps = 0;
+      void setValueImmediately(double val) noexcept {
+         _value.setImmediately(val);
       }
       void setModulationImmediately(double mod) {
-         _modulation = mod;
-         _modulationRamp = 0;
-         _modulationSteps = 0;
+         _modulation.setImmediately(mod);
       }
 
-      void setValueSmoothed(double val, uint16_t steps) {
-         assert(steps > 0);
-         _valueRamp = (val - _value) / steps;
-         _valueSteps = steps;
+      void setValueSmoothed(double val, uint16_t steps) noexcept {
+         _value.setSmoothed(val, steps);
       }
 
-      void setModulationSmoothed(double mod, uint16_t steps) {
-         assert(steps > 0);
-         _modulationRamp = (mod - _modulation) / steps;
-         _modulationSteps = steps;
+      void setModulationSmoothed(double mod, uint16_t steps) noexcept {
+         _modulation.setSmoothed(mod, steps);
       }
 
       // Advances the value by 1 samples and return the new value + modulation
-      double step() {
-         if (_valueSteps > 0) [[unlikely]] {
-            _value += _valueRamp;
-            --_valueSteps;
-         }
-
-         if (_modulationSteps > 0) [[unlikely]] {
-            _modulation += _modulationRamp;
-            --_modulationSteps;
-         }
-
-         return _value + _modulation;
+      double step() noexcept {
+         return _value.step() + _modulation.step();
       }
 
       // Advances the value by n samples and return the new value + modulation
       double step(uint32_t n) {
-         if (_valueSteps > 0) [[unlikely]] {
-            auto k = std::min<uint32_t>(_valueSteps, n);
-            _value += k * _valueRamp;
-            _valueSteps -= k;
-         }
-
-         if (_modulationSteps > 0) [[unlikely]] {
-            auto k = std::min<uint32_t>(_valueSteps, n);
-            _modulation += k * _modulationRamp;
-            _modulationSteps -= k;
-         }
-
-         return _value + _modulation;
+         return _value.step(n) + _modulation.step(n);
       }
 
    private:
       clap_param_info _info;
 
-      double _value = 0;
-      double _modulation = 0;
-
-      double _valueRamp = 0;
-      double _modulationRamp = 0;
-
-      uint16_t _valueSteps = 0;
-      uint16_t _modulationSteps = 0;
+      SmoothedValue _value;
+      SmoothedValue _modulation;
 
       double _modulatedValue = 0;
       double _convertedModulatedValue = 0;

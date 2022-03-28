@@ -9,7 +9,6 @@
 
 #include <clap/clap.h>
 
-#include "parameter-interpolator.hh"
 #include "parameter.hh"
 
 namespace clap {

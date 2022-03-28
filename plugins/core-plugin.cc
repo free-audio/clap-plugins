@@ -11,6 +11,7 @@
 #include <clap/helpers/plugin.hxx>
 
 #include "core-plugin.hh"
+#include "module.hh"
 #include "stream-helper.hh"
 
 #include "gui/abstract-gui.hh"

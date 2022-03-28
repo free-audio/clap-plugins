@@ -29,6 +29,7 @@ add_library(
   module.hh
   module.cc
   smoothed-value.hh
+  domain-converter.hh
 
   modules/adsr-module.hh
   modules/adsr-module.cc

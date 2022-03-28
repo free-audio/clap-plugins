@@ -76,8 +76,6 @@ namespace clap {
       const uint32_t evCount = process->in_events->size(process->in_events);
       uint32_t nextEvIndex = 0;
       uint32_t N = process->frames_count;
-      double lastGaindB = 0;
-      double gain = 1;
 
       processGuiEvents(process);
 
@@ -88,11 +86,8 @@ namespace clap {
 
          /* Process as many samples as possible until the next event */
          for (; i < N; ++i) {
-            const float gaindB = _gainParam->step();
-            if (lastGaindB != gaindB) [[unlikely]] {
-               lastGaindB = gaindB;
-               gain = std::pow(10.0, gaindB / 20.0);
-            }
+            const double gaindB = _gainParam->step();
+            const float gain = _gainConv.convert(gaindB);
 
             for (int c = 0; c < _channelCount; ++c)
                out[c][i] = gain * in[c][i];

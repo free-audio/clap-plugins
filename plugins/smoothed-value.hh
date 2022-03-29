@@ -7,6 +7,9 @@
 namespace clap {
    class SmoothedValue {
    public:
+      SmoothedValue() = default;
+      explicit SmoothedValue(double v) : _value(v) {}
+
       double value() const noexcept { return _value; }
 
       void setImmediately(double val) noexcept {
@@ -15,7 +18,7 @@ namespace clap {
          _steps = 0;
       }
 
-      void setSmoothed(double val, uint16_t steps) noexcept {
+      void setSmoothed(double val, uint32_t steps) noexcept {
          assert(steps > 0);
          _ramp = (val - _value) / steps;
          _steps = steps;
@@ -45,6 +48,6 @@ namespace clap {
    private:
       double _value = 0;
       double _ramp = 0;
-      uint16_t _steps = 0;
+      uint32_t _steps = 0;
    };
 } // namespace clap

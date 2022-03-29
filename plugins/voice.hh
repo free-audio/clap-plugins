@@ -2,10 +2,18 @@
 
 #include <cstdint>
 
+#include "smoothed-value.hh"
+
 namespace clap {
    class Voice {
    public:
       static constexpr const uint32_t max_voices = 16;
+
+      Voice(uint32_t voiceIndex) : _voiceIndex(voiceIndex) {}
+      Voice(const Voice &) = delete;
+      Voice(Voice &&) = delete;
+      Voice &operator=(const Voice &) = delete;
+      Voice &operator=(Voice &&) = delete;
 
       [[nodiscard]] uint32_t voiceIndex() const noexcept;
       [[nodiscard]] bool isAssigned() const noexcept;
@@ -30,5 +38,14 @@ namespace clap {
    private:
       const uint32_t _voiceIndex;
       bool _isAssigned = false;
+
+      double _velocity;
+      SmoothedValue _pitch;
+      SmoothedValue _brigthness;
+      SmoothedValue _pressure;
+      SmoothedValue _vibrato;
+      SmoothedValue _expression;
+      SmoothedValue _gain;
+      SmoothedValue _pan;
    };
 } // namespace clap

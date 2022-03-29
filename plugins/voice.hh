@@ -35,6 +35,8 @@ namespace clap {
       [[nodiscard]] double gain() const noexcept;
       [[nodiscard]] double pan() const noexcept;
 
+      void reset() noexcept;
+
    private:
       const uint32_t _voiceIndex;
       bool _isAssigned = false;

@@ -18,33 +18,35 @@ endif()
 add_library(
   clap-plugins MODULE
 
+  audio-buffer.hh
   clap-entry.cc
+  core-plugin.cc
+  core-plugin.hh
+  domain-converter.hh
+  modulation-matrix.hh
+  module.cc
+  module.hh
+  modules/adsr-module.cc
+  modules/adsr-module.hh
+  modules/root-module.hh
+  modules/voice-module.hh
+  parameter.hh
   parameters.cc
   parameters.hh
-  parameter.hh
-  core-plugin.hh
-  core-plugin.cc
+  path-provider.cc
+  path-provider.hh
+  plugs/char-check/char-check.cc
+  plugs/char-check/char-check.hh
+  plugs/dc-offset/dc-offset.cc
+  plugs/dc-offset/dc-offset.hh
+  plugs/gain/gain.cc
+  plugs/gain/gain.hh
+  plugs/transport/transport-info.cc
+  plugs/transport/transport-info.hh
+  smoothed-value.hh
   stream-helper.hh
   voice.hh
-  module.hh
-  module.cc
-  smoothed-value.hh
-  domain-converter.hh
-
-  modules/adsr-module.hh
-  modules/adsr-module.cc
-
-  path-provider.hh
-  path-provider.cc
-
-  plugs/dc-offset/dc-offset.hh
-  plugs/dc-offset/dc-offset.cc
-  plugs/gain/gain.hh
-  plugs/gain/gain.cc
-  plugs/transport/transport-info.hh
-  plugs/transport/transport-info.cc
-  plugs/char-check/char-check.hh
-  plugs/char-check/char-check.cc)
+  )
 
 if(NOT CLAP_PLUGINS_HEADLESS)
   if(CLAP_PLUGINS_REMOTE_GUI)

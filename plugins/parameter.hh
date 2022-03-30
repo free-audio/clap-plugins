@@ -9,6 +9,7 @@
 
 #include <clap/clap.h>
 
+#include "audio-buffer.hh"
 #include "smoothed-value.hh"
 #include "voice.hh"
 
@@ -67,9 +68,15 @@ namespace clap {
          return v.hasModulation ? v.modulation : _modulation;
       }
 
+      [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
+      void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }
+
    private:
       clap_param_info _info;
 
+      bool _hasGuiOverride = false;
+
+      std::unique_ptr<AudioBuffer<double>> _valueBuffer;
       SmoothedValue _value;
       SmoothedValue _modulation;
 

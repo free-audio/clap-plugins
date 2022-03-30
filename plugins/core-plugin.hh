@@ -40,6 +40,7 @@ namespace clap {
       //-------------//
       bool init() noexcept override;
       void initTrackInfo() noexcept;
+      clap_process_status process(const clap_process *process) noexcept override;
 
       //------------------------//
       // clap_plugin_track_info //
@@ -167,7 +168,7 @@ namespace clap {
          double mod;
       };
 
-      void pushGuiToPluginEvent(const GuiToPluginEvent& event);
+      void pushGuiToPluginEvent(const GuiToPluginEvent &event);
 
       helpers::ParamQueue<GuiToPluginEvent, 32> _guiToPluginQueue;
       helpers::ReducingParamQueue<clap_id, PluginToGuiValue> _pluginToGuiQueue;

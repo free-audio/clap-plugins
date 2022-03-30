@@ -295,6 +295,16 @@ namespace clap {
       runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
    }
 
+   // Design:
+   // - divide the block into chunks of up to N=256 frames
+   // - render global parameters to audio buffers
+   // - run the voice management:
+   //   - prepare voice event queues
+   //   - run the voices and eventually in parallel
+   clap_process_status CorePlugin::process(const clap_process *process) noexcept {
+      return CLAP_PROCESS_SLEEP;
+   }
+
    void CorePlugin::processInputParameterChange(const clap_event_header *hdr) {
       if (hdr->space_id == CLAP_CORE_EVENT_SPACE_ID) {
          switch (hdr->type) {

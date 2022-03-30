@@ -10,6 +10,7 @@
 #include <clap/clap.h>
 
 #include "audio-buffer.hh"
+#include "intrusive-list.hh"
 #include "smoothed-value.hh"
 #include "voice.hh"
 
@@ -80,7 +81,11 @@ namespace clap {
       SmoothedValue _value;
       SmoothedValue _modulation;
 
+      IntrusiveListHook<Parameter> _valueToProcessHook;
+      IntrusiveListHook<Parameter> _modulationToProcessHook;
+
       struct VoiceData {
+         Parameter &param;
          bool hasValue;
          bool hasModulation;
          SmoothedValue value;
@@ -88,8 +93,8 @@ namespace clap {
 
          // When a parameter diverge, it should then be put into the linked list of parameters that
          // diverged in order to be reset when the voice ends
-         Parameter *valueToResetHook;
-         Parameter *modulationToResetHook;
+         IntrusiveListHook<VoiceData> valueToResetHook;
+         IntrusiveListHook<VoiceData> modulationToResetHook;
       };
 
       Voices<VoiceData> _voices;

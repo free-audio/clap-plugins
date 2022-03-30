@@ -10,6 +10,7 @@
 #include "gui/abstract-gui-listener.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
+#include "intrusive-list.hh"
 
 namespace clap {
 
@@ -25,6 +26,8 @@ namespace clap {
    class CorePlugin : public PluginGlue, public AbstractGuiListener {
       using super = PluginGlue;
       friend class Module;
+
+      static const constexpr uint32_t max_frames = 256;
 
    public:
       CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
@@ -187,6 +190,7 @@ namespace clap {
       std::unique_ptr<GuiHandle> _guiHandle;
 
       Parameters _parameters;
+      IntrusiveList<Parameter, &Parameter::VoiceData::valueToResetHook> _parametersToReset;
 
       static const constexpr uint32_t _paramSmoothingDuration = 64;
 

@@ -45,6 +45,15 @@ namespace clap {
          return _value;
       }
 
+      [[nodiscard]] bool isSmoothing() const noexcept { return _steps > 0; }
+
+      void render(double *buffer, uint32_t numValues, uint32_t stepSize) noexcept
+      {
+         buffer[0] = _value;
+         for (uint32_t i = 1; i < numValues; ++i)
+            buffer[i] = step(stepSize);
+      }
+
    private:
       double _value = 0;
       double _ramp = 0;

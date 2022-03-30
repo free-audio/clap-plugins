@@ -45,13 +45,17 @@ namespace clap {
          return CLAP_PROCESS_SLEEP;
       }
       [[nodiscard]] virtual bool shouldProcessVoices() const noexcept { return false; }
-      [[nodiscard]] virtual clap_process_status processVoice(const clap_process *process,
-                                                             uint32_t voiceIndex) noexcept {
+      [[nodiscard]] virtual clap_process_status processVoice(uint32_t voiceIndex, const clap_process *process) noexcept {
          return CLAP_PROCESS_SLEEP;
       }
       /** \} */
 
    protected:
+      [[nodiscard]] virtual bool wantsNoteEvents() const noexcept { return false; }
+      virtual void onNoteOn(int32_t voiceIndex, const clap_event_note& note) noexcept {}
+      virtual void onNoteOff(int32_t voiceIndex, const clap_event_note& note) noexcept {}
+      virtual void onNoteChoke(int32_t voiceIndex, const clap_event_note& note) noexcept {}
+
       CorePlugin &_plugin;
       const std::string _name;
       const clap_id _paramIdStart;

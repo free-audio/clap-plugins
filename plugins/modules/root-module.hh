@@ -14,7 +14,7 @@ namespace clap {
        * Adds a module to the root module.
        * Modules are processed in the FIFO order.
        */
-      void addModule(Module *module) { _modules.push_back(module); }
+      void addModule(Module *module);
 
       enum class VoiceMode {
          /// Retriggers on each notes, single voice
@@ -31,7 +31,13 @@ namespace clap {
       clap_process_status process(const clap_process *process) noexcept override;
 
    private:
+      uint32_t processEvents(const clap_process *process,
+                             uint32_t &index,
+                             uint32_t count,
+                             uint32_t time) noexcept;
+
       VoiceMode _voiceMode = VoiceMode::Mono;
       std::vector<Module *> _modules;
+      std::vector<Module *> _noteListeners;
    };
 } // namespace clap

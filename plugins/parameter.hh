@@ -15,7 +15,7 @@
 namespace clap {
    class Voice;
 
-   class Parameter {
+   class Parameter final {
    public:
       explicit Parameter(const clap_param_info &info) : _info(info) { _info.cookie = this; }
 
@@ -31,7 +31,6 @@ namespace clap {
       const clap_param_info &info() const noexcept { return _info; }
 
       void setDefaultValue() {
-
          _value.setImmediately(_info.default_value);
          _modulation.setImmediately(0);
       }
@@ -52,29 +51,40 @@ namespace clap {
       double step(uint32_t n) { return _value.step(n) + _modulation.step(n); }
 
    private:
+      auto &getVoiceData(uint32_t voiceIndex) noexcept {
+         assert(voiceIndex < _voices.size());
+         return _voices[voiceIndex];
+      }
+
+   public:
       SmoothedValue &getVoiceValue(uint32_t voiceIndex) {
-         assert(voiceIndex < _voiceValues.size());
-         return _hasVoiceValue.test(voiceIndex) ? _voiceValues[voiceIndex] : _value;
+         auto &v = getVoiceData(voiceIndex);
+         return v.hasValue ? v.value : _value;
       }
 
       SmoothedValue &getVoiceModulation(uint32_t voiceIndex) {
-         assert(voiceIndex < _voiceModulations.size());
-         return  _hasVoiceModulation.test(voiceIndex) ? _voiceModulations[voiceIndex] : _modulation;
+         auto &v = getVoiceData(voiceIndex);
+         return v.hasModulation ? v.modulation : _modulation;
       }
 
+   private:
       clap_param_info _info;
 
       SmoothedValue _value;
       SmoothedValue _modulation;
 
-      std::bitset<Voice::max_voices> _hasVoiceValue;
-      std::bitset<Voice::max_voices> _hasVoiceModulation;
-      std::array<SmoothedValue, Voice::max_voices> _voiceValues;
-      std::array<SmoothedValue, Voice::max_voices> _voiceModulations;
+      struct VoiceData {
+         bool hasValue;
+         bool hasModulation;
+         SmoothedValue value;
+         SmoothedValue modulation;
 
-      // When a parameter diverge, it should then be put into the linked list of parameters that
-      // diverged in order to be reset when the voice ends
-      std::array<Parameter *, Voice::max_voices> _voicesValueToResetHooks;
-      std::array<Parameter *, Voice::max_voices> _voicesModulationToResetHooks;
+         // When a parameter diverge, it should then be put into the linked list of parameters that
+         // diverged in order to be reset when the voice ends
+         Parameter *valueToResetHook;
+         Parameter *modulationToResetHook;
+      };
+
+      Voices<VoiceData> _voices;
    };
 } // namespace clap

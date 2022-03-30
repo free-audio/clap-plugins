@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../module.hh"
 #include "../domain-converter.hh"
+#include "../module.hh"
 
 namespace clap {
    class AdsrModule : public Module {
@@ -9,13 +9,16 @@ namespace clap {
       AdsrModule(CorePlugin &plugin, std::string name, clap_id paramIdStart);
       ~AdsrModule() override;
 
-      void trigger();
-      void release();
-
-      clap_process_status processVoice(const clap_process *process,
-                                       uint32_t voiceIndex) noexcept override;
+      void trigger(int32_t voiceIndex, double velocity);
+      void release(int32_t voiceIndex);
+      void choke(int32_t voiceIndex);
 
    protected:
+      bool wantsNoteEvents() const noexcept override;
+      void onNoteOn(int32_t voiceIndex, const clap_event_note &note) noexcept override;
+      void onNoteOff(int32_t voiceIndex, const clap_event_note &note) noexcept override;
+      void onNoteChoke(int32_t voiceIndex, const clap_event_note &note) noexcept override;
+
       Parameter *_attackParam = nullptr;
       Parameter *_decayParam = nullptr;
       Parameter *_sustainParam = nullptr;
@@ -28,6 +31,7 @@ namespace clap {
             Decay,
             Sustain,
             Release,
+            Choke,
          };
 
          Phase phase = Rest;
@@ -35,6 +39,6 @@ namespace clap {
          std::unique_ptr<AudioBuffer<float>> buffer;
       };
 
-      std::array<State, Voice::max_voices> _states;
+      Voices<State> _states;
    };
 } // namespace clap

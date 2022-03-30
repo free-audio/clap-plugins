@@ -50,4 +50,7 @@ namespace clap {
       SmoothedValue _gain;
       SmoothedValue _pan;
    };
+
+   template <typename T>
+   using Voices = std::array<T, Voice::max_voices>;
 } // namespace clap

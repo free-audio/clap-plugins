@@ -28,12 +28,4 @@ namespace clap {
 
    TransportInfo::TransportInfo(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "transport-info"), descriptor(), host) {}
-
-   clap_process_status TransportInfo::process(const clap_process *process) noexcept {
-      processGuiEvents(process);
-
-      _pluginToGuiQueue.producerDone();
-
-      return CLAP_PROCESS_CONTINUE_IF_NOT_QUIET;
-   }
 } // namespace clap

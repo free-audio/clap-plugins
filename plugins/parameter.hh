@@ -17,7 +17,9 @@
 namespace clap {
    class Voice;
 
+   class CorePlugin;
    class Parameter final {
+      friend class CorePlugin;
    public:
       explicit Parameter(const clap_param_info &info) : _info(info) { _info.cookie = this; }
 
@@ -55,7 +57,29 @@ namespace clap {
       double step() noexcept { return _value.step() + _modulation.step(); }
 
       // Advances the value by n samples and return the new value + modulation
-      double step(uint32_t n) { return _value.step(n) + _modulation.step(n); }
+      double step(uint32_t n) noexcept { return _value.step(n) + _modulation.step(n); }
+
+      void renderValue(uint32_t frameCount) noexcept {
+         if (_value.isSmoothing()) {
+            _value.render(_valueBuffer.data(), frameCount, 1);
+            _valueBuffer.setConstant(false);
+         } else {
+            _valueBuffer.data()[0] = _value.value();
+            _valueBuffer.setConstant(true);
+            _valueToProcessHook.unlink();
+         }
+      }
+
+      void renderModulation(uint32_t frameCount) noexcept {
+         if (_modulation.isSmoothing()) {
+            _modulation.render(_valueBuffer.data(), frameCount, 1);
+            _modulationBuffer.setConstant(false);
+         } else {
+            _modulationBuffer.data()[0] = _modulation.value();
+            _modulationBuffer.setConstant(true);
+            _modulationToProcessHook.unlink();
+         }
+      }
 
    private:
       auto &getVoiceData(uint32_t voiceIndex) noexcept {
@@ -64,12 +88,12 @@ namespace clap {
       }
 
    public:
-      SmoothedValue &getVoiceValue(uint32_t voiceIndex) {
+      SmoothedValue &getVoiceValue(uint32_t voiceIndex) noexcept {
          auto &v = getVoiceData(voiceIndex);
          return v.hasValue ? v.value : _value;
       }
 
-      SmoothedValue &getVoiceModulation(uint32_t voiceIndex) {
+      SmoothedValue &getVoiceModulation(uint32_t voiceIndex) noexcept {
          auto &v = getVoiceData(voiceIndex);
          return v.hasModulation ? v.modulation : _modulation;
       }

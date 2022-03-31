@@ -11,8 +11,5 @@ namespace clap {
       TransportInfo(const std::string& pluginPath, const clap_host *host);
 
       static const clap_plugin_descriptor *descriptor();
-
-   protected:
-      clap_process_status process(const clap_process *process) noexcept override;
    };
 } // namespace clap

@@ -14,7 +14,6 @@ namespace clap {
 
    protected:
       void addDumbParam(const char *name);
-      clap_process_status process(const clap_process *process) noexcept override;
 
    private:
       clap_id _nextParamId = 0;

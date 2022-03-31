@@ -53,11 +53,4 @@ namespace clap {
       snprintf(info.name, sizeof(info.name), "%s", name);
       _parameters.addParameter(info);
    }
-
-   clap_process_status CharCheck::process(const clap_process *process) noexcept {
-      processGuiEvents(process);
-
-      _pluginToGuiQueue.producerDone();
-      return CLAP_PROCESS_SLEEP;
-   }
 } // namespace clap

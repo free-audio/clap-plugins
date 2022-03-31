@@ -71,7 +71,7 @@ namespace clap {
       _audioOutputs.push_back(info);
    }
 
-   clap_process_status DcOffset::process(const clap_process *process) noexcept {
+   clap_process_status DcOffset::processBackup(const clap_process *process) noexcept {
       float **in = process->audio_inputs[0].data32;
       float **out = process->audio_outputs[0].data32;
       const uint32_t evCount = process->in_events->size(process->in_events);

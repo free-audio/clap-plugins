@@ -18,7 +18,7 @@ namespace clap {
       bool init() noexcept override;
       void defineAudioPorts() noexcept;
       void deactivate() noexcept override;
-      clap_process_status process(const clap_process *process) noexcept override;
+      clap_process_status processBackup(const clap_process *process) noexcept;
 
    private:
       int _channelCount = 1;

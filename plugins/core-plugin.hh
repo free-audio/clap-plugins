@@ -43,9 +43,11 @@ namespace clap {
       //-------------//
       bool init() noexcept override;
       void initTrackInfo() noexcept;
-      clap_process_status process(const clap_process *process) noexcept override;
+
+      clap_process_status process(const clap_process *process) noexcept final;
       clap_process_status
       processRange(const clap_process *process, uint32_t frameOffset, uint32_t frameCount) noexcept;
+      void renderParameters(uint32_t frameCount) noexcept;
 
       //------------------------//
       // clap_plugin_track_info //

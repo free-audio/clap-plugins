@@ -13,6 +13,7 @@
 #include "core-plugin.hh"
 #include "module.hh"
 #include "stream-helper.hh"
+#include "container-of.hh"
 
 #include "gui/abstract-gui.hh"
 
@@ -312,8 +313,10 @@ namespace clap {
       for (uint32_t i = 0; i < process->frames_count;) {
          N = processEvents(process, nextEvIndex, evCount, i);
 
+         uint32_t numFramesToProcess = std::min(N - 1, BLOCK_SIZE);
          // Process a range of frames
-         processRange(process, i, N - i);
+         processRange(process, i, numFramesToProcess);
+         i += numFramesToProcess;
       }
 
       // Try to pass the queue to the plugin GUI
@@ -325,7 +328,25 @@ namespace clap {
    clap_process_status CorePlugin::processRange(const clap_process *process,
                                                 uint32_t frameOffset,
                                                 uint32_t frameCount) noexcept {
+      renderParameters(frameCount);
+
+      // TODO
+
       return CLAP_PROCESS_CONTINUE;
+   }
+
+   void CorePlugin::renderParameters(uint32_t frameCount) noexcept {
+      for (auto it = _parameterValueToProcess.begin(); !it.end(); ) {
+         Parameter *param = containerOf(it.item(), &Parameter::_valueToProcessHook);
+         ++it; // We increment immediately because param->renderValue() may unlink the param
+         param->renderValue(frameCount);
+      }
+
+      for (auto it = _parameterModulationToProcess.begin(); !it.end(); ) {
+         Parameter *param = containerOf(it.item(), &Parameter::_modulationToProcessHook);
+         ++it; // We increment immediately because param->renderModulation() may unlink the param
+         param->renderModulation(frameCount);
+      }
    }
 
    void CorePlugin::processInputParameterChange(const clap_event_header *hdr) {

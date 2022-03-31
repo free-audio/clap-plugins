@@ -8,7 +8,7 @@ namespace clap {
    template <typename T = float>
    class AudioBuffer {
    public:
-      AudioBuffer(uint32_t channelCount, uint32_t frameCount, double sampleRate)
+      AudioBuffer(uint32_t channelCount, uint32_t frameCount, double sampleRate = 0)
          : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate),
            _data(static_cast<T*>(std::aligned_alloc(32, channelCount * frameCount * sizeof(T)))) {
          if (!_data)
@@ -31,7 +31,7 @@ namespace clap {
    private:
       const uint32_t _channelCount;
       const uint32_t _frameCount;
-      const double _sampleRate;
+      const double _sampleRate; // 0 if unspecified
       T *const _data;
       uint32_t _stride;
    };

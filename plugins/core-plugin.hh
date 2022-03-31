@@ -192,8 +192,8 @@ namespace clap {
       std::unique_ptr<GuiHandle> _guiHandle;
 
       Parameters _parameters;
-      IntrusiveList<Parameter, &Parameter::_valueToProcessHook> _parameterValueToProcess;
-      IntrusiveList<Parameter, &Parameter::_valueToProcessHook> _parameterModulationToProcess;
+      IntrusiveList _parameterValueToProcess;
+      IntrusiveList _parameterModulationToProcess;
 
       static const constexpr uint32_t _paramSmoothingDuration = 64;
 

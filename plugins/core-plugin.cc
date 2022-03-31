@@ -352,8 +352,8 @@ namespace clap {
             else
                p->setValueImmediately(ev->value);
 
-            if (p->valueNeedsProcessing() && (!p->_valueToProcessHook.isHooked() || _parameterValueToProcess.empty()))
-               _parameterValueToProcess.pushBack(p);
+            if (p->valueNeedsProcessing() && !p->_valueToProcessHook.isHooked())
+               _parameterValueToProcess.pushBack(&p->_valueToProcessHook);
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
@@ -381,8 +381,8 @@ namespace clap {
             else
                p->setModulationImmediately(ev->amount);
 
-            if (p->modulationNeedsProcessing() && (!p->_modulationToProcessHook.isHooked() || _parameterModulationToProcess.empty()))
-               _parameterModulationToProcess.pushBack(p);
+            if (p->modulationNeedsProcessing() && !p->_modulationToProcessHook.isHooked())
+               _parameterModulationToProcess.pushBack(&p->_modulationToProcessHook);
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;

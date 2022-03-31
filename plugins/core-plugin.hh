@@ -8,9 +8,9 @@
 
 #include "gui/abstract-gui-factory.hh"
 #include "gui/abstract-gui-listener.hh"
+#include "intrusive-list.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
-#include "intrusive-list.hh"
 
 namespace clap {
 
@@ -44,6 +44,8 @@ namespace clap {
       bool init() noexcept override;
       void initTrackInfo() noexcept;
       clap_process_status process(const clap_process *process) noexcept override;
+      clap_process_status
+      processRange(const clap_process *process, uint32_t frameOffset, uint32_t frameCount) noexcept;
 
       //------------------------//
       // clap_plugin_track_info //
@@ -190,7 +192,8 @@ namespace clap {
       std::unique_ptr<GuiHandle> _guiHandle;
 
       Parameters _parameters;
-      IntrusiveList<Parameter, &Parameter::_valueToProcessHook> _parametersToReset;
+      IntrusiveList<Parameter, &Parameter::_valueToProcessHook> _parameterValueToProcess;
+      IntrusiveList<Parameter, &Parameter::_valueToProcessHook> _parameterModulationToProcess;
 
       static const constexpr uint32_t _paramSmoothingDuration = 64;
 

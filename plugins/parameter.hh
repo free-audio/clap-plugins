@@ -46,6 +46,11 @@ namespace clap {
          _modulation.setSmoothed(mod, steps);
       }
 
+      [[nodiscard]] bool valueNeedsProcessing() const noexcept { return _value.isSmoothing(); }
+      [[nodiscard]] bool modulationNeedsProcessing() const noexcept {
+         return _modulation.isSmoothing();
+      }
+
       // Advances the value by 1 samples and return the new value + modulation
       double step() noexcept { return _value.step() + _modulation.step(); }
 

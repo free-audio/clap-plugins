@@ -305,10 +305,27 @@ namespace clap {
       // This will process all the parameters changes coming from the plugin GUI
       processGuiEvents(process);
 
+      const uint32_t evCount = process->in_events->size(process->in_events);
+      uint32_t nextEvIndex = 0;
+      uint32_t N = process->frames_count;
+
+      for (uint32_t i = 0; i < process->frames_count;) {
+         N = processEvents(process, nextEvIndex, evCount, i);
+
+         // Process a range of frames
+         processRange(process, i, N - i);
+      }
+
       // Try to pass the queue to the plugin GUI
       _pluginToGuiQueue.producerDone();
 
       return CLAP_PROCESS_SLEEP;
+   }
+
+   clap_process_status CorePlugin::processRange(const clap_process *process,
+                                                uint32_t frameOffset,
+                                                uint32_t frameCount) noexcept {
+      return CLAP_PROCESS_CONTINUE;
    }
 
    void CorePlugin::processInputParameterChange(const clap_event_header *hdr) {
@@ -334,7 +351,11 @@ namespace clap {
                p->setValueSmoothed(ev->value, _paramSmoothingDuration);
             else
                p->setValueImmediately(ev->value);
-            _pluginToGuiQueue.set(p->info().id, {ev->value, p->modulation()});
+
+            if (p->valueNeedsProcessing() && (!p->_valueToProcessHook.isHooked() || _parameterValueToProcess.empty()))
+               _parameterValueToProcess.pushBack(p);
+
+            _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
          }
 
@@ -359,7 +380,11 @@ namespace clap {
                p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
             else
                p->setModulationImmediately(ev->amount);
-            _pluginToGuiQueue.set(p->info().id, {p->value(), ev->amount});
+
+            if (p->modulationNeedsProcessing() && (!p->_modulationToProcessHook.isHooked() || _parameterModulationToProcess.empty()))
+               _parameterModulationToProcess.pushBack(p);
+
+            _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
          }
          }
@@ -379,23 +404,24 @@ namespace clap {
             param->setValueImmediately(value.value);
 
          switch (value.type) {
-         case GuiToPluginEvent::Value: [[likely]] {
-            clap_event_param_value ev;
-            ev.header.time = 0;
-            ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-            ev.header.type = CLAP_EVENT_PARAM_VALUE;
-            ev.header.size = sizeof(ev);
-            ev.header.flags = 0;
-            ev.param_id = value.paramId;
-            ev.value = value.value;
-            ev.channel = -1;
-            ev.key = -1;
-            ev.cookie = param;
+         case GuiToPluginEvent::Value:
+            [[likely]] {
+               clap_event_param_value ev;
+               ev.header.time = 0;
+               ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+               ev.header.type = CLAP_EVENT_PARAM_VALUE;
+               ev.header.size = sizeof(ev);
+               ev.header.flags = 0;
+               ev.param_id = value.paramId;
+               ev.value = value.value;
+               ev.channel = -1;
+               ev.key = -1;
+               ev.cookie = param;
 
-            if (!out->try_push(out, &ev.header)) [[unlikely]]
-               return;
-            break;
-         }
+               if (!out->try_push(out, &ev.header)) [[unlikely]]
+                  return;
+               break;
+            }
 
          case GuiToPluginEvent::Begin:
          case GuiToPluginEvent::End: {

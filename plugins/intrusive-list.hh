@@ -68,11 +68,13 @@ namespace clap {
          return *this;
       }
 
-      [[nodiscard]] inline bool operator==(const IntrusiveListReverseIterator<T, Member> &other) const {
+      [[nodiscard]] inline bool
+      operator==(const IntrusiveListReverseIterator<T, Member> &other) const {
          return _item == other._item;
       }
 
-      [[nodiscard]] inline bool operator!=(const IntrusiveListReverseIterator<T, Member> &other) const {
+      [[nodiscard]] inline bool
+      operator!=(const IntrusiveListReverseIterator<T, Member> &other) const {
          return !(*this == other);
       }
 
@@ -121,12 +123,10 @@ namespace clap {
       }
 
       inline T *front() const {
-         assert(_head);
          return _head;
       }
 
       inline T *back() const {
-         assert(_tail);
          return _tail;
       }
 

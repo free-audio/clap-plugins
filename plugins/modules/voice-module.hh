@@ -5,11 +5,7 @@
 namespace clap {
    class VoiceModule : public Module {
    public:
-      Voice(uint32_t voiceIndex) : _voiceIndex(voiceIndex) {}
-      Voice(const Voice &) = delete;
-      Voice(Voice &&) = delete;
-      Voice &operator=(const Voice &) = delete;
-      Voice &operator=(Voice &&) = delete;
+      VoiceModule(CorePlugin &plugin);
 
       [[nodiscard]] uint32_t voiceIndex() const noexcept;
       [[nodiscard]] bool isAssigned() const noexcept;
@@ -34,7 +30,6 @@ namespace clap {
       void reset() noexcept;
 
    private:
-      const uint32_t _voiceIndex;
       bool _isAssigned = false;
 
       double _velocity;

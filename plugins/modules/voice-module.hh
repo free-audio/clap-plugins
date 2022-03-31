@@ -1,14 +1,10 @@
 #pragma once
 
-#include <cstdint>
-
-#include "smoothed-value.hh"
-#include "constants.hh"
+#include "../module.hh"
 
 namespace clap {
-   class Voice {
+   class VoiceModule : public Module {
    public:
-
       Voice(uint32_t voiceIndex) : _voiceIndex(voiceIndex) {}
       Voice(const Voice &) = delete;
       Voice(Voice &&) = delete;
@@ -50,7 +46,4 @@ namespace clap {
       SmoothedValue _gain;
       SmoothedValue _pan;
    };
-
-   template <typename T>
-   using Voices = std::array<T, MAX_VOICES>;
 } // namespace clap

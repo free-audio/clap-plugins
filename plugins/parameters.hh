@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -17,8 +19,7 @@ namespace clap {
       Parameters() = default;
       Parameters(const Parameters &parameters);
 
-      void addParameter(const clap_param_info &info);
-      void addParameter(const Parameter &param);
+      Parameter *addParameter(const clap_param_info &info);
 
       size_t count() const noexcept;
 

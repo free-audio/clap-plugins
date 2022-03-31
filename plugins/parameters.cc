@@ -3,12 +3,16 @@
 #include "parameters.hh"
 
 namespace clap {
-   void clap::Parameters::addParameter(const clap_param_info &info) {
+   Parameter *clap::Parameters::addParameter(const clap_param_info &info) {
       assert(_id2param.find(info.id) == _id2param.end());
 
       auto p = std::make_unique<Parameter>(info);
-      _id2param.insert_or_assign(info.id, p.get());
+      auto ptr = p.get();
+      auto ret = _id2param.insert_or_assign(info.id, p.get());
+      if (!ret.second)
+         throw std::logic_error("same parameter id was inserted twice");
       _params.emplace_back(std::move(p));
+      return ptr;
    }
 
    size_t Parameters::count() const noexcept { return _params.size(); }

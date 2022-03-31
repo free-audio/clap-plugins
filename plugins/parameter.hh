@@ -12,16 +12,15 @@
 #include "audio-buffer.hh"
 #include "intrusive-list.hh"
 #include "smoothed-value.hh"
-#include "voice.hh"
+#include "constants.hh"
 
 namespace clap {
-   class Voice;
-
    class CorePlugin;
    class Parameter final {
       friend class CorePlugin;
+
    public:
-      explicit Parameter(const clap_param_info &info) : _info(info) { _info.cookie = this; }
+      explicit Parameter(const clap_param_info &info);
 
       Parameter(const Parameter &) = delete;
       Parameter(Parameter &&) = delete;
@@ -81,6 +80,7 @@ namespace clap {
          }
       }
 
+#if 0
    private:
       auto &getVoiceData(uint32_t voiceIndex) noexcept {
          assert(voiceIndex < _voices.size());
@@ -97,6 +97,7 @@ namespace clap {
          auto &v = getVoiceData(voiceIndex);
          return v.hasModulation ? v.modulation : _modulation;
       }
+#endif
 
       [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
       void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }
@@ -117,6 +118,7 @@ namespace clap {
       IntrusiveList::Hook _modulationToProcessHook;
 
    private:
+#if 0
       struct VoiceData {
          bool hasValue;
          bool hasModulation;
@@ -130,5 +132,6 @@ namespace clap {
       };
 
       Voices<VoiceData> _voices;
+#endif
    };
 } // namespace clap

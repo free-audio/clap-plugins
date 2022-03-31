@@ -11,6 +11,9 @@
 #include "intrusive-list.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
+#include "context.hh"
+
+#include "modules/root-module.hh"
 
 namespace clap {
 
@@ -203,5 +206,7 @@ namespace clap {
       bool _hasTransportCopy = false;
       bool _hasTransport = false;
       clap_event_transport _transportCopy;
+
+      Context _context;
    };
 } // namespace clap

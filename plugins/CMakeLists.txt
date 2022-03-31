@@ -29,9 +29,12 @@ add_library(
   module.hh
   modules/adsr-module.cc
   modules/adsr-module.hh
-  #modules/root-module.cc
-  #modules/root-module.hh
+  modules/root-module.cc
+  modules/root-module.hh
+  modules/voice-expender-module.hh
+  modules/voice-module.hh
   parameter.hh
+  parameter.cc
   parameters.cc
   parameters.hh
   path-provider.cc
@@ -46,7 +49,6 @@ add_library(
   plugs/transport/transport-info.hh
   smoothed-value.hh
   stream-helper.hh
-  voice.hh
   )
 
 if(NOT CLAP_PLUGINS_HEADLESS)

@@ -5,9 +5,9 @@
 
 #include <clap/clap.h>
 
-#include "parameter.hh"
-#include "voice.hh"
 #include "audio-buffer.hh"
+#include "context.hh"
+#include "parameter.hh"
 
 namespace clap {
    class CorePlugin;
@@ -28,32 +28,30 @@ namespace clap {
       Module(CorePlugin &plugin, std::string name, clap_id paramIdStart);
       virtual ~Module();
 
+      // Registers all parameters from this modules
+      virtual void registerParameters();
+      Parameter *addParameter(uint32_t id,
+                              const std::string &name,
+                              uint32_t flags,
+                              double min,
+                              double max,
+                              double deflt);
+
+      [[nodiscard]] Module *cloneVoice() const;
+
       [[nodiscard]] virtual bool activate(double sampleRate, uint32_t maxFrameCount) {
          return true;
       }
       virtual void deactivate() {}
 
-      /**
-       * Process method.
-       *
-       * If the module is strictly monophonic, then shouldProcessVoices() should return false.
-       * If the module is polyphonic, then process() will compute the monophonic parts of the
-       * module, and processVoice() the voice specific parts.
-       * \{
-       */
-      [[nodiscard]] virtual clap_process_status process(const clap_process *process) noexcept {
+      virtual clap_process_status process(Context &c, uint32_t numFrames) noexcept {
          return CLAP_PROCESS_SLEEP;
       }
-      [[nodiscard]] virtual bool shouldProcessVoices() const noexcept { return false; }
-      [[nodiscard]] virtual clap_process_status processVoice(uint32_t voiceIndex, const clap_process *process) noexcept {
-         return CLAP_PROCESS_SLEEP;
-      }
-      /** \} */
 
       [[nodiscard]] virtual bool wantsNoteEvents() const noexcept { return false; }
-      virtual void onNoteOn(int32_t voiceIndex, const clap_event_note& note) noexcept {}
-      virtual void onNoteOff(int32_t voiceIndex, const clap_event_note& note) noexcept {}
-      virtual void onNoteChoke(int32_t voiceIndex, const clap_event_note& note) noexcept {}
+      virtual void onNoteOn(const clap_event_note &note) noexcept {}
+      virtual void onNoteOff(const clap_event_note &note) noexcept {}
+      virtual void onNoteChoke(const clap_event_note &note) noexcept {}
 
    protected:
       CorePlugin &_plugin;

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../module.hh"
+#include "../parameters.hh"
 
 namespace clap {
-   class Voice;
-
    class RootModule final : public Module {
    public:
       RootModule(CorePlugin &plugin, std::string name, clap_id paramIdStart);
@@ -28,14 +27,10 @@ namespace clap {
       };
       void setVoiceMode(VoiceMode mode);
 
-      clap_process_status process(const clap_process *process) noexcept override;
+      [[nodiscard]] clap_process_status
+      processRange(const clap_process *process, uint32_t frameOffset, uint32_t numFrames) noexcept;
 
    private:
-      uint32_t processEvents(const clap_process *process,
-                             uint32_t &index,
-                             uint32_t count,
-                             uint32_t time) noexcept;
-
       VoiceMode _voiceMode = VoiceMode::Mono;
       std::vector<Module *> _modules;
       std::vector<Module *> _noteListeners;

@@ -13,6 +13,8 @@ namespace clap {
       IntrusiveListHook<T> &operator=(const IntrusiveListHook<T> &) { return *this; }
       IntrusiveListHook<T> &operator=(IntrusiveListHook<T> &&) { return *this; }
 
+      [[nodiscard]] bool isHooked() const noexcept { return _next == nullptr && _prev == nullptr; }
+
       T *_next = nullptr;
       T *_prev = nullptr;
    };

@@ -50,12 +50,12 @@ namespace clap {
       }
       /** \} */
 
-   protected:
       [[nodiscard]] virtual bool wantsNoteEvents() const noexcept { return false; }
       virtual void onNoteOn(int32_t voiceIndex, const clap_event_note& note) noexcept {}
       virtual void onNoteOff(int32_t voiceIndex, const clap_event_note& note) noexcept {}
       virtual void onNoteChoke(int32_t voiceIndex, const clap_event_note& note) noexcept {}
 
+   protected:
       CorePlugin &_plugin;
       const std::string _name;
       const clap_id _paramIdStart;

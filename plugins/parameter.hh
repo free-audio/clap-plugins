@@ -52,6 +52,7 @@ namespace clap {
       // Advances the value by n samples and return the new value + modulation
       double step(uint32_t n) { return _value.step(n) + _modulation.step(n); }
 
+#if 0
    private:
       auto &getVoiceData(uint32_t voiceIndex) noexcept {
          assert(voiceIndex < _voices.size());
@@ -68,6 +69,7 @@ namespace clap {
          auto &v = getVoiceData(voiceIndex);
          return v.hasModulation ? v.modulation : _modulation;
       }
+#endif
 
       [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
       void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }
@@ -81,9 +83,13 @@ namespace clap {
       SmoothedValue _value;
       SmoothedValue _modulation;
 
+   public:
+      /* keep those hooks public */
       IntrusiveListHook<Parameter> _valueToProcessHook;
       IntrusiveListHook<Parameter> _modulationToProcessHook;
 
+   private:
+#if 0
       struct VoiceData {
          Parameter &param;
          bool hasValue;
@@ -98,5 +104,6 @@ namespace clap {
       };
 
       Voices<VoiceData> _voices;
+#endif
    };
 } // namespace clap

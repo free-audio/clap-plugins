@@ -29,8 +29,8 @@ add_library(
   module.hh
   modules/adsr-module.cc
   modules/adsr-module.hh
-  modules/root-module.cc
-  modules/root-module.hh
+  #modules/root-module.cc
+  #modules/root-module.hh
   parameter.hh
   parameters.cc
   parameters.hh

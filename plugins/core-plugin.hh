@@ -190,7 +190,7 @@ namespace clap {
       std::unique_ptr<GuiHandle> _guiHandle;
 
       Parameters _parameters;
-      IntrusiveList<Parameter, &Parameter::VoiceData::valueToResetHook> _parametersToReset;
+      IntrusiveList<Parameter, &Parameter::_valueToProcessHook> _parametersToReset;
 
       static const constexpr uint32_t _paramSmoothingDuration = 64;
 

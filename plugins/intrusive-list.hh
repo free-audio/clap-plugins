@@ -13,8 +13,8 @@ namespace clap {
       IntrusiveListHook<T> &operator=(const IntrusiveListHook<T> &) { return *this; }
       IntrusiveListHook<T> &operator=(IntrusiveListHook<T> &&) { return *this; }
 
-      T *next = nullptr;
-      T *prev = nullptr;
+      T *_next = nullptr;
+      T *_prev = nullptr;
    };
 
    template <typename T, IntrusiveListHook<T> T::*Member>
@@ -25,23 +25,23 @@ namespace clap {
    public:
       inline IntrusiveListIterator(T *item) : _item(item) {}
 
-      inline T &operator*() const { return *_item; }
-      inline T *operator->() const { return _item; }
+      [[nodiscard]] inline T &operator*() const { return *_item; }
+      [[nodiscard]] inline T *operator->() const { return _item; }
       inline IntrusiveListIterator<T, Member> &operator++() {
-         _item = (_item->*Member).next_;
+         _item = (_item->*Member)._next;
          return *this;
       }
 
       inline IntrusiveListIterator<T, Member> &operator--() {
-         _item = (_item->*Member).prev_;
+         _item = (_item->*Member)._prev;
          return *this;
       }
 
-      inline bool operator==(const IntrusiveListIterator<T, Member> &other) const {
+      [[nodiscard]] inline bool operator==(const IntrusiveListIterator<T, Member> &other) const {
          return _item == other._item;
       }
 
-      inline bool operator!=(const IntrusiveListIterator<T, Member> &other) const {
+      [[nodiscard]] inline bool operator!=(const IntrusiveListIterator<T, Member> &other) const {
          return !(*this == other);
       }
 
@@ -54,28 +54,28 @@ namespace clap {
    public:
       inline IntrusiveListReverseIterator(T *item) : _item(item) {}
 
-      inline T &operator*() const { return *_item; }
-      inline T *operator->() const { return _item; }
+      [[nodiscard]] inline T &operator*() const { return *_item; }
+      [[nodiscard]] inline T *operator->() const { return _item; }
       inline IntrusiveListReverseIterator<T, Member> &operator--() {
-         _item = (_item->*Member).next_;
+         _item = (_item->*Member)._next;
          return *this;
       }
 
       inline IntrusiveListReverseIterator<T, Member> &operator++() {
-         _item = (_item->*Member).prev_;
+         _item = (_item->*Member)._prev;
          return *this;
       }
 
-      inline bool operator==(const IntrusiveListReverseIterator<T, Member> &other) const {
+      [[nodiscard]] inline bool operator==(const IntrusiveListReverseIterator<T, Member> &other) const {
          return _item == other._item;
       }
 
-      inline bool operator!=(const IntrusiveListReverseIterator<T, Member> &other) const {
+      [[nodiscard]] inline bool operator!=(const IntrusiveListReverseIterator<T, Member> &other) const {
          return !(*this == other);
       }
 
    private:
-      T *_item;
+      T *_item = nullptr;
    };
 
    template <typename T, IntrusiveListHook<T> T::*Member>
@@ -84,80 +84,80 @@ namespace clap {
       typedef IntrusiveListIterator<T, Member> iterator;
       typedef IntrusiveListReverseIterator<T, Member> reverse_iterator;
 
-      inline IntrusiveList() : head_(nullptr), tail_(nullptr), size_(0) {}
+      inline IntrusiveList() : _head(nullptr), _tail(nullptr), _size(0) {}
       inline ~IntrusiveList() {
          while (!empty())
             popBack();
       }
 
-      inline bool empty() const { return !head_; }
+      [[nodiscard]] inline bool empty() const { return !_head; }
 
-      inline size_t size() const { return size_; }
+      [[nodiscard]] inline size_t size() const { return _size; }
 
       inline void pushFront(T *item) {
-         ++size_;
+         ++_size;
 
-         if (head_)
-            (head_->*Member).prev_ = item;
+         if (_head)
+            (_head->*Member)._prev = item;
          else
-            tail_ = item;
-         (item->*Member).next_ = head_;
-         (item->*Member).prev_ = nullptr;
-         head_ = item;
+            _tail = item;
+         (item->*Member)._next = _head;
+         (item->*Member)._prev = nullptr;
+         _head = item;
       }
 
       inline void pushBack(T *item) {
-         ++size_;
+         ++_size;
 
-         if (tail_)
-            (tail_->*Member).next_ = item;
+         if (_tail)
+            (_tail->*Member)._next = item;
          else
-            head_ = item;
-         (item->*Member).prev_ = tail_;
-         (item->*Member).next_ = nullptr;
-         tail_ = item;
+            _head = item;
+         (item->*Member)._prev = _tail;
+         (item->*Member)._next = nullptr;
+         _tail = item;
       }
 
       inline T *front() const {
-         assert(head_);
-         return head_;
+         assert(_head);
+         return _head;
       }
 
       inline T *back() const {
-         assert(tail_);
-         return tail_;
+         assert(_tail);
+         return _tail;
       }
 
       inline void popFront() {
-         if (!head_)
+         if (!_head)
             return;
 
-         --size_;
+         --_size;
 
-         if (head_ == tail_) {
-            head_ = nullptr;
-            tail_ = nullptr;
+         if (_head == _tail) {
+            _head = nullptr;
+            _tail = nullptr;
             return;
          }
 
-         head_ = (head_->*Member).next_;
-         (head_->*Member).prev_ = nullptr;
+         _head = (_head->*Member)._next;
+         (_head->*Member)._prev = nullptr;
       }
 
       inline void popBack() {
-         if (!tail_)
+         if (!_tail)
             return;
 
-         --size_;
+         --_size;
 
-         if (head_ == tail_) {
-            head_ = nullptr;
-            tail_ = nullptr;
+         if (_head == _tail) {
+            _head = nullptr;
+            _tail = nullptr;
             return;
          }
 
-         tail_ = (tail_->*Member).prev_;
-         (tail_->*Member).next_ = nullptr;
+         _tail = (_tail->*Member)._prev;
+         (_tail->*Member)._next = nullptr;
       }
 
       inline void clear() {
@@ -167,26 +167,26 @@ namespace clap {
       }
 
       inline void erase(T *item) {
-         if ((item->*Member).prev_)
-            ((item->*Member).prev_->*Member).next_ = (item->*Member).next_;
+         if ((item->*Member)._prev)
+            ((item->*Member)._prev->*Member)._next = (item->*Member)._next;
          else
-            head_ = (item->*Member).next_;
+            _head = (item->*Member)._next;
 
-         if ((item->*Member).next_)
-            ((item->*Member).next_->*Member).prev_ = (item->*Member).prev_;
+         if ((item->*Member)._next)
+            ((item->*Member)._next->*Member)._prev = (item->*Member)._prev;
          else
-            tail_ = (item->*Member).prev_;
+            _tail = (item->*Member)._prev;
       }
 
-      iterator begin() const { return empty() ? end() : iterator(head_); }
+      iterator begin() const { return empty() ? end() : iterator(_head); }
       iterator end() const { return iterator(nullptr); }
 
-      reverse_iterator rbegin() const { return empty() ? rend() : reverse_iterator(tail_); }
+      reverse_iterator rbegin() const { return empty() ? rend() : reverse_iterator(_tail); }
       reverse_iterator rend() const { return reverse_iterator(nullptr); }
 
    private:
-      T *head_ = nullptr;
-      T *tail_ = nullptr;
-      size_t size_ = 0;
+      T *_head = nullptr;
+      T *_tail = nullptr;
+      size_t _size = 0;
    };
 } // namespace clap

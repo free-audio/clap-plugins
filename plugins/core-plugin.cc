@@ -302,6 +302,12 @@ namespace clap {
    //   - prepare voice event queues
    //   - run the voices and eventually in parallel
    clap_process_status CorePlugin::process(const clap_process *process) noexcept {
+      // This will process all the parameters changes coming from the plugin GUI
+      processGuiEvents(process);
+
+      // Try to pass the queue to the plugin GUI
+      _pluginToGuiQueue.producerDone();
+
       return CLAP_PROCESS_SLEEP;
    }
 
@@ -363,17 +369,17 @@ namespace clap {
    void CorePlugin::processGuiParameterChange(const clap_output_events *out) {
       GuiToPluginEvent value;
       while (_guiToPluginQueue.tryPeek(value)) {
-         auto p = _parameters.getById(value.paramId);
-         if (!p)
+         auto param = _parameters.getById(value.paramId);
+         if (!param) [[unlikely]]
             return;
 
-         if (isProcessing())
-            p->setValueSmoothed(value.value, _paramSmoothingDuration);
+         if (isProcessing()) [[likely]]
+            param->setValueSmoothed(value.value, _paramSmoothingDuration);
          else
-            p->setValueImmediately(value.value);
+            param->setValueImmediately(value.value);
 
          switch (value.type) {
-         case GuiToPluginEvent::Value: {
+         case GuiToPluginEvent::Value: [[likely]] {
             clap_event_param_value ev;
             ev.header.time = 0;
             ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
@@ -384,24 +390,31 @@ namespace clap {
             ev.value = value.value;
             ev.channel = -1;
             ev.key = -1;
-            ev.cookie = p;
+            ev.cookie = param;
 
-            if (!out->try_push(out, &ev.header))
+            if (!out->try_push(out, &ev.header)) [[unlikely]]
                return;
             break;
          }
 
          case GuiToPluginEvent::Begin:
          case GuiToPluginEvent::End: {
+            auto param = _parameters.getById(value.paramId);
+            if (!param) [[unlikely]]
+               return;
+
+            param->setHasGuiOverride(value.type == GuiToPluginEvent::Begin);
+
             clap_event_param_gesture ev;
             ev.header.time = 0;
             ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
-            ev.header.type = value.type == GuiToPluginEvent::Begin ? CLAP_EVENT_PARAM_GESTURE_BEGIN : CLAP_EVENT_PARAM_GESTURE_END;
+            ev.header.type = value.type == GuiToPluginEvent::Begin ? CLAP_EVENT_PARAM_GESTURE_BEGIN
+                                                                   : CLAP_EVENT_PARAM_GESTURE_END;
             ev.header.size = sizeof(ev);
             ev.header.flags = 0;
             ev.param_id = value.paramId;
 
-            if (!out->try_push(out, &ev.header))
+            if (!out->try_push(out, &ev.header)) [[unlikely]]
                return;
             break;
          }

@@ -4,191 +4,154 @@
 #include <cstddef>
 
 namespace clap {
-   template <typename T>
-   class IntrusiveListHook {
+
+   class IntrusiveList final {
    public:
-      IntrusiveListHook() = default;
-      IntrusiveListHook(const IntrusiveListHook<T> &) {}
-      IntrusiveListHook(IntrusiveListHook<T> &&) {}
-      IntrusiveListHook<T> &operator=(const IntrusiveListHook<T> &) { return *this; }
-      IntrusiveListHook<T> &operator=(IntrusiveListHook<T> &&) { return *this; }
+      class Iterator;
 
-      [[nodiscard]] bool isHooked() const noexcept { return _next == nullptr && _prev == nullptr; }
+      class Hook final {
+         friend class Iterator;
+         friend class IntrusiveList;
 
-      T *_next = nullptr;
-      T *_prev = nullptr;
-   };
+      public:
+         constexpr Hook() = default;
+         constexpr Hook(const Hook &) {}
+         constexpr Hook(Hook &&) {}
+         constexpr Hook &operator=(const Hook &) { return *this; }
+         constexpr Hook &operator=(Hook &&) { return *this; }
+         ~Hook()
+         {
+            assert(!isHooked());
+         }
 
-   template <typename T, IntrusiveListHook<T> T::*Member>
-   class IntrusiveList;
+         [[nodiscard]] inline bool isHooked() const noexcept {
+            assert(checkInvariants());
+            return _next != this;
+         }
 
-   template <typename T, IntrusiveListHook<T> T::*Member>
-   class IntrusiveListIterator {
-   public:
-      inline IntrusiveListIterator(T *item) : _item(item) {}
+         inline void unlink() noexcept {
+            assert(checkInvariants());
 
-      [[nodiscard]] inline T &operator*() const { return *_item; }
-      [[nodiscard]] inline T *operator->() const { return _item; }
-      inline IntrusiveListIterator<T, Member> &operator++() {
-         _item = (_item->*Member)._next;
-         return *this;
-      }
+            _next->_prev = _prev;
+            _prev->_next = _next;
+         }
 
-      inline IntrusiveListIterator<T, Member> &operator--() {
-         _item = (_item->*Member)._prev;
-         return *this;
-      }
+         [[nodiscard]] inline bool checkInvariants() const noexcept {
+            assert(_next == this ? _prev == this : true);
+            assert(_prev == this ? _next == this : true);
+            return true;
+         }
 
-      [[nodiscard]] inline bool operator==(const IntrusiveListIterator<T, Member> &other) const {
-         return _item == other._item;
-      }
+      private:
+         Hook *_next = this;
+         Hook *_prev = this;
+      };
 
-      [[nodiscard]] inline bool operator!=(const IntrusiveListIterator<T, Member> &other) const {
-         return !(*this == other);
-      }
+      class Iterator final {
+      public:
+         inline Iterator(Hook *head, Hook *item) : _head(head), _item(item) {}
+         inline Iterator(const Iterator& it) : _head(it._head), _item(it._item) {}
 
-   private:
-      T *_item = nullptr;
-   };
+         [[nodiscard]] inline Hook *item() const {
+            assert(!end());
+            return _item;
+         }
 
-   template <typename T, IntrusiveListHook<T> T::*Member>
-   class IntrusiveListReverseIterator {
-   public:
-      inline IntrusiveListReverseIterator(T *item) : _item(item) {}
+         inline Iterator &operator++() {
+            _item = _item->_next;
+            return *this;
+         }
 
-      [[nodiscard]] inline T &operator*() const { return *_item; }
-      [[nodiscard]] inline T *operator->() const { return _item; }
-      inline IntrusiveListReverseIterator<T, Member> &operator--() {
-         _item = (_item->*Member)._next;
-         return *this;
-      }
+         inline Iterator &operator--() {
+            _item = _item->_prev;
+            return *this;
+         }
 
-      inline IntrusiveListReverseIterator<T, Member> &operator++() {
-         _item = (_item->*Member)._prev;
-         return *this;
-      }
+         [[nodiscard]] inline bool operator==(const Iterator &other) const {
+            assert(_head == other._head);
+            return _item == other._item;
+         }
 
-      [[nodiscard]] inline bool
-      operator==(const IntrusiveListReverseIterator<T, Member> &other) const {
-         return _item == other._item;
-      }
+         [[nodiscard]] inline bool operator!=(const Iterator &other) const {
+            assert(_head == other._head);
+            return _item != other._item;
+         }
 
-      [[nodiscard]] inline bool
-      operator!=(const IntrusiveListReverseIterator<T, Member> &other) const {
-         return !(*this == other);
-      }
+         [[nodiscard]] inline bool end() const noexcept { return _head == _item; }
 
-   private:
-      T *_item = nullptr;
-   };
+      private:
+         Hook *const _head;
+         Hook *_item = nullptr;
+      };
 
-   template <typename T, IntrusiveListHook<T> T::*Member>
-   class IntrusiveList {
-   public:
-      typedef IntrusiveListIterator<T, Member> iterator;
-      typedef IntrusiveListReverseIterator<T, Member> reverse_iterator;
-
-      inline IntrusiveList() : _head(nullptr), _tail(nullptr), _size(0) {}
+      inline IntrusiveList() = default;
       inline ~IntrusiveList() {
-         while (!empty())
-            popBack();
+         clear();
       }
 
-      [[nodiscard]] inline bool empty() const { return !_head; }
+      [[nodiscard]] inline bool empty() const { return !_head.isHooked(); }
 
-      [[nodiscard]] inline size_t size() const { return _size; }
+      inline void pushFront(Hook *item) {
+         assert(!item->isHooked());
 
-      inline void pushFront(T *item) {
-         ++_size;
-
-         if (_head)
-            (_head->*Member)._prev = item;
-         else
-            _tail = item;
-         (item->*Member)._next = _head;
-         (item->*Member)._prev = nullptr;
-         _head = item;
+         if (!_head.isHooked()) {
+            item->_next = &_head;
+            item->_prev = &_head;
+            _head._next = item;
+            _head._prev = item;
+         } else {
+            item->_next = _head._next;
+            item->_prev = &_head;
+            _head._next->_prev = item;
+            _head._next = item;
+         }
       }
 
-      inline void pushBack(T *item) {
-         ++_size;
+      inline void pushBack(Hook *item) {
+         assert(!item->isHooked());
 
-         if (_tail)
-            (_tail->*Member)._next = item;
-         else
-            _head = item;
-         (item->*Member)._prev = _tail;
-         (item->*Member)._next = nullptr;
-         _tail = item;
+         if (!_head.isHooked()) {
+            item->_next = &_head;
+            item->_prev = &_head;
+            _head._next = item;
+            _head._prev = item;
+         } else {
+            item->_next = &_head;
+            item->_prev = _head._prev;
+            _head._prev->_next = item;
+            _head._prev = item;
+         }
       }
 
-      inline T *front() const {
-         return _head;
+      inline Hook *front() const {
+         assert(!empty());
+         return _head._next;
       }
 
-      inline T *back() const {
-         return _tail;
+      inline Hook *back() const {
+         assert(!empty());
+         return _head._prev;
       }
 
       inline void popFront() {
-         if (!_head)
-            return;
-
-         --_size;
-
-         if (_head == _tail) {
-            _head = nullptr;
-            _tail = nullptr;
-            return;
-         }
-
-         _head = (_head->*Member)._next;
-         (_head->*Member)._prev = nullptr;
+         assert(!empty());
+         _head._next->unlink();
       }
 
       inline void popBack() {
-         if (!_tail)
-            return;
-
-         --_size;
-
-         if (_head == _tail) {
-            _head = nullptr;
-            _tail = nullptr;
-            return;
-         }
-
-         _tail = (_tail->*Member)._prev;
-         (_tail->*Member)._next = nullptr;
+         assert(!empty());
+         _head._prev->unlink();
       }
 
       inline void clear() {
-         // poping everything to unlink (and potentially release while unref)
          while (!empty())
             popBack();
       }
 
-      inline void erase(T *item) {
-         if ((item->*Member)._prev)
-            ((item->*Member)._prev->*Member)._next = (item->*Member)._next;
-         else
-            _head = (item->*Member)._next;
-
-         if ((item->*Member)._next)
-            ((item->*Member)._next->*Member)._prev = (item->*Member)._prev;
-         else
-            _tail = (item->*Member)._prev;
-      }
-
-      iterator begin() const { return empty() ? end() : iterator(_head); }
-      iterator end() const { return iterator(nullptr); }
-
-      reverse_iterator rbegin() const { return empty() ? rend() : reverse_iterator(_tail); }
-      reverse_iterator rend() const { return reverse_iterator(nullptr); }
+      Iterator begin() { return empty() ? end() : Iterator(&_head, _head._next); }
+      Iterator end() { return {&_head, &_head}; }
 
    private:
-      T *_head = nullptr;
-      T *_tail = nullptr;
-      size_t _size = 0;
+      Hook _head;
    };
 } // namespace clap

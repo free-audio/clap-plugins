@@ -57,7 +57,6 @@ namespace clap {
       // Advances the value by n samples and return the new value + modulation
       double step(uint32_t n) { return _value.step(n) + _modulation.step(n); }
 
-#if 0
    private:
       auto &getVoiceData(uint32_t voiceIndex) noexcept {
          assert(voiceIndex < _voices.size());
@@ -74,7 +73,6 @@ namespace clap {
          auto &v = getVoiceData(voiceIndex);
          return v.hasModulation ? v.modulation : _modulation;
       }
-#endif
 
       [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
       void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }
@@ -84,7 +82,8 @@ namespace clap {
 
       bool _hasGuiOverride = false;
 
-      std::unique_ptr<AudioBuffer<double>> _valueBuffer;
+      AudioBuffer<double> _valueBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _modulationBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _value;
       SmoothedValue _modulation;
 
@@ -94,9 +93,7 @@ namespace clap {
       IntrusiveList::Hook _modulationToProcessHook;
 
    private:
-#if 0
       struct VoiceData {
-         Parameter &param;
          bool hasValue;
          bool hasModulation;
          SmoothedValue value;
@@ -104,11 +101,10 @@ namespace clap {
 
          // When a parameter diverge, it should then be put into the linked list of parameters that
          // diverged in order to be reset when the voice ends
-         IntrusiveListHook<VoiceData> valueToResetHook;
-         IntrusiveListHook<VoiceData> modulationToResetHook;
+         IntrusiveList::Hook valueToResetHook;
+         IntrusiveList::Hook modulationToResetHook;
       };
 
       Voices<VoiceData> _voices;
-#endif
    };
 } // namespace clap

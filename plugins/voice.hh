@@ -3,11 +3,11 @@
 #include <cstdint>
 
 #include "smoothed-value.hh"
+#include "constants.hh"
 
 namespace clap {
    class Voice {
    public:
-      static constexpr const uint32_t max_voices = 16;
 
       Voice(uint32_t voiceIndex) : _voiceIndex(voiceIndex) {}
       Voice(const Voice &) = delete;
@@ -52,5 +52,5 @@ namespace clap {
    };
 
    template <typename T>
-   using Voices = std::array<T, Voice::max_voices>;
+   using Voices = std::array<T, MAX_VOICES>;
 } // namespace clap

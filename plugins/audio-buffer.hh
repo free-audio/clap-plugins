@@ -10,7 +10,7 @@ namespace clap {
    public:
       AudioBuffer(uint32_t channelCount, uint32_t frameCount, double sampleRate)
          : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate),
-           _data(std::aligned_alloc(32, channelCount * frameCount * sizeof(T))) {
+           _data(static_cast<T*>(std::aligned_alloc(32, channelCount * frameCount * sizeof(T)))) {
          if (!_data)
             throw std::bad_alloc();
       }

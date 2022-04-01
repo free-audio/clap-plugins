@@ -3,6 +3,15 @@
 #include "transport-info.hh"
 
 namespace clap {
+   class TransportInfoModule final : public Module {
+   public:
+      TransportInfoModule(TransportInfo &plugin) : Module(plugin, "", 0) {}
+
+      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+         return CLAP_PROCESS_CONTINUE;
+      }
+   };
+
    const clap_plugin_descriptor *TransportInfo::descriptor() {
       static const char *features[] = {"utility", "analyzer", nullptr};
 

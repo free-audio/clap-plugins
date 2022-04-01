@@ -7,9 +7,10 @@ namespace clap {
    class AdsrModule : public Module {
    public:
       AdsrModule(CorePlugin &plugin, std::string name, clap_id paramIdStart);
+      AdsrModule(const AdsrModule&);
       ~AdsrModule() override;
 
-      void registerParameters() override;
+      std::unique_ptr<Module> cloneVoice() const override;
 
       void trigger(double velocity);
       void release();

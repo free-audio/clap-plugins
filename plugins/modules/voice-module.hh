@@ -10,8 +10,7 @@ namespace clap {
 
    public:
       VoiceModule(CorePlugin &plugin, std::unique_ptr<Module> module);
-
-      void registerParameters() override;
+      VoiceModule(const VoiceModule& m);
 
       std::unique_ptr<Module> cloneVoice() const override;
 

@@ -17,8 +17,6 @@ namespace clap {
 
       void deactivate() override;
 
-      void registerParameters() override;
-
       clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
 
    private:

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 #include <memory>
+#include <string>
 
 #include <clap/clap.h>
 
@@ -21,22 +21,13 @@ namespace clap {
       // this module.
       static const constexpr uint32_t parameter_capacity = 1024;
 
-      Module(const Module &) = delete;
       Module(Module &&) = delete;
       Module &operator=(const Module &) = delete;
       Module &operator=(Module &&) = delete;
 
       Module(CorePlugin &plugin, std::string name, clap_id paramIdStart);
+      Module(const Module &) = default;
       virtual ~Module();
-
-      // Registers all parameters from this modules
-      virtual void registerParameters();
-      Parameter *addParameter(uint32_t id,
-                              const std::string &name,
-                              uint32_t flags,
-                              double min,
-                              double max,
-                              double deflt);
 
       [[nodiscard]] virtual std::unique_ptr<Module> cloneVoice() const;
 
@@ -55,6 +46,14 @@ namespace clap {
       virtual void onNoteChoke(const clap_event_note &note) noexcept {}
 
    protected:
+      // Registers all parameters from this modules
+      Parameter *addParameter(uint32_t id,
+                              const std::string &name,
+                              uint32_t flags,
+                              double min,
+                              double max,
+                              double deflt);
+
       CorePlugin &_plugin;
       const std::string _name;
       const clap_id _paramIdStart;

@@ -11,6 +11,8 @@ namespace clap {
       : Module(plugin, "voice-expander", paramIdStart) {
 
       _voices[0] = std::make_unique<VoiceModule>(_plugin, std::move(module));
+      for (uint32_t i = 1; i < _voices.size(); ++i)
+         _voices[i] = std::make_unique<VoiceModule>(*_voices[0]);
    }
 
    bool VoiceExpanderModule::activate(double sampleRate, uint32_t maxFrameCount) {
@@ -39,12 +41,5 @@ namespace clap {
       }
 
       return CLAP_PROCESS_SLEEP;
-   }
-
-   void VoiceExpanderModule::registerParameters() {
-      _voices[0]->registerParameters();
-
-      for (uint32_t i = 1; i < _voices.size(); ++i)
-         _voices[i] = std::make_unique<VoiceModule>(_plugin, _voices[0]->_module->cloneVoice());
    }
 } // namespace clap

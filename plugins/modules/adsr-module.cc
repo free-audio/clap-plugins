@@ -3,12 +3,7 @@
 namespace clap {
 
    AdsrModule::AdsrModule(CorePlugin &plugin, std::string name, clap_id paramIdStart)
-      : Module(plugin, name, paramIdStart) {}
-
-   AdsrModule::~AdsrModule() = default;
-
-   void AdsrModule::registerParameters() {
-
+      : Module(plugin, name, paramIdStart) {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
@@ -23,6 +18,13 @@ namespace clap {
       _velocityParam = addParameter(
          4, "velocity", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 0, 1, 0.3);
    }
+
+   AdsrModule::AdsrModule(const AdsrModule &m)
+      : Module(m), _attackParam(m._attackParam), _decayParam(m._decayParam),
+        _sustainParam(m._sustainParam), _releaseParam(m._releaseParam),
+        _velocityParam(m._velocityParam) {}
+
+   AdsrModule::~AdsrModule() = default;
 
    void AdsrModule::trigger(double velocity) {
       phase = Phase::Attack;

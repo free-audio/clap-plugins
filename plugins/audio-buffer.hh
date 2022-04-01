@@ -15,15 +15,10 @@ namespace clap {
             throw std::bad_alloc();
       }
 
-      AudioBuffer(AudioBuffer<T> &&o)
-         : _channelCount(o._channelCount), _frameCount(o._frameCount), _sampleRate(o._sampleRate),
-           _data(o._data), _stride(o.stride) {
-         o._data = nullptr;
-      }
-
       AudioBuffer(const AudioBuffer<T> &other) = delete;
       AudioBuffer<T> &operator=(const AudioBuffer<T> &) = delete;
       AudioBuffer<T> &operator=(AudioBuffer<T> &&) = delete;
+      AudioBuffer(AudioBuffer<T> &&o) = delete;
 
       ~AudioBuffer() { std::free(_data); }
 

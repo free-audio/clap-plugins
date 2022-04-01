@@ -5,8 +5,15 @@
 
 namespace clap {
 
-   VoiceExpanderModule::VoiceExpanderModule(CorePlugin &plugin, clap_id paramIdStart)
-      : Module(plugin, "voice-expander", paramIdStart) {}
+   VoiceExpanderModule::VoiceExpanderModule(CorePlugin &plugin,
+                                            clap_id paramIdStart,
+                                            std::unique_ptr<Module> module)
+      : Module(plugin, "voice-expander", paramIdStart) {
+
+      for (uint32_t i = 1; i < _voices.size(); ++i)
+         _voices[i] = std::make_unique<VoiceModule>(_plugin, module->cloneVoice());
+      _voices[0] = std::make_unique<VoiceModule>(_plugin, std::move(module));
+   }
 
    bool VoiceExpanderModule::activate(double sampleRate, uint32_t maxFrameCount) {
       for (auto &voice : _voices) {

@@ -3,6 +3,15 @@
 #include "char-check.hh"
 
 namespace clap {
+   class CharCheckModule final : public Module {
+   public:
+      CharCheckModule(CharCheck &plugin) : Module(plugin, "", 0) {}
+
+      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+         return CLAP_PROCESS_SLEEP;
+      }
+   };
+
    const clap_plugin_descriptor *CharCheck::descriptor() {
       static const char *features[] = {"validation", nullptr};
 
@@ -23,6 +32,8 @@ namespace clap {
 
    CharCheck::CharCheck(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "char-check"), descriptor(), host) {
+      _rootModule = std::make_unique<CharCheckModule>(*this);
+
       addDumbParam("Hello");
       addDumbParam("こんにちは");
       addDumbParam("テレビ");

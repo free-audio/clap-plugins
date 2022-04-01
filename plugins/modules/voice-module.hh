@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../intrusive-list.hh"
-#include "../module.hh"
+#include "module.hh"
 
 namespace clap {
    class VoiceExpanderModule;

@@ -11,7 +11,7 @@
 #include <clap/helpers/plugin.hxx>
 
 #include "core-plugin.hh"
-#include "module.hh"
+#include "modules/module.hh"
 #include "stream-helper.hh"
 #include "container-of.hh"
 

@@ -6,9 +6,9 @@
 
 #include <clap/clap.h>
 
-#include "audio-buffer.hh"
-#include "context.hh"
-#include "parameter.hh"
+#include "../audio-buffer.hh"
+#include "../context.hh"
+#include "../parameter.hh"
 
 namespace clap {
    class CorePlugin;

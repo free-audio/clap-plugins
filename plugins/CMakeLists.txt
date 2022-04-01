@@ -25,18 +25,18 @@ add_library(
   core-plugin.hh
   domain-converter.hh
   modulation-matrix.hh
-  module.cc
-  module.hh
   modules/adsr-module.cc
   modules/adsr-module.hh
+  modules/module.cc
+  modules/module.hh
   modules/root-module.cc
   modules/root-module.hh
-  modules/voice-expander-module.hh
   modules/voice-expander-module.cc
-  modules/voice-module.hh
+  modules/voice-expander-module.hh
   modules/voice-module.cc
-  parameter.hh
+  modules/voice-module.hh
   parameter.cc
+  parameter.hh
   parameters.cc
   parameters.hh
   path-provider.cc
@@ -51,6 +51,11 @@ add_library(
   plugs/transport/transport-info.hh
   smoothed-value.hh
   stream-helper.hh
+  value-types/decibel-value-type.hh
+  value-types/decibel-value-type.cc
+  value-types/simple-value-type.hh
+  value-types/simple-value-type.hh
+  value-types/value-type.hh
   )
 
 if(NOT CLAP_PLUGINS_HEADLESS)

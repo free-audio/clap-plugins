@@ -5,7 +5,7 @@
 
 #include "../constants.hh"
 #include "../intrusive-list.hh"
-#include "../module.hh"
+#include "module.hh"
 
 #include "voice-module.hh"
 

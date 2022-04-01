@@ -1,9 +1,12 @@
 #pragma once
 
-#include "../module.hh"
+#include "module.hh"
 #include "../parameters.hh"
 
 namespace clap {
+   /** Root module.
+    * Converts external I/O to internal representation (audio buffer, ...).
+    */
    class RootModule final : public Module {
    public:
       RootModule(CorePlugin &plugin, std::string name, clap_id paramIdStart);

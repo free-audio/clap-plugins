@@ -1,5 +1,5 @@
 #include "module.hh"
-#include "core-plugin.hh"
+#include "../core-plugin.hh"
 
 namespace clap {
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../domain-converter.hh"
-#include "../module.hh"
+#include "module.hh"
 
 namespace clap {
    class AdsrModule : public Module {

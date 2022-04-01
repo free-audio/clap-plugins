@@ -6,12 +6,12 @@
 #include <clap/helpers/plugin.hh>
 #include <clap/helpers/reducing-param-queue.hxx>
 
+#include "context.hh"
 #include "gui/abstract-gui-factory.hh"
 #include "gui/abstract-gui-listener.hh"
 #include "intrusive-list.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
-#include "context.hh"
 
 #include "modules/root-module.hh"
 
@@ -78,29 +78,17 @@ namespace clap {
 
       uint32_t paramsCount() const noexcept override { return _parameters.count(); }
 
-      bool paramsInfo(uint32_t paramIndex, clap_param_info *info) const noexcept override {
-         *info = _parameters.getByIndex(paramIndex)->info();
-         return true;
-      }
+      bool paramsInfo(uint32_t paramIndex, clap_param_info *info) const noexcept override;
 
-      virtual bool paramsValue(clap_id paramId, double *value) noexcept override {
-         *value = _parameters.getById(paramId)->value();
-         return true;
-      }
+      virtual bool paramsValue(clap_id paramId, double *value) noexcept override;
 
       virtual bool paramsValueToText(clap_id paramId,
                                      double value,
                                      char *display,
-                                     uint32_t size) noexcept override {
-         // TODO
-         return false;
-      }
+                                     uint32_t size) noexcept override;
 
       virtual bool
-      paramsTextToValue(clap_id param_id, const char *display, double *value) noexcept override {
-         // TODO
-         return false;
-      }
+      paramsTextToValue(clap_id paramId, const char *display, double *value) noexcept override;
 
       virtual void paramsFlush(const clap_input_events *in,
                                const clap_output_events *out) noexcept override;

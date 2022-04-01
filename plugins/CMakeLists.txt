@@ -54,7 +54,8 @@ add_library(
   value-types/decibel-value-type.hh
   value-types/decibel-value-type.cc
   value-types/simple-value-type.hh
-  value-types/simple-value-type.hh
+  value-types/simple-value-type.cc
+  value-types/value-type.cc
   value-types/value-type.hh
   )
 

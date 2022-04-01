@@ -3,6 +3,7 @@
 #include "simple-value-type.hh"
 
 namespace clap {
+   const SimpleValueType SimpleValueType::instance;
 
    std::string SimpleValueType::toText(double paramValue) const {
       std::ostringstream os;

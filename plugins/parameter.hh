@@ -10,9 +10,10 @@
 #include <clap/clap.h>
 
 #include "audio-buffer.hh"
+#include "constants.hh"
 #include "intrusive-list.hh"
 #include "smoothed-value.hh"
-#include "constants.hh"
+#include "value-types/simple-value-type.hh"
 
 namespace clap {
    class CorePlugin;
@@ -20,7 +21,8 @@ namespace clap {
       friend class CorePlugin;
 
    public:
-      explicit Parameter(const clap_param_info &info);
+      explicit Parameter(const clap_param_info &info,
+                         const ValueType &valueType = SimpleValueType::instance);
 
       Parameter(const Parameter &) = delete;
       Parameter(Parameter &&) = delete;
@@ -30,6 +32,7 @@ namespace clap {
       double value() const noexcept { return _value.value(); }
       double modulation() const noexcept { return _modulation.value(); }
       double modulatedValue() const noexcept { return _value.value() + _modulation.value(); }
+      auto& valueType() const noexcept { return _valueType; }
 
       const clap_param_info &info() const noexcept { return _info; }
 
@@ -104,6 +107,7 @@ namespace clap {
 
    private:
       clap_param_info _info;
+      const ValueType &_valueType;
 
       bool _hasGuiOverride = false;
 

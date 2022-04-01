@@ -10,10 +10,10 @@
 #include <clap/helpers/host-proxy.hxx>
 #include <clap/helpers/plugin.hxx>
 
+#include "container-of.hh"
 #include "core-plugin.hh"
 #include "modules/module.hh"
 #include "stream-helper.hh"
-#include "container-of.hh"
 
 #include "gui/abstract-gui.hh"
 
@@ -336,13 +336,13 @@ namespace clap {
    }
 
    void CorePlugin::renderParameters(uint32_t frameCount) noexcept {
-      for (auto it = _parameterValueToProcess.begin(); !it.end(); ) {
+      for (auto it = _parameterValueToProcess.begin(); !it.end();) {
          Parameter *param = containerOf(it.item(), &Parameter::_valueToProcessHook);
          ++it; // We increment immediately because param->renderValue() may unlink the param
          param->renderValue(frameCount);
       }
 
-      for (auto it = _parameterModulationToProcess.begin(); !it.end(); ) {
+      for (auto it = _parameterModulationToProcess.begin(); !it.end();) {
          Parameter *param = containerOf(it.item(), &Parameter::_modulationToProcessHook);
          ++it; // We increment immediately because param->renderModulation() may unlink the param
          param->renderModulation(frameCount);
@@ -527,5 +527,46 @@ namespace clap {
       }
 
       return process->frames_count;
+   }
+
+   bool CorePlugin::paramsInfo(uint32_t paramIndex, clap_param_info *info) const noexcept {
+      auto param = _parameters.getByIndex(paramIndex);
+      if (!param)
+         return false;
+
+      *info = param->info();
+      return true;
+   }
+
+   bool CorePlugin::paramsValue(clap_id paramId, double *value) noexcept {
+      auto param = _parameters.getById(paramId);
+      if (!param)
+         return false;
+
+      *value = param->value();
+      return true;
+   }
+
+   bool CorePlugin::paramsValueToText(clap_id paramId,
+                                      double value,
+                                      char *display,
+                                      uint32_t size) noexcept {
+      auto param = _parameters.getById(paramId);
+      if (!param)
+         return false;
+
+      std::string text = param->valueType().toText(value);
+      snprintf(display, size, "%s", text.c_str());
+      return true;
+   }
+
+   bool
+   CorePlugin::paramsTextToValue(clap_id paramId, const char *display, double *value) noexcept {
+      auto param = _parameters.getById(paramId);
+      if (!param)
+         return false;
+
+      *value = param->valueType().fromText(display);
+      return true;
    }
 } // namespace clap

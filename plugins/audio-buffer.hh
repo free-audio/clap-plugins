@@ -32,6 +32,7 @@ namespace clap {
       void setConstant(bool isConstant) noexcept { _stride = isConstant ? _channelCount : 0; }
 
       [[nodiscard]] uint32_t frameCount() const noexcept { return _frameCount; }
+      [[nodiscard]] uint32_t channelCount() const noexcept { return _channelCount; }
 
       [[nodiscard]] double sampleRate() const noexcept { return _sampleRate; }
 

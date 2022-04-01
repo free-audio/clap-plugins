@@ -83,6 +83,14 @@ namespace clap {
          }
       }
 
+      auto& valueBuffer() const noexcept {
+         return _valueBuffer;
+      }
+
+      auto& modulationBuffer() const noexcept {
+         return _modulationBuffer;
+      }
+
 #if 0
    private:
       auto &getVoiceData(uint32_t voiceIndex) noexcept {

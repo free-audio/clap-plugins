@@ -2,20 +2,45 @@
 
 #include "../modules/module.hh"
 #include "dc-offset.hh"
+#include "../audio-buffer.hh"
 
 namespace clap {
 
    class DcOffsetModule final : public Module {
    public:
       DcOffsetModule(DcOffset &plugin) : Module(plugin, "", 0) {
-         addParameter(0,
-                      "offset",
-                      CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
-                         CLAP_PARAM_REQUIRES_PROCESS,
-                      -1,
-                      1,
-                      0);
+         _offsetParam = addParameter(0,
+                                     "offset",
+                                     CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
+                                        CLAP_PARAM_REQUIRES_PROCESS,
+                                     -1,
+                                     1,
+                                     0);
       }
+
+      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+         assert(_isActive);
+
+         const uint32_t N = numFrames * c.audioInputs[0]->channelCount();
+         auto in = c.audioInputs[0]->data();
+         const auto inStride = c.audioInputs[0]->stride();
+         auto out = c.audioOutputs[0]->data();
+
+         auto &offsetValueBuffer = _offsetParam->valueBuffer();
+         auto offsetValue = offsetValueBuffer.data();
+         auto offsetValueStride = offsetValueBuffer.stride();
+
+         auto &offsetModulationBuffer = _offsetParam->modulationBuffer();
+         auto offsetModulation = offsetModulationBuffer.data();
+         auto offsetModulationStride = offsetModulationBuffer.stride();
+
+         for (uint32_t i = 0; i < N; ++i)
+            out[i] = in[i * inStride] + offsetValue[i * offsetValueStride] + offsetModulation[i * offsetModulationStride];
+
+         return CLAP_PROCESS_SLEEP;
+      }
+
+      Parameter *_offsetParam = nullptr;
    };
 
    const clap_plugin_descriptor *DcOffset::descriptor() {
@@ -27,34 +52,19 @@ namespace clap {
          "com.github.free-audio.clap.dc-offset",
          "DC Offset",
          "clap",
-         "https://github.com/free-audio/clap",
+         "https://github.com/free-audio/clap-plugins",
          nullptr,
          nullptr,
-         "0.1",
+         "0.2",
          "Example DC Offset plugin",
          features};
       return &desc;
    }
 
-   enum {
-      kParamIdOffset = 0,
-   };
-
    DcOffset::DcOffset(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "dc-offset"), descriptor(), host) {
-      _parameters.addParameter(clap_param_info{
-         kParamIdOffset,
-         CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE | CLAP_PARAM_REQUIRES_PROCESS,
-         nullptr,
-         "offset",
-         "/",
-         -1,
-         1,
-         0,
-      });
-
-      _offsetParam = _parameters.getById(kParamIdOffset);
-   }
+         _rootModule = std::make_unique<DcOffsetModule>(*this);
+      }
 
    bool DcOffset::init() noexcept {
       if (!super::init())
@@ -81,32 +91,5 @@ namespace clap {
       _audioInputs.push_back(info);
       _audioOutputs.clear();
       _audioOutputs.push_back(info);
-   }
-
-   clap_process_status DcOffset::processBackup(const clap_process *process) noexcept {
-      float **in = process->audio_inputs[0].data32;
-      float **out = process->audio_outputs[0].data32;
-      const uint32_t evCount = process->in_events->size(process->in_events);
-      uint32_t nextEvIndex = 0;
-      uint32_t N = process->frames_count;
-
-      processGuiEvents(process);
-
-      /* foreach frames */
-      for (uint32_t i = 0; i < process->frames_count;) {
-
-         N = processEvents(process, nextEvIndex, evCount, i);
-
-         /* Process as many samples as possible until the next event */
-         for (; i < N; ++i) {
-            const float offset = _offsetParam->step();
-            for (int c = 0; c < _channelCount; ++c)
-               out[c][i] = in[c][i] + offset;
-         }
-      }
-
-      _pluginToGuiQueue.producerDone();
-
-      return CLAP_PROCESS_CONTINUE_IF_NOT_QUIET;
    }
 } // namespace clap

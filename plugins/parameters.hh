@@ -19,7 +19,7 @@ namespace clap {
       Parameters() = default;
       Parameters(const Parameters &parameters);
 
-      Parameter *addParameter(const clap_param_info &info);
+      Parameter *addParameter(const clap_param_info &info, const ValueType& valueType = SimpleValueType::instance);
 
       size_t count() const noexcept;
 

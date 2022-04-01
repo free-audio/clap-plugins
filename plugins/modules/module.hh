@@ -57,7 +57,8 @@ namespace clap {
                               uint32_t flags,
                               double min,
                               double max,
-                              double deflt);
+                              double deflt,
+                              const ValueType &valueType = SimpleValueType::instance);
 
       CorePlugin &_plugin;
       const std::string _name;

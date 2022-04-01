@@ -1,12 +1,25 @@
 #include <cstring>
 
+#include "../modules/module.hh"
 #include "dc-offset.hh"
 
 namespace clap {
+
+   class DcOffsetModule final : public Module {
+   public:
+      DcOffsetModule(DcOffset &plugin) : Module(plugin, "", 0) {
+         addParameter(0,
+                      "offset",
+                      CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
+                         CLAP_PARAM_REQUIRES_PROCESS,
+                      -1,
+                      1,
+                      0);
+      }
+   };
+
    const clap_plugin_descriptor *DcOffset::descriptor() {
-      static const char *features[] = {
-         "utility", "audio_effect", nullptr
-      };
+      static const char *features[] = {"utility", "audio_effect", nullptr};
 
       static const clap_plugin_descriptor desc = {
 
@@ -19,8 +32,7 @@ namespace clap {
          nullptr,
          "0.1",
          "Example DC Offset plugin",
-         features
-      };
+         features};
       return &desc;
    }
 

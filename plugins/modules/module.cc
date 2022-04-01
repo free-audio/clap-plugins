@@ -11,7 +11,7 @@ namespace clap {
    std::unique_ptr<Module> Module::cloneVoice() const { return {}; }
 
    Parameter *Module::addParameter(
-      uint32_t id, const std::string &name, uint32_t flags, double min, double max, double deflt) {
+      uint32_t id, const std::string &name, uint32_t flags, double min, double max, double deflt, const ValueType& valueType) {
       clap_param_info info;
       info.id = _paramIdStart + id;
       info.cookie = nullptr;
@@ -21,7 +21,7 @@ namespace clap {
       info.default_value = deflt;
       snprintf(info.name, sizeof(info.name), "%s", name.c_str());
       snprintf(info.module, sizeof(info.module), "/%s", _name.c_str());
-      return _plugin._parameters.addParameter(info);
+      return _plugin._parameters.addParameter(info, valueType);
    }
 
    bool Module::activate(double sampleRate, uint32_t maxFrameCount) {

@@ -9,7 +9,7 @@ namespace clap {
     */
    class RootModule final : public Module {
    public:
-      RootModule(CorePlugin &plugin, std::string name, clap_id paramIdStart);
+      RootModule(CorePlugin &plugin);
       ~RootModule() override;
 
       /**

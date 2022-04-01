@@ -1,8 +1,54 @@
 #include <cstring>
 
+#include "../../domain-converter.hh"
+#include "../../value-types/decibel-value-type.hh"
 #include "gain.hh"
 
 namespace clap {
+
+   class GainModule final : public Module {
+   public:
+      GainModule(Gain &plugin) : Module(plugin, "", 0) {
+         _gainParam = addParameter(0,
+                                   "gain",
+                                   CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
+                                      CLAP_PARAM_REQUIRES_PROCESS,
+                                   -40,
+                                   40,
+                                   0,
+                                   DecibelValueType::instance);
+      }
+
+      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+         assert(_isActive);
+
+         const uint32_t N = numFrames * c.audioInputs[0]->channelCount();
+         auto in = c.audioInputs[0]->data();
+         const auto inStride = c.audioInputs[0]->stride();
+         auto out = c.audioOutputs[0]->data();
+
+         auto &gainValueBuffer = _gainParam->valueBuffer();
+         auto gainValue = gainValueBuffer.data();
+         auto gainValueStride = gainValueBuffer.stride();
+
+         auto &gainModulationBuffer = _gainParam->modulationBuffer();
+         auto gainModulation = gainModulationBuffer.data();
+         auto gainModulationStride = gainModulationBuffer.stride();
+
+         for (uint32_t i = 0; i < N; ++i) {
+            const double gaindB =
+               gainValue[i * gainValueStride] + gainModulation[i * gainModulationStride];
+            const double gain = _gainConv.convert(gaindB);
+            out[i] = gain * in[i * inStride];
+         }
+
+         return CLAP_PROCESS_SLEEP;
+      }
+
+      Parameter *_gainParam = nullptr;
+      GainConverter _gainConv{0};
+   };
+
    const clap_plugin_descriptor *Gain::descriptor() {
       static const char *features[] = {"mix", "gain", "audio_effect", nullptr};
 
@@ -26,20 +72,7 @@ namespace clap {
    };
 
    Gain::Gain(const std::string &pluginPath, const clap_host *host)
-      : CorePlugin(PathProvider::create(pluginPath, "gain"), descriptor(), host) {
-      _parameters.addParameter(clap_param_info{
-         kParamIdGain,
-         0,
-         nullptr,
-         "gain",
-         "/",
-         -40,
-         40,
-         0,
-      });
-
-      _gainParam = _parameters.getById(kParamIdGain);
-   }
+      : CorePlugin(PathProvider::create(pluginPath, "gain"), descriptor(), host) {}
 
    bool Gain::init() noexcept {
       if (!super::init())
@@ -68,34 +101,4 @@ namespace clap {
       _audioOutputs.push_back(info);
    }
 
-   void Gain::deactivate() noexcept { _channelCount = 0; }
-
-   clap_process_status Gain::processBackup(const clap_process *process) noexcept {
-      float **in = process->audio_inputs[0].data32;
-      float **out = process->audio_outputs[0].data32;
-      const uint32_t evCount = process->in_events->size(process->in_events);
-      uint32_t nextEvIndex = 0;
-      uint32_t N = process->frames_count;
-
-      processGuiEvents(process);
-
-      /* foreach frames */
-      for (uint32_t i = 0; i < process->frames_count;) {
-
-         N = processEvents(process, nextEvIndex, evCount, i);
-
-         /* Process as many samples as possible until the next event */
-         for (; i < N; ++i) {
-            const double gaindB = _gainParam->step();
-            const float gain = _gainConv.convert(gaindB);
-
-            for (int c = 0; c < _channelCount; ++c)
-               out[c][i] = gain * in[c][i];
-         }
-      }
-
-      _pluginToGuiQueue.producerDone();
-
-      return CLAP_PROCESS_CONTINUE_IF_NOT_QUIET;
-   }
 } // namespace clap

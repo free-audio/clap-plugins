@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../core-plugin.hh"
-#include "../domain-converter.hh"
 
 namespace clap {
    class Gain final : public CorePlugin {
@@ -17,12 +16,9 @@ namespace clap {
       // clap_plugin
       bool init() noexcept override;
       void defineAudioPorts() noexcept;
-      void deactivate() noexcept override;
       clap_process_status processBackup(const clap_process *process) noexcept;
 
    private:
       int _channelCount = 1;
-      Parameter *_gainParam = nullptr;
-      GainConverter _gainConv{0};
    };
 } // namespace clap

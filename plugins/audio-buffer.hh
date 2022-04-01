@@ -10,10 +10,20 @@ namespace clap {
    public:
       AudioBuffer(uint32_t channelCount, uint32_t frameCount, double sampleRate = 0)
          : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate),
-           _data(static_cast<T*>(std::aligned_alloc(32, channelCount * frameCount * sizeof(T)))) {
+           _data(static_cast<T *>(std::aligned_alloc(32, channelCount * frameCount * sizeof(T)))) {
          if (!_data)
             throw std::bad_alloc();
       }
+
+      AudioBuffer(AudioBuffer<T> &&o)
+         : _channelCount(o._channelCount), _frameCount(o._frameCount), _sampleRate(o._sampleRate),
+           _data(o._data), _stride(o.stride) {
+         o._data = nullptr;
+      }
+
+      AudioBuffer(const AudioBuffer<T> &other) = delete;
+      AudioBuffer<T> &operator=(const AudioBuffer<T> &) = delete;
+      AudioBuffer<T> &operator=(AudioBuffer<T> &&) = delete;
 
       ~AudioBuffer() { std::free(_data); }
 

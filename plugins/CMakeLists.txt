@@ -32,7 +32,9 @@ add_library(
   modules/root-module.cc
   modules/root-module.hh
   modules/voice-expender-module.hh
+  modules/voice-expender-module.cc
   modules/voice-module.hh
+  modules/voice-module.cc
   parameter.hh
   parameter.cc
   parameters.cc

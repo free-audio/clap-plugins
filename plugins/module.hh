@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <memory>
 
 #include <clap/clap.h>
 
@@ -37,7 +38,7 @@ namespace clap {
                               double max,
                               double deflt);
 
-      [[nodiscard]] Module *cloneVoice() const;
+      [[nodiscard]] virtual std::unique_ptr<Module> cloneVoice() const;
 
       [[nodiscard]] virtual bool activate(double sampleRate, uint32_t maxFrameCount) {
          return true;

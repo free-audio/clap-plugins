@@ -8,7 +8,7 @@ namespace clap {
 
    Module::~Module() = default;
 
-   Module *Module::cloneVoice() const { return nullptr; }
+   std::unique_ptr<Module> Module::cloneVoice() const { return {}; }
 
    Parameter *Module::addParameter(
       uint32_t id, const std::string &name, uint32_t flags, double min, double max, double deflt) {

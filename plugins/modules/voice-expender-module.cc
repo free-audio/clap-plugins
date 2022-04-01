@@ -10,8 +10,6 @@ namespace clap {
                                             std::unique_ptr<Module> module)
       : Module(plugin, "voice-expander", paramIdStart) {
 
-      for (uint32_t i = 1; i < _voices.size(); ++i)
-         _voices[i] = std::make_unique<VoiceModule>(_plugin, module->cloneVoice());
       _voices[0] = std::make_unique<VoiceModule>(_plugin, std::move(module));
    }
 
@@ -43,4 +41,10 @@ namespace clap {
       return CLAP_PROCESS_SLEEP;
    }
 
+   void VoiceExpanderModule::registerParameters() {
+      _voices[0]->registerParameters();
+
+      for (uint32_t i = 1; i < _voices.size(); ++i)
+         _voices[i] = std::make_unique<VoiceModule>(_plugin, _voices[0]->_module->cloneVoice());
+   }
 } // namespace clap

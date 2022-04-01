@@ -7,4 +7,6 @@ namespace clap {
    std::unique_ptr<Module> VoiceModule::cloneVoice() const {
       return std::make_unique<VoiceModule>(_plugin, _module->cloneVoice());
    }
+
+   void VoiceModule::registerParameters() { _module->registerParameters(); }
 } // namespace clap

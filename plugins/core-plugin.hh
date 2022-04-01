@@ -52,7 +52,7 @@ namespace clap {
       void deactivate() noexcept override;
       bool startProcessing() noexcept override;
       void stopProcessing() noexcept override;
-      void reset() noexcept;
+      void reset() noexcept override;
 
       clap_process_status process(const clap_process *process) noexcept final;
       clap_process_status

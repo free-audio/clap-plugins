@@ -34,7 +34,7 @@ namespace clap {
       [[nodiscard]] auto &gain() const noexcept { return _gainBuffer; }
       [[nodiscard]] auto &pan() const noexcept { return _panBuffer; }
 
-      void reset() noexcept;
+      void reset() noexcept override;
 
    private:
       const std::unique_ptr<Module> _module;

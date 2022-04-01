@@ -9,4 +9,8 @@ namespace clap {
    std::unique_ptr<Module> VoiceModule::cloneVoice() const {
       return std::make_unique<VoiceModule>(*this);
    }
+
+   void VoiceModule::reset() noexcept {
+      _module->reset();
+   }
 } // namespace clap

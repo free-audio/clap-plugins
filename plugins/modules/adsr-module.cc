@@ -26,6 +26,10 @@ namespace clap {
 
    AdsrModule::~AdsrModule() = default;
 
+   std::unique_ptr<Module> AdsrModule::cloneVoice() const {
+      return std::make_unique<AdsrModule>(*this);
+   }
+
    void AdsrModule::trigger(double velocity) {
       phase = Phase::Attack;
       // TODO: use velocity
@@ -68,4 +72,5 @@ namespace clap {
    void AdsrModule::onNoteOff(const clap_event_note &note) noexcept { release(); }
 
    void AdsrModule::onNoteChoke(const clap_event_note &note) noexcept { choke(); }
+
 } // namespace clap

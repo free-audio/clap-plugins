@@ -296,33 +296,42 @@ namespace clap {
       runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
    }
 
-   bool CorePlugin::activate(double sampleRate, uint32_t minFrameCount, uint32_t maxFrameCount) noexcept
-   {
+   //------------------//
+   // Audio Processing //
+   //------------------//
+   bool CorePlugin::activate(double sampleRate,
+                             uint32_t minFrameCount,
+                             uint32_t maxFrameCount) noexcept {
       _context.sampleRateD = sampleRate;
       _context.sampleRateF = sampleRate;
+
+      _context.audioInputs.resize(_audioInputs.size());
+      _context.audioOutputs.resize(_audioInputs.size());
+
+      for (uint32_t i = 0; i < _audioInputs.size(); ++i) {
+         auto &info = _audioInputs[i];
+         auto &buffer = _context.audioInputs[i];
+
+         buffer = std::make_unique<AudioBuffer<double>>(info.channel_count, BLOCK_SIZE, sampleRate);
+      }
+
+      for (uint32_t i = 0; i < _audioOutputs.size(); ++i) {
+         auto &info = _audioOutputs[i];
+         auto &buffer = _context.audioOutputs[i];
+
+         buffer = std::make_unique<AudioBuffer<double>>(info.channel_count, BLOCK_SIZE, sampleRate);
+      }
 
       return _rootModule->activate(sampleRate, maxFrameCount);
    }
 
-   void CorePlugin::deactivate() noexcept
-   {
-      _rootModule->deactivate();
-   }
+   void CorePlugin::deactivate() noexcept { _rootModule->deactivate(); }
 
-   bool CorePlugin::startProcessing() noexcept
-   {
-      return _rootModule->startProcessing();
-   }
+   bool CorePlugin::startProcessing() noexcept { return _rootModule->startProcessing(); }
 
-   void CorePlugin::stopProcessing() noexcept
-   {
-      _rootModule->stopProcessing();
-   }
+   void CorePlugin::stopProcessing() noexcept { _rootModule->stopProcessing(); }
 
-   void CorePlugin::reset() noexcept
-   {
-      _rootModule->reset();
-   }
+   void CorePlugin::reset() noexcept { _rootModule->reset(); }
 
    // Design:
    // - divide the block into chunks of up to N=256 frames
@@ -358,8 +367,19 @@ namespace clap {
                                                 uint32_t frameCount) noexcept {
       renderParameters(frameCount);
 
-      // TODO: prepareContext
-      return _rootModule->process(_context, frameCount);
+      for (uint32_t i = 0; i < process->audio_inputs_count; ++i) {
+         auto in = &process->audio_inputs[i];
+         _context.audioInputs[i]->fromClap(in, frameOffset, frameCount);
+      }
+
+      auto status = _rootModule->process(_context, frameCount);
+
+      for (uint32_t i = 0; i < process->audio_outputs_count; ++i) {
+         auto out = &process->audio_outputs[i];
+         _context.audioOutputs[i]->toClap(out, frameOffset, frameCount);
+      }
+
+      return status;
    }
 
    void CorePlugin::renderParameters(uint32_t frameCount) noexcept {

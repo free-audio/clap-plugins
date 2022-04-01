@@ -7,7 +7,7 @@
 
 #include "constants.hh"
 #include "audio-buffer.hh"
-#include "fixedpoint.hh"
+#include "fixed-point.hh"
 
 namespace clap {
    // audio processing context

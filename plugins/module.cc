@@ -24,4 +24,20 @@ namespace clap {
       return _plugin._parameters.addParameter(info);
    }
 
+   bool Module::activate(double sampleRate, uint32_t maxFrameCount) {
+      assert(!_isActive);
+      _isActive = doActivate(sampleRate, maxFrameCount);
+      return _isActive;
+   }
+
+   void Module::deactivate() {
+      if (!_isActive)
+         return;
+      doDeactivate();
+      _isActive = false;
+   }
+
+   bool Module::doActivate(double sampleRate, uint32_t maxFrameCount) { return true; }
+
+   void Module::doDeactivate() {}
 } // namespace clap

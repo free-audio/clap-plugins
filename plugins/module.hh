@@ -31,12 +31,13 @@ namespace clap {
 
       [[nodiscard]] virtual std::unique_ptr<Module> cloneVoice() const;
 
-      [[nodiscard]] virtual bool activate(double sampleRate, uint32_t maxFrameCount) {
-         return true;
-      }
-      virtual void deactivate() {}
+      bool activate(double sampleRate, uint32_t maxFrameCount);
+      [[nodiscard]] virtual bool doActivate(double sampleRate, uint32_t maxFrameCount);
+      void deactivate();
+      virtual void doDeactivate();
 
       virtual clap_process_status process(Context &c, uint32_t numFrames) noexcept {
+         assert(_isActive);
          return CLAP_PROCESS_SLEEP;
       }
 
@@ -57,5 +58,7 @@ namespace clap {
       CorePlugin &_plugin;
       const std::string _name;
       const clap_id _paramIdStart;
+
+      bool _isActive = false;
    };
 } // namespace clap

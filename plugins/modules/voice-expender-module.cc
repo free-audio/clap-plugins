@@ -15,7 +15,7 @@ namespace clap {
          _voices[i] = std::make_unique<VoiceModule>(*_voices[0]);
    }
 
-   bool VoiceExpanderModule::activate(double sampleRate, uint32_t maxFrameCount) {
+   bool VoiceExpanderModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
       for (auto &voice : _voices) {
          if (voice) {
             if (!voice->activate(sampleRate, maxFrameCount)) {
@@ -27,7 +27,7 @@ namespace clap {
       return true;
    }
 
-   void VoiceExpanderModule::deactivate() {
+   void VoiceExpanderModule::doDeactivate() {
       for (auto &voice : _voices)
          if (voice)
             voice->deactivate();

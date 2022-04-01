@@ -45,4 +45,7 @@ namespace clap {
       T *const _data;
       uint32_t _stride;
    };
+
+   extern template class AudioBuffer<float>;
+   extern template class AudioBuffer<double>;
 } // namespace clap

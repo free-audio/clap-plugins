@@ -18,6 +18,7 @@ endif()
 add_library(
   clap-plugins MODULE
 
+  audio-buffer.cc
   audio-buffer.hh
   clap-entry.cc
   constants.hh

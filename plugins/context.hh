@@ -1,9 +1,12 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <clap/clap.h>
 
+#include "constants.hh"
+#include "audio-buffer.hh"
 #include "fixedpoint.hh"
 
 namespace clap {
@@ -14,12 +17,16 @@ namespace clap {
       uint32_t numFrames;
 
       // current sampleRate
-      double sampleRate;
+      double sampleRateD;
       float sampleRateF;
 
       bool isPlaying;
       bool isRecording;
 
-      std::vector<FixedPoint> beatTime;
+      // pre-calculated array of beat time for each frames
+      std::array<FixedPoint, BLOCK_SIZE> beatTime;
+
+      std::vector<std::unique_ptr<AudioBuffer<double>>> audioInputs;
+      std::vector<std::unique_ptr<AudioBuffer<double>>> audioOutputs;
    };
 } // namespace clap

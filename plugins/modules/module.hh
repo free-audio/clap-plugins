@@ -36,6 +36,10 @@ namespace clap {
       void deactivate();
       virtual void doDeactivate();
 
+      virtual bool startProcessing() noexcept { return true; }
+      virtual void stopProcessing() noexcept {}
+      virtual void reset() noexcept {}
+
       virtual clap_process_status process(Context &c, uint32_t numFrames) noexcept {
          assert(_isActive);
          return CLAP_PROCESS_SLEEP;

@@ -296,6 +296,34 @@ namespace clap {
       runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
    }
 
+   bool CorePlugin::activate(double sampleRate, uint32_t minFrameCount, uint32_t maxFrameCount) noexcept
+   {
+      _context.sampleRateD = sampleRate;
+      _context.sampleRateF = sampleRate;
+
+      return _rootModule->activate(sampleRate, maxFrameCount);
+   }
+
+   void CorePlugin::deactivate() noexcept
+   {
+      _rootModule->deactivate();
+   }
+
+   bool CorePlugin::startProcessing() noexcept
+   {
+      return _rootModule->startProcessing();
+   }
+
+   void CorePlugin::stopProcessing() noexcept
+   {
+      _rootModule->stopProcessing();
+   }
+
+   void CorePlugin::reset() noexcept
+   {
+      _rootModule->reset();
+   }
+
    // Design:
    // - divide the block into chunks of up to N=256 frames
    // - render global parameters to audio buffers
@@ -330,9 +358,8 @@ namespace clap {
                                                 uint32_t frameCount) noexcept {
       renderParameters(frameCount);
 
-      // TODO
-
-      return CLAP_PROCESS_CONTINUE;
+      // TODO: prepareContext
+      return _rootModule->process(_context, frameCount);
    }
 
    void CorePlugin::renderParameters(uint32_t frameCount) noexcept {

@@ -47,6 +47,13 @@ namespace clap {
       bool init() noexcept override;
       void initTrackInfo() noexcept;
 
+      bool
+      activate(double sampleRate, uint32_t minFrameCount, uint32_t maxFrameCount) noexcept override;
+      void deactivate() noexcept override;
+      bool startProcessing() noexcept override;
+      void stopProcessing() noexcept override;
+      void reset() noexcept;
+
       clap_process_status process(const clap_process *process) noexcept final;
       clap_process_status
       processRange(const clap_process *process, uint32_t frameOffset, uint32_t frameCount) noexcept;
@@ -196,5 +203,6 @@ namespace clap {
       clap_event_transport _transportCopy;
 
       Context _context;
+      std::unique_ptr<Module> _rootModule;
    };
 } // namespace clap

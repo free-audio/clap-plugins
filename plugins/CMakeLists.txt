@@ -20,10 +20,14 @@ add_library(
 
   audio-buffer.hh
   clap-entry.cc
+  constants.hh
+  container-of.hh
   context.hh
   core-plugin.cc
   core-plugin.hh
   domain-converter.hh
+  fixed-point.hh
+  intrusive-list.hh
   modulation-matrix.hh
   modules/adsr-module.cc
   modules/adsr-module.hh

@@ -31,8 +31,8 @@ add_library(
   modules/adsr-module.hh
   modules/root-module.cc
   modules/root-module.hh
-  modules/voice-expender-module.hh
-  modules/voice-expender-module.cc
+  modules/voice-expander-module.hh
+  modules/voice-expander-module.cc
   modules/voice-module.hh
   modules/voice-module.cc
   parameter.hh

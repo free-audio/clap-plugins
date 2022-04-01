@@ -1,6 +1,6 @@
 #include "../container-of.hh"
 
-#include "voice-expender-module.hh"
+#include "voice-expander-module.hh"
 #include "voice-module.hh"
 
 namespace clap {

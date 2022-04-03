@@ -34,11 +34,17 @@ namespace clap {
 
             _next->_prev = _prev;
             _prev->_next = _next;
+            _prev = this;
+            _next = this;
+
+            assert(!isHooked());
          }
 
          [[nodiscard]] inline bool checkInvariants() const noexcept {
             assert(_next == this ? _prev == this : true);
             assert(_prev == this ? _next == this : true);
+            assert(_next != this ? _next->_prev == this : true);
+            assert(_prev != this ? _prev->_next == this : true);
             return true;
          }
 

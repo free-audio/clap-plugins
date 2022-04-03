@@ -369,15 +369,17 @@ namespace clap {
       renderParameters(frameCount);
 
       for (uint32_t i = 0; i < process->audio_inputs_count; ++i) {
-         auto in = &process->audio_inputs[i];
-         _context.audioInputs[i]->fromClap(in, frameOffset, frameCount);
+         auto& moduleIn = _context.audioInputs[i];
+         auto clapIn = &process->audio_inputs[i];
+         moduleIn->fromClap(clapIn, frameOffset, frameCount);
       }
 
       auto status = _rootModule->process(_context, frameCount);
 
       for (uint32_t i = 0; i < process->audio_outputs_count; ++i) {
-         auto out = &process->audio_outputs[i];
-         _context.audioOutputs[i]->toClap(out, frameOffset, frameCount);
+         auto& moduleOut = _context.audioOutputs[i];
+         auto* clapOut = &process->audio_outputs[i];
+         moduleOut->toClap(clapOut, frameOffset, frameCount);
       }
 
       return status;

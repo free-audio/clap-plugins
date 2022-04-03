@@ -38,7 +38,7 @@ namespace clap {
 
          CLAP_VERSION,
          "com.github.free-audio.clap.gain",
-         "gain",
+         "Gain",
          "clap",
          "https://github.com/free-audio/clap",
          nullptr,
@@ -54,7 +54,9 @@ namespace clap {
    };
 
    Gain::Gain(const std::string &pluginPath, const clap_host *host)
-      : CorePlugin(PathProvider::create(pluginPath, "gain"), descriptor(), host) {}
+      : CorePlugin(PathProvider::create(pluginPath, "gain"), descriptor(), host) {
+         _rootModule = std::make_unique<GainModule>(*this);
+      }
 
    bool Gain::init() noexcept {
       if (!super::init())

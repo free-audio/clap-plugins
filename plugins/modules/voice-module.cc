@@ -6,7 +6,9 @@ namespace clap {
          _module->setVoiceModule(this);
       }
 
-   VoiceModule::VoiceModule(const VoiceModule &m) : Module(m), _module(m._module->cloneVoice()) {}
+   VoiceModule::VoiceModule(const VoiceModule &m) : Module(m), _module(m._module->cloneVoice()) {
+      _module->setVoiceModule(this);
+   }
 
    std::unique_ptr<Module> VoiceModule::cloneVoice() const {
       return std::make_unique<VoiceModule>(*this);

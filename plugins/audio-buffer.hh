@@ -40,7 +40,7 @@ namespace clap {
       [[nodiscard]] double sampleRate() const noexcept { return _sampleRate; }
 
       void fromClap(const clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) noexcept;
-      void toClap(clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) noexcept;
+      void toClap(clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) const noexcept;
 
       // Store a + b into this buffer
       template <typename Operator>

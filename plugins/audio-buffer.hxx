@@ -5,7 +5,10 @@
 namespace clap {
    template <typename T>
    template <typename Operator>
-   void AudioBuffer<T>::compute(const Operator& op, AudioBuffer<T> &a, AudioBuffer<T> &b, uint32_t numFrames) noexcept {
+   void AudioBuffer<T>::compute(const Operator &op,
+                                const AudioBuffer<T> &a,
+                                const AudioBuffer<T> &b,
+                                uint32_t numFrames) noexcept {
       assert(numFrames <= _frameCount);
       assert(a.channelCount() == 1 || a.channelCount() == _channelCount);
       assert(b.channelCount() == 1 || b.channelCount() == _channelCount);

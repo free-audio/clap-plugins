@@ -21,21 +21,7 @@ namespace clap {
       clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
 
-         const uint32_t N = numFrames * c.audioInputs[0]->channelCount();
-         auto in = c.audioInputs[0]->data();
-         const auto inStride = c.audioInputs[0]->stride();
-         auto out = c.audioOutputs[0]->data();
-
-         auto &offsetValueBuffer = _offsetParam->valueBuffer();
-         auto offsetValue = offsetValueBuffer.data();
-         auto offsetValueStride = offsetValueBuffer.stride();
-
-         auto &offsetModulationBuffer = _offsetParam->modulationBuffer();
-         auto offsetModulation = offsetModulationBuffer.data();
-         auto offsetModulationStride = offsetModulationBuffer.stride();
-
-         for (uint32_t i = 0; i < N; ++i)
-            out[i] = in[i * inStride] + offsetValue[i * offsetValueStride] + offsetModulation[i * offsetModulationStride];
+         c.audioOutputs[0]->sum(*c.audioInputs[0], _offsetParam->modulatedValueBuffer(), numFrames);
 
          return CLAP_PROCESS_SLEEP;
       }

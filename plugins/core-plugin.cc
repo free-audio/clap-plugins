@@ -394,6 +394,12 @@ namespace clap {
          ++it; // We increment immediately because param->renderModulation() may unlink the param
          param->renderModulation(frameCount);
       }
+
+      for (auto it = _parameterModulatedValueToProcess.begin(); !it.end();) {
+         Parameter *param = containerOf(it.item(), &Parameter::_modulatedValueToProcessHook);
+         ++it; // We increment immediately because param->renderModulation() may unlink the param
+         param->renderModulatedValue(frameCount);
+      }
    }
 
    void CorePlugin::processInputParameterChange(const clap_event_header *hdr) {
@@ -420,8 +426,11 @@ namespace clap {
             else
                p->setValueImmediately(ev->value);
 
-            if (p->valueNeedsProcessing() && !p->_valueToProcessHook.isHooked())
+            if (p->valueNeedsProcessing() && !p->_valueToProcessHook.isHooked()) {
                _parameterValueToProcess.pushBack(&p->_valueToProcessHook);
+               if (!p->_modulatedValueToProcessHook.isHooked())
+                  _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
+            }
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
@@ -449,8 +458,11 @@ namespace clap {
             else
                p->setModulationImmediately(ev->amount);
 
-            if (p->modulationNeedsProcessing() && !p->_modulationToProcessHook.isHooked())
+            if (p->modulationNeedsProcessing() && !p->_modulationToProcessHook.isHooked()) {
                _parameterModulationToProcess.pushBack(&p->_modulationToProcessHook);
+               if (!p->_modulatedValueToProcessHook.isHooked())
+                  _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
+            }
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;

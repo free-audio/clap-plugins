@@ -109,6 +109,7 @@ namespace clap {
       /* keep those hooks public */
       IntrusiveList::Hook _valueToProcessHook;
       IntrusiveList::Hook _modulationToProcessHook;
+      IntrusiveList::Hook _modulatedValueToProcessHook;
 
    private:
 #if 0

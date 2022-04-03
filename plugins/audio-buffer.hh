@@ -41,9 +41,9 @@ namespace clap {
 
       // Store a + b into this buffer
       template <typename Operator>
-      void compute(const Operator& op, AudioBuffer<T>& a, AudioBuffer<T>& b, uint32_t numFrames) noexcept;
+      void compute(const Operator& op, const AudioBuffer<T>& a, const AudioBuffer<T>& b, uint32_t numFrames) noexcept;
 
-      void sum(AudioBuffer<T>& a, AudioBuffer<T>& b, uint32_t numFrames) noexcept
+      void sum(const AudioBuffer<T>& a, const AudioBuffer<T>& b, uint32_t numFrames) noexcept
       {
          struct Sum
          {

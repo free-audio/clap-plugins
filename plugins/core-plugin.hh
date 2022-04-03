@@ -194,6 +194,7 @@ namespace clap {
       Parameters _parameters;
       IntrusiveList _parameterValueToProcess;
       IntrusiveList _parameterModulationToProcess;
+      IntrusiveList _parameterModulatedValueToProcess;
 
       static const constexpr uint32_t _paramSmoothingDuration = 64;
 

@@ -31,5 +31,8 @@ namespace clap {
    void Parameter::renderModulatedValue(uint32_t frameCount) noexcept {
       _modulatedValueBuffer.sum(_valueBuffer, _modulationBuffer, frameCount);
       _valueType.toEngine(_modulatedValueBuffer, frameCount);
+
+      if (!_value.isSmoothing() && !_modulation.isSmoothing())
+         _modulatedValueToProcessHook.unlink();
    }
 } // namespace clap

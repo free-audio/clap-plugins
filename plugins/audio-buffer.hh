@@ -71,7 +71,7 @@ namespace clap {
       const uint32_t _frameCount;
       const double _sampleRate; // 0 if unspecified
       T *const _data;
-      uint32_t _stride;
+      uint32_t _stride = 0;
    };
 
    extern template class AudioBuffer<float>;

@@ -4,6 +4,8 @@
 #include "decibel-value-type.hh"
 
 namespace clap {
+   const DecibelValueType DecibelValueType::instance;
+
    std::string DecibelValueType::toText(double paramValue) const {
       std::ostringstream os;
       os << paramValue << " dB";

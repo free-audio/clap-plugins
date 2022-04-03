@@ -20,6 +20,12 @@ namespace clap {
 
       void setSmoothed(double val, uint32_t steps) noexcept {
          assert(steps > 0);
+
+         if (val == _value) {
+            setImmediately(val);
+            return;
+         }
+
          _ramp = (val - _value) / steps;
          _steps = steps;
       }

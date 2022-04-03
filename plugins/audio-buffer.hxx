@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "audio-buffer.hh"
 
 namespace clap {

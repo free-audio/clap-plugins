@@ -63,7 +63,7 @@ namespace clap {
       }
 
       // This isn't the first block and it is constant, and the block before were constant too
-      const bool allConstant = (buffer->constant_mask & allConstantMask) == allConstantMask;
+      const bool allConstant = ((buffer->constant_mask & allConstantMask) == allConstantMask);
       if (_stride == 0 && frameOffset != 0 && allConstant) {
          // check if the constant value is the same as in the previous block
          bool same = true;

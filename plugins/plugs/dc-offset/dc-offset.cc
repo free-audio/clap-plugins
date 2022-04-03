@@ -1,8 +1,8 @@
 #include <cstring>
 
+#include "../audio-buffer.hh"
 #include "../modules/module.hh"
 #include "dc-offset.hh"
-#include "../audio-buffer.hh"
 
 namespace clap {
 
@@ -49,8 +49,8 @@ namespace clap {
 
    DcOffset::DcOffset(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "dc-offset"), descriptor(), host) {
-         _rootModule = std::make_unique<DcOffsetModule>(*this);
-      }
+      _rootModule = std::make_unique<DcOffsetModule>(*this);
+   }
 
    bool DcOffset::init() noexcept {
       if (!super::init())

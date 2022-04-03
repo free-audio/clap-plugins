@@ -19,7 +19,7 @@ namespace clap {
 
    void Parameter::renderModulation(uint32_t frameCount) noexcept {
       if (_modulation.isSmoothing()) {
-         _modulation.render(_valueBuffer.data(), frameCount);
+         _modulation.render(_modulationBuffer.data(), frameCount);
          _modulationBuffer.setConstant(false);
       } else {
          _modulationBuffer.data()[0] = _modulation.value();

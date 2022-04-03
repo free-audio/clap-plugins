@@ -32,7 +32,7 @@ namespace clap {
 
       // Advances the value by 1 samples and return the new value + modulation
       double step() noexcept {
-         if (_steps > 0) [[unlikely]] {
+         if (_steps > 0) [[likely]] {
             _value += _ramp;
             --_steps;
          }
@@ -42,7 +42,7 @@ namespace clap {
 
       // Advances the value by n samples and return the new value + modulation
       double step(uint32_t n) noexcept {
-         if (_steps > 0) [[unlikely]] {
+         if (_steps > 0) [[likely]] {
             auto k = std::min<uint32_t>(_steps, n);
             _value += k * _ramp;
             _steps -= k;
@@ -55,9 +55,14 @@ namespace clap {
 
       void render(double *buffer, uint32_t numValues, uint32_t stepSize) noexcept
       {
-         buffer[0] = _value;
-         for (uint32_t i = 1; i < numValues; ++i)
+         for (uint32_t i = 0; i < numValues; ++i)
             buffer[i] = step(stepSize);
+      }
+
+      void render(double *buffer, uint32_t numValues) noexcept
+      {
+         for (uint32_t i = 0; i < numValues; ++i)
+            buffer[i] = step();
       }
 
    private:

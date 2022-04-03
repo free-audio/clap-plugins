@@ -8,7 +8,7 @@ namespace clap {
 
    void Parameter::renderValue(uint32_t frameCount) noexcept {
       if (_value.isSmoothing()) {
-         _value.render(_valueBuffer.data(), frameCount, 1);
+         _value.render(_valueBuffer.data(), frameCount);
          _valueBuffer.setConstant(false);
       } else {
          _valueBuffer.data()[0] = _value.value();
@@ -19,7 +19,7 @@ namespace clap {
 
    void Parameter::renderModulation(uint32_t frameCount) noexcept {
       if (_modulation.isSmoothing()) {
-         _modulation.render(_valueBuffer.data(), frameCount, 1);
+         _modulation.render(_valueBuffer.data(), frameCount);
          _modulationBuffer.setConstant(false);
       } else {
          _modulationBuffer.data()[0] = _modulation.value();

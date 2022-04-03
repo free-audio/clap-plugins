@@ -11,7 +11,8 @@
 
 namespace clap {
    class VoiceExpanderModule : public Module {
-      VoiceExpanderModule(CorePlugin &plugin, clap_id paramIdStart, std::unique_ptr<Module> module);
+   public:
+      VoiceExpanderModule(CorePlugin &plugin, uint32_t moduleId, std::unique_ptr<Module> module);
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
 

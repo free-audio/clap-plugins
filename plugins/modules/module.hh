@@ -14,7 +14,10 @@ namespace clap {
    class CorePlugin;
 
    /** Re-usable processing unit */
+   class VoiceModule;
    class Module {
+      friend class VoiceModule;
+
    public:
       // This value is fixed and must **NEVER** change.
       // It defines the amount of space reserved for clap parameters id within
@@ -25,7 +28,7 @@ namespace clap {
       Module &operator=(const Module &) = delete;
       Module &operator=(Module &&) = delete;
 
-      Module(CorePlugin &plugin, std::string name, clap_id paramIdStart);
+      Module(CorePlugin &plugin, std::string name, uint32_t moduleId);
       Module(const Module &) = default;
       virtual ~Module();
 
@@ -60,9 +63,16 @@ namespace clap {
                               double deflt,
                               const ValueType &valueType = SimpleValueType::instance);
 
+      // Sets a pointer to the parent voice module in order to retrive
+      // the current voice info
+      void setVoiceModule(const VoiceModule *voiceModule) noexcept { _voiceModule = voiceModule; }
+
       CorePlugin &_plugin;
       const std::string _name;
+      const uint32_t _moduleId;
       const clap_id _paramIdStart;
+
+      const VoiceModule *_voiceModule = nullptr;
 
       bool _isActive = false;
    };

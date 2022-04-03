@@ -2,8 +2,8 @@
 
 namespace clap {
 
-   AdsrModule::AdsrModule(CorePlugin &plugin, std::string name, clap_id paramIdStart)
-      : Module(plugin, name, paramIdStart) {
+   AdsrModule::AdsrModule(CorePlugin &plugin, std::string name, uint32_t moduleId)
+      : Module(plugin, name, moduleId) {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 

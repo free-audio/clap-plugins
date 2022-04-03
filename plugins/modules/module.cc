@@ -3,15 +3,21 @@
 
 namespace clap {
 
-   Module::Module(CorePlugin &plugin, std::string name, clap_id paramIdStart)
-      : _plugin(plugin), _name(std::move(name)), _paramIdStart(paramIdStart) {}
+   Module::Module(CorePlugin &plugin, std::string name, uint32_t moduleId)
+      : _plugin(plugin), _name(std::move(name)), _moduleId(moduleId),
+        _paramIdStart(moduleId * parameter_capacity) {}
 
    Module::~Module() = default;
 
    std::unique_ptr<Module> Module::cloneVoice() const { return {}; }
 
-   Parameter *Module::addParameter(
-      uint32_t id, const std::string &name, uint32_t flags, double min, double max, double deflt, const ValueType& valueType) {
+   Parameter *Module::addParameter(uint32_t id,
+                                   const std::string &name,
+                                   uint32_t flags,
+                                   double min,
+                                   double max,
+                                   double deflt,
+                                   const ValueType &valueType) {
       clap_param_info info;
       info.id = _paramIdStart + id;
       info.cookie = nullptr;

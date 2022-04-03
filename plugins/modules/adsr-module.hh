@@ -6,7 +6,7 @@
 namespace clap {
    class AdsrModule : public Module {
    public:
-      AdsrModule(CorePlugin &plugin, std::string name, clap_id paramIdStart);
+      AdsrModule(CorePlugin &plugin, std::string name, uint32_t moduleId);
       AdsrModule(const AdsrModule&);
       ~AdsrModule() override;
 

@@ -54,6 +54,8 @@ add_library(
   plugs/gain/gain.hh
   plugs/transport/transport-info.cc
   plugs/transport/transport-info.hh
+  plugs/synth/synth.hh
+  plugs/synth/synth.cc
   smoothed-value.hh
   stream-helper.hh
   value-types/decibel-value-type.hh

@@ -427,11 +427,10 @@ namespace clap {
             else
                p->setValueImmediately(ev->value);
 
-            if (p->valueNeedsProcessing() && !p->_valueToProcessHook.isHooked()) {
+            if (!p->_valueToProcessHook.isHooked())
                _parameterValueToProcess.pushBack(&p->_valueToProcessHook);
-               if (!p->_modulatedValueToProcessHook.isHooked())
-                  _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
-            }
+            if (!p->_modulatedValueToProcessHook.isHooked())
+               _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
@@ -459,11 +458,10 @@ namespace clap {
             else
                p->setModulationImmediately(ev->amount);
 
-            if (p->modulationNeedsProcessing() && !p->_modulationToProcessHook.isHooked()) {
+            if (!p->_modulationToProcessHook.isHooked())
                _parameterModulationToProcess.pushBack(&p->_modulationToProcessHook);
-               if (!p->_modulatedValueToProcessHook.isHooked())
-                  _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
-            }
+            if (!p->_modulatedValueToProcessHook.isHooked())
+               _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
@@ -475,14 +473,19 @@ namespace clap {
    void CorePlugin::processGuiParameterChange(const clap_output_events *out) {
       GuiToPluginEvent value;
       while (_guiToPluginQueue.tryPeek(value)) {
-         auto param = _parameters.getById(value.paramId);
-         if (!param) [[unlikely]]
+         auto p = _parameters.getById(value.paramId);
+         if (!p) [[unlikely]]
             return;
 
          if (isProcessing()) [[likely]]
-            param->setValueSmoothed(value.value, _paramSmoothingDuration);
+            p->setValueSmoothed(value.value, _paramSmoothingDuration);
          else
-            param->setValueImmediately(value.value);
+            p->setValueImmediately(value.value);
+
+         if (!p->_valueToProcessHook.isHooked())
+            _parameterValueToProcess.pushBack(&p->_valueToProcessHook);
+         if (!p->_modulatedValueToProcessHook.isHooked())
+            _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
 
          switch (value.type) {
          case GuiToPluginEvent::Value:
@@ -497,7 +500,7 @@ namespace clap {
                ev.value = value.value;
                ev.channel = -1;
                ev.key = -1;
-               ev.cookie = param;
+               ev.cookie = p;
 
                if (!out->try_push(out, &ev.header)) [[unlikely]]
                   return;

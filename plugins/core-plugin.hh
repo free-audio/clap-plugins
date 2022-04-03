@@ -175,6 +175,14 @@ namespace clap {
 
       void pushGuiToPluginEvent(const GuiToPluginEvent &event);
 
+      Parameter *addParameter(const clap_param_info &info, const ValueType &valueType) {
+         auto p = _parameters.addParameter(info, valueType);
+         _parameterValueToProcess.pushBack(&p->_valueToProcessHook);
+         _parameterModulationToProcess.pushBack(&p->_modulationToProcessHook);
+         _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
+         return p;
+      }
+
       helpers::ParamQueue<GuiToPluginEvent, 32> _guiToPluginQueue;
       helpers::ReducingParamQueue<clap_id, PluginToGuiValue> _pluginToGuiQueue;
 

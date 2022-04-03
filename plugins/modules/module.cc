@@ -27,7 +27,7 @@ namespace clap {
       info.default_value = deflt;
       snprintf(info.name, sizeof(info.name), "%s", name.c_str());
       snprintf(info.module, sizeof(info.module), "/%s", _name.c_str());
-      return _plugin._parameters.addParameter(info, valueType);
+      return _plugin.addParameter(info, valueType);
    }
 
    bool Module::activate(double sampleRate, uint32_t maxFrameCount) {

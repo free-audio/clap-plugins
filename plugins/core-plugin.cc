@@ -346,20 +346,21 @@ namespace clap {
       const uint32_t evCount = process->in_events->size(process->in_events);
       uint32_t nextEvIndex = 0;
       uint32_t N = process->frames_count;
+      clap_process_status status = CLAP_PROCESS_SLEEP;
 
       for (uint32_t i = 0; i < process->frames_count;) {
          N = processEvents(process, nextEvIndex, evCount, i);
 
-         uint32_t numFramesToProcess = std::min(N - 1, BLOCK_SIZE);
+         uint32_t numFramesToProcess = std::min(N - i, BLOCK_SIZE);
          // Process a range of frames
-         processRange(process, i, numFramesToProcess);
+         status = processRange(process, i, numFramesToProcess);
          i += numFramesToProcess;
       }
 
       // Try to pass the queue to the plugin GUI
       _pluginToGuiQueue.producerDone();
 
-      return CLAP_PROCESS_SLEEP;
+      return status;
    }
 
    clap_process_status CorePlugin::processRange(const clap_process *process,

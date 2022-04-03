@@ -39,32 +39,26 @@ namespace clap {
 
       if (a.channelCount() == 1 && b.channelCount() == 1) {
          for (uint32_t i = 0; i < numFrames; ++i) {
-            T v = op(a._data[i], b._data[i]);
+            T v = op(a._data[i * a._stride], b._data[i * b._stride]);
             for (uint32_t c = 0; c < _channelCount; ++c)
                _data[i * _channelCount + c] = v;
          }
       } else if (a.channelCount() == 1) {
          for (uint32_t i = 0; i < numFrames; ++i) {
-            T va = a._data[i];
-            for (uint32_t c = 0; c < _channelCount; ++c) {
-               auto index = i * _channelCount + c;
-               _data[index] = op(va, b._data[index]);
-            }
+            T va = a._data[i * a._stride];
+            for (uint32_t c = 0; c < _channelCount; ++c)
+               _data[i * _channelCount + c] = op(va, b._data[i * b._stride + c]);
          }
       } else if (b.channelCount() == 1) {
          for (uint32_t i = 0; i < numFrames; ++i) {
-            T vb = b._data[i];
-            for (uint32_t c = 0; c < _channelCount; ++c) {
-               auto index = i * _channelCount + c;
-               _data[index] = op(a._data[index], vb);
-            }
+            T vb = b._data[i * b._stride];
+            for (uint32_t c = 0; c < _channelCount; ++c)
+               _data[i * _channelCount + c] = op(a._data[i * a._stride + c], vb);
          }
       } else {
          for (uint32_t i = 0; i < numFrames; ++i) {
-            for (uint32_t c = 0; c < _channelCount; ++c) {
-               auto index = i * _channelCount + c;
-               _data[index] = op(a._data[index], b._data[index]);
-            }
+            for (uint32_t c = 0; c < _channelCount; ++c)
+               _data[i * _channelCount + c] = op(a._data[i * a._stride + c], b._data[i * b._stride + c]);
          }
       }
       setConstant(false);

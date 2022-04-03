@@ -5,4 +5,30 @@ namespace clap {
       : _info(info), _valueType(valueType) {
       _info.cookie = this;
    }
+
+   void Parameter::renderValue(uint32_t frameCount) noexcept {
+      if (_value.isSmoothing()) {
+         _value.render(_valueBuffer.data(), frameCount, 1);
+         _valueBuffer.setConstant(false);
+      } else {
+         _valueBuffer.data()[0] = _value.value();
+         _valueBuffer.setConstant(true);
+         _valueToProcessHook.unlink();
+      }
+   }
+
+   void Parameter::renderModulation(uint32_t frameCount) noexcept {
+      if (_modulation.isSmoothing()) {
+         _modulation.render(_valueBuffer.data(), frameCount, 1);
+         _modulationBuffer.setConstant(false);
+      } else {
+         _modulationBuffer.data()[0] = _modulation.value();
+         _modulationBuffer.setConstant(true);
+         _modulationToProcessHook.unlink();
+      }
+   }
+
+   void Parameter::renderModulatedValue(uint32_t frameCount) noexcept {
+      _modulatedValueBuffer.sum(_valueBuffer, _modulationBuffer, frameCount);
+   }
 } // namespace clap

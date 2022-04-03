@@ -1,6 +1,9 @@
+#include <cassert>
+
 #include "audio-buffer.hh"
 
 namespace clap {
+
    template <typename T>
    void AudioBuffer<T>::fromClap(const clap_audio_buffer *buffer,
                                  uint32_t frameOffset,

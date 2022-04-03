@@ -39,6 +39,20 @@ namespace clap {
       void fromClap(const clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) noexcept;
       void toClap(clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) noexcept;
 
+      // Store a + b into this buffer
+      template <typename Operator>
+      void compute(const Operator& op, AudioBuffer<T>& a, AudioBuffer<T>& b, uint32_t numFrames) noexcept;
+
+      void sum(AudioBuffer<T>& a, AudioBuffer<T>& b, uint32_t numFrames) noexcept
+      {
+         struct Sum
+         {
+            T operator()(T a, T b) const noexcept { return a + b; }
+         } op;
+
+         compute(op, a, b, numFrames);
+      }
+
    private:
       const uint32_t _channelCount;
       const uint32_t _frameCount;
@@ -50,3 +64,5 @@ namespace clap {
    extern template class AudioBuffer<float>;
    extern template class AudioBuffer<double>;
 } // namespace clap
+
+#include "audio-buffer.hxx"

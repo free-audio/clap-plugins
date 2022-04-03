@@ -31,16 +31,17 @@ namespace clap {
    }
 
    void AdsrModule::trigger(double velocity) {
-      phase = Phase::Attack;
+      _phase = Phase::Attack;
+      _velocity = velocity;
       // TODO: use velocity
    }
 
    void AdsrModule::release() {
-      switch (phase) {
+      switch (_phase) {
       case Phase::Attack:
       case Phase::Decay:
       case Phase::Sustain:
-         phase = Phase::Release;
+         _phase = Phase::Release;
          return;
 
       case Phase::Choke:
@@ -51,11 +52,11 @@ namespace clap {
    }
 
    void AdsrModule::choke() {
-      switch (phase) {
+      switch (_phase) {
       case Phase::Attack:
       case Phase::Decay:
       case Phase::Sustain:
-         phase = Phase::Release;
+         _phase = Phase::Release;
          return;
 
       case Phase::Choke:
@@ -72,5 +73,26 @@ namespace clap {
    void AdsrModule::onNoteOff(const clap_event_note &note) noexcept { release(); }
 
    void AdsrModule::onNoteChoke(const clap_event_note &note) noexcept { choke(); }
+
+   clap_process_status AdsrModule::process(Context &c, uint32_t numFrames) noexcept {
+      assert(_isActive);
+
+      switch (_phase) {
+      case Phase::Rest:
+         break;
+      case Phase::Attack:
+         break;
+      case Phase::Decay:
+         break;
+      case Phase::Sustain:
+         break;
+      case Phase::Release:
+         break;
+      case Phase::Choke:
+         break;
+      }
+
+      return _phase == Phase::Rest ? CLAP_PROCESS_SLEEP : CLAP_PROCESS_CONTINUE;
+   }
 
 } // namespace clap

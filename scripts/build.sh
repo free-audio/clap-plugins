@@ -48,6 +48,8 @@ rm -rf $buildtrees
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options install --recurse \
   qtdeclarative
 
+vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options upgrade 
+
 # save space
 rm -rf $buildtrees
 

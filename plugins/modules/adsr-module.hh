@@ -7,7 +7,7 @@ namespace clap {
    class AdsrModule : public Module {
    public:
       AdsrModule(CorePlugin &plugin, std::string name, uint32_t moduleId);
-      AdsrModule(const AdsrModule&);
+      AdsrModule(const AdsrModule &);
       ~AdsrModule() override;
 
       std::unique_ptr<Module> cloneVoice() const override;
@@ -15,6 +15,8 @@ namespace clap {
       void trigger(double velocity);
       void release();
       void choke();
+
+      clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
 
    protected:
       bool wantsNoteEvents() const noexcept override;
@@ -37,8 +39,9 @@ namespace clap {
          Choke,
       };
 
-      Phase phase = Phase::Rest;
-      double level = 0;
-      std::unique_ptr<AudioBuffer<float>> buffer;
+      Phase _phase = Phase::Rest;
+      double _level = 0;
+      double _velocity = 0.8;
+      std::unique_ptr<AudioBuffer<float>> _buffer;
    };
 } // namespace clap

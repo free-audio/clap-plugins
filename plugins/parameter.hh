@@ -37,8 +37,8 @@ namespace clap {
       const clap_param_info &info() const noexcept { return _info; }
 
       void setDefaultValue() {
-         _value.setImmediately(_info.default_value);
-         _modulation.setImmediately(0);
+         setValueImmediately(_info.default_value);
+         setModulationImmediately(0);
       }
 
       void setValueImmediately(double val) noexcept { _value.setImmediately(val); }

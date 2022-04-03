@@ -53,6 +53,19 @@ namespace clap {
          compute(op, a, b, numFrames);
       }
 
+      void product(const AudioBuffer<T>& a, const AudioBuffer<T>& b, uint32_t numFrames) noexcept
+      {
+         struct Sum
+         {
+            T operator()(T a, T b) const noexcept { return a * b; }
+         } op;
+
+         compute(op, a, b, numFrames);
+      }
+
+      template <typename Operator>
+      void applyTo(const Operator& op, uint32_t numFrames) noexcept;
+
    private:
       const uint32_t _channelCount;
       const uint32_t _frameCount;

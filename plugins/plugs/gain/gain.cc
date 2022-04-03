@@ -22,25 +22,7 @@ namespace clap {
       clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
 
-         const uint32_t N = numFrames * c.audioInputs[0]->channelCount();
-         auto in = c.audioInputs[0]->data();
-         const auto inStride = c.audioInputs[0]->stride();
-         auto out = c.audioOutputs[0]->data();
-
-         auto &gainValueBuffer = _gainParam->valueBuffer();
-         auto gainValue = gainValueBuffer.data();
-         auto gainValueStride = gainValueBuffer.stride();
-
-         auto &gainModulationBuffer = _gainParam->modulationBuffer();
-         auto gainModulation = gainModulationBuffer.data();
-         auto gainModulationStride = gainModulationBuffer.stride();
-
-         for (uint32_t i = 0; i < N; ++i) {
-            const double gaindB =
-               gainValue[i * gainValueStride] + gainModulation[i * gainModulationStride];
-            const double gain = _gainConv.convert(gaindB);
-            out[i] = gain * in[i * inStride];
-         }
+         c.audioOutputs[0]->product(*c.audioInputs[0], _gainParam->modulatedValueBuffer(), numFrames);
 
          return CLAP_PROCESS_SLEEP;
       }

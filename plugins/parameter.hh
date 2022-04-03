@@ -66,10 +66,10 @@ namespace clap {
       void renderModulatedValue(uint32_t frameCount) noexcept;
 
       auto &valueBuffer() const noexcept { return _valueBuffer; }
-
-      auto &modulatedValueBuffer() const noexcept { return _modulatedValueBuffer; }
-
       auto &modulationBuffer() const noexcept { return _modulationBuffer; }
+
+      // valueType.toEngine(value + mod)
+      auto &modulatedValueBuffer() const noexcept { return _modulatedValueBuffer; }
 
 #if 0
    private:

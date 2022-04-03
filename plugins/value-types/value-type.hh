@@ -9,12 +9,13 @@ namespace clap {
    public:
       virtual ~ValueType();
 
-      virtual std::string toText(double paramValue) const = 0;
-      virtual double fromText(const std::string &paramValueText) const = 0;
+      [[nodiscard]] virtual std::string toText(double paramValue) const = 0;
+      [[nodiscard]] virtual double fromText(const std::string &paramValueText) const = 0;
 
       /* Domain conversion */
-      virtual double toParam(double engineValue) const = 0;
-      virtual double toEngine(double paramValue) const = 0;
+      [[nodiscard]] virtual bool hasEngineDomain() const;
+      [[nodiscard]] virtual double toParam(double engineValue) const;
+      [[nodiscard]] virtual double toEngine(double paramValue) const;
       virtual void toEngine(AudioBuffer<double> &buffer, uint32_t numFrames) const;
    };
 } // namespace clap

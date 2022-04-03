@@ -11,6 +11,8 @@ namespace clap {
 
       std::string toText(double paramValue) const override;
       double fromText(const std::string &paramValueText) const override;
+
+      bool hasEngineDomain() const override;
       double toEngine(double paramValue) const override;
       double toParam(double engineValue) const override;
    };

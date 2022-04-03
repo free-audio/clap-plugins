@@ -5,6 +5,9 @@ namespace clap {
    ValueType::~ValueType() = default;
 
    void ValueType::toEngine(AudioBuffer<double> &buffer, uint32_t numFrames) const {
+      if (!hasEngineDomain())
+         return;
+
       struct Op {
          Op(const ValueType &vt) : _valueType(vt) {}
 
@@ -15,4 +18,7 @@ namespace clap {
 
       buffer.applyTo(op, numFrames);
    }
+   bool ValueType::hasEngineDomain() const { return false; }
+   double ValueType::toParam(double engineValue) const { return engineValue; }
+   double ValueType::toEngine(double paramValue) const { return paramValue; }
 } // namespace clap

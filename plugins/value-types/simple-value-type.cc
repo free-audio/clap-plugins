@@ -20,4 +20,5 @@ namespace clap {
 
    double SimpleValueType::toEngine(double paramValue) const { return paramValue; }
    double SimpleValueType::toParam(double engineValue) const { return engineValue; }
+   bool SimpleValueType::hasEngineDomain() const { return false; }
 } // namespace clap

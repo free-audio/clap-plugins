@@ -10,6 +10,7 @@ namespace clap {
       static const SimpleValueType instance;
 
       std::string toText(double paramValue) const override;
+      bool hasEngineDomain() const override;
       double fromText(const std::string &paramValueText) const override;
       double toEngine(double paramValue) const override;
       double toParam(double engineValue) const override;

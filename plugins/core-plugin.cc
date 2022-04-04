@@ -210,28 +210,25 @@ namespace clap {
    bool CorePlugin::guiGetSize(uint32_t *width, uint32_t *height) noexcept {
       if (!_guiHandle)
          return false;
-
       return _guiHandle->gui().getSize(width, height);
    }
 
    bool CorePlugin::guiAdjustSize(uint32_t *width, uint32_t *height) noexcept {
       if (!_guiHandle)
          return false;
-
       return _guiHandle->gui().roundSize(width, height);
    }
 
    bool CorePlugin::guiSetSize(uint32_t width, uint32_t height) noexcept {
       if (!_guiHandle)
          return false;
-
       return _guiHandle->gui().setSize(width, height);
    }
 
-   bool CorePlugin::guiSetScale(double scale) noexcept {
-      if (_guiHandle)
-         return _guiHandle->gui().setScale(scale);
-      return false;
+   bool  CorePlugin::guiSetScale(double scale) noexcept {
+      if (!_guiHandle)
+         return false;
+      return _guiHandle->gui().setScale(scale);
    }
 
    bool CorePlugin::guiShow() noexcept {
@@ -369,7 +366,7 @@ namespace clap {
       renderParameters(frameCount);
 
       for (uint32_t i = 0; i < process->audio_inputs_count; ++i) {
-         auto& moduleIn = _context.audioInputs[i];
+         auto &moduleIn = _context.audioInputs[i];
          auto clapIn = &process->audio_inputs[i];
          moduleIn->fromClap(clapIn, frameOffset, frameCount);
       }
@@ -377,8 +374,8 @@ namespace clap {
       auto status = _rootModule->process(_context, frameCount);
 
       for (uint32_t i = 0; i < process->audio_outputs_count; ++i) {
-         auto& moduleOut = _context.audioOutputs[i];
-         auto* clapOut = &process->audio_outputs[i];
+         auto &moduleOut = _context.audioOutputs[i];
+         auto *clapOut = &process->audio_outputs[i];
          moduleOut->toClap(clapOut, frameOffset, frameCount);
       }
 

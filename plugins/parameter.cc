@@ -4,6 +4,7 @@ namespace clap {
    Parameter::Parameter(const clap_param_info &info, const ValueType &valueType)
       : _info(info), _valueType(valueType) {
       _info.cookie = this;
+      setDefaultValue();
    }
 
    void Parameter::renderValue(uint32_t frameCount) noexcept {

@@ -19,10 +19,7 @@ namespace clap {
          constexpr Hook(Hook &&) {}
          constexpr Hook &operator=(const Hook &) { return *this; }
          constexpr Hook &operator=(Hook &&) { return *this; }
-         ~Hook()
-         {
-            assert(!isHooked());
-         }
+         ~Hook() { assert(!isHooked()); }
 
          [[nodiscard]] inline bool isHooked() const noexcept {
             assert(checkInvariants());
@@ -56,7 +53,7 @@ namespace clap {
       class Iterator final {
       public:
          inline Iterator(Hook *head, Hook *item) : _head(head), _item(item) {}
-         inline Iterator(const Iterator& it) : _head(it._head), _item(it._item) {}
+         inline Iterator(const Iterator &it) : _head(it._head), _item(it._item) {}
 
          [[nodiscard]] inline Hook *item() const {
             assert(!end());
@@ -91,9 +88,7 @@ namespace clap {
       };
 
       inline IntrusiveList() = default;
-      inline ~IntrusiveList() {
-         clear();
-      }
+      inline ~IntrusiveList() { clear(); }
 
       [[nodiscard]] inline bool empty() const { return !_head.isHooked(); }
 
@@ -154,8 +149,10 @@ namespace clap {
             popBack();
       }
 
-      Iterator begin() { return empty() ? end() : Iterator(&_head, _head._next); }
-      Iterator end() { return {&_head, &_head}; }
+      Iterator begin() const {
+         return empty() ? end() : Iterator(const_cast<Hook *>(&_head), _head._next);
+      }
+      Iterator end() const { return {const_cast<Hook *>(&_head), const_cast<Hook *>(&_head)}; }
 
    private:
       Hook _head;

@@ -5,17 +5,18 @@
 #include "value-type.hh"
 
 namespace clap {
-   class SimpleValueType final : public ValueType {
+   class FrequencyValueType final : public ValueType {
    public:
-      SimpleValueType(double min, double max, double deflt);
+      FrequencyValueType(double min = 20, double max = 20000, double defaultValue = 345);
 
-      double minValue() const noexcept override { return _minValue; }
-      double maxValue() const noexcept override { return _maxValue; }
-      double defaultValue() const noexcept override { return _defaultValue; }
+      double minValue() const noexcept override { return 0; }
+      double maxValue() const noexcept override { return 1; }
+      double defaultValue() const noexcept override { return toParam(_defaultValue); }
 
       std::string toText(double paramValue) const override;
-      bool hasEngineDomain() const override;
       double fromText(const std::string &paramValueText) const override;
+
+      bool hasEngineDomain() const override;
       double toEngine(double paramValue) const override;
       double toParam(double engineValue) const override;
 
@@ -23,5 +24,8 @@ namespace clap {
       const double _minValue;
       const double _maxValue;
       const double _defaultValue;
+
+      const double _a;
+      const double _b;
    };
 } // namespace clap

@@ -70,6 +70,8 @@ add_library(
   value-types/simple-value-type.cc
   value-types/value-type.cc
   value-types/value-type.hh
+  value-types/frequency-value-type.hh
+  value-types/frequency-value-type.cc
   )
 
 if(NOT CLAP_PLUGINS_HEADLESS)

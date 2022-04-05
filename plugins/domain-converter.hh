@@ -6,8 +6,12 @@ namespace clap {
    template <typename Operator>
    class DomainConverter {
    public:
-      DomainConverter(double initialValue)
-         : _op(), _in(initialValue), _out(_op(initialValue)) {}
+      DomainConverter(const Operator &op, double initialValue)
+         : _op(op), _in(initialValue), _out(_op(initialValue)) {}
+
+      DomainConverter(double initialValue) : _op(), _in(initialValue), _out(_op(initialValue)) {}
+
+      DomainConverter<Operator>& operator=(const DomainConverter<Operator>&o) = default;
 
       [[nodiscard]] double convert(double in) {
          if (in == _in) [[likely]]
@@ -18,7 +22,7 @@ namespace clap {
       }
 
    private:
-      const Operator _op;
+      Operator _op;
       double _in;
       double _out;
    };

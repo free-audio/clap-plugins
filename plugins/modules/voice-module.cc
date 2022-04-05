@@ -1,12 +1,16 @@
 #include "voice-module.hh"
 
 namespace clap {
-   VoiceModule::VoiceModule(CorePlugin &plugin, std::unique_ptr<Module> module)
-      : Module(plugin, "", 0), _module(std::move(module)) {
+   VoiceModule::VoiceModule(CorePlugin &plugin,
+                            std::unique_ptr<Module> module,
+                            uint32_t channelCount)
+      : Module(plugin, "", 0), _module(std::move(module)), _outputBuffer(channelCount, BLOCK_SIZE) {
       _module->setVoiceModule(this);
    }
 
-   VoiceModule::VoiceModule(const VoiceModule &m) : Module(m), _module(m._module->cloneVoice()) {
+   VoiceModule::VoiceModule(const VoiceModule &m)
+      : Module(m), _module(m._module->cloneVoice()),
+        _outputBuffer(m._outputBuffer.channelCount(), m._outputBuffer.frameCount()) {
       _module->setVoiceModule(this);
    }
 
@@ -41,4 +45,15 @@ namespace clap {
       if (_module->wantsNoteEvents()) [[likely]]
          _module->onNoteOff(note);
    }
+
+   clap_process_status VoiceModule::process(Context &c, uint32_t numFrames) noexcept {
+      assert(_isActive);
+      return _module->process(c, numFrames);
+   }
+
+   bool VoiceModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
+      return _module->activate(sampleRate, maxFrameCount);
+   }
+
+   void VoiceModule::doDeactivate() { _module->deactivate(); }
 } // namespace clap

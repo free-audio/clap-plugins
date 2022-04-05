@@ -9,10 +9,12 @@ namespace clap {
       friend class VoiceExpanderModule;
 
    public:
-      VoiceModule(CorePlugin &plugin, std::unique_ptr<Module> module);
+      VoiceModule(CorePlugin &plugin, std::unique_ptr<Module> module, uint32_t channelCount);
       VoiceModule(const VoiceModule &m);
 
       std::unique_ptr<Module> cloneVoice() const override;
+
+      auto& outputBuffer() { return _outputBuffer; }
 
       [[nodiscard]] uint32_t voiceIndex() const noexcept;
       [[nodiscard]] bool isAssigned() const noexcept;
@@ -35,10 +37,15 @@ namespace clap {
       [[nodiscard]] auto &gain() const noexcept { return _gainBuffer; }
       [[nodiscard]] auto &pan() const noexcept { return _panBuffer; }
 
+      bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
+      void doDeactivate() override;
+
       bool wantsNoteEvents() const noexcept override;
       void onNoteOn(const clap_event_note &note) noexcept override;
       void onNoteOff(const clap_event_note &note) noexcept override;
       void onNoteChoke(const clap_event_note &note) noexcept override;
+
+      clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
 
       void reset() noexcept override;
 
@@ -66,5 +73,7 @@ namespace clap {
       AudioBuffer<double> _gainBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _pan;
       AudioBuffer<double> _panBuffer{1, BLOCK_SIZE, 0};
+
+      AudioBuffer<double> _outputBuffer;
    };
 } // namespace clap

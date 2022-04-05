@@ -15,7 +15,6 @@ namespace clap {
       VoiceExpanderModule(CorePlugin &plugin, uint32_t moduleId, std::unique_ptr<Module> module);
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
-
       void doDeactivate() override;
 
       clap_process_status process(Context &c, uint32_t numFrames) noexcept override;

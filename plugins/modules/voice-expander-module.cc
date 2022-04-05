@@ -10,7 +10,7 @@ namespace clap {
                                             std::unique_ptr<Module> module)
       : Module(plugin, "voice-expander", moduleId) {
 
-      _voices[0] = std::make_unique<VoiceModule>(_plugin, std::move(module));
+      _voices[0] = std::make_unique<VoiceModule>(_plugin, std::move(module), 1);
       for (uint32_t i = 1; i < _voices.size(); ++i)
          _voices[i] = std::make_unique<VoiceModule>(*_voices[0]);
 

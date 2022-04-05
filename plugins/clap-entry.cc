@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "path-provider.hh"
+#include "plugs/adsr/adsr-plug.hh"
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/gain/gain.hh"
 #include "plugs/transport/transport-info.hh"
@@ -42,6 +43,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::TransportInfo>();
    addPlugin<clap::Gain>();
    addPlugin<clap::CharCheck>();
+   addPlugin<clap::AdsrPlug>();
    return true;
 }
 

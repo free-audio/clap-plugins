@@ -46,6 +46,8 @@ add_library(
   parameters.hh
   path-provider.cc
   path-provider.hh
+  plugs/adsr/adsr-plug.cc
+  plugs/adsr/adsr-plug.hh
   plugs/char-check/char-check.cc
   plugs/char-check/char-check.hh
   plugs/dc-offset/dc-offset.cc

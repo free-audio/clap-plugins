@@ -47,6 +47,7 @@ namespace clap {
    void AudioBuffer<T>::toClap(clap_audio_buffer *buffer,
                                uint32_t frameOffset,
                                uint32_t frameCount) const noexcept {
+#if 0
       const uint32_t allConstantMask = (1 << _channelCount) - 1;
 
       // This is the first block and it is constant
@@ -91,6 +92,7 @@ namespace clap {
                   buffer->data64[c][i] = buffer->data64[c][0];
          }
       }
+#endif
 
       // Copy this block
       if (buffer->data32) {

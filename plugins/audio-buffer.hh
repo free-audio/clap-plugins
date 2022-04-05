@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <cassert>
 #include <cstdint>
 #include <cstdlib>
 #include <new>
@@ -39,27 +41,28 @@ namespace clap {
 
       [[nodiscard]] double sampleRate() const noexcept { return _sampleRate; }
 
-      void fromClap(const clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) noexcept;
-      void toClap(clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) const noexcept;
+      void
+      fromClap(const clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) noexcept;
+      void
+      toClap(clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) const noexcept;
 
       // Store a + b into this buffer
       template <typename Operator>
-      void compute(const Operator& op, const AudioBuffer<T>& a, const AudioBuffer<T>& b, uint32_t numFrames) noexcept;
+      void compute(const Operator &op,
+                   const AudioBuffer<T> &a,
+                   const AudioBuffer<T> &b,
+                   uint32_t numFrames) noexcept;
 
-      void sum(const AudioBuffer<T>& a, const AudioBuffer<T>& b, uint32_t numFrames) noexcept
-      {
-         struct Sum
-         {
+      void sum(const AudioBuffer<T> &a, const AudioBuffer<T> &b, uint32_t numFrames) noexcept {
+         struct Sum {
             T operator()(T a, T b) const noexcept { return a + b; }
          } op;
 
          compute(op, a, b, numFrames);
       }
 
-      void product(const AudioBuffer<T>& a, const AudioBuffer<T>& b, uint32_t numFrames) noexcept
-      {
-         struct Sum
-         {
+      void product(const AudioBuffer<T> &a, const AudioBuffer<T> &b, uint32_t numFrames) noexcept {
+         struct Sum {
             T operator()(T a, T b) const noexcept { return a * b; }
          } op;
 
@@ -67,7 +70,31 @@ namespace clap {
       }
 
       template <typename Operator>
-      void applyTo(const Operator& op, uint32_t numFrames) noexcept;
+      void applyTo(const Operator &op, uint32_t numFrames) noexcept;
+
+      void copy(const AudioBuffer<T> &a, uint32_t numFrames) noexcept {
+         assert(numFrames <= _frameCount);
+         assert(numFrames <= a._frameCount);
+
+         if (a.isConstant()) {
+            setConstant(true);
+            if (_channelCount == a._channelCount) {
+               std::copy_n(a._data, _channelCount, _data);
+            } else if (a._channelCount == 1) {
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[c] = a._data[0];
+            }
+         } else {
+            setConstant(false);
+            if (_channelCount == a._channelCount) {
+               std::copy_n(a._data, numFrames * _channelCount, _data);
+            } else if (a._channelCount == 1) {
+               for (uint32_t i = 0; i < numFrames; ++i)
+                  for (uint32_t c = 0; c < _channelCount; ++c)
+                     _data[i * _channelCount + c] = a._data[i];
+            }
+         }
+      }
 
    private:
       const uint32_t _channelCount;

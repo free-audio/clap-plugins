@@ -32,8 +32,13 @@ namespace clap {
 
    void AdsrModule::trigger(double velocity) {
       _phase = Phase::Attack;
-      _velocity = velocity;
+      _noteOnVelocity = velocity;
+      _state = 1 - _level / ExpCoeff::K;
       // TODO: use velocity
+   }
+
+   void AdsrModule::computeStateForDecay() {
+      _state = 1 + ExpCoeff::thr + (_level - 1) / ExpCoeff::K;
    }
 
    void AdsrModule::release() {
@@ -42,6 +47,7 @@ namespace clap {
       case Phase::Decay:
       case Phase::Sustain:
          _phase = Phase::Release;
+         computeStateForDecay();
          return;
 
       case Phase::Choke:
@@ -56,7 +62,8 @@ namespace clap {
       case Phase::Attack:
       case Phase::Decay:
       case Phase::Sustain:
-         _phase = Phase::Release;
+         _phase = Phase::Choke;
+         _state = 1; // TODO
          return;
 
       case Phase::Choke:
@@ -74,25 +81,110 @@ namespace clap {
 
    void AdsrModule::onNoteChoke(const clap_event_note &note) noexcept { choke(); }
 
+   bool AdsrModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
+      _conv = DomainConverter<ExpCoeff>(ExpCoeff(sampleRate), 0);
+      return true;
+   }
+
    clap_process_status AdsrModule::process(Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);
 
-      switch (_phase) {
-      case Phase::Rest:
-         break;
-      case Phase::Attack:
-         break;
-      case Phase::Decay:
-         break;
-      case Phase::Sustain:
-         break;
-      case Phase::Release:
-         break;
-      case Phase::Choke:
-         break;
+      auto out = _buffer.data();
+
+      auto &attackBuffer = _attackParam->modulatedValueBuffer();
+      auto &decayBuffer = _decayParam->modulatedValueBuffer();
+      auto &sustainBuffer = _sustainParam->modulatedValueBuffer();
+      auto &releaseBuffer = _releaseParam->modulatedValueBuffer();
+      // auto &velocityBuffer = _velocityParam->modulatedValueBuffer();
+
+      if (_phase == Phase::Rest) {
+         _buffer.setConstant(true);
+         out[0] = 0;
+         return CLAP_PROCESS_SLEEP;
+      } else if (_phase == Phase::Sustain && sustainBuffer.isConstant()) {
+         _buffer.setConstant(true);
+         out[0] = _level;
+         return CLAP_PROCESS_CONTINUE;
+      }
+
+      _buffer.setConstant(false);
+
+      for (uint32_t i = 0; i < numFrames; ++i) {
+         switch (_phase) {
+         case Phase::Rest:
+            for (; i < numFrames; ++i)
+               out[i] = 0;
+            break;
+
+         case Phase::Attack: {
+            for (; i < numFrames; ++i) {
+               double k = _conv.convert(attackBuffer.getSample(i, 0));
+               _state *= k;
+               _level = ExpCoeff::K * (1 - _state);
+
+               if (_level >= 1) [[unlikely]] {
+                  computeStateForDecay();
+                  _phase = Phase::Decay;
+                  _level = 1;
+                  out[i] = 1;
+                  break;
+               }
+
+               out[i] = _level;
+            }
+            break;
+         }
+
+         case Phase::Decay: {
+            for (; i < numFrames; ++i) {
+               double k = _conv.convert(decayBuffer.getSample(i, 0));
+               auto s = sustainBuffer.getSample(i, 0);
+               _state *= k;
+               _level = 1 - ExpCoeff::K * (1 + ExpCoeff::thr - _state);
+               out[i] = _level;
+
+               if (_level <= s) [[unlikely]] {
+                  _phase = Phase::Sustain;
+                  _level = std::max(0., _level);
+                  out[i] = _level;
+                  break;
+               }
+            }
+            break;
+         }
+
+         case Phase::Sustain: {
+            for (; i < numFrames; ++i)
+               out[i] = _level;
+            break;
+         }
+
+         case Phase::Release: {
+            for (; i < numFrames; ++i) {
+               double k = _conv.convert(releaseBuffer.getSample(i, 0));
+               _state *= k;
+
+               _level = 1 - ExpCoeff::K * (1 + ExpCoeff::thr - _state);
+               if (_level <= 0) [[unlikely]] {
+                  _level = 0;
+                  _phase = Phase::Rest;
+                  out[i] = 0;
+                  break;
+               }
+
+               out[i] = _level;
+            }
+            break;
+         }
+
+         case Phase::Choke:
+            // TODO
+            _phase = Phase::Rest;
+            out[i] = 0;
+            break;
+         }
       }
 
       return _phase == Phase::Rest ? CLAP_PROCESS_SLEEP : CLAP_PROCESS_CONTINUE;
    }
-
 } // namespace clap

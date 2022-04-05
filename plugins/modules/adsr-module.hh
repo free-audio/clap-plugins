@@ -16,13 +16,35 @@ namespace clap {
       void release();
       void choke();
 
+      bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
       clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
 
-   protected:
       bool wantsNoteEvents() const noexcept override;
       void onNoteOn(const clap_event_note &note) noexcept override;
       void onNoteOff(const clap_event_note &note) noexcept override;
       void onNoteChoke(const clap_event_note &note) noexcept override;
+
+      auto& outputBuffer() const { return _buffer; }
+
+   protected:
+      struct ExpCoeff {
+         static const constexpr double thr = 0.06;
+         static const constexpr double K = 1 / (1 - thr);
+
+         explicit ExpCoeff(double sampleRate) : _sampleRate(sampleRate) {}
+
+         [[nodiscard]] double operator()(double seconds) const noexcept {
+            // needs to multiply the result N times to reach 95% of the decay
+            const double N = _sampleRate * seconds;
+            return std::exp(-3.0 / N);
+         }
+
+         double _sampleRate;
+      };
+
+      void computeStateForDecay();
+
+      DomainConverter<ExpCoeff> _conv{ExpCoeff(44100), 0};
 
       Parameter *_attackParam = nullptr;
       Parameter *_decayParam = nullptr;
@@ -40,8 +62,10 @@ namespace clap {
       };
 
       Phase _phase = Phase::Rest;
+      double _state = 1;
       double _level = 0;
-      double _velocity = 0.8;
-      std::unique_ptr<AudioBuffer<float>> _buffer;
+      double _noteOnVelocity = 0.8;
+
+      AudioBuffer<double> _buffer{1, BLOCK_SIZE};
    };
 } // namespace clap

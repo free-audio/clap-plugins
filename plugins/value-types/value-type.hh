@@ -13,6 +13,8 @@ namespace clap {
       /* The sample rate may be required to do the conversion to engine */
       virtual void setSampleRate(double sampleRate) noexcept {}
 
+      [[nodiscard]] virtual bool isStepped() const noexcept { return false; }
+
       [[nodiscard]] virtual double defaultValue() const noexcept { return std::numeric_limits<double>::lowest(); }
       [[nodiscard]] virtual double minValue() const noexcept { return std::numeric_limits<double>::lowest(); }
       [[nodiscard]] virtual double maxValue() const noexcept { return std::numeric_limits<double>::max(); }

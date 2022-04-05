@@ -44,8 +44,15 @@ namespace clap {
 
       double _sampleRate = 0;
 
+      enum class Mode : int {
+         LP,
+         BP,
+         HP
+      };
+
       Parameter *_freqParam = nullptr;
       Parameter *_resoParam = nullptr;
+      Parameter *_modeParam = nullptr;
 
       const AudioBuffer<double> *_input;
       AudioBuffer<double> _output{1, BLOCK_SIZE};

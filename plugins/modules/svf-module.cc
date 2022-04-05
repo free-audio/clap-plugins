@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "../value-types/enumerated-value-type.hh"
 #include "../value-types/frequency-value-type.hh"
 #include "svf-module.hh"
 
@@ -19,6 +20,11 @@ namespace clap {
                                 "reso",
                                 CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                 std::make_unique<SimpleValueType>(0, 0.98, 0.3));
+      _modeParam = addParameter(
+         2,
+         "mode",
+         CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE | CLAP_PARAM_IS_STEPPED,
+         std::make_unique<EnumeratedValueType>(std::vector<std::string>{"LP", "BP", "HP"}, 0));
 
       _output.setConstant(false);
    }
@@ -71,6 +77,7 @@ namespace clap {
 
       auto &freqBuffer = _freqParam->modulatedValueBuffer();
       auto &resoBuffer = _resoParam->modulatedValueBuffer();
+      auto &modeBuffer = _modeParam->modulatedValueBuffer();
 
       for (uint32_t i = 0; i < numFrames; ++i) {
          setFilter(freqBuffer.getSample(i, 0), resoBuffer.getSample(i, 0));
@@ -83,12 +90,24 @@ namespace clap {
          _ic1eq = v1 * 2.0 - _ic1eq;
          _ic2eq = v2 * 2.0 - _ic2eq;
 
-         if (true)
-            out[i] = v2; // low pass
-         else if (true)
-            out[i] = v1; // band pass
-         else
-            out[i] = v0 - _k * v1 - v2; // high pass
+         double modeValue = modeBuffer.getSample(i, 0);
+         Mode mode = static_cast<Mode>(std::clamp<int>(modeValue, 0, 2));
+
+         switch (mode) {
+         case Mode::LP:
+            out[i] = v2;
+            break;
+         case Mode::BP:
+            out[i] = v1;
+            break;
+         case Mode::HP:
+            out[i] = v0 - _k * v1 - v2;
+            break;
+         default:
+            assert(false);
+            out[i] = 0;
+            break;
+         }
       }
 
       return CLAP_PROCESS_CONTINUE;

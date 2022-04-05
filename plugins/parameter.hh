@@ -21,8 +21,9 @@ namespace clap {
       friend class CorePlugin;
 
    public:
-      explicit Parameter(const clap_param_info &info,
-                         std::unique_ptr<ValueType> valueType = std::make_unique<SimpleValueType>());
+      explicit Parameter(
+         const clap_param_info &info,
+         std::unique_ptr<ValueType> valueType = std::make_unique<SimpleValueType>());
 
       Parameter(const Parameter &) = delete;
       Parameter(Parameter &&) = delete;
@@ -44,10 +45,18 @@ namespace clap {
       void setValueImmediately(double val) noexcept { _value.setImmediately(val); }
       void setModulationImmediately(double mod) { _modulation.setImmediately(mod); }
 
-      void setValueSmoothed(double val, uint16_t steps) noexcept { _value.setSmoothed(val, steps); }
+      void setValueSmoothed(double val, uint16_t steps) noexcept {
+         if (_valueType->isStepped())
+            _value.setImmediately(val);
+         else
+            _value.setSmoothed(val, steps);
+      }
 
       void setModulationSmoothed(double mod, uint16_t steps) noexcept {
-         _modulation.setSmoothed(mod, steps);
+         if (_valueType->isStepped())
+            _modulation.setImmediately(mod);
+         else
+            _modulation.setSmoothed(mod, steps);
       }
 
       [[nodiscard]] bool valueNeedsProcessing() const noexcept { return _value.isSmoothing(); }

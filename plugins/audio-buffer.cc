@@ -25,7 +25,7 @@ namespace clap {
 
       if (buffer->data32) {
          for (uint32_t c = 0; c < _channelCount; ++c) {
-            const uint32_t stride = (buffer->constant_mask & (1 << c)) ? 1 : 0;
+            const uint32_t stride = (buffer->constant_mask & (1 << c)) ? 0 : 1;
             for (uint32_t i = 0; i < _frameCount; ++i) {
                const uint32_t index = stride * (i + frameOffset);
                _data[i * _channelCount + c] = static_cast<T>(buffer->data32[c][index]);
@@ -33,7 +33,7 @@ namespace clap {
          }
       } else {
          for (uint32_t c = 0; c < _channelCount; ++c) {
-            const uint32_t stride = (buffer->constant_mask & (1 << c)) ? 1 : 0;
+            const uint32_t stride = (buffer->constant_mask & (1 << c)) ? 0 : 1;
             for (uint32_t i = 0; i < _frameCount; ++i) {
                const uint32_t index = stride * (i + frameOffset);
                _data[i * _channelCount + c] = static_cast<T>(buffer->data64[c][index]);

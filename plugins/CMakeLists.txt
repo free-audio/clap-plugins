@@ -40,6 +40,8 @@ add_library(
   modules/voice-expander-module.hh
   modules/voice-module.cc
   modules/voice-module.hh
+  modules/svf-module.hh
+  modules/svf-module.cc
   parameter.cc
   parameter.hh
   parameters.cc
@@ -58,6 +60,8 @@ add_library(
   plugs/transport/transport-info.hh
   plugs/synth/synth.hh
   plugs/synth/synth.cc
+  plugs/svf/svf-plug.hh
+  plugs/svf/svf-plug.cc
   smoothed-value.hh
   stream-helper.hh
   value-types/decibel-value-type.hh

@@ -13,6 +13,7 @@
 #include "plugs/transport/transport-info.hh"
 #include "plugs/char-check/char-check.hh"
 #include "plugs/synth/synth.hh"
+#include "plugs/svf/svf-plug.hh"
 
 struct PluginEntry {
    using create_func = std::function<const clap_plugin *(const clap_host *)>;
@@ -44,6 +45,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::Gain>();
    addPlugin<clap::CharCheck>();
    addPlugin<clap::AdsrPlug>();
+   addPlugin<clap::SvfPlug>();
    return true;
 }
 

@@ -4,7 +4,8 @@
 #include "decibel-value-type.hh"
 
 namespace clap {
-   const DecibelValueType DecibelValueType::instance;
+
+   DecibelValueType::DecibelValueType(double min, double max, double dflt) : _minValue(min), _maxValue(max), _defaultValue(dflt) {}
 
    std::string DecibelValueType::toText(double paramValue) const {
       std::ostringstream os;

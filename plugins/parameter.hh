@@ -22,7 +22,7 @@ namespace clap {
 
    public:
       explicit Parameter(const clap_param_info &info,
-                         const ValueType &valueType = SimpleValueType::instance);
+                         std::unique_ptr<ValueType> valueType = std::make_unique<SimpleValueType>());
 
       Parameter(const Parameter &) = delete;
       Parameter(Parameter &&) = delete;
@@ -95,7 +95,7 @@ namespace clap {
 
    private:
       clap_param_info _info;
-      const ValueType &_valueType;
+      std::unique_ptr<ValueType> _valueType;
 
       bool _hasGuiOverride = false;
 

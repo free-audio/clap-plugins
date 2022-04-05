@@ -4,10 +4,10 @@
 
 namespace clap {
    Parameter *clap::Parameters::addParameter(const clap_param_info &info,
-                                             const ValueType &valueType) {
+                                             std::unique_ptr<ValueType> valueType) {
       assert(_id2param.find(info.id) == _id2param.end());
 
-      auto p = std::make_unique<Parameter>(info, valueType);
+      auto p = std::make_unique<Parameter>(info, std::move(valueType));
       auto ptr = p.get();
       auto ret = _id2param.insert_or_assign(info.id, p.get());
       if (!ret.second)

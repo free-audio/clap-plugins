@@ -656,7 +656,7 @@ namespace clap {
       if (!param)
          return false;
 
-      std::string text = param->valueType().toText(value);
+      std::string text = param->valueType()->toText(value);
       snprintf(display, size, "%s", text.c_str());
       return true;
    }
@@ -667,7 +667,7 @@ namespace clap {
       if (!param)
          return false;
 
-      *value = param->valueType().fromText(display);
+      *value = param->valueType()->fromText(display);
       return true;
    }
 } // namespace clap

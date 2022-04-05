@@ -13,16 +13,14 @@ namespace clap {
                                    "gain",
                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
                                       CLAP_PARAM_REQUIRES_PROCESS,
-                                   -40,
-                                   40,
-                                   0,
-                                   DecibelValueType::instance);
+                                   std::make_unique<DecibelValueType>(-40, 40, 0));
       }
 
       clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
 
-         c.audioOutputs[0]->product(*c.audioInputs[0], _gainParam->modulatedValueBuffer(), numFrames);
+         c.audioOutputs[0]->product(
+            *c.audioInputs[0], _gainParam->modulatedValueBuffer(), numFrames);
 
          return CLAP_PROCESS_SLEEP;
       }
@@ -55,8 +53,8 @@ namespace clap {
 
    Gain::Gain(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "gain"), descriptor(), host) {
-         _rootModule = std::make_unique<GainModule>(*this);
-      }
+      _rootModule = std::make_unique<GainModule>(*this);
+   }
 
    bool Gain::init() noexcept {
       if (!super::init())

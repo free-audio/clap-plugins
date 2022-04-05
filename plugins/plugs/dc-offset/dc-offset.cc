@@ -13,9 +13,7 @@ namespace clap {
                                      "offset",
                                      CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
                                         CLAP_PARAM_REQUIRES_PROCESS,
-                                     -1,
-                                     1,
-                                     0);
+                                     std::make_unique<SimpleValueType>(-1, 1, 0));
       }
 
       clap_process_status process(Context &c, uint32_t numFrames) noexcept override {

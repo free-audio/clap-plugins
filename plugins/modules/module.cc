@@ -14,20 +14,17 @@ namespace clap {
    Parameter *Module::addParameter(uint32_t id,
                                    const std::string &name,
                                    uint32_t flags,
-                                   double min,
-                                   double max,
-                                   double deflt,
-                                   const ValueType &valueType) {
+                                   std::unique_ptr<ValueType> valueType) {
       clap_param_info info;
       info.id = _paramIdStart + id;
       info.cookie = nullptr;
       info.flags = flags;
-      info.min_value = min;
-      info.max_value = max;
-      info.default_value = deflt;
+      info.min_value = valueType->minValue();
+      info.max_value = valueType->maxValue();
+      info.default_value = valueType->defaultValue();
       snprintf(info.name, sizeof(info.name), "%s", name.c_str());
       snprintf(info.module, sizeof(info.module), "/%s", _name.c_str());
-      return _plugin.addParameter(info, valueType);
+      return _plugin.addParameter(info, std::move(valueType));
    }
 
    bool Module::activate(double sampleRate, uint32_t maxFrameCount) {

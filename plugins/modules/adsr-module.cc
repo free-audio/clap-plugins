@@ -7,16 +7,26 @@ namespace clap {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
-      _attackParam = addParameter(
-         0, "attack", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 0, 1, 0.1);
-      _decayParam =
-         addParameter(1, "decay", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 0, 1, 0.2);
-      _sustainParam = addParameter(
-         2, "sustain", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 0, 1, 0.8);
-      _releaseParam = addParameter(
-         3, "release", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 0, 1, 0.3);
-      _velocityParam = addParameter(
-         4, "velocity", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 0, 1, 0.3);
+      _attackParam = addParameter(0,
+                                  "attack",
+                                  CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                  std::make_unique<SimpleValueType>(0, 1, 0.1));
+      _decayParam = addParameter(1,
+                                 "decay",
+                                 CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                 std::make_unique<SimpleValueType>(0, 1, 0.2));
+      _sustainParam = addParameter(2,
+                                   "sustain",
+                                   CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                   std::make_unique<SimpleValueType>(0, 1, 0.8));
+      _releaseParam = addParameter(3,
+                                   "release",
+                                   CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                   std::make_unique<SimpleValueType>(0, 1, 0.3));
+      _velocityParam = addParameter(4,
+                                    "velocity",
+                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                    std::make_unique<SimpleValueType>(0, 1, 0.3));
    }
 
    AdsrModule::AdsrModule(const AdsrModule &m)

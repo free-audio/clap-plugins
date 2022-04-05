@@ -58,10 +58,7 @@ namespace clap {
       Parameter *addParameter(uint32_t id,
                               const std::string &name,
                               uint32_t flags,
-                              double min,
-                              double max,
-                              double deflt,
-                              const ValueType &valueType = SimpleValueType::instance);
+                              std::unique_ptr<ValueType> valueType);
 
       // Sets a pointer to the parent voice module in order to retrive
       // the current voice info

@@ -62,6 +62,6 @@ namespace clap {
          0,
       };
       snprintf(info.name, sizeof(info.name), "%s", name);
-      _parameters.addParameter(info);
+      _parameters.addParameter(info, std::make_unique<SimpleValueType>(0, 1, 0));
    }
 } // namespace clap

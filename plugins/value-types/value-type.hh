@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <numeric>
 
 #include "../audio-buffer.hh"
 
@@ -8,6 +9,13 @@ namespace clap {
    class ValueType {
    public:
       virtual ~ValueType();
+
+      /* The sample rate may be required to do the conversion to engine */
+      virtual void setSampleRate(double sampleRate) noexcept {}
+
+      [[nodiscard]] virtual double defaultValue() const noexcept { return std::numeric_limits<double>::lowest(); }
+      [[nodiscard]] virtual double minValue() const noexcept { return std::numeric_limits<double>::lowest(); }
+      [[nodiscard]] virtual double maxValue() const noexcept { return std::numeric_limits<double>::max(); }
 
       [[nodiscard]] virtual std::string toText(double paramValue) const = 0;
       [[nodiscard]] virtual double fromText(const std::string &paramValueText) const = 0;

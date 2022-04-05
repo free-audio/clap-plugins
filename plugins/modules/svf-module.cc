@@ -10,10 +10,14 @@ namespace clap {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
-      _freqParam = addParameter(
-         0, "freq", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 20, 20000, 400);
-      _resoParam =
-         addParameter(1, "reso", CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE, 0, 1, 0.3);
+      _freqParam = addParameter(0,
+                                "freq",
+                                CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                std::make_unique<SimpleValueType>(20, 20000, 400));
+      _resoParam = addParameter(1,
+                                "reso",
+                                CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                std::make_unique<SimpleValueType>(0, 1, 0.3));
 
       _output.setConstant(false);
    }

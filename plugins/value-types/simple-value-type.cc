@@ -1,9 +1,12 @@
 #include <sstream>
+#include <algorithm>
 
 #include "simple-value-type.hh"
 
 namespace clap {
-   const SimpleValueType SimpleValueType::instance;
+
+   SimpleValueType::SimpleValueType(double min, double max, double deflt)
+      : _minValue(min), _maxValue(max), _defaultValue(deflt) {}
 
    std::string SimpleValueType::toText(double paramValue) const {
       std::ostringstream os;
@@ -18,7 +21,10 @@ namespace clap {
       return value;
    }
 
-   double SimpleValueType::toEngine(double paramValue) const { return paramValue; }
-   double SimpleValueType::toParam(double engineValue) const { return engineValue; }
+   double SimpleValueType::toEngine(double paramValue) const { return std::clamp<double>(paramValue, _minValue, _maxValue); }
+
+   double SimpleValueType::toParam(double engineValue) const { return std::clamp<double>(engineValue, _minValue, _maxValue); }
+
    bool SimpleValueType::hasEngineDomain() const { return false; }
+
 } // namespace clap

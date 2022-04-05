@@ -18,6 +18,7 @@ namespace clap {
 
       buffer.applyTo(op, numFrames);
    }
+
    bool ValueType::hasEngineDomain() const { return false; }
    double ValueType::toParam(double engineValue) const { return engineValue; }
    double ValueType::toEngine(double paramValue) const { return paramValue; }

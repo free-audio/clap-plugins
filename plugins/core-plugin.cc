@@ -225,7 +225,7 @@ namespace clap {
       return _guiHandle->gui().setSize(width, height);
    }
 
-   bool  CorePlugin::guiSetScale(double scale) noexcept {
+   bool CorePlugin::guiSetScale(double scale) noexcept {
       if (!_guiHandle)
          return false;
       return _guiHandle->gui().setScale(scale);
@@ -302,22 +302,20 @@ namespace clap {
       _context.sampleRateD = sampleRate;
       _context.sampleRateF = sampleRate;
 
-      _context.audioInputs.resize(_audioInputs.size());
-      _context.audioOutputs.resize(_audioInputs.size());
+      auto setupBuffers = [sampleRate](auto &declAudio, auto &ctxAudio) {
+         ctxAudio.resize(declAudio.size());
 
-      for (uint32_t i = 0; i < _audioInputs.size(); ++i) {
-         auto &info = _audioInputs[i];
-         auto &buffer = _context.audioInputs[i];
+         for (uint32_t i = 0; i < declAudio.size(); ++i) {
+            auto &info = declAudio[i];
+            auto &buffer = ctxAudio[i];
 
-         buffer = std::make_unique<AudioBuffer<double>>(info.channel_count, BLOCK_SIZE, sampleRate);
-      }
+            buffer =
+               std::make_unique<AudioBuffer<double>>(info.channel_count, BLOCK_SIZE, sampleRate);
+         }
+      };
 
-      for (uint32_t i = 0; i < _audioOutputs.size(); ++i) {
-         auto &info = _audioOutputs[i];
-         auto &buffer = _context.audioOutputs[i];
-
-         buffer = std::make_unique<AudioBuffer<double>>(info.channel_count, BLOCK_SIZE, sampleRate);
-      }
+      setupBuffers(_audioInputs, _context.audioInputs);
+      setupBuffers(_audioOutputs, _context.audioOutputs);
 
       return _rootModule->activate(sampleRate, maxFrameCount);
    }
@@ -583,6 +581,47 @@ namespace clap {
             case CLAP_EVENT_PARAM_VALUE:
             case CLAP_EVENT_PARAM_MOD:
                processInputParameterChange(hdr);
+               break;
+
+            case CLAP_EVENT_NOTE_ON:
+               if (_rootModule->wantsNoteEvents()) {
+                  auto ev = reinterpret_cast<const clap_event_note *>(hdr);
+                  _rootModule->onNoteOn(*ev);
+               }
+               break;
+
+            case CLAP_EVENT_NOTE_OFF:
+               if (_rootModule->wantsNoteEvents()) {
+                  auto ev = reinterpret_cast<const clap_event_note *>(hdr);
+                  _rootModule->onNoteOff(*ev);
+               }
+               break;
+
+            case CLAP_EVENT_NOTE_CHOKE:
+               if (_rootModule->wantsNoteEvents()) {
+                  auto ev = reinterpret_cast<const clap_event_note *>(hdr);
+                  _rootModule->onNoteChoke(*ev);
+               }
+               break;
+
+            case CLAP_EVENT_NOTE_EXPRESSION:
+               // TODO
+               break;
+
+            case CLAP_EVENT_MIDI:
+               // TODO
+               break;
+
+            case CLAP_EVENT_MIDI_SYSEX:
+               // TODO
+               break;
+
+            case CLAP_EVENT_MIDI2:
+               // TODO
+               break;
+
+            case CLAP_EVENT_TRANSPORT:
+               // TODO
                break;
             }
          }

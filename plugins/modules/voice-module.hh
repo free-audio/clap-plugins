@@ -10,7 +10,7 @@ namespace clap {
 
    public:
       VoiceModule(CorePlugin &plugin, std::unique_ptr<Module> module);
-      VoiceModule(const VoiceModule& m);
+      VoiceModule(const VoiceModule &m);
 
       std::unique_ptr<Module> cloneVoice() const override;
 
@@ -18,8 +18,9 @@ namespace clap {
       [[nodiscard]] bool isAssigned() const noexcept;
 
       // key and channel info
-      [[nodiscard]] int32_t channel() const noexcept;
-      [[nodiscard]] int32_t key() const noexcept;
+      [[nodiscard]] bool match(int32_t key, int32_t channel) const;
+      [[nodiscard]] int32_t channel() const noexcept { return _channel; }
+      [[nodiscard]] int32_t key() const noexcept { return _key; }
       [[nodiscard]] int32_t lowestKey() const noexcept;
       [[nodiscard]] int32_t highestKey() const noexcept;
       [[nodiscard]] int32_t startKey() const noexcept;
@@ -34,14 +35,21 @@ namespace clap {
       [[nodiscard]] auto &gain() const noexcept { return _gainBuffer; }
       [[nodiscard]] auto &pan() const noexcept { return _panBuffer; }
 
+      bool wantsNoteEvents() const noexcept override;
+      void onNoteOn(const clap_event_note &note) noexcept override;
+      void onNoteOff(const clap_event_note &note) noexcept override;
+      void onNoteChoke(const clap_event_note &note) noexcept override;
+
       void reset() noexcept override;
 
    private:
       const std::unique_ptr<Module> _module;
 
       bool _isAssigned = false;
+      int32_t _key;
+      int32_t _channel;
 
-      IntrusiveList::Hook _activeVoicesHook;
+      IntrusiveList::Hook _stateHook;
 
       double _velocity;
       SmoothedValue _pitch;

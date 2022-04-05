@@ -9,6 +9,38 @@
 
 namespace clap {
 
+   class SynthModule final : public Module {
+   public:
+      SynthModule(Synth &synth) : Module(synth, "", 0), _adsr(synth, "amp", 1) {}
+      SynthModule(const SynthModule &m) : Module(m), _adsr(m._adsr) {}
+
+      bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
+         bool succeed = true;
+         succeed &= _adsr.activate(sampleRate, maxFrameCount);
+
+         if (succeed)
+            return true;
+
+         deactivate();
+         return false;
+      }
+
+      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+         auto status = _adsr.process(c, numFrames);
+         //_voiceModule.outputBuffer.copy(_adsr.outputBuffer());
+         c.audioOutputs[0]->copy(_adsr.outputBuffer(), numFrames);
+         return status;
+      }
+
+      bool wantsNoteEvents() const noexcept override { return true; }
+      void onNoteOn(const clap_event_note &note) noexcept override { _adsr.onNoteOn(note); }
+      void onNoteOff(const clap_event_note &note) noexcept override { _adsr.onNoteOff(note); }
+      void onNoteChoke(const clap_event_note &note) noexcept override { _adsr.onNoteChoke(note); }
+
+   protected:
+      AdsrModule _adsr;
+   };
+
    const clap_plugin_descriptor *Synth::descriptor() {
       static const char *features[] = {"instrument", nullptr};
 
@@ -29,8 +61,9 @@ namespace clap {
 
    Synth::Synth(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "synth"), descriptor(), host) {
-      auto aeg = std::make_unique<AdsrModule>(*this, "Amp Env", 1);
-      _rootModule = std::make_unique<VoiceExpanderModule>(*this, 0, std::move(aeg));
+      auto sm = std::make_unique<SynthModule>(*this);
+      _rootModule = std::move(sm);
+      //_rootModule = std::make_unique<VoiceExpanderModule>(*this, 0, std::move(aeg));
    }
 
    bool Synth::init() noexcept {

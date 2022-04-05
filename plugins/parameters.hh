@@ -33,7 +33,6 @@ namespace clap {
             p->setDefaultValue();
       }
 
-
       template <class Archive>
       void serialize(Archive &ar) const {
          std::vector<std::pair<clap_id, double>> values;

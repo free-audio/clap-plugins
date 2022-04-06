@@ -42,6 +42,8 @@ add_library(
   modules/voice-module.hh
   modules/svf-module.hh
   modules/svf-module.cc
+  modules/digi-osc-module.hh
+  modules/digi-osc-module.cc
   parameter.cc
   parameter.hh
   parameters.cc

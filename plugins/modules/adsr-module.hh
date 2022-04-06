@@ -44,8 +44,6 @@ namespace clap {
          double _sampleRate;
       };
 
-      void computeStateForDecay();
-
       DomainConverter<ExpCoeff> _conv{ExpCoeff(44100), 0};
 
       Parameter *_attackParam = nullptr;

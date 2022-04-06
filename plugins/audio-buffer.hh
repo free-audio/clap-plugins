@@ -8,11 +8,15 @@
 
 #include <clap/clap.h>
 
+#include "constants.hh"
+
 namespace clap {
    template <typename T = float>
    class AudioBuffer {
    public:
-      AudioBuffer(uint32_t channelCount, uint32_t frameCount, double sampleRate = 0)
+      explicit AudioBuffer(uint32_t channelCount = 1,
+                           uint32_t frameCount = BLOCK_SIZE,
+                           double sampleRate = 0)
          : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate),
            _data(static_cast<T *>(std::aligned_alloc(32, channelCount * frameCount * sizeof(T)))) {
          if (!_data) [[unlikely]]

@@ -43,12 +43,8 @@ namespace clap {
    void AdsrModule::trigger(double velocity) {
       _phase = Phase::Attack;
       _noteOnVelocity = velocity;
-      _state = 1 - _level / ExpCoeff::K;
+      _target = 1;
       // TODO: use velocity
-   }
-
-   void AdsrModule::computeStateForDecay() {
-      _state = 1 + ExpCoeff::thr + (_level - 1) / ExpCoeff::K;
    }
 
    void AdsrModule::release() {
@@ -57,7 +53,7 @@ namespace clap {
       case Phase::Decay:
       case Phase::Sustain:
          _phase = Phase::Release;
-         computeStateForDecay();
+         _target = 0;
          return;
 
       case Phase::Choke:
@@ -73,7 +69,7 @@ namespace clap {
       case Phase::Decay:
       case Phase::Sustain:
          _phase = Phase::Choke;
-         _state = 1; // TODO
+         _target = 0;
          return;
 
       case Phase::Choke:
@@ -105,16 +101,12 @@ namespace clap {
       auto &decayBuffer = _decayParam->modulatedValueBuffer();
       auto &sustainBuffer = _sustainParam->modulatedValueBuffer();
       auto &releaseBuffer = _releaseParam->modulatedValueBuffer();
-      // auto &velocityBuffer = _velocityParam->modulatedValueBuffer();
+      auto &velocityBuffer = _velocityParam->modulatedValueBuffer();
 
       if (_phase == Phase::Rest) {
          _buffer.setConstant(true);
          out[0] = 0;
          return CLAP_PROCESS_SLEEP;
-      } else if (_phase == Phase::Sustain && sustainBuffer.isConstant()) {
-         _buffer.setConstant(true);
-         out[0] = _level;
-         return CLAP_PROCESS_CONTINUE;
       }
 
       _buffer.setConstant(false);
@@ -128,15 +120,16 @@ namespace clap {
 
          case Phase::Attack: {
             for (; i < numFrames; ++i) {
+               double v = velocityBuffer.getSample(i, 0);
                double k = _conv.convert(attackBuffer.getSample(i, 0));
-               _state *= k;
-               _level = ExpCoeff::K * (1 - _state);
 
-               if (_level >= 1) [[unlikely]] {
-                  computeStateForDecay();
+               _target = (1 - v) + v * _noteOnVelocity;
+               _level = k * _level + (1 - k) * (_target + ExpCoeff::attackOffset);
+
+               if (_level >= _target) [[unlikely]] {
                   _phase = Phase::Decay;
-                  _level = 1;
-                  out[i] = 1;
+                  _level = _target;
+                  out[i] = _level;
                   break;
                }
 
@@ -147,10 +140,12 @@ namespace clap {
 
          case Phase::Decay: {
             for (; i < numFrames; ++i) {
+               double s = sustainBuffer.getSample(i, 0);
+               double v = velocityBuffer.getSample(i, 0);
                double k = _conv.convert(decayBuffer.getSample(i, 0));
-               auto s = sustainBuffer.getSample(i, 0);
-               _state *= k;
-               _level = 1 - ExpCoeff::K * (1 + ExpCoeff::thr - _state);
+
+               _target = s * ((1 - v) + v * _noteOnVelocity);
+               _level = k * _level + (1 - k) * (_target - ExpCoeff::decayOffset);
                out[i] = _level;
 
                if (_level <= s) [[unlikely]] {
@@ -164,17 +159,22 @@ namespace clap {
          }
 
          case Phase::Sustain: {
-            for (; i < numFrames; ++i)
+            for (; i < numFrames; ++i) {
+               double s = sustainBuffer.getSample(i, 0);
+               double v = velocityBuffer.getSample(i, 0);
+               double k = _conv.convert(decayBuffer.getSample(i, 0));
+
+               _target = s * ((1 - v) + v * _noteOnVelocity);
+               _level = k * _level + (1 - k) * _target;
                out[i] = _level;
+            }
             break;
          }
 
          case Phase::Release: {
             for (; i < numFrames; ++i) {
                double k = _conv.convert(releaseBuffer.getSample(i, 0));
-               _state *= k;
-
-               _level = 1 - ExpCoeff::K * (1 + ExpCoeff::thr - _state);
+               _level = k * _level + (1 - k) * (0 - ExpCoeff::releaseOffset);
                if (_level <= 0) [[unlikely]] {
                   _level = 0;
                   _phase = Phase::Rest;
@@ -188,9 +188,18 @@ namespace clap {
          }
 
          case Phase::Choke:
-            // TODO
-            _phase = Phase::Rest;
-            out[i] = 0;
+            for (; i < numFrames; ++i) {
+               double k = _conv.convert(0.001);
+               _level = k * _level + (1 - k) * (0 - ExpCoeff::chokeOffset);
+               if (_level <= 0) [[unlikely]] {
+                  _level = 0;
+                  _phase = Phase::Rest;
+                  out[i] = 0;
+                  break;
+               }
+
+               out[i] = _level;
+            }
             break;
          }
       }

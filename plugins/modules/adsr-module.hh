@@ -28,8 +28,10 @@ namespace clap {
 
    protected:
       struct ExpCoeff {
-         static const constexpr double thr = 0.06;
-         static const constexpr double K = 1 / (1 - thr);
+         static const constexpr double attackOffset = 0.01;
+         static const constexpr double decayOffset = 0.002;
+         static const constexpr double releaseOffset = 0.001;
+         static const constexpr double chokeOffset = 0.005;
 
          explicit ExpCoeff(double sampleRate) : _sampleRate(sampleRate) {}
 
@@ -62,8 +64,8 @@ namespace clap {
       };
 
       Phase _phase = Phase::Rest;
-      double _state = 1;
       double _level = 0;
+      double _target = 0;
       double _noteOnVelocity = 0.8;
 
       AudioBuffer<double> _buffer{1, BLOCK_SIZE};

@@ -21,6 +21,10 @@ namespace clap {
       double sampleRateD;
       float sampleRateF;
 
+      // 1 / sampleRate
+      double sampleRateInvD;
+      double sampleRateInvF;
+
       bool isPlaying;
       bool isRecording;
 

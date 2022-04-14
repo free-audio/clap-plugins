@@ -20,6 +20,7 @@ namespace clap {
    std::unique_ptr<Module> DigiOscModule::cloneVoice() const {
       return std::make_unique<DigiOscModule>(*this);
    }
+
    bool DigiOscModule::doActivate(double sampleRate, uint32_t maxFrameCount) { return true; }
 
    clap_process_status DigiOscModule::process(Context &c, uint32_t numFrames) noexcept {
@@ -30,8 +31,10 @@ namespace clap {
       auto &pdBuffer = _pdParam->modulatedValueBuffer();
 
       for (uint32_t i = 0; i < numFrames; ++i) {
-         // TODO: compute OSC
-         out[i] = 0;
+         double phaseInc = _freq->getSample(i, 0) * c.sampleRateInvD;
+         out[i] = std::sin(2 * M_PI * _phase);
+         _phase += phaseInc;
+         _phase -= std::floor(_phase);
       }
 
       return CLAP_PROCESS_CONTINUE;

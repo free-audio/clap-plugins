@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../core-plugin.hh"
-#include "../modules/adsr-module.hh"
 
 namespace clap {
    class Synth final : public CorePlugin {

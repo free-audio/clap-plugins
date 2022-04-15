@@ -24,6 +24,8 @@ namespace clap {
       void onNoteOff(const clap_event_note &note) noexcept override;
       void onNoteChoke(const clap_event_note &note) noexcept override;
 
+      auto& outputBuffer() const noexcept { return _outputBuffer; }
+
    private:
       VoiceModule* findActiveVoice(int32_t key, int32_t channel) const;
       VoiceModule* assignVoice(int32_t key, int32_t channel);

@@ -95,6 +95,7 @@ namespace clap {
    clap_process_status AdsrModule::process(const Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);
 
+      _buffer.clear(-1);
       auto out = _buffer.data();
 
       auto &attackBuffer = _attackParam->modulatedValueBuffer();

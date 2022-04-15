@@ -6,5 +6,8 @@ namespace clap {
    static const constexpr uint32_t MAX_VOICES = 16;
 
    // Internal block size used to divide large process calls
-   static const constexpr uint32_t BLOCK_SIZE = 256;
+   static const constexpr uint32_t BLOCK_SIZE = 128;
+
+   // Grow it when necessary
+   static const constexpr uint32_t MAX_AUDIO_CHANNELS = 2;
 } // namespace clap

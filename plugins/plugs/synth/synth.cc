@@ -11,126 +11,135 @@
 #include "synth.hh"
 
 namespace clap {
-   enum ModuleIdentifiers {
-      VoiceExpanderId = 0,
-      AmpAdsrId = 1,
-      FltAdsrId = 2,
-      FltId = 3,
-      Osc1Id = 4,
-      Osc2Id = 5,
-   };
+   namespace {
+      enum ModuleIdentifiers {
+         SynthId = 0,
+         VoiceExpanderId = 1,
+         FltAdsrId = 2,
+         FltId = 3,
+         Osc1Id = 4,
+         Osc2Id = 5,
+         AmpAdsrId = 6,
+      };
 
-   class SynthVoiceModule final : public Module {
-   public:
-      SynthVoiceModule(Synth &synth)
-         : Module(synth, "", 0), _ampAdsr(synth, "amp", AmpAdsrId),
-           _filterAdsr(synth, "filter env", FltAdsrId), _filter(synth, "filter", FltId),
-           _digiOsc1(synth, "osc1", Osc1Id), _digiOsc2(synth, "osc2", Osc2Id) {}
+      class SynthVoiceModule final : public Module {
+      public:
+         SynthVoiceModule(Synth &synth)
+            : Module(synth, "", 0), _ampAdsr(synth, "amp", AmpAdsrId),
+              _filterAdsr(synth, "filter env", FltAdsrId), _filter(synth, "filter", FltId),
+              _digiOsc1(synth, "osc1", Osc1Id), _digiOsc2(synth, "osc2", Osc2Id) {
+            performRouting();
+         }
 
-      SynthVoiceModule(const SynthVoiceModule &m)
-         : Module(m), _ampAdsr(m._ampAdsr), _filterAdsr(m._filterAdsr), _filter(m._filter),
-           _digiOsc1(m._digiOsc1), _digiOsc2(m._digiOsc2) {}
+         SynthVoiceModule(const SynthVoiceModule &m)
+            : Module(m), _ampAdsr(m._ampAdsr), _filterAdsr(m._filterAdsr), _filter(m._filter),
+              _digiOsc1(m._digiOsc1), _digiOsc2(m._digiOsc2) {
+            performRouting();
+         }
 
-      std::unique_ptr<Module> cloneVoice() const override {
-         return std::make_unique<SynthVoiceModule>(*this);
-      }
+         std::unique_ptr<Module> cloneVoice() const override {
+            return std::make_unique<SynthVoiceModule>(*this);
+         }
 
-      bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
-         bool succeed = true;
+         void performRouting() {
+            // TODO
+            //_filter.setInput();
+         }
 
-         succeed &= _ampAdsr.activate(sampleRate, maxFrameCount);
-         succeed &= _filterAdsr.activate(sampleRate, maxFrameCount);
-         succeed &= _filter.activate(sampleRate, maxFrameCount);
-         succeed &= _digiOsc1.activate(sampleRate, maxFrameCount);
-         succeed &= _digiOsc2.activate(sampleRate, maxFrameCount);
+         bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
+            bool succeed = true;
 
-         if (succeed)
-            return true;
+            succeed &= _ampAdsr.activate(sampleRate, maxFrameCount);
+            succeed &= _filterAdsr.activate(sampleRate, maxFrameCount);
+            succeed &= _filter.activate(sampleRate, maxFrameCount);
+            succeed &= _digiOsc1.activate(sampleRate, maxFrameCount);
+            succeed &= _digiOsc2.activate(sampleRate, maxFrameCount);
 
-         deactivate();
+            if (succeed)
+               return true;
 
-         //_filter.setInput();
+            deactivate();
 
-         return false;
-      }
+            return false;
+         }
 
-      void doDeactivate() override {
-         _ampAdsr.deactivate();
-         _filterAdsr.deactivate();
-         _filter.deactivate();
-         _digiOsc1.deactivate();
-         _digiOsc2.deactivate();
-      }
+         void doDeactivate() override {
+            _ampAdsr.deactivate();
+            _filterAdsr.deactivate();
+            _filter.deactivate();
+            _digiOsc1.deactivate();
+            _digiOsc2.deactivate();
+         }
 
-      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
-         auto status = _ampAdsr.process(c, numFrames);
-         _voiceModule->outputBuffer().copy(_ampAdsr.outputBuffer(), numFrames);
-         // c.audioOutputs[0]->copy(_ampAdsr.outputBuffer(), numFrames);
-         return status;
-      }
+         clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
+            auto status = _ampAdsr.process(c, numFrames);
+            _voiceModule->outputBuffer().copy(_ampAdsr.outputBuffer(), numFrames);
+            return status;
+         }
 
-      bool wantsNoteEvents() const noexcept override { return true; }
+         bool wantsNoteEvents() const noexcept override { return true; }
 
-      void onNoteOn(const clap_event_note &note) noexcept override {
-         _ampAdsr.onNoteOn(note);
-         _filterAdsr.onNoteOn(note);
-      }
+         void onNoteOn(const clap_event_note &note) noexcept override {
+            _ampAdsr.onNoteOn(note);
+            _filterAdsr.onNoteOn(note);
+         }
 
-      void onNoteOff(const clap_event_note &note) noexcept override {
-         _ampAdsr.onNoteOff(note);
-         _filterAdsr.onNoteOff(note);
-      }
+         void onNoteOff(const clap_event_note &note) noexcept override {
+            _ampAdsr.onNoteOff(note);
+            _filterAdsr.onNoteOff(note);
+         }
 
-      void onNoteChoke(const clap_event_note &note) noexcept override {
-         _ampAdsr.onNoteChoke(note);
-         _filterAdsr.onNoteChoke(note);
-      }
+         void onNoteChoke(const clap_event_note &note) noexcept override {
+            _ampAdsr.onNoteChoke(note);
+            _filterAdsr.onNoteChoke(note);
+         }
 
-   protected:
-      AdsrModule _ampAdsr;
-      AdsrModule _filterAdsr;
-      SvfModule _filter;
-      DigiOscModule _digiOsc1;
-      DigiOscModule _digiOsc2;
-   };
+      protected:
+         AdsrModule _ampAdsr;
+         AdsrModule _filterAdsr;
+         SvfModule _filter;
+         DigiOscModule _digiOsc1;
+         DigiOscModule _digiOsc2;
+      };
 
-   class SynthModule final : public Module {
-   public:
-      SynthModule(Synth &synth)
-         : Module(synth, "", 0),
-           _expanderModule(synth, 0, std::make_unique<SynthVoiceModule>(synth), 1) {}
+      class SynthModule final : public Module {
+      public:
+         SynthModule(Synth &synth)
+            : Module(synth, "", SynthId),
+              _expanderModule(synth, 0, std::make_unique<SynthVoiceModule>(synth), 1) {}
 
-      SynthModule(const SynthModule &m) = delete;
+         SynthModule(const SynthModule &m) = delete;
 
-      bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
-         return _expanderModule.activate(sampleRate, maxFrameCount);
-      }
+         bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
+            return _expanderModule.activate(sampleRate, maxFrameCount);
+         }
 
-      void doDeactivate() override {
-         _expanderModule.deactivate();
-      }
+         void doDeactivate() override { _expanderModule.deactivate(); }
 
-      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
-         return _expanderModule.process(c, numFrames);
-      }
+         clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
+            auto status = _expanderModule.process(c, numFrames);
+            c.audioOutputs[0]->copy(_expanderModule.outputBuffer(), numFrames);
+            return status;
+         }
 
-      bool wantsNoteEvents() const noexcept override { return true; }
+         bool wantsNoteEvents() const noexcept override { return true; }
 
-      void onNoteOn(const clap_event_note &note) noexcept override {
-         _expanderModule.onNoteOn(note);
-      }
+         void onNoteOn(const clap_event_note &note) noexcept override {
+            _expanderModule.onNoteOn(note);
+         }
 
-      void onNoteOff(const clap_event_note &note) noexcept override {
-         _expanderModule.onNoteOff(note);
-      }
+         void onNoteOff(const clap_event_note &note) noexcept override {
+            _expanderModule.onNoteOff(note);
+         }
 
-      void onNoteChoke(const clap_event_note &note) noexcept override {
-         _expanderModule.onNoteChoke(note);
-      }
+         void onNoteChoke(const clap_event_note &note) noexcept override {
+            _expanderModule.onNoteChoke(note);
+         }
 
-   private:
-      VoiceExpanderModule _expanderModule;
-   };
+      private:
+         VoiceExpanderModule _expanderModule;
+      };
+   } // namespace
 
    const clap_plugin_descriptor *Synth::descriptor() {
       static const char *features[] = {"instrument", nullptr};

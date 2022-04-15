@@ -70,7 +70,6 @@ namespace clap {
       if (_module->wantsNoteEvents()) [[likely]]
          _module->onNoteExpression(noteExp);
 
-      // TODO
       switch (noteExp.expression_id) {
       case CLAP_NOTE_EXPRESSION_VOLUME:
          if (_wasJustAssigned)
@@ -124,8 +123,19 @@ namespace clap {
    }
 
    clap_process_status VoiceModule::process(const Context &c, uint32_t numFrames) noexcept {
-      assert(_isActive);
+      assert(isActive());
+      assert(isAssigned());
+
+      _tuning.render(_tuningBuffer.data(), numFrames);
+      _vibrato.render(_vibratoBuffer.data(), numFrames);
+      _brigthness.render(_brigthnessBuffer.data(), numFrames);
+      _pressure.render(_pressureBuffer.data(), numFrames);
+      _expression.render(_expressionBuffer.data(), numFrames);
+      _volume.render(_volumeBuffer.data(), numFrames);
+      _pan.render(_panBuffer.data(), numFrames);
+
       auto status = _module->process(c, numFrames);
+
       _wasJustAssigned = false;
       return status;
    }

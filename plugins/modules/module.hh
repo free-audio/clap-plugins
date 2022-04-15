@@ -38,6 +38,7 @@ namespace clap {
       [[nodiscard]] virtual bool doActivate(double sampleRate, uint32_t maxFrameCount);
       void deactivate();
       virtual void doDeactivate();
+      [[nodiscard]] bool isActive() const noexcept { return _isActive; }
 
       virtual bool startProcessing() noexcept { return true; }
       virtual void stopProcessing() noexcept {}
@@ -56,7 +57,9 @@ namespace clap {
 
       // Sets a pointer to the parent voice module in order to retrive
       // the current voice info
-      virtual void setVoiceModule(const VoiceModule *voiceModule) noexcept { _voiceModule = voiceModule; }
+      virtual void setVoiceModule(const VoiceModule *voiceModule) noexcept {
+         _voiceModule = voiceModule;
+      }
 
    protected:
       // Registers all parameters from this modules

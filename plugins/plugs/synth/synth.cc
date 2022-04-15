@@ -44,8 +44,8 @@ namespace clap {
          }
 
          void performRouting() {
-            // TODO
-            //_filter.setInput();
+            _digiOsc1.setPmInput(&_digiOsc2.outputBuffer());
+            _filter.setInput(&_oscMixBuffer);
          }
 
          bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
@@ -74,9 +74,16 @@ namespace clap {
          }
 
          clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
+            _digiOsc2.process(c, numFrames);
             _digiOsc1.process(c, numFrames);
+
+            _oscMixBuffer.sum(_digiOsc1.outputBuffer(), _digiOsc2.outputBuffer(), numFrames);
+
+            _filter.process(c, numFrames);
+
             auto status = _ampAdsr.process(c, numFrames);
-            _voiceModule->outputBuffer().product(_digiOsc1.outputBuffer(), _ampAdsr.outputBuffer(), numFrames);
+            _voiceModule->outputBuffer().product(_filter.outputBuffer(), _ampAdsr.outputBuffer(), numFrames);
+
             return status;
          }
 
@@ -112,6 +119,8 @@ namespace clap {
          SvfModule _filter;
          DigiOscModule _digiOsc1;
          DigiOscModule _digiOsc2;
+
+         AudioBuffer<double> _oscMixBuffer{1, BLOCK_SIZE};
       };
 
       class SynthModule final : public Module {

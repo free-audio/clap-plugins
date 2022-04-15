@@ -30,7 +30,7 @@ namespace clap {
    }
 
    SvfModule::SvfModule(const SvfModule &m)
-      : Module(m), _freqParam(m._freqParam), _resoParam(m._resoParam) {}
+      : Module(m), _freqParam(m._freqParam), _resoParam(m._resoParam), _modeParam(m._modeParam) {}
 
    SvfModule::~SvfModule() = default;
 
@@ -74,13 +74,14 @@ namespace clap {
       auto const in = _input->data();
       auto const inStride = _input->stride();
       auto const out = _output.data();
+      _output.setConstant(false);
 
       auto &freqBuffer = _freqParam->modulatedValueBuffer();
       auto &resoBuffer = _resoParam->modulatedValueBuffer();
       auto &modeBuffer = _modeParam->modulatedValueBuffer();
 
       for (uint32_t i = 0; i < numFrames; ++i) {
-         setFilter(freqBuffer.getSample(i, 0), resoBuffer.getSample(i, 0));
+         setFilter(freqBuffer.getSample(i), resoBuffer.getSample(i));
 
          double v0 = in[i * inStride];
          double v3 = v0 - _ic2eq;
@@ -90,7 +91,7 @@ namespace clap {
          _ic1eq = v1 * 2.0 - _ic1eq;
          _ic2eq = v2 * 2.0 - _ic2eq;
 
-         double modeValue = modeBuffer.getSample(i, 0);
+         double modeValue = modeBuffer.getSample(i);
          Mode mode = static_cast<Mode>(std::clamp<int>(modeValue, 0, 2));
 
          switch (mode) {

@@ -604,7 +604,10 @@ namespace clap {
                break;
 
             case CLAP_EVENT_NOTE_EXPRESSION:
-               // TODO
+               if (_rootModule->wantsNoteEvents()) {
+                  auto ev = reinterpret_cast<const clap_event_note_expression *>(hdr);
+                  _rootModule->onNoteExpression(*ev);
+               }
                break;
 
             case CLAP_EVENT_MIDI:

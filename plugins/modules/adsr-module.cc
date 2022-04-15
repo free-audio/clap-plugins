@@ -121,8 +121,8 @@ namespace clap {
 
          case Phase::Attack: {
             for (; i < numFrames; ++i) {
-               double v = velocityBuffer.getSample(i, 0);
-               double k = _conv.convert(attackBuffer.getSample(i, 0));
+               double v = velocityBuffer.getSample(i);
+               double k = _conv.convert(attackBuffer.getSample(i));
 
                _target = (1 - v) + v * _noteOnVelocity;
                _level = k * _level + (1 - k) * (_target + ExpCoeff::attackOffset);
@@ -141,9 +141,9 @@ namespace clap {
 
          case Phase::Decay: {
             for (; i < numFrames; ++i) {
-               double s = sustainBuffer.getSample(i, 0);
-               double v = velocityBuffer.getSample(i, 0);
-               double k = _conv.convert(decayBuffer.getSample(i, 0));
+               double s = sustainBuffer.getSample(i);
+               double v = velocityBuffer.getSample(i);
+               double k = _conv.convert(decayBuffer.getSample(i));
 
                _target = s * ((1 - v) + v * _noteOnVelocity);
                _level = k * _level + (1 - k) * (_target - ExpCoeff::decayOffset);
@@ -161,9 +161,9 @@ namespace clap {
 
          case Phase::Sustain: {
             for (; i < numFrames; ++i) {
-               double s = sustainBuffer.getSample(i, 0);
-               double v = velocityBuffer.getSample(i, 0);
-               double k = _conv.convert(decayBuffer.getSample(i, 0));
+               double s = sustainBuffer.getSample(i);
+               double v = velocityBuffer.getSample(i);
+               double k = _conv.convert(decayBuffer.getSample(i));
 
                _target = s * ((1 - v) + v * _noteOnVelocity);
                _level = k * _level + (1 - k) * _target;
@@ -174,7 +174,7 @@ namespace clap {
 
          case Phase::Release: {
             for (; i < numFrames; ++i) {
-               double k = _conv.convert(releaseBuffer.getSample(i, 0));
+               double k = _conv.convert(releaseBuffer.getSample(i));
                _level = k * _level + (1 - k) * (0 - ExpCoeff::releaseOffset);
                if (_level <= 0) [[unlikely]] {
                   _level = 0;

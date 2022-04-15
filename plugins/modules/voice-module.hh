@@ -31,6 +31,7 @@ namespace clap {
 
       // note expressions for this voice
       [[nodiscard]] double velocity() const noexcept { return _velocity; }
+      [[nodiscard]] double keyFreq() const noexcept { return _keyFreq; }
       [[nodiscard]] auto &tuning() const noexcept { return _tuningBuffer; }
       [[nodiscard]] auto &brightness() const noexcept { return _brigthnessBuffer; }
       [[nodiscard]] auto &pressure() const noexcept { return _pressureBuffer; }

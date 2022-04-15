@@ -1,4 +1,5 @@
 #include "digi-osc-module.hh"
+#include "../tuning-utilities.hh"
 #include "voice-module.hh"
 
 namespace clap {
@@ -35,9 +36,12 @@ namespace clap {
       auto &pdBuffer = _pdParam->modulatedValueBuffer();
 
       for (uint32_t i = 0; i < numFrames; ++i) {
-         double freq = 440; // TODO
+         double tuningRatio =
+            tuningToRatio(voiceTuningBuffer.getSample(i));
+         double freq = _voiceModule->keyFreq() * tuningRatio;
          double phaseInc = freq * c.sampleRateInvD;
-         out[i] = std::sin(2 * M_PI * _phase);
+         double phaseMod = _pmInput ? _pmInput->getSample(i) : 0;
+         out[i] = std::sin(2 * M_PI * (_phase + phaseMod));
          _phase += phaseInc;
          _phase -= std::floor(_phase);
          assert(_phase >= 0);

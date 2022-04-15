@@ -39,7 +39,7 @@ namespace clap {
       [[nodiscard]] uint32_t stride() const noexcept { return _stride; }
       [[nodiscard]] bool isConstant() const noexcept { return _stride == 0; }
       void setConstant(bool isConstant) noexcept { _stride = _channelCount * !isConstant; }
-      [[nodiscard]] const T getSample(uint32_t frame, uint32_t channel) const noexcept {
+      [[nodiscard]] const T getSample(uint32_t frame, uint32_t channel = 0) const noexcept {
          return _data[frame * _stride + channel];
       }
 

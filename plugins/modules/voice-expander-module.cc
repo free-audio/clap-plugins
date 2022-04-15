@@ -1,4 +1,5 @@
 #include "../container-of.hh"
+#include "../merge-process-status.hh"
 
 #include "voice-expander-module.hh"
 #include "voice-module.hh"
@@ -11,8 +12,10 @@ namespace clap {
       : Module(plugin, "voice-expander", moduleId) {
 
       _voices[0] = std::make_unique<VoiceModule>(_plugin, std::move(module), 1);
-      for (uint32_t i = 1; i < _voices.size(); ++i)
+      for (uint32_t i = 1; i < _voices.size(); ++i) {
          _voices[i] = std::make_unique<VoiceModule>(*_voices[0]);
+         _voices[i]->setVoiceIndex(i);
+      }
 
       for (auto &voice : _voices)
          _sleepingVoices.pushBack(&voice->_stateHook);
@@ -37,13 +40,17 @@ namespace clap {
    }
 
    clap_process_status VoiceExpanderModule::process(const Context &c, uint32_t numFrames) noexcept {
-      for (auto it = _activeVoices.begin(); !it.end(); ++it) {
+      clap_process_status status = CLAP_PROCESS_SLEEP;
+      for (auto it = _activeVoices.begin(); !it.end();) {
          auto voice = containerOf(it.item(), &VoiceModule::_stateHook);
-         voice->process(c, numFrames);
-         // TODO if the voice returns sleep, then it is over
+         status = mergeProcessStatus(status, voice->process(c, numFrames));
+         ++it;
+
+         if (status == CLAP_PROCESS_SLEEP)
+            releaseVoice(*voice);
       }
 
-      return CLAP_PROCESS_SLEEP;
+      return status;
    }
 
    VoiceModule *VoiceExpanderModule::findActiveVoice(int32_t key, int32_t channel) const {
@@ -61,9 +68,20 @@ namespace clap {
          return nullptr; // TODO: steal voice instead
 
       auto voice = containerOf(_sleepingVoices.front(), &VoiceModule::_stateHook);
+      assert(!voice->isAssigned());
       voice->_stateHook.unlink();
+      voice->_isAssigned = true;
+      voice->_key = key;
+      voice->_channel = channel;
       _activeVoices.pushBack(&voice->_stateHook);
       return voice;
+   }
+
+   void VoiceExpanderModule::releaseVoice(VoiceModule &voice) {
+      assert(voice.isAssigned());
+      voice._stateHook.unlink();
+      voice._isAssigned = false;
+      _sleepingVoices.pushBack(&voice._stateHook);
    }
 
    bool VoiceExpanderModule::wantsNoteEvents() const noexcept { return true; }

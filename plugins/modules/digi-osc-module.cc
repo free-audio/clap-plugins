@@ -1,4 +1,5 @@
 #include "digi-osc-module.hh"
+#include "voice-module.hh"
 
 namespace clap {
 
@@ -28,10 +29,12 @@ namespace clap {
 
       auto out = _buffer.data();
 
+      auto &freqBuffer = _voiceModule->pitchFreq();
+
       auto &pdBuffer = _pdParam->modulatedValueBuffer();
 
       for (uint32_t i = 0; i < numFrames; ++i) {
-         double phaseInc = _freq->getSample(i, 0) * c.sampleRateInvD;
+         double phaseInc = freqBuffer.getSample(i, 0) * c.sampleRateInvD;
          out[i] = std::sin(2 * M_PI * _phase);
          _phase += phaseInc;
          _phase -= std::floor(_phase);

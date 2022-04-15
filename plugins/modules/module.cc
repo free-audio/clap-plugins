@@ -1,5 +1,7 @@
-#include "module.hh"
+#include <iostream>
+
 #include "../core-plugin.hh"
+#include "module.hh"
 
 namespace clap {
 
@@ -9,7 +11,10 @@ namespace clap {
 
    Module::~Module() = default;
 
-   std::unique_ptr<Module> Module::cloneVoice() const { return {}; }
+   std::unique_ptr<Module> Module::cloneVoice() const {
+      std::cerr << "missing Module::cloneVoice() implementation" << std::endl;
+      std::terminate();
+   }
 
    Parameter *Module::addParameter(uint32_t id,
                                    const std::string &name,

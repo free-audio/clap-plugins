@@ -14,10 +14,11 @@ namespace clap {
 
       std::unique_ptr<Module> cloneVoice() const override;
 
-      auto& outputBuffer() { return _outputBuffer; }
+      auto &outputBuffer() { return _outputBuffer; }
 
-      [[nodiscard]] uint32_t voiceIndex() const noexcept;
-      [[nodiscard]] bool isAssigned() const noexcept;
+      void setVoiceIndex(uint32_t voiceIndex) noexcept { _voiceIndex = voiceIndex; }
+      [[nodiscard]] uint32_t voiceIndex() const noexcept { return _voiceIndex; }
+      [[nodiscard]] bool isAssigned() const noexcept { return _isAssigned; }
 
       // key and channel info
       [[nodiscard]] bool match(int32_t key, int32_t channel) const;
@@ -30,6 +31,7 @@ namespace clap {
       // note expressions for this voice
       [[nodiscard]] double velocity() const noexcept { return _velocity; }
       [[nodiscard]] auto &pitch() const noexcept { return _pitchBuffer; }
+      [[nodiscard]] auto &pitchFreq() const noexcept { return _pitchFreqBuffer; }
       [[nodiscard]] auto &brightness() const noexcept { return _brigthnessBuffer; }
       [[nodiscard]] auto &pressure() const noexcept { return _pressureBuffer; }
       [[nodiscard]] auto &vibrato() const noexcept { return _vibratoBuffer; }
@@ -52,6 +54,7 @@ namespace clap {
    private:
       const std::unique_ptr<Module> _module;
 
+      uint32_t _voiceIndex = 0;
       bool _isAssigned = false;
       int32_t _key;
       int32_t _channel;
@@ -59,19 +62,22 @@ namespace clap {
       IntrusiveList::Hook _stateHook;
 
       double _velocity;
+
       SmoothedValue _pitch;
-      AudioBuffer<double> _pitchBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _brigthness;
-      AudioBuffer<double> _brigthnessBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _pressure;
-      AudioBuffer<double> _pressureBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _vibrato;
-      AudioBuffer<double> _vibratoBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _expression;
-      AudioBuffer<double> _expressionBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _gain;
-      AudioBuffer<double> _gainBuffer{1, BLOCK_SIZE, 0};
       SmoothedValue _pan;
+
+      AudioBuffer<double> _pitchBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _pitchFreqBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _brigthnessBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _pressureBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _vibratoBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _expressionBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _gainBuffer{1, BLOCK_SIZE, 0};
       AudioBuffer<double> _panBuffer{1, BLOCK_SIZE, 0};
 
       AudioBuffer<double> _outputBuffer;

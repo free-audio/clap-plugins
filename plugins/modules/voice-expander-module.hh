@@ -27,6 +27,7 @@ namespace clap {
    private:
       VoiceModule* findActiveVoice(int32_t key, int32_t channel) const;
       VoiceModule* assignVoice(int32_t key, int32_t channel);
+      void releaseVoice(VoiceModule &);
 
       IntrusiveList _activeVoices;   // uses VoiceModule._stateHook
       IntrusiveList _sleepingVoices; // uses VoiceModule._stateHook

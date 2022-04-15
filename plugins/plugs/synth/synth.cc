@@ -31,6 +31,11 @@ namespace clap {
          : Module(m), _ampAdsr(m._ampAdsr), _filterAdsr(m._filterAdsr), _filter(m._filter),
            _digiOsc1(m._digiOsc1), _digiOsc2(m._digiOsc2) {}
 
+      std::unique_ptr<Module> cloneVoice() const override
+      {
+         return std::make_unique<SynthModule>(*this);
+      }
+
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
          bool succeed = true;
 
@@ -111,8 +116,7 @@ namespace clap {
    Synth::Synth(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "synth"), descriptor(), host) {
       auto sm = std::make_unique<SynthModule>(*this);
-      _rootModule = std::move(sm);
-      //_rootModule = std::make_unique<VoiceExpanderModule>(*this, 0, std::move(aeg));
+      _rootModule = std::make_unique<VoiceExpanderModule>(*this, 0, std::move(sm));
    }
 
    bool Synth::init() noexcept {

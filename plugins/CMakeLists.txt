@@ -29,6 +29,8 @@ add_library(
   domain-converter.hh
   fixed-point.hh
   intrusive-list.hh
+  merge-process-status.hh
+  merge-process-status.cc
   modulation-matrix.hh
   modules/adsr-module.cc
   modules/adsr-module.hh

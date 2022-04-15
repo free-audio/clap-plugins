@@ -12,6 +12,11 @@ namespace clap {
       AdsrPlugModule(AdsrPlug &AdsrPlug) : Module(AdsrPlug, "", 0), _adsr(AdsrPlug, "amp", 1) {}
       AdsrPlugModule(const AdsrPlugModule &m) : Module(m), _adsr(m._adsr) {}
 
+      std::unique_ptr<Module> cloneVoice() const override
+      {
+         return std::make_unique<AdsrPlugModule>(*this);
+      }
+
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
          bool succeed = true;
          succeed &= _adsr.activate(sampleRate, maxFrameCount);

@@ -23,12 +23,13 @@ namespace clap {
       void onNoteOn(const clap_event_note &note) noexcept override;
       void onNoteOff(const clap_event_note &note) noexcept override;
       void onNoteChoke(const clap_event_note &note) noexcept override;
+      void onNoteExpression(const clap_event_note_expression &noteExp) noexcept override;
 
       auto& outputBuffer() const noexcept { return _outputBuffer; }
 
    private:
       VoiceModule* findActiveVoice(int32_t key, int32_t channel) const;
-      VoiceModule* assignVoice(int32_t key, int32_t channel);
+      VoiceModule* assignVoice();
       void releaseVoice(VoiceModule &);
 
       IntrusiveList _activeVoices;   // uses VoiceModule._stateHook

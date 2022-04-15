@@ -68,6 +68,8 @@ add_library(
   plugs/svf/svf-plug.cc
   smoothed-value.hh
   stream-helper.hh
+  tuning-provider.cc
+  tuning-provider.hh
   value-types/decibel-value-type.hh
   value-types/decibel-value-type.cc
   value-types/simple-value-type.hh

@@ -299,8 +299,7 @@ namespace clap {
    bool CorePlugin::activate(double sampleRate,
                              uint32_t minFrameCount,
                              uint32_t maxFrameCount) noexcept {
-      _context.sampleRateD = sampleRate;
-      _context.sampleRateF = sampleRate;
+      _context.setSampleRate(sampleRate);
 
       auto setupBuffers = [sampleRate](auto &declAudio, auto &ctxAudio) {
          ctxAudio.resize(declAudio.size());

@@ -52,6 +52,11 @@ namespace clap {
       virtual void onNoteOn(const clap_event_note &note) noexcept {}
       virtual void onNoteOff(const clap_event_note &note) noexcept {}
       virtual void onNoteChoke(const clap_event_note &note) noexcept {}
+      virtual void onNoteExpression(const clap_event_note_expression &noteExp) noexcept {}
+
+      // Sets a pointer to the parent voice module in order to retrive
+      // the current voice info
+      virtual void setVoiceModule(const VoiceModule *voiceModule) noexcept { _voiceModule = voiceModule; }
 
    protected:
       // Registers all parameters from this modules
@@ -59,10 +64,6 @@ namespace clap {
                               const std::string &name,
                               uint32_t flags,
                               std::unique_ptr<ValueType> valueType);
-
-      // Sets a pointer to the parent voice module in order to retrive
-      // the current voice info
-      void setVoiceModule(const VoiceModule *voiceModule) noexcept { _voiceModule = voiceModule; }
 
       CorePlugin &_plugin;
       const std::string _name;

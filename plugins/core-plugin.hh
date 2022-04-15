@@ -12,6 +12,7 @@
 #include "intrusive-list.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
+#include "tuning-provider.hh"
 
 #include "modules/root-module.hh"
 
@@ -39,6 +40,7 @@ namespace clap {
       ~CorePlugin() override;
 
       const PathProvider &pathProvider() const noexcept { return *_pathProvider; }
+      const TuningProvider &tuningProvider() const noexcept { return _tuningProvider; }
 
    protected:
       //-------------//
@@ -213,5 +215,7 @@ namespace clap {
 
       Context _context;
       std::unique_ptr<Module> _rootModule;
+
+      TuningProvider _tuningProvider;
    };
 } // namespace clap

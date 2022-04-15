@@ -14,8 +14,13 @@ namespace clap {
    // audio processing context
    class Context {
    public:
-      // number of frames to process
-      uint32_t numFrames;
+      void setSampleRate(double sr)
+      {
+         sampleRateD = sr;
+         sampleRateF = static_cast<float>(sr);
+         sampleRateInvD = 1.0 / sr;
+         sampleRateInvF = static_cast<float>(sampleRateInvD);
+      }
 
       // current sampleRate
       double sampleRateD;

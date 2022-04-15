@@ -70,16 +70,14 @@ namespace clap {
       return nullptr;
    }
 
-   VoiceModule *VoiceExpanderModule::assignVoice(int32_t key, int32_t channel) {
+   VoiceModule *VoiceExpanderModule::assignVoice() {
       if (_sleepingVoices.empty())
          return nullptr; // TODO: steal voice instead
 
       auto voice = containerOf(_sleepingVoices.front(), &VoiceModule::_stateHook);
       assert(!voice->isAssigned());
       voice->_stateHook.unlink();
-      voice->_isAssigned = true;
-      voice->_key = key;
-      voice->_channel = channel;
+      voice->assign();
       _activeVoices.pushBack(&voice->_stateHook);
       return voice;
    }
@@ -100,7 +98,7 @@ namespace clap {
          return;
       }
 
-      voice = assignVoice(note.key, note.channel);
+      voice = assignVoice();
       if (!voice)
          return;
 
@@ -117,5 +115,11 @@ namespace clap {
       auto voice = findActiveVoice(note.key, note.channel);
       if (voice)
          voice->onNoteChoke(note);
+   }
+
+   void VoiceExpanderModule::onNoteExpression(const clap_event_note_expression &noteExp) noexcept {
+      auto voice = findActiveVoice(noteExp.key, noteExp.channel);
+      if (voice)
+         voice->onNoteExpression(noteExp);
    }
 } // namespace clap

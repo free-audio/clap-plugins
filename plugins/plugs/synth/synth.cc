@@ -23,6 +23,8 @@ namespace clap {
       };
 
       class SynthVoiceModule final : public Module {
+         using super = Module;
+
       public:
          SynthVoiceModule(Synth &synth)
             : Module(synth, "", 0), _ampAdsr(synth, "amp", AmpAdsrId),
@@ -72,8 +74,9 @@ namespace clap {
          }
 
          clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
+            _digiOsc1.process(c, numFrames);
             auto status = _ampAdsr.process(c, numFrames);
-            _voiceModule->outputBuffer().copy(_ampAdsr.outputBuffer(), numFrames);
+            _voiceModule->outputBuffer().product(_digiOsc1.outputBuffer(), _ampAdsr.outputBuffer(), numFrames);
             return status;
          }
 
@@ -92,6 +95,15 @@ namespace clap {
          void onNoteChoke(const clap_event_note &note) noexcept override {
             _ampAdsr.onNoteChoke(note);
             _filterAdsr.onNoteChoke(note);
+         }
+
+         void setVoiceModule(const VoiceModule *voiceModule) noexcept override {
+            super::setVoiceModule(voiceModule);
+            _ampAdsr.setVoiceModule(voiceModule);
+            _filterAdsr.setVoiceModule(voiceModule);
+            _filter.setVoiceModule(voiceModule);
+            _digiOsc1.setVoiceModule(voiceModule);
+            _digiOsc2.setVoiceModule(voiceModule);
          }
 
       protected:
@@ -134,6 +146,10 @@ namespace clap {
 
          void onNoteChoke(const clap_event_note &note) noexcept override {
             _expanderModule.onNoteChoke(note);
+         }
+
+         void onNoteExpression(const clap_event_note_expression &noteExp) noexcept override {
+            _expanderModule.onNoteExpression(noteExp);
          }
 
       private:

@@ -1,4 +1,6 @@
 #include "voice-module.hh"
+#include "../core-plugin.hh"
+#include "../tuning-provider.hh"
 
 namespace clap {
    VoiceModule::VoiceModule(CorePlugin &plugin,
@@ -20,6 +22,20 @@ namespace clap {
 
    void VoiceModule::reset() noexcept { _module->reset(); }
 
+   void VoiceModule::assign() noexcept {
+      assert(!isAssigned());
+      _isAssigned = true;
+      _wasJustAssigned = true;
+
+      _tuning.setImmediately(0);
+      _vibrato.setImmediately(0);
+      _brigthness.setImmediately(0);
+      _pressure.setImmediately(0);
+      _expression.setImmediately(0);
+      _volume.setImmediately(0);
+      _pan.setImmediately(0.5);
+   }
+
    bool VoiceModule::match(int32_t key_, int32_t channel_) const {
       return key_ == key() && channel_ == channel();
    }
@@ -27,10 +43,14 @@ namespace clap {
    bool VoiceModule::wantsNoteEvents() const noexcept { return true; }
 
    void VoiceModule::onNoteOn(const clap_event_note &note) noexcept {
+      assert(isAssigned());
+
       _key = note.key;
       _channel = note.channel;
       _velocity = note.velocity;
-      // TODO: pitch, note expression, ...
+      _keyFreq = _plugin.tuningProvider().getFreq(0, _channel, _key);
+
+      // TODO: glide
 
       if (_module->wantsNoteEvents()) [[likely]]
          _module->onNoteOn(note);
@@ -46,9 +66,68 @@ namespace clap {
          _module->onNoteOff(note);
    }
 
+   void VoiceModule::onNoteExpression(const clap_event_note_expression &noteExp) noexcept {
+      if (_module->wantsNoteEvents()) [[likely]]
+         _module->onNoteExpression(noteExp);
+
+      // TODO
+      switch (noteExp.expression_id) {
+      case CLAP_NOTE_EXPRESSION_VOLUME:
+         if (_wasJustAssigned)
+            _volume.setImmediately(noteExp.value);
+         else
+            _volume.setSmoothed(noteExp.value, 256);
+         break;
+
+      case CLAP_NOTE_EXPRESSION_PAN:
+         if (_wasJustAssigned)
+            _pan.setImmediately(noteExp.value);
+         else
+            _pan.setSmoothed(noteExp.value, 256);
+         break;
+
+      case CLAP_NOTE_EXPRESSION_TUNING:
+         if (_wasJustAssigned)
+            _tuning.setImmediately(noteExp.value);
+         else
+            _tuning.setSmoothed(noteExp.value, 256);
+         break;
+
+      case CLAP_NOTE_EXPRESSION_VIBRATO:
+         if (_wasJustAssigned)
+            _vibrato.setImmediately(noteExp.value);
+         else
+            _vibrato.setSmoothed(noteExp.value, 256);
+         break;
+
+      case CLAP_NOTE_EXPRESSION_EXPRESSION:
+         if (_wasJustAssigned)
+            _expression.setImmediately(noteExp.value);
+         else
+            _expression.setSmoothed(noteExp.value, 256);
+         break;
+
+      case CLAP_NOTE_EXPRESSION_BRIGHTNESS:
+         if (_wasJustAssigned)
+            _brigthness.setImmediately(noteExp.value);
+         else
+            _brigthness.setSmoothed(noteExp.value, 256);
+         break;
+
+      case CLAP_NOTE_EXPRESSION_PRESSURE:
+         if (_wasJustAssigned)
+            _pressure.setImmediately(noteExp.value);
+         else
+            _pressure.setSmoothed(noteExp.value, 256);
+         break;
+      }
+   }
+
    clap_process_status VoiceModule::process(const Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);
-      return _module->process(c, numFrames);
+      auto status = _module->process(c, numFrames);
+      _wasJustAssigned = false;
+      return status;
    }
 
    bool VoiceModule::doActivate(double sampleRate, uint32_t maxFrameCount) {

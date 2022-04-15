@@ -46,7 +46,7 @@ namespace clap {
          _module->onNoteOff(note);
    }
 
-   clap_process_status VoiceModule::process(Context &c, uint32_t numFrames) noexcept {
+   clap_process_status VoiceModule::process(const Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);
       return _module->process(c, numFrames);
    }

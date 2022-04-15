@@ -17,7 +17,7 @@ namespace clap {
       std::unique_ptr<Module> cloneVoice() const override;
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override;
 
       void reset() noexcept override;
 

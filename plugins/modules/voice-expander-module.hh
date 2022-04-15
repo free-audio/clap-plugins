@@ -17,7 +17,7 @@ namespace clap {
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
       void doDeactivate() override;
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override;
 
       bool wantsNoteEvents() const noexcept override;
       void onNoteOn(const clap_event_note &note) noexcept override;

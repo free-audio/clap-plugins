@@ -45,7 +45,7 @@ namespace clap {
       void onNoteOff(const clap_event_note &note) noexcept override;
       void onNoteChoke(const clap_event_note &note) noexcept override;
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override;
 
       void reset() noexcept override;
 

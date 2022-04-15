@@ -68,7 +68,7 @@ namespace clap {
       _lastReso = reso;
    }
 
-   clap_process_status SvfModule::process(Context &c, uint32_t numFrames) noexcept {
+   clap_process_status SvfModule::process(const Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);
 
       auto const in = _input->data();

@@ -58,7 +58,7 @@ namespace clap {
          _digiOsc2.deactivate();
       }
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          auto status = _ampAdsr.process(c, numFrames);
          //_voiceModule.outputBuffer.copy(_adsr.outputBuffer());
          c.audioOutputs[0]->copy(_ampAdsr.outputBuffer(), numFrames);

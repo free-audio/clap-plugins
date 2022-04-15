@@ -23,7 +23,7 @@ namespace clap {
 
    bool DigiOscModule::doActivate(double sampleRate, uint32_t maxFrameCount) { return true; }
 
-   clap_process_status DigiOscModule::process(Context &c, uint32_t numFrames) noexcept {
+   clap_process_status DigiOscModule::process(const Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);
 
       auto out = _buffer.data();

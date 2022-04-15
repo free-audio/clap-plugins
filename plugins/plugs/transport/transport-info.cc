@@ -7,7 +7,7 @@ namespace clap {
    public:
       TransportInfoModule(TransportInfo &plugin) : Module(plugin, "", 0) {}
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          return CLAP_PROCESS_CONTINUE;
       }
    };

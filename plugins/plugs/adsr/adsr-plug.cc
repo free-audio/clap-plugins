@@ -23,7 +23,7 @@ namespace clap {
          return false;
       }
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          auto status = _adsr.process(c, numFrames);
          c.audioOutputs[0]->copy(_adsr.outputBuffer(), numFrames);
          return status;

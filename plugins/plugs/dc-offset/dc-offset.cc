@@ -16,7 +16,7 @@ namespace clap {
                                      std::make_unique<SimpleValueType>(-1, 1, 0));
       }
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
 
          c.audioOutputs[0]->sum(*c.audioInputs[0], _offsetParam->modulatedValueBuffer(), numFrames);

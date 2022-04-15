@@ -22,7 +22,7 @@ namespace clap {
          return false;
       }
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          _svf.setInput(c.audioInputs[0].get());
          auto status = _svf.process(c, numFrames);
          c.audioOutputs[0]->copy(_svf.outputBuffer(), numFrames);

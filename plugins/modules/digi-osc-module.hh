@@ -15,7 +15,7 @@ namespace clap {
       void trigger();
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override;
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override;
 
       void setFreq(const AudioBuffer<double> *in) noexcept { _freq = in; }
       auto &outputBuffer() const { return _buffer; }

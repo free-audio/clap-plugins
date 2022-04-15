@@ -36,7 +36,7 @@ namespace clap {
             voice->deactivate();
    }
 
-   clap_process_status VoiceExpanderModule::process(Context &c, uint32_t numFrames) noexcept {
+   clap_process_status VoiceExpanderModule::process(const Context &c, uint32_t numFrames) noexcept {
       for (auto it = _activeVoices.begin(); !it.end(); ++it) {
          auto voice = containerOf(it.item(), &VoiceModule::_stateHook);
          voice->process(c, numFrames);

@@ -43,7 +43,7 @@ namespace clap {
       virtual void stopProcessing() noexcept {}
       virtual void reset() noexcept {}
 
-      virtual clap_process_status process(Context &c, uint32_t numFrames) noexcept {
+      virtual clap_process_status process(const Context &c, uint32_t numFrames) noexcept {
          assert(_isActive);
          return CLAP_PROCESS_SLEEP;
       }

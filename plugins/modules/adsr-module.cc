@@ -92,7 +92,7 @@ namespace clap {
       return true;
    }
 
-   clap_process_status AdsrModule::process(Context &c, uint32_t numFrames) noexcept {
+   clap_process_status AdsrModule::process(const Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);
 
       auto out = _buffer.data();

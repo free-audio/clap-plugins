@@ -16,7 +16,7 @@ namespace clap {
                                    std::make_unique<DecibelValueType>(-40, 40, 0));
       }
 
-      clap_process_status process(Context &c, uint32_t numFrames) noexcept override {
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
 
          c.audioOutputs[0]->product(

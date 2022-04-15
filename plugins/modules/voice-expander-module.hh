@@ -12,7 +12,7 @@
 namespace clap {
    class VoiceExpanderModule : public Module {
    public:
-      VoiceExpanderModule(CorePlugin &plugin, uint32_t moduleId, std::unique_ptr<Module> module);
+      VoiceExpanderModule(CorePlugin &plugin, uint32_t moduleId, std::unique_ptr<Module> module, uint32_t channelCount);
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
       void doDeactivate() override;
@@ -33,5 +33,7 @@ namespace clap {
       IntrusiveList _sleepingVoices; // uses VoiceModule._stateHook
 
       std::array<std::unique_ptr<VoiceModule>, MAX_VOICES> _voices;
+
+      AudioBuffer<double> _outputBuffer;
    };
 } // namespace clap

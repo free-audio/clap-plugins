@@ -49,6 +49,7 @@ BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeColon
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
+# PackConstructorInitializers: Never
 ColumnLimit: 100
 CommentPragmas:  '^ IWYU pragma:'
 CompactNamespaces: true

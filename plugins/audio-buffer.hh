@@ -50,7 +50,7 @@ namespace clap {
       void
       toClap(clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) const noexcept;
 
-      // Store a + b into this buffer
+      // Store op(a, b) into this buffer
       template <typename Operator>
       void compute(const Operator &op,
                    const AudioBuffer<T> &a,
@@ -98,6 +98,12 @@ namespace clap {
                      _data[i * _channelCount + c] = a._data[i];
             }
          }
+      }
+
+      void clear(const T &value = T{}) {
+         for (uint32_t c = 0; c < _channelCount; ++c)
+            _data[c] = value;
+         setConstant(true);
       }
 
    private:

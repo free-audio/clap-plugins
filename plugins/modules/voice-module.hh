@@ -14,7 +14,7 @@ namespace clap {
 
       std::unique_ptr<Module> cloneVoice() const override;
 
-      auto &outputBuffer() { return _outputBuffer; }
+      auto &outputBuffer() const { return _outputBuffer; }
 
       void setVoiceIndex(uint32_t voiceIndex) noexcept { _voiceIndex = voiceIndex; }
       [[nodiscard]] uint32_t voiceIndex() const noexcept { return _voiceIndex; }
@@ -80,6 +80,6 @@ namespace clap {
       AudioBuffer<double> _gainBuffer{1, BLOCK_SIZE, 0};
       AudioBuffer<double> _panBuffer{1, BLOCK_SIZE, 0};
 
-      AudioBuffer<double> _outputBuffer;
+      mutable AudioBuffer<double> _outputBuffer;
    };
 } // namespace clap

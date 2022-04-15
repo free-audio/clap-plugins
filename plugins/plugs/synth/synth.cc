@@ -20,20 +20,19 @@ namespace clap {
       Osc2Id = 5,
    };
 
-   class SynthModule final : public Module {
+   class SynthVoiceModule final : public Module {
    public:
-      SynthModule(Synth &synth)
+      SynthVoiceModule(Synth &synth)
          : Module(synth, "", 0), _ampAdsr(synth, "amp", AmpAdsrId),
            _filterAdsr(synth, "filter env", FltAdsrId), _filter(synth, "filter", FltId),
            _digiOsc1(synth, "osc1", Osc1Id), _digiOsc2(synth, "osc2", Osc2Id) {}
 
-      SynthModule(const SynthModule &m)
+      SynthVoiceModule(const SynthVoiceModule &m)
          : Module(m), _ampAdsr(m._ampAdsr), _filterAdsr(m._filterAdsr), _filter(m._filter),
            _digiOsc1(m._digiOsc1), _digiOsc2(m._digiOsc2) {}
 
-      std::unique_ptr<Module> cloneVoice() const override
-      {
-         return std::make_unique<SynthModule>(*this);
+      std::unique_ptr<Module> cloneVoice() const override {
+         return std::make_unique<SynthVoiceModule>(*this);
       }
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
@@ -65,8 +64,8 @@ namespace clap {
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          auto status = _ampAdsr.process(c, numFrames);
-         //_voiceModule.outputBuffer.copy(_adsr.outputBuffer());
-         c.audioOutputs[0]->copy(_ampAdsr.outputBuffer(), numFrames);
+         _voiceModule->outputBuffer().copy(_ampAdsr.outputBuffer(), numFrames);
+         // c.audioOutputs[0]->copy(_ampAdsr.outputBuffer(), numFrames);
          return status;
       }
 
@@ -95,6 +94,44 @@ namespace clap {
       DigiOscModule _digiOsc2;
    };
 
+   class SynthModule final : public Module {
+   public:
+      SynthModule(Synth &synth)
+         : Module(synth, "", 0),
+           _expanderModule(synth, 0, std::make_unique<SynthVoiceModule>(synth), 1) {}
+
+      SynthModule(const SynthModule &m) = delete;
+
+      bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
+         return _expanderModule.activate(sampleRate, maxFrameCount);
+      }
+
+      void doDeactivate() override {
+         _expanderModule.deactivate();
+      }
+
+      clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
+         return _expanderModule.process(c, numFrames);
+      }
+
+      bool wantsNoteEvents() const noexcept override { return true; }
+
+      void onNoteOn(const clap_event_note &note) noexcept override {
+         _expanderModule.onNoteOn(note);
+      }
+
+      void onNoteOff(const clap_event_note &note) noexcept override {
+         _expanderModule.onNoteOff(note);
+      }
+
+      void onNoteChoke(const clap_event_note &note) noexcept override {
+         _expanderModule.onNoteChoke(note);
+      }
+
+   private:
+      VoiceExpanderModule _expanderModule;
+   };
+
    const clap_plugin_descriptor *Synth::descriptor() {
       static const char *features[] = {"instrument", nullptr};
 
@@ -115,8 +152,7 @@ namespace clap {
 
    Synth::Synth(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "synth"), descriptor(), host) {
-      auto sm = std::make_unique<SynthModule>(*this);
-      _rootModule = std::make_unique<VoiceExpanderModule>(*this, 0, std::move(sm));
+      _rootModule = std::make_unique<SynthModule>(*this);
    }
 
    bool Synth::init() noexcept {

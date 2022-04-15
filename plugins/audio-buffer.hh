@@ -19,6 +19,9 @@ namespace clap {
                            double sampleRate = 0)
          : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate),
            _data(static_cast<T *>(std::aligned_alloc(32, channelCount * frameCount * sizeof(T)))) {
+         if (_channelCount > MAX_AUDIO_CHANNELS)
+            throw std::invalid_argument("too many audio channels");
+
          if (!_data) [[unlikely]]
             throw std::bad_alloc();
       }

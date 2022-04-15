@@ -37,6 +37,82 @@ namespace clap {
          return;
       }
 
+      if (a.isConstant()) {
+         if (a.channelCount() == 1 && b.channelCount() == 1) {
+            T va = a._data[0];
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               T v = op(va, b._data[i * b._stride]);
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = v;
+            }
+         } else if (a.channelCount() == 1) {
+            T va = a._data[0];
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = op(va, b._data[i * b._stride + c]);
+            }
+         } else if (b.channelCount() == 1) {
+            T va[BLOCK_SIZE];
+            for (uint32_t c = 0; c < a._channelCount; ++c)
+               va[c] = a._data[c];
+
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               T vb = b._data[i * b._stride];
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = op(va[c], vb);
+            }
+         } else {
+            T va[BLOCK_SIZE];
+            for (uint32_t c = 0; c < a._channelCount; ++c)
+               va[c] = a._data[c];
+
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = op(va[c], b._data[i * b._stride + c]);
+            }
+         }
+         setConstant(false);
+         return;
+      }
+
+      if (b.isConstant()) {
+         if (a.channelCount() == 1 && b.channelCount() == 1) {
+            T vb = b._data[0];
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               T v = op(a._data[i * a._stride], vb);
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = v;
+            }
+         } else if (a.channelCount() == 1) {
+            T vb[BLOCK_SIZE];
+            for (uint32_t c = 0; c < a._channelCount; ++c)
+               vb[c] = b._data[c];
+
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               T va = a._data[i * a._stride];
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = op(va, vb[c]);
+            }
+         } else if (b.channelCount() == 1) {
+            T vb = b._data[0];
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = op(a._data[i * a._stride + c], vb);
+            }
+         } else {
+            T vb[BLOCK_SIZE];
+            for (uint32_t c = 0; c < a._channelCount; ++c)
+               vb[c] = b._data[c];
+
+            for (uint32_t i = 0; i < numFrames; ++i) {
+               for (uint32_t c = 0; c < _channelCount; ++c)
+                  _data[i * _channelCount + c] = op(a._data[i * a._stride + c], vb[c]);
+            }
+         }
+         setConstant(false);
+         return;
+      }
+
       if (a.channelCount() == 1 && b.channelCount() == 1) {
          for (uint32_t i = 0; i < numFrames; ++i) {
             T v = op(a._data[i * a._stride], b._data[i * b._stride]);
@@ -58,7 +134,8 @@ namespace clap {
       } else {
          for (uint32_t i = 0; i < numFrames; ++i) {
             for (uint32_t c = 0; c < _channelCount; ++c)
-               _data[i * _channelCount + c] = op(a._data[i * a._stride + c], b._data[i * b._stride + c]);
+               _data[i * _channelCount + c] =
+                  op(a._data[i * a._stride + c], b._data[i * b._stride + c]);
          }
       }
       setConstant(false);

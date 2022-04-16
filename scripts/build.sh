@@ -1,9 +1,5 @@
 #! /bin/bash -e
 
-if [[ ! -x vcpkg/vcpkg ]] ; then
-  vcpkg/bootstrap-vcpkg.sh
-fi
-
 cpu="$(uname -m)"
 case "$cpu" in
 x86_64)
@@ -38,6 +34,12 @@ fi
 
 vcpkg_options="--triplet ${triplet}-cp --host-triplet ${triplet}-cp --x-buildtrees-root=$buildtrees"
 cmake_options="-DVCPKG_TARGET_TRIPLET=${triplet}-cp -DCMAKE_VCPKG_HOST_TRIPLET=${triplet}-cp"
+
+if [[ ! -x vcpkg/vcpkg ]] ; then
+  vcpkg/bootstrap-vcpkg.sh
+else
+  vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_option upgrade --no-dry-run
+fi
 
 vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options install --recurse \
   "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant,network,freetype,testlib,freetype${QT_FEATURES}]"

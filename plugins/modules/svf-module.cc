@@ -116,8 +116,7 @@ namespace clap {
       if (_fmInput) {
          _fmBuffer.product(fmAmountBuffer, *_fmInput, numFrames);
       } else {
-         _fmBuffer.data()[0] = 0;
-         _fmBuffer.setConstant(true);
+         _fmBuffer.product(fmAmountBuffer, *_input, numFrames);
       }
 
       _fmBuffer.sum(_fmBuffer, _envBuffer, numFrames);

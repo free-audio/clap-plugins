@@ -9,13 +9,13 @@ namespace clap {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
-      _pdParam = addParameter(0,
-                              "phase distortion",
-                              CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                              std::make_unique<SimpleValueType>(0, 1, 0));
+      _tuningParam = addParameter(0,
+                                  "tuning",
+                                  CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                  std::make_unique<SimpleValueType>(-120, 120, 0));
    }
 
-   DigiOscModule::DigiOscModule(const DigiOscModule &m) : Module(m), _pdParam(m._pdParam) {}
+   DigiOscModule::DigiOscModule(const DigiOscModule &m) : Module(m), _tuningParam(m._tuningParam) {}
 
    DigiOscModule::~DigiOscModule() = default;
 
@@ -32,12 +32,10 @@ namespace clap {
       _buffer.setConstant(false);
 
       auto &voiceTuningBuffer = _voiceModule->tuning();
-
-      auto &pdBuffer = _pdParam->modulatedValueBuffer();
+      auto &tuningBuffer = _tuningParam->modulatedValueBuffer();
 
       for (uint32_t i = 0; i < numFrames; ++i) {
-         double tuningRatio =
-            tuningToRatio(voiceTuningBuffer.getSample(i));
+         double tuningRatio = tuningToRatio(voiceTuningBuffer.getSample(i) + tuningBuffer.getSample(i));
          double freq = _voiceModule->keyFreq() * tuningRatio;
          double phaseInc = freq * c.sampleRateInvD;
          double phaseMod = _pmInput ? _pmInput->getSample(i) : 0;

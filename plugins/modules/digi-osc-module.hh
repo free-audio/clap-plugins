@@ -21,7 +21,7 @@ namespace clap {
       auto &outputBuffer() const { return _buffer; }
 
    protected:
-      Parameter *_pdParam = nullptr;
+      Parameter *_tuningParam = nullptr;
 
       double _phase = 0;
       AudioBuffer<double> _buffer;

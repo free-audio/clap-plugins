@@ -2,11 +2,11 @@
 #include <cmath>
 #include <vector>
 
+#include "../tuning-utilities.hh"
 #include "../value-types/enumerated-value-type.hh"
 #include "../value-types/frequency-value-type.hh"
-#include "../tuning-utilities.hh"
-#include "voice-module.hh"
 #include "svf-module.hh"
+#include "voice-module.hh"
 
 namespace clap {
 
@@ -46,7 +46,8 @@ namespace clap {
    }
 
    SvfModule::SvfModule(const SvfModule &m)
-      : Module(m), _freqParam(m._freqParam), _resoParam(m._resoParam), _modeParam(m._modeParam) {}
+      : Module(m), _freqParam(m._freqParam), _resoParam(m._resoParam), _modeParam(m._modeParam),
+        _keytrackParam(m._keytrackParam), _envParam(m._envParam), _fmParam(m._fmParam) {}
 
    SvfModule::~SvfModule() = default;
 

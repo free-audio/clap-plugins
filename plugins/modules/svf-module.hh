@@ -22,6 +22,8 @@ namespace clap {
       void reset() noexcept override;
 
       void setInput(const AudioBuffer<double> *in) { _input = in; }
+      void setEnvInput(const AudioBuffer<double> *in) { _envInput = in; }
+      void setFmInput(const AudioBuffer<double> *in) { _fmInput = in; }
       auto &outputBuffer() const { return _output; }
 
    protected:
@@ -53,8 +55,17 @@ namespace clap {
       Parameter *_freqParam = nullptr;
       Parameter *_resoParam = nullptr;
       Parameter *_modeParam = nullptr;
+      Parameter *_keytrackParam = nullptr;
+      Parameter *_envParam = nullptr;
+      Parameter *_fmParam = nullptr;
 
-      const AudioBuffer<double> *_input;
+      const AudioBuffer<double> *_input = nullptr;
+      const AudioBuffer<double> *_envInput = nullptr;
+      const AudioBuffer<double> *_fmInput = nullptr;
+
+      AudioBuffer<double> _envBuffer{1, BLOCK_SIZE};
+      AudioBuffer<double> _fmBuffer{1, BLOCK_SIZE};
+      AudioBuffer<double> _ktBuffer{1, BLOCK_SIZE};
       AudioBuffer<double> _output{1, BLOCK_SIZE};
    };
 } // namespace clap

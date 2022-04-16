@@ -33,6 +33,7 @@ namespace clap {
       [[nodiscard]] double velocity() const noexcept { return _velocity; }
       [[nodiscard]] double keyFreq() const noexcept { return _keyFreq; }
       [[nodiscard]] auto &tuning() const noexcept { return _tuningBuffer; }
+      [[nodiscard]] auto &pitch() const noexcept { return _pitchBuffer; }
       [[nodiscard]] auto &brightness() const noexcept { return _brigthnessBuffer; }
       [[nodiscard]] auto &pressure() const noexcept { return _pressureBuffer; }
       [[nodiscard]] auto &vibrato() const noexcept { return _vibratoBuffer; }
@@ -76,6 +77,7 @@ namespace clap {
       SmoothedValue _pan;
 
       AudioBuffer<double> _tuningBuffer{1, BLOCK_SIZE, 0};
+      AudioBuffer<double> _pitchBuffer{1, BLOCK_SIZE, 0};
       AudioBuffer<double> _brigthnessBuffer{1, BLOCK_SIZE, 0};
       AudioBuffer<double> _pressureBuffer{1, BLOCK_SIZE, 0};
       AudioBuffer<double> _vibratoBuffer{1, BLOCK_SIZE, 0};

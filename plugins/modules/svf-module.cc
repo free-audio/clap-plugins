@@ -1,8 +1,11 @@
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #include "../value-types/enumerated-value-type.hh"
 #include "../value-types/frequency-value-type.hh"
+#include "../tuning-utilities.hh"
+#include "voice-module.hh"
 #include "svf-module.hh"
 
 namespace clap {
@@ -25,6 +28,19 @@ namespace clap {
          "mode",
          CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE | CLAP_PARAM_IS_STEPPED,
          std::make_unique<EnumeratedValueType>(std::vector<std::string>{"LP", "BP", "HP"}, 0));
+      _keytrackParam = addParameter(3,
+                                    "keytrack",
+                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                                    std::make_unique<SimpleValueType>(0, 120, 0));
+      _envParam = addParameter(4,
+                               "env amount",
+                               CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                               std::make_unique<SimpleValueType>(-120, 120, 0));
+
+      _fmParam = addParameter(5,
+                              "FM amount",
+                              CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
+                              std::make_unique<SimpleValueType>(-120, 120, 0));
 
       _output.setConstant(false);
    }
@@ -79,9 +95,37 @@ namespace clap {
       auto &freqBuffer = _freqParam->modulatedValueBuffer();
       auto &resoBuffer = _resoParam->modulatedValueBuffer();
       auto &modeBuffer = _modeParam->modulatedValueBuffer();
+      auto &keytrackBuffer = _keytrackParam->modulatedValueBuffer();
+      auto &envAmountBuffer = _envParam->modulatedValueBuffer();
+      auto &fmAmountBuffer = _fmParam->modulatedValueBuffer();
+
+      if (_voiceModule) {
+         _ktBuffer.product(keytrackBuffer, _voiceModule->pitch(), numFrames);
+      } else {
+         _ktBuffer.data()[0] = 0;
+         _ktBuffer.setConstant(true);
+      }
+
+      if (_envInput) {
+         _envBuffer.product(envAmountBuffer, *_envInput, numFrames);
+      } else {
+         _envBuffer.data()[0] = 0;
+         _envBuffer.setConstant(true);
+      }
+
+      if (_fmInput) {
+         _fmBuffer.product(fmAmountBuffer, *_fmInput, numFrames);
+      } else {
+         _fmBuffer.data()[0] = 0;
+         _fmBuffer.setConstant(true);
+      }
+
+      _fmBuffer.sum(_fmBuffer, _envBuffer, numFrames);
+      _fmBuffer.sum(_fmBuffer, _ktBuffer, numFrames);
 
       for (uint32_t i = 0; i < numFrames; ++i) {
-         setFilter(freqBuffer.getSample(i), resoBuffer.getSample(i));
+         double fmRatio = tuningToRatio(_fmBuffer.getSample(i));
+         setFilter(freqBuffer.getSample(i) * fmRatio, resoBuffer.getSample(i));
 
          double v0 = in[i * inStride];
          double v3 = v0 - _ic2eq;

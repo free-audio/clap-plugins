@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWindow>
+#include <QVariant>
 
 #include "abstract-gui.hh"
 #include "plugin-proxy.hh"
@@ -63,6 +64,7 @@ namespace clap {
 
    private:
       void showLater();
+      void setRootScale(double scale);
 
       static bool wantsLogicalSize() noexcept;
       void onQuickViewVisibilityChange(bool isVisible);
@@ -75,6 +77,8 @@ namespace clap {
       // QML proxy objects
       std::unique_ptr<PluginProxy> _pluginProxy;
       std::unique_ptr<TransportProxy> _transportProxy;
+
+      double _rootScale = 1.;
    };
 
 } // namespace clap

@@ -33,6 +33,7 @@ namespace clap {
 
       qmlContext->setContextProperty("plugin", _pluginProxy.get());
       qmlContext->setContextProperty("transport", _transportProxy.get());
+      setRootScale(1);
 
       connect(
          _quickView.get(), &QQuickView::visibleChanged, this, &Gui::onQuickViewVisibilityChange);
@@ -209,19 +210,28 @@ namespace clap {
       _quickView->setWidth(width);
       _quickView->setHeight(height);
 
-      double rw = double(width) / double(root->width());
-      double rh = double(height) / double(root->height());
+      double rw = double(width) / double(root->width() / _rootScale);
+      double rh = double(height) / double(root->height() / _rootScale);
       double scale = std::min<double>(rw, rh);
       root->setTransformOrigin(QQuickItem::TopLeft);
-      root->setScale(scale);
+      setRootScale(scale);
 
       return true;
+   }
+
+   void Gui::setRootScale(double scale)
+   {
+      _rootScale = scale;
+      _quickView->engine()->rootContext()->setContextProperty("rootScale", scale);
    }
 
    bool Gui::roundSize(uint32_t *width, uint32_t *height) {
       uint32_t w, h;
       if (!getSize(&w, &h))
          return false;
+
+      w /= _rootScale;
+      h /= _rootScale;
 
       if (*width < w)
          *width = w;

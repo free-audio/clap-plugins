@@ -14,7 +14,7 @@ Canvas {
 
    id: knob
    width: size
-   height: size
+   height: size + 10
 
    property real lastY: 0
 
@@ -94,6 +94,7 @@ Canvas {
       drawBackground(ctx);
       drawModulation(ctx);
       drawValue(ctx);
+      drawLabel(ctx);
    }
 
    function drawBackground(ctx) {
@@ -160,5 +161,12 @@ Canvas {
       ctx.fill();
 
       ctx.restore();
+   }
+
+   Text {
+      text: knob.param.name
+      y: size
+      color: white
+      font.bold: true
    }
 }

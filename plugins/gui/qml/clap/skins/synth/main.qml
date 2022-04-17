@@ -4,21 +4,59 @@ import QtQuick.Layouts
 import clap.lib
 
 Rectangle {
-        width: 500 * rootScale
-        height: 300 * rootScale
+        width: 1000 * rootScale
+        height: 600 * rootScale
         color: "#224477"
 
-        ColumnLayout {
-                spacing: 10
+        RowLayout {
+                ColumnLayout {
+                        spacing: 10
 
-                ADSR {
-                        id: filter_adsr
-                        moduleId: 2
+                        GroupBox {
+                                title: "Osc1"
+                                DigiOsc {
+                                        id: osc1
+                                        moduleId: 4
+                                }
+                        }
+
+                        GroupBox {
+                                title: "Osc2"
+                                DigiOsc {
+                                        id: osc2
+                                        moduleId: 5
+                                }
+                        }
                 }
+                ColumnLayout {
+                        spacing: 10
 
-                ADSR {
-                        id: amp_adsr
-                        moduleId: 6
+                        GroupBox {
+                                title: "Filter"
+                                Filter {
+                                        id: filter
+                                        moduleId: 3
+                                }
+                        }
+                }
+                ColumnLayout {
+                        spacing: 10
+
+                        GroupBox {
+                                title: "FEG"
+                                ADSR {
+                                        id: filter_adsr
+                                        moduleId: 2
+                                }
+                        }
+
+                        GroupBox {
+                                title: "AEG"
+                                ADSR {
+                                        id: amp_adsr
+                                        moduleId: 6
+                                }
+                        }
                 }
         }
 }

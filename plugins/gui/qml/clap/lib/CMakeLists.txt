@@ -6,4 +6,6 @@ qt6_add_qml_module(clap-qml-lib
         QML_FILES
                 Knob.qml
                 ADSR.qml
+                Filter.qml
+                DigiOsc.qml
 )

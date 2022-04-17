@@ -5,4 +5,5 @@ qt6_add_qml_module(clap-qml-lib
         RESOURCE_PREFIX /qml
         QML_FILES
                 Knob.qml
+                ADSR.qml
 )

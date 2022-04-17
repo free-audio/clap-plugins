@@ -1,5 +1,6 @@
 #include "plugin-proxy.hh"
 #include "gui.hh"
+#include "../modules/module.hh"
 
 namespace clap {
    PluginProxy::PluginProxy(Gui &client) : super(&client), _client(client) {}
@@ -12,6 +13,10 @@ namespace clap {
       auto *p = new ParameterProxy(_client, paramId);
       _parameters.insert_or_assign(paramId, p);
       return p;
+   }
+
+   ParameterProxy *PluginProxy::param(clap_id moduleId, clap_id paramId) {
+      return param(Module::parameter_capacity * moduleId + paramId);
    }
 
    QString PluginProxy::toString() const { return "Plugin"; }

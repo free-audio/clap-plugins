@@ -22,6 +22,7 @@ namespace clap {
       void defineParameter(const clap_param_info &info);
 
       Q_INVOKABLE ParameterProxy *param(clap_id paramId);
+      Q_INVOKABLE ParameterProxy *param(clap_id moduleId, clap_id paramId);
       Q_INVOKABLE QString toString() const;
 
    private:

@@ -8,4 +8,5 @@ qt6_add_qml_module(clap-qml-skins
                 gain/main.qml
                 transport-info/main.qml
                 char-check/main.qml
+                synth/main.qml
 )

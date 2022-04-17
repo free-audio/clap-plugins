@@ -1,10 +1,9 @@
 import QtQuick 2.1
 import QtQuick.Layouts
 
-Canvas {
-    property int moduleId : 0;
+RowLayout {
+        property int moduleId : 0;
 
-    RowLayout {
         Knob {
                 id: attack_knob
                 param: plugin.param(moduleId, 0)
@@ -34,5 +33,4 @@ Canvas {
                 param: plugin.param(moduleId, 4)
                 size: 40 * rootScale
         }
-    }
 }

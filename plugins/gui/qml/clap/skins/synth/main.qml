@@ -5,7 +5,7 @@ import clap.lib
 
 Rectangle {
         width: 500 * rootScale
-        height: 200 * rootScale
+        height: 300 * rootScale
         color: "#224477"
 
         ColumnLayout {

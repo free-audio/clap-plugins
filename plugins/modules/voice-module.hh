@@ -11,6 +11,7 @@ namespace clap {
    public:
       VoiceModule(CorePlugin &plugin, std::unique_ptr<Module> module, uint32_t channelCount);
       VoiceModule(const VoiceModule &m);
+      ~VoiceModule() override;
 
       std::unique_ptr<Module> cloneVoice() const override;
 

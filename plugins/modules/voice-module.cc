@@ -16,6 +16,12 @@ namespace clap {
       _module->setVoiceModule(this);
    }
 
+   VoiceModule::~VoiceModule()
+   {
+      if (_stateHook.isHooked())
+         _stateHook.unlink();
+   }
+
    std::unique_ptr<Module> VoiceModule::cloneVoice() const {
       return std::make_unique<VoiceModule>(*this);
    }

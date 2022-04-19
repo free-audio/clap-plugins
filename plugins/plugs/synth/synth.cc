@@ -61,6 +61,8 @@ namespace clap {
          void performRouting() {
             _digiOsc1.setPmInput(&_digiOsc2.outputBuffer());
             _filter.setInput(&_oscMixBuffer);
+            //_filter.setEnvInput(&_filterAdsr.outputBuffer());
+            //_filter.setFmInput(&_digiOsc2.outputBuffer());
          }
 
          bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
@@ -89,11 +91,13 @@ namespace clap {
          }
 
          clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
-            _digiOsc2.process(c, numFrames);
-            _digiOsc1.process(c, numFrames);
+            _filterAdsr.process(c, numFrames);
 
-            _osc1MixBuffer.product(_digiOsc1.outputBuffer(), _osc1VolumeParam->modulatedValueBuffer(), numFrames);
+            _digiOsc2.process(c, numFrames);
             _osc2MixBuffer.product(_digiOsc2.outputBuffer(), _osc2VolumeParam->modulatedValueBuffer(), numFrames);
+
+            _digiOsc1.process(c, numFrames);
+            _osc1MixBuffer.product(_digiOsc1.outputBuffer(), _osc1VolumeParam->modulatedValueBuffer(), numFrames);
 
             _oscMixBuffer.sum(_osc1MixBuffer, _osc2MixBuffer, numFrames);
 

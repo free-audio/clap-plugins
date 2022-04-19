@@ -103,15 +103,13 @@ namespace clap {
       if (_voiceModule) {
          _ktBuffer.product(keytrackBuffer, _voiceModule->pitch(), numFrames);
       } else {
-         _ktBuffer.data()[0] = 0;
-         _ktBuffer.setConstant(true);
+         _ktBuffer.setConstantValue(0);
       }
 
       if (_envInput) {
          _envBuffer.product(envAmountBuffer, *_envInput, numFrames);
       } else {
-         _envBuffer.data()[0] = 0;
-         _envBuffer.setConstant(true);
+         _envBuffer.setConstantValue(0);
       }
 
       if (_fmInput) {

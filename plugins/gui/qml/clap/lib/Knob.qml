@@ -94,7 +94,6 @@ Canvas {
       drawBackground(ctx);
       drawModulation(ctx);
       drawValue(ctx);
-      drawLabel(ctx);
    }
 
    function drawBackground(ctx) {

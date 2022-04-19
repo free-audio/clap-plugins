@@ -473,19 +473,20 @@ namespace clap {
          if (!p) [[unlikely]]
             return;
 
-         if (isProcessing()) [[likely]]
-            p->setValueSmoothed(value.value, _paramSmoothingDuration);
-         else
-            p->setValueImmediately(value.value);
-
-         if (!p->_valueToProcessHook.isHooked())
-            _parameterValueToProcess.pushBack(&p->_valueToProcessHook);
-         if (!p->_modulatedValueToProcessHook.isHooked())
-            _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
-
          switch (value.type) {
          case GuiToPluginEvent::Value:
             [[likely]] {
+
+               if (isProcessing()) [[likely]]
+                  p->setValueSmoothed(value.value, _paramSmoothingDuration);
+               else
+                  p->setValueImmediately(value.value);
+
+               if (!p->_valueToProcessHook.isHooked())
+                  _parameterValueToProcess.pushBack(&p->_valueToProcessHook);
+               if (!p->_modulatedValueToProcessHook.isHooked())
+                  _parameterModulatedValueToProcess.pushBack(&p->_modulatedValueToProcessHook);
+
                clap_event_param_value ev;
                ev.header.time = 0;
                ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;

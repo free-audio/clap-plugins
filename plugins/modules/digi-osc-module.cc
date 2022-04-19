@@ -1,6 +1,7 @@
 #include "digi-osc-module.hh"
 #include "../tuning-utilities.hh"
 #include "voice-module.hh"
+#include "../value-types/decibel-value-type.hh"
 
 namespace clap {
 
@@ -20,7 +21,8 @@ namespace clap {
                               std::make_unique<SimpleValueType>(0, 5, 0));
    }
 
-   DigiOscModule::DigiOscModule(const DigiOscModule &m) : Module(m), _tuningParam(m._tuningParam) {}
+   DigiOscModule::DigiOscModule(const DigiOscModule &m)
+      : Module(m), _tuningParam(m._tuningParam), _pmParam(m._pmParam) {}
 
    DigiOscModule::~DigiOscModule() = default;
 
@@ -43,8 +45,7 @@ namespace clap {
       if (_pmInput) {
          _pmBuffer.product(pmBuffer, *_pmInput, numFrames);
       } else {
-         _pmBuffer.data()[0] = 0;
-         _pmBuffer.setConstant(true);
+         _pmBuffer.setConstantValue(0);
       }
 
       for (uint32_t i = 0; i < numFrames; ++i) {

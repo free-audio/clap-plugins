@@ -33,7 +33,7 @@ namespace clap {
       _modulatedValueBuffer.sum(_valueBuffer, _modulationBuffer, frameCount);
       _valueType->toEngine(_modulatedValueBuffer, frameCount);
 
-      if (!_value.isSmoothing() && !_modulation.isSmoothing())
+      if (!_value.isSmoothing() && !_modulation.isSmoothing() && _modulatedValueBuffer.isConstant())
          _modulatedValueToProcessHook.unlink();
    }
 } // namespace clap

@@ -38,6 +38,11 @@ namespace clap {
 
       [[nodiscard]] uint32_t stride() const noexcept { return _stride; }
       [[nodiscard]] bool isConstant() const noexcept { return _stride == 0; }
+      void setConstantValue(double value) noexcept {
+         _stride = 0;
+         for (uint32_t i = 0; i < _channelCount; ++i)
+            _data[i] = value;
+      }
       void setConstant(bool isConstant) noexcept { _stride = _channelCount * !isConstant; }
       [[nodiscard]] const T getSample(uint32_t frame, uint32_t channel = 0) const noexcept {
          return _data[frame * _stride + channel];

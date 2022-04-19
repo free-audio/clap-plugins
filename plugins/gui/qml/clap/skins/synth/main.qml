@@ -28,6 +28,22 @@ Rectangle {
                                 }
                         }
                 }
+                GroupBox {
+                        title: "Mixer"
+                        ColumnLayout {
+                                Knob {
+                                        id: osc1Gain
+                                        param: plugin.param(7, 0)
+                                        size: 40 * rootScale
+                                }
+
+                                Knob {
+                                        id: osc2Gain
+                                        param: plugin.param(7, 1)
+                                        size: 40 * rootScale
+                                }
+                        }
+                }
                 ColumnLayout {
                         spacing: 10
 

@@ -9,4 +9,10 @@ RowLayout {
                 param: plugin.param(moduleId, 0)
                 size: 40 * rootScale
         }
+
+        Knob {
+                id: pm
+                param: plugin.param(moduleId, 1)
+                size: 40 * rootScale
+        }
 }

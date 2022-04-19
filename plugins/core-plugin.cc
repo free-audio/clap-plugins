@@ -201,7 +201,7 @@ namespace clap {
       for (int i = 0; i < paramsCount(); ++i) {
          auto p = _parameters.getByIndex(i);
          _guiHandle->gui().defineParameter(p->info());
-         _guiHandle->gui().updateParameter(p->info().id, p->value(), p->modulatedValue());
+         _guiHandle->gui().updateParameter(p->info().id, p->value(), p->modulation());
       }
    }
 

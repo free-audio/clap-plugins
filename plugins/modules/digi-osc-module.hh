@@ -22,8 +22,10 @@ namespace clap {
 
    protected:
       Parameter *_tuningParam = nullptr;
+      Parameter *_pmParam = nullptr;
 
       double _phase = 0;
+      AudioBuffer<double> _pmBuffer;
       AudioBuffer<double> _buffer;
 
       const AudioBuffer<double> *_pmInput = nullptr;

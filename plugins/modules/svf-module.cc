@@ -38,7 +38,7 @@ namespace clap {
                                std::make_unique<SimpleValueType>(-120, 120, 0));
 
       _fmParam = addParameter(5,
-                              "mod",
+                              "fm",
                               CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                               std::make_unique<SimpleValueType>(-120, 120, 0));
 

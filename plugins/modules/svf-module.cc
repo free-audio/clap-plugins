@@ -29,16 +29,16 @@ namespace clap {
          CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE | CLAP_PARAM_IS_STEPPED,
          std::make_unique<EnumeratedValueType>(std::vector<std::string>{"LP", "BP", "HP"}, 0));
       _keytrackParam = addParameter(3,
-                                    "keytrack",
+                                    "kt",
                                     CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                     std::make_unique<SimpleValueType>(0, 120, 0));
       _envParam = addParameter(4,
-                               "env amount",
+                               "env",
                                CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                std::make_unique<SimpleValueType>(-120, 120, 0));
 
       _fmParam = addParameter(5,
-                              "FM amount",
+                              "mod",
                               CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                               std::make_unique<SimpleValueType>(-120, 120, 0));
 

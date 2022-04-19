@@ -8,23 +8,23 @@ namespace clap {
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
       _attackParam = addParameter(0,
-                                  "attack",
+                                  "A",
                                   CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                   std::make_unique<SimpleValueType>(0, 1, 0.1));
       _decayParam = addParameter(1,
-                                 "decay",
+                                 "D",
                                  CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                  std::make_unique<SimpleValueType>(0, 1, 0.2));
       _sustainParam = addParameter(2,
-                                   "sustain",
+                                   "S",
                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                    std::make_unique<SimpleValueType>(0, 1, 0.8));
       _releaseParam = addParameter(3,
-                                   "release",
+                                   "R",
                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                    std::make_unique<SimpleValueType>(0, 1, 0.3));
       _velocityParam = addParameter(4,
-                                    "velocity",
+                                    "vel",
                                     CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                     std::make_unique<SimpleValueType>(0, 1, 0.3));
    }

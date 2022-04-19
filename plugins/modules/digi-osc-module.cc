@@ -10,7 +10,7 @@ namespace clap {
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
       _tuningParam = addParameter(0,
-                                  "tuning",
+                                  "tun",
                                   CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
                                   std::make_unique<SimpleValueType>(-120, 120, 0));
    }

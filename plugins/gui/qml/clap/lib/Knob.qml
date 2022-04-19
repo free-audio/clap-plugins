@@ -166,7 +166,7 @@ Canvas {
    Text {
       text: knob.param.name
       y: size
-      color: white
+      color: "white"
       font.bold: true
    }
 }

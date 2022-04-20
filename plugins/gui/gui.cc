@@ -191,8 +191,8 @@ namespace clap {
          return false;
 
       auto ratio = wantsLogicalSize() ? 1 : _quickView->devicePixelRatio();
-      *width = rootItem->width() * ratio;
-      *height = rootItem->height() * ratio;
+      *width = std::ceil(rootItem->width() * ratio);
+      *height = std::ceil(rootItem->height() * ratio);
       return true;
    }
 
@@ -210,8 +210,8 @@ namespace clap {
       _quickView->setWidth(width);
       _quickView->setHeight(height);
 
-      double rw = double(width) / double(root->width() / _rootScale);
-      double rh = double(height) / double(root->height() / _rootScale);
+      double rw = _rootScale * double(width) / root->width();
+      double rh = _rootScale * double(height) / root->height();
       double scale = std::min<double>(rw, rh);
       root->setTransformOrigin(QQuickItem::TopLeft);
       setRootScale(scale);
@@ -230,19 +230,19 @@ namespace clap {
       if (!getSize(&w, &h))
          return false;
 
-      w /= _rootScale;
-      h /= _rootScale;
+      double originalWidth = w / _rootScale;
+      double originalHeight = h / _rootScale;
 
-      if (*width < w)
-         *width = w;
-      if (*height < h)
-         *height = h;
+      if (*width < originalWidth)
+         *width = originalWidth;
+      if (*height < originalHeight)
+         *height = originalHeight;
 
       double rw = double(*width) / double(w);
       double rh = double(*height) / double(h);
       double r = std::min<double>(rw, rh);
-      *width = std::round(r * w);
-      *height = std::round(r * h);
+      *width = std::ceil(r * w);
+      *height = std::ceil(r * h);
       return true;
    }
 

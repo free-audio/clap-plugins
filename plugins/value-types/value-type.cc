@@ -16,7 +16,7 @@ namespace clap {
          const ValueType &_valueType;
       } op(*this);
 
-      buffer.applyTo(op, numFrames);
+      buffer.compute(op, numFrames);
    }
 
    bool ValueType::hasEngineDomain() const { return false; }

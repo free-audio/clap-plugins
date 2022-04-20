@@ -18,11 +18,11 @@ namespace clap {
       _freqParam = addParameter(0,
                                 "freq",
                                 CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                std::make_unique<FrequencyValueType>(20, 20000, 400));
+                                std::make_unique<FrequencyValueType>(20, 20000, 20000));
       _resoParam = addParameter(1,
                                 "reso",
                                 CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                std::make_unique<SimpleValueType>(0, 0.98, 0.3));
+                                std::make_unique<SimpleValueType>(0, 0.98, 0));
       _modeParam = addParameter(
          2,
          "mode",

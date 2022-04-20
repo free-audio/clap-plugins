@@ -58,6 +58,10 @@ namespace clap {
       void
       toClap(clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) const noexcept;
 
+      // Store op(this) into this buffer
+      template <typename Operator>
+      void compute(const Operator &op, uint32_t numFrames) noexcept;
+
       // Store op(a, b) into this buffer
       template <typename Operator>
       void compute(const Operator &op,
@@ -80,9 +84,6 @@ namespace clap {
 
          compute(op, a, b, numFrames);
       }
-
-      template <typename Operator>
-      void applyTo(const Operator &op, uint32_t numFrames) noexcept;
 
       void copy(const AudioBuffer<T> &a, uint32_t numFrames) noexcept {
          assert(numFrames <= _frameCount);

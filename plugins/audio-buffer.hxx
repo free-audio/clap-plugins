@@ -143,7 +143,7 @@ namespace clap {
 
    template <typename T>
    template <typename Operator>
-   void AudioBuffer<T>::applyTo(const Operator &op, uint32_t numFrames) noexcept {
+   void AudioBuffer<T>::compute(const Operator &op, uint32_t numFrames) noexcept {
       assert(numFrames <= _frameCount);
       const uint32_t N = _channelCount * (isConstant() ? 1 : numFrames);
       for (uint32_t i = 0; i < N; ++i)

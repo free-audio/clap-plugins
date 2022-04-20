@@ -74,5 +74,11 @@ Rectangle {
                                 }
                         }
                 }
+
+                Knob {
+                        id: volume
+                        param: plugin.param(7, 2)
+                        size: 40 * rootScale
+                }
         }
 }

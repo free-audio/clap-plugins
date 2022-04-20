@@ -44,13 +44,19 @@ namespace clap {
                                                CLAP_PARAM_REQUIRES_PROCESS,
                                             std::make_unique<DecibelValueType>(-120, 24, 0));
 
+            _volumeParam = addParameter(2,
+                                        "volume",
+                                        CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
+                                           CLAP_PARAM_REQUIRES_PROCESS,
+                                        std::make_unique<DecibelValueType>(-120, 0, 0));
+
             performRouting();
          }
 
          SynthVoiceModule(const SynthVoiceModule &m)
             : Module(m), _ampAdsr(m._ampAdsr), _filterAdsr(m._filterAdsr), _filter(m._filter),
               _digiOsc1(m._digiOsc1), _digiOsc2(m._digiOsc2), _osc1VolumeParam(m._osc1VolumeParam),
-              _osc2VolumeParam(m._osc2VolumeParam) {
+              _osc2VolumeParam(m._osc2VolumeParam), _volumeParam(m._volumeParam) {
             performRouting();
          }
 
@@ -94,18 +100,21 @@ namespace clap {
             _filterAdsr.process(c, numFrames);
 
             _digiOsc2.process(c, numFrames);
-            _osc2MixBuffer.product(_digiOsc2.outputBuffer(), _osc2VolumeParam->modulatedValueBuffer(), numFrames);
+            _osc2MixBuffer.product(
+               _digiOsc2.outputBuffer(), _osc2VolumeParam->modulatedValueBuffer(), numFrames);
 
             _digiOsc1.process(c, numFrames);
-            _osc1MixBuffer.product(_digiOsc1.outputBuffer(), _osc1VolumeParam->modulatedValueBuffer(), numFrames);
+            _osc1MixBuffer.product(
+               _digiOsc1.outputBuffer(), _osc1VolumeParam->modulatedValueBuffer(), numFrames);
 
             _oscMixBuffer.sum(_osc1MixBuffer, _osc2MixBuffer, numFrames);
 
             _filter.process(c, numFrames);
 
             auto status = _ampAdsr.process(c, numFrames);
-            _voiceModule->outputBuffer().product(
-               _filter.outputBuffer(), _ampAdsr.outputBuffer(), numFrames);
+            auto &voiceBuffer = _voiceModule->outputBuffer();
+            voiceBuffer.product(_filter.outputBuffer(), _ampAdsr.outputBuffer(), numFrames);
+            voiceBuffer.product(voiceBuffer, _volumeParam->modulatedValueBuffer(), numFrames);
 
             return status;
          }
@@ -149,6 +158,7 @@ namespace clap {
 
          Parameter *_osc1VolumeParam = nullptr;
          Parameter *_osc2VolumeParam = nullptr;
+         Parameter *_volumeParam = nullptr;
       };
 
       class SynthModule final : public Module {
@@ -168,6 +178,7 @@ namespace clap {
          clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
             auto status = _expanderModule.process(c, numFrames);
             c.audioOutputs[0]->copy(_expanderModule.outputBuffer(), numFrames);
+            c.audioOutputs[0]->compute([] (double x) -> double { return std::tanh(x); }, numFrames);
             return status;
          }
 

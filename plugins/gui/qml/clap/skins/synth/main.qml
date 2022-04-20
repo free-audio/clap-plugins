@@ -4,8 +4,8 @@ import QtQuick.Layouts
 import clap.lib
 
 Rectangle {
-        width: 1000 * rootScale
-        height: 600 * rootScale
+        width: 600 * rootScale
+        height: 300 * rootScale
         color: "#224477"
 
         RowLayout {

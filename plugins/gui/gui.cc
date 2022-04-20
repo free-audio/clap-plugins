@@ -241,8 +241,16 @@ namespace clap {
       double rw = double(*width) / double(w);
       double rh = double(*height) / double(h);
       double r = std::min<double>(rw, rh);
-      *width = std::ceil(r * w);
-      *height = std::ceil(r * h);
+
+      uint32_t finalWidth = std::ceil(r * w);
+      uint32_t finalHeight = std::ceil(r * h);
+
+      // we want the value of roundSize to be stable
+      if (finalWidth != *width || finalHeight != *height)
+         roundSize(&finalWidth, &finalHeight);
+
+      *width = finalWidth;
+      *height = finalHeight;
       return true;
    }
 

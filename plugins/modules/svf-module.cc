@@ -17,32 +17,22 @@ namespace clap {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
-      _freqParam = addParameter(0,
-                                "freq",
-                                CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                std::make_unique<FrequencyValueType>(20, 20000, 20000));
-      _resoParam = addParameter(1,
-                                "reso",
-                                CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                std::make_unique<SimpleValueType>(0, 0.98, 0));
+      _freqParam = addParameter(
+         0, "freq", Parameter::POLY_FLAGS, std::make_unique<FrequencyValueType>(20, 20000, 20000));
+      _resoParam = addParameter(
+         1, "reso", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 0.98, 0));
       _modeParam = addParameter(
          2,
          "mode",
          CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE | CLAP_PARAM_IS_STEPPED,
          std::make_unique<EnumeratedValueType>(std::vector<std::string>{"LP", "BP", "HP"}, 0));
-      _keytrackParam = addParameter(3,
-                                    "kt",
-                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                    std::make_unique<SimpleValueType>(0, 120, 0));
-      _envParam = addParameter(4,
-                               "env",
-                               CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                               std::make_unique<SimpleValueType>(-120, 120, 0));
+      _keytrackParam =
+         addParameter(3, "kt", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 120, 0));
+      _envParam = addParameter(
+         4, "env", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(-120, 120, 0));
 
-      _fmParam = addParameter(5,
-                              "fm",
-                              CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                              std::make_unique<SimpleValueType>(-120, 120, 0));
+      _fmParam = addParameter(
+         5, "fm", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(-120, 120, 0));
 
       _output.setConstant(false);
    }

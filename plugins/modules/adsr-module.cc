@@ -9,26 +9,16 @@ namespace clap {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
-      _attackParam = addParameter(0,
-                                  "A",
-                                  CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                  std::make_unique<SimpleValueType>(0, 1, 0.1));
-      _decayParam = addParameter(1,
-                                 "D",
-                                 CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                 std::make_unique<SimpleValueType>(0, 1, 0.2));
-      _sustainParam = addParameter(2,
-                                   "S",
-                                   CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                   std::make_unique<SimpleValueType>(0, 1, 0.8));
-      _releaseParam = addParameter(3,
-                                   "R",
-                                   CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                   std::make_unique<SimpleValueType>(0, 1, 0.3));
-      _velocityParam = addParameter(4,
-                                    "vel",
-                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                    std::make_unique<SimpleValueType>(0, 1, 0.3));
+      _attackParam =
+         addParameter(0, "A", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 1, 0.1));
+      _decayParam =
+         addParameter(1, "D", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 1, 0.2));
+      _sustainParam =
+         addParameter(2, "S", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 1, 0.8));
+      _releaseParam =
+         addParameter(3, "R", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 1, 0.3));
+      _velocityParam = addParameter(
+         4, "vel", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 1, 0.3));
    }
 
    AdsrModule::AdsrModule(const AdsrModule &m)

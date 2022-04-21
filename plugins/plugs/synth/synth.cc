@@ -191,6 +191,10 @@ namespace clap {
             _expanderModule.onNoteExpression(noteExp);
          }
 
+         VoiceExpanderModule *getVoiceExpander() noexcept final {
+            return &_expanderModule;
+         }
+
          const VoiceExpanderModule *getVoiceExpander() const noexcept final {
             return &_expanderModule;
          }

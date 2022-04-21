@@ -3,10 +3,11 @@
 #include <array>
 #include <memory>
 
+#include <clap/helpers/note-end-queue.hh>
+
 #include "../constants.hh"
 #include "../intrusive-list.hh"
 #include "module.hh"
-
 #include "voice-module.hh"
 
 namespace clap {
@@ -31,6 +32,8 @@ namespace clap {
       VoiceModule* getVoice(uint32_t voiceIndex) noexcept { return _voices[voiceIndex].get(); }
       const VoiceModule* getVoice(uint32_t voiceIndex) const noexcept { return _voices[voiceIndex].get(); }
 
+      auto& noteEndQueue() { return _noteEndQueue; }
+
    private:
       VoiceModule* assignVoice();
       void releaseVoice(VoiceModule &);
@@ -41,5 +44,7 @@ namespace clap {
       std::array<std::unique_ptr<VoiceModule>, MAX_VOICES> _voices;
 
       AudioBuffer<double> _outputBuffer;
+
+      helpers::NoteEndQueue _noteEndQueue;
    };
 } // namespace clap

@@ -352,6 +352,10 @@ namespace clap {
          i += numFramesToProcess;
       }
 
+      auto voiceExpander = getVoiceExpander();
+      if (voiceExpander)
+         voiceExpander->noteEndQueue().flush(process->out_events);
+
       // Try to pass the queue to the plugin GUI
       _pluginToGuiQueue.producerDone();
 

@@ -63,6 +63,10 @@ namespace clap {
          _voiceModule = voiceModule;
       }
 
+      virtual VoiceExpanderModule *getVoiceExpander() noexcept {
+         return nullptr;
+      }
+
       virtual const VoiceExpanderModule *getVoiceExpander() const noexcept {
          return nullptr;
       }

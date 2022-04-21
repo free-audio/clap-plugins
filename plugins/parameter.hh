@@ -35,9 +35,9 @@ namespace clap {
       static const constexpr uint32_t POLY_AUTO_FLAGS = CLAP_PARAM_IS_AUTOMATABLE |
                                                         CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL |
                                                         CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE;
-      static const constexpr uint32_t POLY_MOD_FLAGS = CLAP_PARAM_IS_AUTOMATABLE |
-                                                       CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL |
-                                                       CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE;
+      static const constexpr uint32_t POLY_MOD_FLAGS = CLAP_PARAM_IS_MODULATABLE |
+                                                       CLAP_PARAM_IS_MODULATABLE_PER_CHANNEL |
+                                                       CLAP_PARAM_IS_MODULATABLE_PER_NOTE;
       static const constexpr uint32_t POLY_FLAGS = POLY_AUTO_FLAGS | POLY_MOD_FLAGS;
 
       auto &valueType() const noexcept { return _valueType; }

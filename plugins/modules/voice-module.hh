@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../intrusive-list.hh"
+#include "../smoothed-value.hh"
 #include "module.hh"
 
 namespace clap {

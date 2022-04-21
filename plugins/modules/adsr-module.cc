@@ -1,4 +1,6 @@
 #include "adsr-module.hh"
+#include "../parameter.hh"
+#include "../value-types/simple-value-type.hh"
 
 namespace clap {
 
@@ -98,11 +100,11 @@ namespace clap {
       _buffer.clear(-1);
       auto out = _buffer.data();
 
-      auto &attackBuffer = _attackParam->modulatedValueBuffer();
-      auto &decayBuffer = _decayParam->modulatedValueBuffer();
-      auto &sustainBuffer = _sustainParam->modulatedValueBuffer();
-      auto &releaseBuffer = _releaseParam->modulatedValueBuffer();
-      auto &velocityBuffer = _velocityParam->modulatedValueBuffer();
+      auto &attackBuffer = _attackParam->buffer();
+      auto &decayBuffer = _decayParam->buffer();
+      auto &sustainBuffer = _sustainParam->buffer();
+      auto &releaseBuffer = _releaseParam->buffer();
+      auto &velocityBuffer = _velocityParam->buffer();
 
       if (_phase == Phase::Rest) {
          _buffer.setConstant(true);

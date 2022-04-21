@@ -20,7 +20,7 @@ namespace clap {
          assert(_isActive);
 
          c.audioOutputs[0]->product(
-            *c.audioInputs[0], _gainParam->modulatedValueBuffer(), numFrames);
+            *c.audioInputs[0], _gainParam->buffer(), numFrames);
 
          return CLAP_PROCESS_SLEEP;
       }

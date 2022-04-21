@@ -101,11 +101,11 @@ namespace clap {
 
             _digiOsc2.process(c, numFrames);
             _osc2MixBuffer.product(
-               _digiOsc2.outputBuffer(), _osc2VolumeParam->modulatedValueBuffer(), numFrames);
+               _digiOsc2.outputBuffer(), _osc2VolumeParam->buffer(), numFrames);
 
             _digiOsc1.process(c, numFrames);
             _osc1MixBuffer.product(
-               _digiOsc1.outputBuffer(), _osc1VolumeParam->modulatedValueBuffer(), numFrames);
+               _digiOsc1.outputBuffer(), _osc1VolumeParam->buffer(), numFrames);
 
             _oscMixBuffer.sum(_osc1MixBuffer, _osc2MixBuffer, numFrames);
 
@@ -114,7 +114,7 @@ namespace clap {
             auto status = _ampAdsr.process(c, numFrames);
             auto &voiceBuffer = _voiceModule->outputBuffer();
             voiceBuffer.product(_filter.outputBuffer(), _ampAdsr.outputBuffer(), numFrames);
-            voiceBuffer.product(voiceBuffer, _volumeParam->modulatedValueBuffer(), numFrames);
+            voiceBuffer.product(voiceBuffer, _volumeParam->buffer(), numFrames);
 
             return status;
          }

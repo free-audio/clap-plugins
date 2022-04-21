@@ -1,7 +1,9 @@
 #include "digi-osc-module.hh"
+#include "../parameter.hh"
 #include "../tuning-utilities.hh"
-#include "voice-module.hh"
 #include "../value-types/decibel-value-type.hh"
+#include "../value-types/simple-value-type.hh"
+#include "voice-module.hh"
 
 namespace clap {
 
@@ -39,8 +41,8 @@ namespace clap {
       _buffer.setConstant(false);
 
       auto &voiceTuningBuffer = _voiceModule->tuning();
-      auto &tuningBuffer = _tuningParam->modulatedValueBuffer();
-      auto &pmBuffer = _pmParam->modulatedValueBuffer();
+      auto &tuningBuffer = _tuningParam->buffer();
+      auto &pmBuffer = _pmParam->buffer();
 
       if (_pmInput) {
          _pmBuffer.product(pmBuffer, *_pmInput, numFrames);

@@ -30,7 +30,7 @@ namespace clap {
       void reset()
       {
          for (auto &p : _params)
-            p->setDefaultValue();
+            p->reset();
       }
 
       template <class Archive>

@@ -2,9 +2,11 @@
 #include <cmath>
 #include <vector>
 
+#include "../parameter.hh"
 #include "../tuning-utilities.hh"
 #include "../value-types/enumerated-value-type.hh"
 #include "../value-types/frequency-value-type.hh"
+#include "../value-types/simple-value-type.hh"
 #include "svf-module.hh"
 #include "voice-module.hh"
 
@@ -93,12 +95,12 @@ namespace clap {
       auto const out = _output.data();
       _output.setConstant(false);
 
-      auto &freqBuffer = _freqParam->modulatedValueBuffer();
-      auto &resoBuffer = _resoParam->modulatedValueBuffer();
-      auto &modeBuffer = _modeParam->modulatedValueBuffer();
-      auto &keytrackBuffer = _keytrackParam->modulatedValueBuffer();
-      auto &envAmountBuffer = _envParam->modulatedValueBuffer();
-      auto &fmAmountBuffer = _fmParam->modulatedValueBuffer();
+      auto &freqBuffer = _freqParam->buffer();
+      auto &resoBuffer = _resoParam->buffer();
+      auto &modeBuffer = _modeParam->buffer();
+      auto &keytrackBuffer = _keytrackParam->buffer();
+      auto &envAmountBuffer = _envParam->buffer();
+      auto &fmAmountBuffer = _fmParam->buffer();
 
       if (_voiceModule) {
          _ktBuffer.product(keytrackBuffer, _voiceModule->pitch(), numFrames);

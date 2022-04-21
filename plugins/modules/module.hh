@@ -8,10 +8,11 @@
 
 #include "../audio-buffer.hh"
 #include "../context.hh"
-#include "../parameter.hh"
 
 namespace clap {
    class CorePlugin;
+   class Parameter;
+   class ValueType;
 
    /** Re-usable processing unit */
    class VoiceModule;

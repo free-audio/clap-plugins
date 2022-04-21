@@ -4,7 +4,7 @@ namespace clap {
    Parameter::Parameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType)
       : _info(info), _valueType(std::move(valueType)) {
       _info.cookie = this;
-      setDefaultValue();
+      reset();
 
       _mainVoice._param = this;
       _mainVoice._isMain = true;

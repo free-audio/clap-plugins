@@ -12,11 +12,13 @@
 #include "audio-buffer.hh"
 #include "constants.hh"
 #include "intrusive-list.hh"
+#include "modules/voice-module.hh"
 #include "smoothed-value.hh"
 #include "value-types/simple-value-type.hh"
 
 namespace clap {
    class CorePlugin;
+
    class Parameter final {
       friend class CorePlugin;
 
@@ -30,14 +32,17 @@ namespace clap {
       Parameter &operator=(const Parameter &) = delete;
       Parameter &operator=(Parameter &&) = delete;
 
-      double value() const noexcept { return _mainVoice._value.value(); }
-      double modulation() const noexcept { return _mainVoice._modulation.value(); }
-      double modulatedValue() const noexcept { return _mainVoice._value.value() +_mainVoice. _modulation.value(); }
       auto &valueType() const noexcept { return _valueType; }
-
       const clap_param_info &info() const noexcept { return _info; }
 
-      void setDefaultValue() {
+      /* Mostly useful for the GUI */
+      double value() const noexcept { return _mainVoice._value.value(); }
+      double modulation() const noexcept { return _mainVoice._modulation.value(); }
+      double modulatedValue() const noexcept {
+         return _mainVoice._value.value() + _mainVoice._modulation.value();
+      }
+
+      void reset() {
          setValueImmediately(_info.default_value);
          setModulationImmediately(0);
       }
@@ -59,22 +64,24 @@ namespace clap {
             _mainVoice._modulation.setSmoothed(mod, steps);
       }
 
-      [[nodiscard]] bool valueNeedsProcessing() const noexcept { return _mainVoice._value.isSmoothing(); }
+      [[nodiscard]] bool valueNeedsProcessing() const noexcept {
+         return _mainVoice._value.isSmoothing();
+      }
       [[nodiscard]] bool modulationNeedsProcessing() const noexcept {
          return _mainVoice._modulation.isSmoothing();
       }
 
-      // Advances the value by 1 samples and return the new value + modulation
-      double step() noexcept { return _mainVoice._value.step() + _mainVoice._modulation.step(); }
-
-      // Advances the value by n samples and return the new value + modulation
-      double step(uint32_t n) noexcept { return _mainVoice._value.step(n) + _mainVoice._modulation.step(n); }
-
-      auto &valueBuffer() const noexcept { return _mainVoice._valueBuffer; }
-      auto &modulationBuffer() const noexcept { return _mainVoice._modulationBuffer; }
-
-      // valueType.toEngine(value + mod)
-      auto &modulatedValueBuffer() const noexcept { return _mainVoice._modulatedValueBuffer; }
+      auto &buffer() const noexcept { return _mainVoice._modulatedValueBuffer; }
+      auto &buffer(uint32_t voiceIndex) const noexcept {
+         if (_voices[voiceIndex]._hasModulatedValue) [[unlikely]]
+            return _voices[voiceIndex]._modulatedValueBuffer;
+         return _mainVoice._modulatedValueBuffer;
+      }
+      auto &buffer(VoiceModule *voice) const noexcept {
+         if (voice) [[likely]]
+            return buffer(voice->voiceIndex());
+         return buffer();
+      }
 
 #if 0
    private:
@@ -106,6 +113,14 @@ namespace clap {
 
    public:
       struct Voice {
+         void reset() {
+            if (!_isMain) {
+               _hasValue = false;
+               _hasModulation = false;
+               _hasModulatedValue = false;
+            }
+         }
+
          void renderValue(uint32_t frameCount) noexcept;
          void renderModulation(uint32_t frameCount) noexcept;
          void renderModulatedValue(uint32_t frameCount) noexcept;
@@ -117,6 +132,7 @@ namespace clap {
 
          bool _hasValue = false;
          bool _hasModulation = false;
+         bool _hasModulatedValue = false;
 
          SmoothedValue _value;
          SmoothedValue _modulation;
@@ -125,13 +141,8 @@ namespace clap {
          AudioBuffer<double> _modulationBuffer;
          AudioBuffer<double> _modulatedValueBuffer;
 
-         // When a parameter diverge, it should then be put into the linked list of parameters that
-         // diverged in order to be reset when the voice ends
-         IntrusiveList::Hook _valueToResetHook;
          IntrusiveList::Hook _valueToProcessHook;
-         IntrusiveList::Hook _modulationToResetHook;
          IntrusiveList::Hook _modulationToProcessHook;
-         IntrusiveList::Hook _modulatedValueToResetHook;
          IntrusiveList::Hook _modulatedValueToProcessHook;
       };
 

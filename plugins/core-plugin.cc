@@ -422,18 +422,44 @@ namespace clap {
                std::terminate();
             }
 
-            if (isProcessing()) [[likely]]
-               p->setValueSmoothed(ev->value, _paramSmoothingDuration);
-            else
-               p->setValueImmediately(ev->value);
+            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && ev->port_index == -1);
+            if (isGlobal) [[likely]] {
+               if (isProcessing()) [[likely]]
+                  p->setValueSmoothed(ev->value, _paramSmoothingDuration);
+               else
+                  p->setValueImmediately(ev->value);
 
-            if (!p->_mainVoice._valueToProcessHook.isHooked())
-               _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
-            if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
-               _parameterModulatedValueToProcess.pushBack(
-                  &p->_mainVoice._modulatedValueToProcessHook);
+               if (!p->_mainVoice._valueToProcessHook.isHooked())
+                  _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
+               if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
+                  _parameterModulatedValueToProcess.pushBack(
+                     &p->_mainVoice._modulatedValueToProcessHook);
 
-            _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
+               _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
+            } else if (isProcessing()) {
+               auto voiceIndex = findVoiceIndex(ev->channel, ev->key);
+               if (voiceIndex >= 0) {
+                  auto &voice = p->_voices[voiceIndex];
+                  if (!voice._hasValue) {
+                     voice._hasValue = true;
+                     voice._hasModulatedValue = true;
+                     voice._value.setImmediately(ev->value);
+                     auto voiceExpander = getVoiceExpander();
+                     auto voiceModule = voiceExpander->getVoice(voiceIndex);
+                     if (!voice._resetHook.isHooked())
+                        voiceModule->_parametersToReset.pushBack(&voice._resetHook);
+                  } else {
+                     voice._modulation.setSmoothed(ev->value, _paramSmoothingDuration);
+                  }
+
+                  if (!voice._modulationToProcessHook.isHooked())
+                     _parameterModulationToProcess.pushBack(&voice._modulationToProcessHook);
+                  if (!voice._modulatedValueToProcessHook.isHooked())
+                     _parameterModulatedValueToProcess.pushBack(
+                        &voice._modulatedValueToProcessHook);
+               }
+            }
+
             break;
          }
 
@@ -478,7 +504,8 @@ namespace clap {
                      voice._modulation.setImmediately(ev->amount);
                      auto voiceExpander = getVoiceExpander();
                      auto voiceModule = voiceExpander->getVoice(voiceIndex);
-                     voiceModule->_parametersToReset.pushBack(&voice._resetHook);
+                     if (!voice._resetHook.isHooked())
+                        voiceModule->_parametersToReset.pushBack(&voice._resetHook);
                   } else {
                      voice._modulation.setSmoothed(ev->amount, _paramSmoothingDuration);
                   }

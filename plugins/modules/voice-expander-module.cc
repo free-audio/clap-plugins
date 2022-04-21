@@ -100,7 +100,6 @@ namespace clap {
          paramVoice->_valueToProcessHook.unlink();
          paramVoice->_modulationToProcessHook.unlink();
          paramVoice->_modulatedValueToProcessHook.unlink();
-         voice._parametersToReset.popFront();
       }
    }
 

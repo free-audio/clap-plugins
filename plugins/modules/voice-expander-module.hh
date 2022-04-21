@@ -27,8 +27,11 @@ namespace clap {
 
       auto& outputBuffer() const noexcept { return _outputBuffer; }
 
-   private:
       VoiceModule* findActiveVoice(int32_t key, int32_t channel) const;
+      VoiceModule* getVoice(uint32_t voiceIndex) noexcept { return _voices[voiceIndex].get(); }
+      const VoiceModule* getVoice(uint32_t voiceIndex) const noexcept { return _voices[voiceIndex].get(); }
+
+   private:
       VoiceModule* assignVoice();
       void releaseVoice(VoiceModule &);
 

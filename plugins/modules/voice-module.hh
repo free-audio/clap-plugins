@@ -56,6 +56,8 @@ namespace clap {
 
       void reset() noexcept override;
 
+      mutable IntrusiveList _parametersToReset;
+
    private:
       const std::unique_ptr<Module> _module;
 

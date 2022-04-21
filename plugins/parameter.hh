@@ -129,6 +129,7 @@ namespace clap {
          AudioBuffer<double> _modulationBuffer;
          AudioBuffer<double> _modulatedValueBuffer;
 
+         IntrusiveList::Hook _resetHook;
          IntrusiveList::Hook _valueToProcessHook;
          IntrusiveList::Hook _modulationToProcessHook;
          IntrusiveList::Hook _modulatedValueToProcessHook;

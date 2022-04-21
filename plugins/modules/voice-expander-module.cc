@@ -1,6 +1,8 @@
 #include "../container-of.hh"
 #include "../merge-process-status.hh"
 
+#include "../container-of.hh"
+#include "../parameter.hh"
 #include "voice-expander-module.hh"
 #include "voice-module.hh"
 
@@ -87,6 +89,19 @@ namespace clap {
       voice._stateHook.unlink();
       voice._isAssigned = false;
       _sleepingVoices.pushBack(&voice._stateHook);
+
+      while (!voice._parametersToReset.empty()) {
+         auto paramVoice =
+            containerOf(voice._parametersToReset.front(), &Parameter::Voice::_resetHook);
+         paramVoice->_hasValue = false;
+         paramVoice->_hasModulation = false;
+         paramVoice->_hasModulatedValue = false;
+         paramVoice->_resetHook.unlink();
+         paramVoice->_valueToProcessHook.unlink();
+         paramVoice->_modulationToProcessHook.unlink();
+         paramVoice->_modulatedValueToProcessHook.unlink();
+         voice._parametersToReset.popFront();
+      }
    }
 
    bool VoiceExpanderModule::wantsNoteEvents() const noexcept { return true; }

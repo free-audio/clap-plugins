@@ -13,6 +13,7 @@
 #include "container-of.hh"
 #include "core-plugin.hh"
 #include "modules/module.hh"
+#include "modules/voice-expander-module.hh"
 #include "stream-helper.hh"
 
 #include "gui/abstract-gui.hh"
@@ -467,8 +468,27 @@ namespace clap {
                      &p->_mainVoice._modulatedValueToProcessHook);
 
                _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
-            } else {
-               // TODO: find voice
+            } else if (isProcessing()) {
+               auto voiceIndex = findVoiceIndex(ev->channel, ev->key);
+               if (voiceIndex >= 0) {
+                  auto &voice = p->_voices[voiceIndex];
+                  if (!voice._hasModulation) {
+                     voice._hasModulation = true;
+                     voice._hasModulatedValue = true;
+                     voice._modulation.setImmediately(ev->amount);
+                     auto voiceExpander = getVoiceExpander();
+                     auto voiceModule = voiceExpander->getVoice(voiceIndex);
+                     voiceModule->_parametersToReset.pushBack(&voice._resetHook);
+                  } else {
+                     voice._modulation.setSmoothed(ev->amount, _paramSmoothingDuration);
+                  }
+
+                  if (!voice._modulationToProcessHook.isHooked())
+                     _parameterModulationToProcess.pushBack(&voice._modulationToProcessHook);
+                  if (!voice._modulatedValueToProcessHook.isHooked())
+                     _parameterModulatedValueToProcess.pushBack(
+                        &voice._modulatedValueToProcessHook);
+               }
             }
 
             break;
@@ -693,5 +713,17 @@ namespace clap {
       _parameterModulationToProcess.pushBack(&p->_mainVoice._modulationToProcessHook);
       _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
       return p;
+   }
+
+   int32_t CorePlugin::findVoiceIndex(int16_t channel, int16_t key) const noexcept {
+      auto voiceExpander = getVoiceExpander();
+      if (!voiceExpander)
+         return -1;
+
+      auto voice = voiceExpander->findActiveVoice(key, channel);
+      if (!voice)
+         return -1;
+
+      return voice->voiceIndex();
    }
 } // namespace clap

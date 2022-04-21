@@ -181,6 +181,7 @@ namespace clap {
       Parameter *addParameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType);
 
       const VoiceExpanderModule *getVoiceExpander() const noexcept { return _rootModule->getVoiceExpander(); }
+      int32_t findVoiceIndex(int16_t channel, int16_t key) const noexcept;
 
       helpers::ParamQueue<GuiToPluginEvent, 32> _guiToPluginQueue;
       helpers::ReducingParamQueue<clap_id, PluginToGuiValue> _pluginToGuiQueue;

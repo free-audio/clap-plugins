@@ -83,25 +83,6 @@ namespace clap {
          return mainBuffer();
       }
 
-#if 0
-   private:
-      auto &getVoiceData(uint32_t voiceIndex) noexcept {
-         assert(voiceIndex < _voices.size());
-         return _voices[voiceIndex];
-      }
-
-   public:
-      SmoothedValue &getVoiceValue(uint32_t voiceIndex) noexcept {
-         auto &v = getVoiceData(voiceIndex);
-         return v.hasValue ? v.value : _value;
-      }
-
-      SmoothedValue &getVoiceModulation(uint32_t voiceIndex) noexcept {
-         auto &v = getVoiceData(voiceIndex);
-         return v.hasModulation ? v.modulation : _modulation;
-      }
-#endif
-
       [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
       void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }
 

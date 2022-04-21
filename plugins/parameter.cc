@@ -11,6 +11,7 @@ namespace clap {
       _mainVoice._voiceIndex = -1;
       _mainVoice._hasValue = true;
       _mainVoice._hasModulation = true;
+      _mainVoice._hasModulatedValue = true;
 
       for (uint32_t i = 0; i < _voices.size(); ++i) {
          auto &voice = _voices[i];
@@ -19,6 +20,7 @@ namespace clap {
          voice._voiceIndex = i;
          voice._hasValue = false;
          voice._hasModulation = false;
+         voice._hasModulatedValue = false;
       }
    }
 

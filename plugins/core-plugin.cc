@@ -770,7 +770,7 @@ namespace clap {
          info->voice_capacity = voiceExpander->getVoiceCapacity();
       }
 
-      return false;
+      return true;
    }
 
 } // namespace clap

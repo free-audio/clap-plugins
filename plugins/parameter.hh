@@ -94,6 +94,13 @@ namespace clap {
 
    public:
       struct Voice {
+         ~Voice()
+         {
+            assert(!_valueToProcessHook.isHooked());
+            assert(!_modulationToProcessHook.isHooked());
+            assert(!_modulatedValueToProcessHook.isHooked());
+         }
+
          void reset() {
             if (!_isMain) {
                _hasValue = false;

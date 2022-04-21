@@ -178,7 +178,7 @@ namespace clap {
          clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
             auto status = _expanderModule.process(c, numFrames);
             c.audioOutputs[0]->copy(_expanderModule.outputBuffer(), numFrames);
-            c.audioOutputs[0]->compute([] (double x) -> double { return std::tanh(x); }, numFrames);
+            c.audioOutputs[0]->compute([](double x) -> double { return std::tanh(x); }, numFrames);
             return status;
          }
 
@@ -199,6 +199,8 @@ namespace clap {
          void onNoteExpression(const clap_event_note_expression &noteExp) noexcept override {
             _expanderModule.onNoteExpression(noteExp);
          }
+
+         const VoiceExpanderModule *getVoiceExpander() const noexcept final { return &_expanderModule; }
 
       private:
          VoiceExpanderModule _expanderModule;

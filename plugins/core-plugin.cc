@@ -381,19 +381,22 @@ namespace clap {
 
    void CorePlugin::renderParameters(uint32_t frameCount) noexcept {
       for (auto it = _parameterValueToProcess.begin(); !it.end();) {
-         Parameter::Voice *paramVoice = containerOf(it.item(), &Parameter::Voice::_valueToProcessHook);
+         Parameter::Voice *paramVoice =
+            containerOf(it.item(), &Parameter::Voice::_valueToProcessHook);
          ++it; // We increment immediately because param->renderValue() may unlink the param
          paramVoice->renderValue(frameCount);
       }
 
       for (auto it = _parameterModulationToProcess.begin(); !it.end();) {
-         Parameter::Voice *paramVoice = containerOf(it.item(), &Parameter::Voice::_modulationToProcessHook);
+         Parameter::Voice *paramVoice =
+            containerOf(it.item(), &Parameter::Voice::_modulationToProcessHook);
          ++it; // We increment immediately because param->renderModulation() may unlink the param
          paramVoice->renderModulation(frameCount);
       }
 
       for (auto it = _parameterModulatedValueToProcess.begin(); !it.end();) {
-         Parameter::Voice *paramVoice = containerOf(it.item(), &Parameter::Voice::_modulatedValueToProcessHook);
+         Parameter::Voice *paramVoice =
+            containerOf(it.item(), &Parameter::Voice::_modulatedValueToProcessHook);
          ++it; // We increment immediately because param->renderModulation() may unlink the param
          paramVoice->renderModulatedValue(frameCount);
       }
@@ -426,7 +429,8 @@ namespace clap {
             if (!p->_mainVoice._valueToProcessHook.isHooked())
                _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
             if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
-               _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
+               _parameterModulatedValueToProcess.pushBack(
+                  &p->_mainVoice._modulatedValueToProcessHook);
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
@@ -449,17 +453,24 @@ namespace clap {
                std::terminate();
             }
 
-            if (isProcessing()) [[likely]]
-               p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
-            else
-               p->setModulationImmediately(ev->amount);
+            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && ev->port_index == -1);
+            if (isGlobal) [[likely]] {
+               if (isProcessing()) [[likely]]
+                  p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
+               else
+                  p->setModulationImmediately(ev->amount);
 
-            if (!p->_mainVoice._modulationToProcessHook.isHooked())
-               _parameterModulationToProcess.pushBack(&p->_mainVoice._modulationToProcessHook);
-            if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
-               _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
+               if (!p->_mainVoice._modulationToProcessHook.isHooked())
+                  _parameterModulationToProcess.pushBack(&p->_mainVoice._modulationToProcessHook);
+               if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
+                  _parameterModulatedValueToProcess.pushBack(
+                     &p->_mainVoice._modulatedValueToProcessHook);
 
-            _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
+               _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
+            } else {
+               // TODO: find voice
+            }
+
             break;
          }
          }
@@ -485,7 +496,8 @@ namespace clap {
                if (!p->_mainVoice._valueToProcessHook.isHooked())
                   _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
                if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
-                  _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
+                  _parameterModulatedValueToProcess.pushBack(
+                     &p->_mainVoice._modulatedValueToProcessHook);
 
                clap_event_param_value ev;
                ev.header.time = 0;
@@ -672,5 +684,14 @@ namespace clap {
 
       *value = param->valueType()->fromText(display);
       return true;
+   }
+
+   Parameter *CorePlugin::addParameter(const clap_param_info &info,
+                                       std::unique_ptr<ValueType> valueType) {
+      auto p = _parameters.addParameter(info, std::move(valueType));
+      _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
+      _parameterModulationToProcess.pushBack(&p->_mainVoice._modulationToProcessHook);
+      _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
+      return p;
    }
 } // namespace clap

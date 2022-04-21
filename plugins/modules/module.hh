@@ -13,9 +13,10 @@ namespace clap {
    class CorePlugin;
    class Parameter;
    class ValueType;
+   class VoiceModule;
+   class VoiceExpanderModule;
 
    /** Re-usable processing unit */
-   class VoiceModule;
    class Module {
       friend class VoiceModule;
 
@@ -60,6 +61,10 @@ namespace clap {
       // the current voice info
       virtual void setVoiceModule(const VoiceModule *voiceModule) noexcept {
          _voiceModule = voiceModule;
+      }
+
+      virtual const VoiceExpanderModule *getVoiceExpander() const noexcept {
+         return nullptr;
       }
 
    protected:

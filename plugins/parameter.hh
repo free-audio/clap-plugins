@@ -71,16 +71,16 @@ namespace clap {
          return _mainVoice._modulation.isSmoothing();
       }
 
-      auto &buffer() const noexcept { return _mainVoice._modulatedValueBuffer; }
-      auto &buffer(uint32_t voiceIndex) const noexcept {
+      auto &mainBuffer() const noexcept { return _mainVoice._modulatedValueBuffer; }
+      auto &voiceBuffer(uint32_t voiceIndex) const noexcept {
          if (_voices[voiceIndex]._hasModulatedValue) [[unlikely]]
             return _voices[voiceIndex]._modulatedValueBuffer;
          return _mainVoice._modulatedValueBuffer;
       }
-      auto &buffer(VoiceModule *voice) const noexcept {
+      auto &voiceBuffer(const VoiceModule *voice) const noexcept {
          if (voice) [[likely]]
-            return buffer(voice->voiceIndex());
-         return buffer();
+            return voiceBuffer(voice->voiceIndex());
+         return mainBuffer();
       }
 
 #if 0

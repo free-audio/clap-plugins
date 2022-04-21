@@ -41,8 +41,8 @@ namespace clap {
       _buffer.setConstant(false);
 
       auto &voiceTuningBuffer = _voiceModule->tuning();
-      auto &tuningBuffer = _tuningParam->buffer();
-      auto &pmBuffer = _pmParam->buffer();
+      auto &tuningBuffer = _tuningParam->voiceBuffer(_voiceModule);
+      auto &pmBuffer = _pmParam->voiceBuffer(_voiceModule);
 
       if (_pmInput) {
          _pmBuffer.product(pmBuffer, *_pmInput, numFrames);

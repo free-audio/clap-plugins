@@ -95,12 +95,12 @@ namespace clap {
       auto const out = _output.data();
       _output.setConstant(false);
 
-      auto &freqBuffer = _freqParam->buffer();
-      auto &resoBuffer = _resoParam->buffer();
-      auto &modeBuffer = _modeParam->buffer();
-      auto &keytrackBuffer = _keytrackParam->buffer();
-      auto &envAmountBuffer = _envParam->buffer();
-      auto &fmAmountBuffer = _fmParam->buffer();
+      auto &freqBuffer = _freqParam->voiceBuffer(_voiceModule);
+      auto &resoBuffer = _resoParam->voiceBuffer(_voiceModule);
+      auto &modeBuffer = _modeParam->voiceBuffer(_voiceModule);
+      auto &keytrackBuffer = _keytrackParam->voiceBuffer(_voiceModule);
+      auto &envAmountBuffer = _envParam->voiceBuffer(_voiceModule);
+      auto &fmAmountBuffer = _fmParam->voiceBuffer(_voiceModule);
 
       if (_voiceModule) {
          _ktBuffer.product(keytrackBuffer, _voiceModule->pitch(), numFrames);

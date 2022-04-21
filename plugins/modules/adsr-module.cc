@@ -100,11 +100,11 @@ namespace clap {
       _buffer.clear(-1);
       auto out = _buffer.data();
 
-      auto &attackBuffer = _attackParam->buffer();
-      auto &decayBuffer = _decayParam->buffer();
-      auto &sustainBuffer = _sustainParam->buffer();
-      auto &releaseBuffer = _releaseParam->buffer();
-      auto &velocityBuffer = _velocityParam->buffer();
+      auto &attackBuffer = _attackParam->voiceBuffer(_voiceModule);
+      auto &decayBuffer = _decayParam->voiceBuffer(_voiceModule);
+      auto &sustainBuffer = _sustainParam->voiceBuffer(_voiceModule);
+      auto &releaseBuffer = _releaseParam->voiceBuffer(_voiceModule);
+      auto &velocityBuffer = _velocityParam->voiceBuffer(_voiceModule);
 
       if (_phase == Phase::Rest) {
          _buffer.setConstant(true);

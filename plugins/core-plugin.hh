@@ -138,6 +138,12 @@ namespace clap {
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
       void onGuiWindowClosed(bool wasDestroyed) override;
 
+      //------------------------//
+      // clap_plugin_voice_info //
+      //------------------------//
+      bool implementsVoiceInfo() const noexcept override;
+      bool voiceInfoGet(clap_voice_info *info) noexcept override;
+
       //////////////////////
       // Cached Host Info //
       //////////////////////

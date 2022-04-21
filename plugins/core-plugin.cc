@@ -757,4 +757,20 @@ namespace clap {
 
       return voice->voiceIndex();
    }
+
+   bool CorePlugin::implementsVoiceInfo() const noexcept { return true; }
+
+   bool CorePlugin::voiceInfoGet(clap_voice_info *info) noexcept {
+      auto voiceExpander = getVoiceExpander();
+      if (!voiceExpander) {
+         info->voice_capacity = 1;
+         info->voice_count = 1;
+      } else {
+         info->voice_count = voiceExpander->getVoiceCount();
+         info->voice_capacity = voiceExpander->getVoiceCapacity();
+      }
+
+      return false;
+   }
+
 } // namespace clap

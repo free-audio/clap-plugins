@@ -49,12 +49,13 @@ namespace clap {
 
       for (auto it = _activeVoices.begin(); !it.end();) {
          auto voice = containerOf(it.item(), &VoiceModule::_stateHook);
-         status = mergeProcessStatus(status, voice->process(c, numFrames));
+         auto voiceStatus = voice->process(c, numFrames);
+         status = mergeProcessStatus(status, voiceStatus);
          ++it;
 
          _outputBuffer.sum(_outputBuffer, voice->_outputBuffer, numFrames);
 
-         if (status == CLAP_PROCESS_SLEEP)
+         if (voiceStatus == CLAP_PROCESS_SLEEP)
             releaseVoice(*voice);
       }
 

@@ -30,9 +30,9 @@ namespace clap {
       Parameter &operator=(const Parameter &) = delete;
       Parameter &operator=(Parameter &&) = delete;
 
-      double value() const noexcept { return _main._value.value(); }
-      double modulation() const noexcept { return _main._modulation.value(); }
-      double modulatedValue() const noexcept { return _main._value.value() +_main. _modulation.value(); }
+      double value() const noexcept { return _mainVoice._value.value(); }
+      double modulation() const noexcept { return _mainVoice._modulation.value(); }
+      double modulatedValue() const noexcept { return _mainVoice._value.value() +_mainVoice. _modulation.value(); }
       auto &valueType() const noexcept { return _valueType; }
 
       const clap_param_info &info() const noexcept { return _info; }
@@ -42,39 +42,39 @@ namespace clap {
          setModulationImmediately(0);
       }
 
-      void setValueImmediately(double val) noexcept { _main._value.setImmediately(val); }
-      void setModulationImmediately(double mod) { _main._modulation.setImmediately(mod); }
+      void setValueImmediately(double val) noexcept { _mainVoice._value.setImmediately(val); }
+      void setModulationImmediately(double mod) { _mainVoice._modulation.setImmediately(mod); }
 
       void setValueSmoothed(double val, uint16_t steps) noexcept {
          if (_valueType->isStepped())
-            _main._value.setImmediately(val);
+            _mainVoice._value.setImmediately(val);
          else
-            _main._value.setSmoothed(val, steps);
+            _mainVoice._value.setSmoothed(val, steps);
       }
 
       void setModulationSmoothed(double mod, uint16_t steps) noexcept {
          if (_valueType->isStepped())
-            _main._modulation.setImmediately(mod);
+            _mainVoice._modulation.setImmediately(mod);
          else
-            _main._modulation.setSmoothed(mod, steps);
+            _mainVoice._modulation.setSmoothed(mod, steps);
       }
 
-      [[nodiscard]] bool valueNeedsProcessing() const noexcept { return _main._value.isSmoothing(); }
+      [[nodiscard]] bool valueNeedsProcessing() const noexcept { return _mainVoice._value.isSmoothing(); }
       [[nodiscard]] bool modulationNeedsProcessing() const noexcept {
-         return _main._modulation.isSmoothing();
+         return _mainVoice._modulation.isSmoothing();
       }
 
       // Advances the value by 1 samples and return the new value + modulation
-      double step() noexcept { return _main._value.step() + _main._modulation.step(); }
+      double step() noexcept { return _mainVoice._value.step() + _mainVoice._modulation.step(); }
 
       // Advances the value by n samples and return the new value + modulation
-      double step(uint32_t n) noexcept { return _main._value.step(n) + _main._modulation.step(n); }
+      double step(uint32_t n) noexcept { return _mainVoice._value.step(n) + _mainVoice._modulation.step(n); }
 
-      auto &valueBuffer() const noexcept { return _main._valueBuffer; }
-      auto &modulationBuffer() const noexcept { return _main._modulationBuffer; }
+      auto &valueBuffer() const noexcept { return _mainVoice._valueBuffer; }
+      auto &modulationBuffer() const noexcept { return _mainVoice._modulationBuffer; }
 
       // valueType.toEngine(value + mod)
-      auto &modulatedValueBuffer() const noexcept { return _main._modulatedValueBuffer; }
+      auto &modulatedValueBuffer() const noexcept { return _mainVoice._modulatedValueBuffer; }
 
 #if 0
    private:
@@ -105,7 +105,7 @@ namespace clap {
       bool _hasGuiOverride = false;
 
    public:
-      struct VoiceData {
+      struct Voice {
          void renderValue(uint32_t frameCount) noexcept;
          void renderModulation(uint32_t frameCount) noexcept;
          void renderModulatedValue(uint32_t frameCount) noexcept;
@@ -135,7 +135,7 @@ namespace clap {
          IntrusiveList::Hook _modulatedValueToProcessHook;
       };
 
-      VoiceData _main;
-      std::array<VoiceData, MAX_VOICES> _voices;
+      Voice _mainVoice;
+      std::array<Voice, MAX_VOICES> _voices;
    };
 } // namespace clap

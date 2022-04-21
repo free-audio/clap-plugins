@@ -179,9 +179,9 @@ namespace clap {
 
       Parameter *addParameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType) {
          auto p = _parameters.addParameter(info, std::move(valueType));
-         _parameterValueToProcess.pushBack(&p->_main._valueToProcessHook);
-         _parameterModulationToProcess.pushBack(&p->_main._modulationToProcessHook);
-         _parameterModulatedValueToProcess.pushBack(&p->_main._modulatedValueToProcessHook);
+         _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
+         _parameterModulationToProcess.pushBack(&p->_mainVoice._modulationToProcessHook);
+         _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
          return p;
       }
 

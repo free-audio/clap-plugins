@@ -381,19 +381,19 @@ namespace clap {
 
    void CorePlugin::renderParameters(uint32_t frameCount) noexcept {
       for (auto it = _parameterValueToProcess.begin(); !it.end();) {
-         Parameter::VoiceData *paramVoice = containerOf(it.item(), &Parameter::VoiceData::_valueToProcessHook);
+         Parameter::Voice *paramVoice = containerOf(it.item(), &Parameter::Voice::_valueToProcessHook);
          ++it; // We increment immediately because param->renderValue() may unlink the param
          paramVoice->renderValue(frameCount);
       }
 
       for (auto it = _parameterModulationToProcess.begin(); !it.end();) {
-         Parameter::VoiceData *paramVoice = containerOf(it.item(), &Parameter::VoiceData::_modulationToProcessHook);
+         Parameter::Voice *paramVoice = containerOf(it.item(), &Parameter::Voice::_modulationToProcessHook);
          ++it; // We increment immediately because param->renderModulation() may unlink the param
          paramVoice->renderModulation(frameCount);
       }
 
       for (auto it = _parameterModulatedValueToProcess.begin(); !it.end();) {
-         Parameter::VoiceData *paramVoice = containerOf(it.item(), &Parameter::VoiceData::_modulatedValueToProcessHook);
+         Parameter::Voice *paramVoice = containerOf(it.item(), &Parameter::Voice::_modulatedValueToProcessHook);
          ++it; // We increment immediately because param->renderModulation() may unlink the param
          paramVoice->renderModulatedValue(frameCount);
       }
@@ -423,10 +423,10 @@ namespace clap {
             else
                p->setValueImmediately(ev->value);
 
-            if (!p->_main._valueToProcessHook.isHooked())
-               _parameterValueToProcess.pushBack(&p->_main._valueToProcessHook);
-            if (!p->_main._modulatedValueToProcessHook.isHooked())
-               _parameterModulatedValueToProcess.pushBack(&p->_main._modulatedValueToProcessHook);
+            if (!p->_mainVoice._valueToProcessHook.isHooked())
+               _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
+            if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
+               _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
@@ -454,10 +454,10 @@ namespace clap {
             else
                p->setModulationImmediately(ev->amount);
 
-            if (!p->_main._modulationToProcessHook.isHooked())
-               _parameterModulationToProcess.pushBack(&p->_main._modulationToProcessHook);
-            if (!p->_main._modulatedValueToProcessHook.isHooked())
-               _parameterModulatedValueToProcess.pushBack(&p->_main._modulatedValueToProcessHook);
+            if (!p->_mainVoice._modulationToProcessHook.isHooked())
+               _parameterModulationToProcess.pushBack(&p->_mainVoice._modulationToProcessHook);
+            if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
+               _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
 
             _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             break;
@@ -482,10 +482,10 @@ namespace clap {
                else
                   p->setValueImmediately(value.value);
 
-               if (!p->_main._valueToProcessHook.isHooked())
-                  _parameterValueToProcess.pushBack(&p->_main._valueToProcessHook);
-               if (!p->_main._modulatedValueToProcessHook.isHooked())
-                  _parameterModulatedValueToProcess.pushBack(&p->_main._modulatedValueToProcessHook);
+               if (!p->_mainVoice._valueToProcessHook.isHooked())
+                  _parameterValueToProcess.pushBack(&p->_mainVoice._valueToProcessHook);
+               if (!p->_mainVoice._modulatedValueToProcessHook.isHooked())
+                  _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
 
                clap_event_param_value ev;
                ev.header.time = 0;

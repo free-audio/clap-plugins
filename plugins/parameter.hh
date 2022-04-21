@@ -32,6 +32,14 @@ namespace clap {
       Parameter &operator=(const Parameter &) = delete;
       Parameter &operator=(Parameter &&) = delete;
 
+      static const constexpr uint32_t POLY_AUTO_FLAGS = CLAP_PARAM_IS_AUTOMATABLE |
+                                                        CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL |
+                                                        CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE;
+      static const constexpr uint32_t POLY_MOD_FLAGS = CLAP_PARAM_IS_AUTOMATABLE |
+                                                       CLAP_PARAM_IS_AUTOMATABLE_PER_CHANNEL |
+                                                       CLAP_PARAM_IS_AUTOMATABLE_PER_NOTE;
+      static const constexpr uint32_t POLY_FLAGS = POLY_AUTO_FLAGS | POLY_MOD_FLAGS;
+
       auto &valueType() const noexcept { return _valueType; }
       const clap_param_info &info() const noexcept { return _info; }
 
@@ -94,8 +102,7 @@ namespace clap {
 
    public:
       struct Voice {
-         ~Voice()
-         {
+         ~Voice() {
             assert(!_valueToProcessHook.isHooked());
             assert(!_modulationToProcessHook.isHooked());
             assert(!_modulatedValueToProcessHook.isHooked());

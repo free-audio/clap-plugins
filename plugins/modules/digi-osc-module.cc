@@ -12,15 +12,11 @@ namespace clap {
       char moduleName[CLAP_MODULE_SIZE];
       snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
 
-      _tuningParam = addParameter(0,
-                                  "tun",
-                                  CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                                  std::make_unique<SimpleValueType>(-120, 120, 0));
+      _tuningParam = addParameter(
+         0, "tun", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(-120, 120, 0));
 
-      _pmParam = addParameter(1,
-                              "pm",
-                              CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE,
-                              std::make_unique<SimpleValueType>(0, 5, 0));
+      _pmParam =
+         addParameter(1, "pm", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 5, 0));
    }
 
    DigiOscModule::DigiOscModule(const DigiOscModule &m)

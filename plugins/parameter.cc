@@ -25,6 +25,8 @@ namespace clap {
    }
 
    void Parameter::Voice::renderValue(uint32_t frameCount) noexcept {
+      assert(_hasValue);
+
       if (_value.isSmoothing()) {
          _value.render(_valueBuffer.data(), frameCount);
          _valueBuffer.setConstant(false);
@@ -35,6 +37,8 @@ namespace clap {
    }
 
    void Parameter::Voice::renderModulation(uint32_t frameCount) noexcept {
+      assert(_hasModulation);
+
       if (_modulation.isSmoothing()) {
          _modulation.render(_modulationBuffer.data(), frameCount);
          _modulationBuffer.setConstant(false);
@@ -46,7 +50,10 @@ namespace clap {
    }
 
    void Parameter::Voice::renderModulatedValue(uint32_t frameCount) noexcept {
-      _modulatedValueBuffer.sum(_valueBuffer, _modulationBuffer, frameCount);
+      AudioBuffer<double> &valueBuffer = _hasValue ? _valueBuffer : _param->_mainVoice._valueBuffer;
+      AudioBuffer<double> &modulationBuffer = _hasModulation ? _modulationBuffer : _param->_mainVoice._modulationBuffer;
+
+      _modulatedValueBuffer.sum(valueBuffer, modulationBuffer, frameCount);
       _param->_valueType->toEngine(_modulatedValueBuffer, frameCount);
 
       if (!_value.isSmoothing() && !_modulation.isSmoothing() && _modulatedValueBuffer.isConstant())

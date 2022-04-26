@@ -41,6 +41,11 @@ jobs:
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
 
     steps:
+      - name: 'Enable long path support (Windows)'
+        if: startsWith(matrix.os, 'win')
+        shell: 'pwsh'
+        run: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+
       - name: 'Remove old VCPKG'
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')
         shell: 'bash'

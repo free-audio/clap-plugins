@@ -426,7 +426,7 @@ namespace clap {
                std::terminate();
             }
 
-            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && ev->port_index == -1);
+            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && (ev->port_index == -1 || ev->port_index == 0));
             if (isGlobal) [[likely]] {
                if (isProcessing()) [[likely]]
                   p->setValueSmoothed(ev->value, _paramSmoothingDuration);
@@ -484,7 +484,7 @@ namespace clap {
                std::terminate();
             }
 
-            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && ev->port_index == -1);
+            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && (ev->port_index == -1 || ev->port_index == 0));
             if (isGlobal) [[likely]] {
                if (isProcessing()) [[likely]]
                   p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);

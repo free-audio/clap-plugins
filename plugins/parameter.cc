@@ -50,13 +50,25 @@ namespace clap {
    }
 
    void Parameter::Voice::renderModulatedValue(uint32_t frameCount) noexcept {
+      assert(_hasModulatedValue);
+
       AudioBuffer<double> &valueBuffer = _hasValue ? _valueBuffer : _param->_mainVoice._valueBuffer;
       AudioBuffer<double> &modulationBuffer = _hasModulation ? _modulationBuffer : _param->_mainVoice._modulationBuffer;
 
       _modulatedValueBuffer.sum(valueBuffer, modulationBuffer, frameCount);
       _param->_valueType->toEngine(_modulatedValueBuffer, frameCount);
+   }
 
-      if (!_value.isSmoothing() && !_modulation.isSmoothing() && _modulatedValueBuffer.isConstant())
-         _modulatedValueToProcessHook.unlink();
+   const AudioBuffer<double> &Parameter::voiceBuffer(uint32_t voiceIndex) const noexcept {
+      auto &voice = _voices[voiceIndex];
+      if (voice._hasModulatedValue) [[unlikely]]
+         return voice._modulatedValueBuffer;
+      return _mainVoice._modulatedValueBuffer;
+   }
+
+   const AudioBuffer<double> &Parameter::voiceBuffer(const VoiceModule *voice) const noexcept {
+      if (voice) [[likely]]
+         return voiceBuffer(voice->voiceIndex());
+      return mainBuffer();
    }
 } // namespace clap

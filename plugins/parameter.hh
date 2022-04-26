@@ -77,17 +77,11 @@ namespace clap {
          return _mainVoice._modulation.isSmoothing();
       }
 
-      auto &mainBuffer() const noexcept { return _mainVoice._modulatedValueBuffer; }
-      auto &voiceBuffer(uint32_t voiceIndex) const noexcept {
-         if (_voices[voiceIndex]._hasModulatedValue) [[unlikely]]
-            return _voices[voiceIndex]._modulatedValueBuffer;
+      const AudioBuffer<double> &mainBuffer() const noexcept {
          return _mainVoice._modulatedValueBuffer;
       }
-      auto &voiceBuffer(const VoiceModule *voice) const noexcept {
-         if (voice) [[likely]]
-            return voiceBuffer(voice->voiceIndex());
-         return mainBuffer();
-      }
+      const AudioBuffer<double> &voiceBuffer(uint32_t voiceIndex) const noexcept;
+      const AudioBuffer<double> &voiceBuffer(const VoiceModule *voice) const noexcept;
 
       [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
       void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }

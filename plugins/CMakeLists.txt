@@ -81,6 +81,7 @@ add_library(
   value-types/enumerated-value-type.hh
   value-types/enumerated-value-type.cc
   )
+target_compile_definitions(clap-plugins PRIVATE _USE_MATH_DEFINES)
 
 if(NOT CLAP_PLUGINS_HEADLESS)
   if(CLAP_PLUGINS_REMOTE_GUI)

@@ -23,9 +23,7 @@ namespace clap {
       friend class CorePlugin;
 
    public:
-      explicit Parameter(
-         const clap_param_info &info,
-         std::unique_ptr<ValueType> valueType = std::make_unique<SimpleValueType>());
+      explicit Parameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType);
 
       Parameter(const Parameter &) = delete;
       Parameter(Parameter &&) = delete;

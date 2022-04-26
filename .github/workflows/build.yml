@@ -48,8 +48,7 @@ jobs:
 
       - name: 'Change github workspace (Windows)'
         if: startsWith(matrix.os, 'win')
-        env:
-          GITHUB_WORKSPACE: 'D:/clap/'
+        run: echo "GITHUB_WORKSPACE=D:/clap/" >> $GITHUB_ENV
 
       - name: 'Remove old VCPKG'
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')

@@ -1,3 +1,6 @@
 module clap.lib
 
+ADSR 1.0 ADSR.qml
+DigiOsc 1.0 DigiOsc.qml
+Filter 1.0 Filter.qml
 Knob 1.0 Knob.qml

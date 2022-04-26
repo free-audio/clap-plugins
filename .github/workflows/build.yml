@@ -48,7 +48,7 @@ jobs:
 
       - name: 'Change github workspace (Windows)'
         if: startsWith(matrix.os, 'win')
-        run: echo "GITHUB_WORKSPACE=D:/clap/" >> $GITHUB_ENV
+        run: echo "GITHUB_WORKSPACE=D:/a/clap/" >> $GITHUB_ENV
 
       - name: 'Remove old VCPKG'
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')
@@ -56,6 +56,13 @@ jobs:
         run: sudo rm -rf "$VCPKG_INSTALLATION_ROOT"
 
       - uses: actions/checkout@v3
+        if: startsWith(matrix.os, 'win')
+        with:
+          submodules: true
+          path: 'D:\a\c'
+
+      - uses: actions/checkout@v3
+        if: startsWith(matrix.os, 'win') == false
         with:
           submodules: true
 

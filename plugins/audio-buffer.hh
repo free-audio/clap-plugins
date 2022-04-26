@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
+#include <memory>
 #include <new>
 
 #include <clap/clap.h>
@@ -14,16 +15,25 @@ namespace clap {
    template <typename T = float>
    class AudioBuffer {
    public:
+      static const constexpr size_t alignment = 32;
+
       explicit AudioBuffer(uint32_t channelCount = 1,
                            uint32_t frameCount = BLOCK_SIZE,
                            double sampleRate = 0)
-         : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate),
-           _data(static_cast<T *>(std::aligned_alloc(32, channelCount * frameCount * sizeof(T)))) {
+         : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate) {
+
          if (_channelCount > MAX_AUDIO_CHANNELS)
             throw std::invalid_argument("too many audio channels");
 
-         if (!_data) [[unlikely]]
+         const size_t dataSize = channelCount * frameCount * sizeof(T);
+         const size_t dataBaseSize = alignment + dataSize;
+         size_t dataSizeLeft = dataBaseSize;
+         _dataBase = std::malloc(alignment + channelCount * frameCount * sizeof(T));
+
+         if (!_dataBase) [[unlikely]]
             throw std::bad_alloc();
+
+         _data = static_cast<T*>(std::align(alignment, dataSize, _dataBase, dataSizeLeft));
       }
 
       AudioBuffer(const AudioBuffer<T> &other) = delete;
@@ -31,7 +41,7 @@ namespace clap {
       AudioBuffer<T> &operator=(AudioBuffer<T> &&) = delete;
       AudioBuffer(AudioBuffer<T> &&o) = delete;
 
-      ~AudioBuffer() { std::free(_data); }
+      ~AudioBuffer() { std::free(_dataBase); }
 
       [[nodiscard]] T *data() noexcept { return _data; }
       [[nodiscard]] const T *data() const noexcept { return _data; }
@@ -119,7 +129,8 @@ namespace clap {
       const uint32_t _channelCount;
       const uint32_t _frameCount;
       const double _sampleRate; // 0 if unspecified
-      T *const _data;
+      void *_dataBase = nullptr;
+      T *_data = nullptr;
       uint32_t _stride = 0;
    };
 

@@ -1,14 +1,3 @@
-# Copyright (c) 2021 Luca Cappa
-# Released under the term specified in file LICENSE.txt
-# SPDX short identifier: MIT
-#
-# The peculiarity of this workflow is that assumes vcpkg stored as a submodule of this repository.
-# This workflow does the following:
-# - Restores vcpkg artifacts from cache.
-# - Sets up vcpkg if needed, then run CMake with CMakePreset.json using a configuration
-#   that leverages the vcpkg's toolchain file. This will automatically run vcpkg to install dependencies
-#   described by the vcpkg.json manifest file. It will be a no-op if those are restored from cache.
-# - Finally builds the sources with Ninja.
 name: build
 on: [workflow_dispatch]
 
@@ -41,11 +30,6 @@ jobs:
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
 
     steps:
-      - name: 'Enable long path support (Windows)'
-        if: startsWith(matrix.os, 'win')
-        shell: 'pwsh'
-        run: New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-
       - name: 'Remove old VCPKG'
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')
         shell: 'bash'
@@ -105,17 +89,6 @@ jobs:
       - name: 'Bootstrap VCPKG'
         shell: bash
         run: vcpkg/bootstrap-vcpkg.sh
-
-      # - name: 'Setup NuGet Credentials'
-      #   shell: 'bash'
-      #   run: >
-      #     ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1`
-      #     sources add
-      #     -source "https://nuget.pkg.github.com/free-audio/index.json"
-      #     -storepasswordincleartext
-      #     -name "GitHub"
-      #     -username "free-audio"
-      #     -password "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Build
         shell: bash

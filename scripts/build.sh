@@ -38,19 +38,19 @@ cmake_options="-DVCPKG_TARGET_TRIPLET=${triplet}-cp -DCMAKE_VCPKG_HOST_TRIPLET=$
 if [[ ! -x vcpkg/vcpkg ]] ; then
   vcpkg/bootstrap-vcpkg.sh
 else
-  vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_option upgrade --no-dry-run
+  vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_option upgrade --no-dry-run --debug
 fi
 
-vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options install --recurse \
+vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options install --recurse --debug \
   "qtbase[core,png,doubleconversion,gui,concurrent,appstore-compliant,network,freetype,testlib,freetype${QT_FEATURES}]"
 
 # save space
 rm -rf $buildtrees
 
-vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options install --recurse \
+vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options install --recurse --debug \
   qtdeclarative
 
-vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options upgrade 
+vcpkg/vcpkg --overlay-triplets=vcpkg-overlay/triplets $vcpkg_options upgrade --debug
 
 # save space
 rm -rf $buildtrees

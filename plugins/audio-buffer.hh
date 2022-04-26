@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <memory>
 #include <new>
+#include <stdexcept>
 
 #include <clap/clap.h>
 

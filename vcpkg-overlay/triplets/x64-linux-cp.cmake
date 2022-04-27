@@ -9,10 +9,10 @@ set(VCPKG_CMAKE_SYSTEM_NAME Linux)
 set(VCPKG_C_FLAGS_RELEASE "-Os -fomit-frame-pointer")
 set(VCPKG_CXX_FLAGS_RELEASE "-Os -fomit-frame-pointer")
 
-if(NOT PORT MATCHES "harfbuzz")
+#if(NOT PORT MATCHES "harfbuzz")
     # harfbuzz is badly packaged for now, so we also make the debug build
     # https://github.com/microsoft/vcpkg/issues/22680
     set(VCPKG_BUILD_TYPE release)
-endif()
+#endif()
 
 set(VCPKG_QT_NAMESPACE ClapPlugins)

@@ -45,9 +45,11 @@ jobs:
       - uses: lukka/get-cmake@latest
         if: startsWith(matrix.os, 'win')
 
+      - uses: nuget/setup-nuget@v1
+
       - name: Setup MacOS
         if: startsWith(matrix.os, 'macOS')
-        run: brew install automake autoconf ninja cmake mono
+        run: brew install automake autoconf ninja cmake
 
       - name: Setup Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
@@ -86,8 +88,6 @@ jobs:
           libxrender-dev
           libatspi2.0-dev
           mono
-
-      # - uses: nuget/setup-nuget@v1
 
       - name: 'Setup NuGet Credentials'
         shell: 'bash'

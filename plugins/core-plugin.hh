@@ -132,6 +132,7 @@ namespace clap {
       // AbstractGuiListener //
       //---------------------//
       void onGuiPoll() override;
+      void pollVoiceInfo();
       void onGuiParamBeginAdjust(clap_id paramId) override;
       void onGuiParamAdjust(clap_id paramId, double value) override;
       void onGuiParamEndAdjust(clap_id paramId) override;

@@ -257,14 +257,24 @@ namespace clap {
          _hasTransportCopy = false;
       }
 
+      pollVoiceInfo();
+   }
+
+   void CorePlugin::pollVoiceInfo() {
+      if (!_host.canUseVoiceInfo())
+         return;
+
       clap_voice_info info;
-      if (_host.canUseVoiceInfo() && voiceInfoGet(&info)) {
-         if (info.voice_count != _lastVoiceInfo.voice_count ||
-             info.voice_capacity != _lastVoiceInfo.voice_capacity) {
-            _lastVoiceInfo = info;
-            _host.voiceInfoChanged();
-         }
-      }
+      if (!voiceInfoDoGet(&info))
+         return;
+
+      const bool didChange = (info.voice_count != _lastVoiceInfo.voice_count ||
+                              info.voice_capacity != _lastVoiceInfo.voice_capacity);
+      if (!didChange)
+         return;
+
+      _lastVoiceInfo = info;
+      _host.voiceInfoChanged();
    }
 
    void CorePlugin::pushGuiToPluginEvent(const GuiToPluginEvent &event) {

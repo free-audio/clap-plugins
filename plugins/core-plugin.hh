@@ -142,6 +142,7 @@ namespace clap {
       // clap_plugin_voice_info //
       //------------------------//
       bool implementsVoiceInfo() const noexcept override;
+      bool voiceInfoDoGet(clap_voice_info *info) noexcept;
       bool voiceInfoGet(clap_voice_info *info) noexcept override;
 
       //////////////////////
@@ -216,6 +217,8 @@ namespace clap {
       bool _hasTransportCopy = false;
       bool _hasTransport = false;
       clap_event_transport _transportCopy;
+
+      clap_voice_info _lastVoiceInfo;
 
       Context _context;
       std::unique_ptr<Module> _rootModule;

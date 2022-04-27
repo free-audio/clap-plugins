@@ -3,6 +3,7 @@
 
 #include "../container-of.hh"
 #include "../parameter.hh"
+#include "../value-types/enumerated-value-type.hh"
 #include "voice-expander-module.hh"
 #include "voice-module.hh"
 
@@ -22,6 +23,16 @@ namespace clap {
 
       for (auto &voice : _voices)
          _sleepingVoices.pushBack(&voice->_stateHook);
+
+      _voicesParam = addParameter(0,
+                                  "Voices",
+                                  CLAP_PARAM_IS_STEPPED | CLAP_PARAM_IS_AUTOMATABLE,
+                                  std::make_unique<SimpleValueType>(1, MAX_VOICES, MAX_VOICES));
+      _voiceModeParam = addParameter(1,
+                                     "Voice Mode",
+                                     CLAP_PARAM_IS_STEPPED | CLAP_PARAM_IS_AUTOMATABLE,
+                                     std::make_unique<EnumeratedValueType>(
+                                        std::vector<std::string>{"Legato", "Mono", "Poly"}, 2));
    }
 
    bool VoiceExpanderModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
@@ -142,4 +153,15 @@ namespace clap {
       if (voice)
          voice->onNoteExpression(noteExp);
    }
+
+   uint32_t VoiceExpanderModule::getVoiceCount() const noexcept {
+      int voices = _voicesParam->value();
+
+      assert(voices > 0);
+      assert(voices <= MAX_VOICES);
+
+      return std::clamp<uint32_t>(voices, 1, MAX_VOICES);
+   }
+
+   uint32_t VoiceExpanderModule::getVoiceCapacity() const noexcept { return MAX_VOICES; }
 } // namespace clap

@@ -256,6 +256,15 @@ namespace clap {
          _guiHandle->gui().updateTransport(_transportCopy);
          _hasTransportCopy = false;
       }
+
+      clap_voice_info info;
+      if (_host.canUseVoiceInfo() && voiceInfoGet(&info)) {
+         if (info.voice_count != _lastVoiceInfo.voice_count ||
+             info.voice_capacity != _lastVoiceInfo.voice_capacity) {
+            _lastVoiceInfo = info;
+            _host.voiceInfoChanged();
+         }
+      }
    }
 
    void CorePlugin::pushGuiToPluginEvent(const GuiToPluginEvent &event) {
@@ -426,7 +435,8 @@ namespace clap {
                std::terminate();
             }
 
-            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && (ev->port_index == -1 || ev->port_index == 0));
+            const bool isGlobal = (ev->channel == -1 && ev->key == -1 &&
+                                   (ev->port_index == -1 || ev->port_index == 0));
             if (isGlobal) [[likely]] {
                if (isProcessing()) [[likely]]
                   p->setValueSmoothed(ev->value, _paramSmoothingDuration);
@@ -484,7 +494,8 @@ namespace clap {
                std::terminate();
             }
 
-            const bool isGlobal = (ev->channel == -1 && ev->key == -1 && (ev->port_index == -1 || ev->port_index == 0));
+            const bool isGlobal = (ev->channel == -1 && ev->key == -1 &&
+                                   (ev->port_index == -1 || ev->port_index == 0));
             if (isGlobal) [[likely]] {
                if (isProcessing()) [[likely]]
                   p->setModulationSmoothed(ev->amount, _paramSmoothingDuration);
@@ -760,7 +771,7 @@ namespace clap {
 
    bool CorePlugin::implementsVoiceInfo() const noexcept { return true; }
 
-   bool CorePlugin::voiceInfoGet(clap_voice_info *info) noexcept {
+   bool CorePlugin::voiceInfoDoGet(clap_voice_info *info) noexcept {
       auto voiceExpander = getVoiceExpander();
       if (!voiceExpander) {
          info->voice_capacity = 1;
@@ -770,6 +781,14 @@ namespace clap {
          info->voice_capacity = voiceExpander->getVoiceCapacity();
       }
 
+      return true;
+   }
+
+   bool CorePlugin::voiceInfoGet(clap_voice_info *info) noexcept {
+      if (!voiceInfoDoGet(info))
+         return false;
+
+      _lastVoiceInfo = *info;
       return true;
    }
 

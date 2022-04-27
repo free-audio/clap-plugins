@@ -34,8 +34,8 @@ namespace clap {
 
       auto& noteEndQueue() { return _noteEndQueue; }
 
-      uint32_t getVoiceCount() const noexcept { return MAX_VOICES; }
-      uint32_t getVoiceCapacity() const noexcept { return MAX_VOICES; }
+      uint32_t getVoiceCount() const noexcept;
+      uint32_t getVoiceCapacity() const noexcept;
 
    private:
       VoiceModule* assignVoice();
@@ -49,5 +49,8 @@ namespace clap {
       AudioBuffer<double> _outputBuffer;
 
       helpers::NoteEndQueue _noteEndQueue;
+
+      Parameter *_voicesParam = nullptr;
+      Parameter *_voiceModeParam = nullptr;
    };
 } // namespace clap

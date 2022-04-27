@@ -40,12 +40,14 @@ jobs:
           submodules: true
 
       - uses: seanmiddleditch/gha-setup-ninja@master
+        if: startsWith(matrix.os, 'win')
 
       - uses: lukka/get-cmake@latest
+        if: startsWith(matrix.os, 'win')
 
       - name: Setup MacOS
         if: startsWith(matrix.os, 'macOS')
-        run: brew install automake autoconf ninja cmake
+        run: brew install automake autoconf ninja cmake mono
 
       - name: Setup Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
@@ -83,13 +85,15 @@ jobs:
           libxkbcommon-x11-dev
           libxrender-dev
           libatspi2.0-dev
+          mono
 
-      - uses: nuget/setup-nuget@v1
+      # - uses: nuget/setup-nuget@v1
 
       - name: 'Setup NuGet Credentials'
         shell: 'bash'
         run: >
-          nuget sources add
+          ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1`
+          sources add
           -source "https://nuget.pkg.github.com/free-audio/index.json"
           -storepasswordincleartext
           -name "GitHub"

@@ -46,6 +46,8 @@ jobs:
         if: startsWith(matrix.os, 'win')
 
       - uses: nuget/setup-nuget@v1
+        with:
+          version: latest
 
       - name: Setup MacOS
         if: startsWith(matrix.os, 'macOS')
@@ -89,6 +91,10 @@ jobs:
           libatspi2.0-dev
           mono
 
+      - name: 'Bootstrap VCPKG'
+        shell: bash
+        run: vcpkg/bootstrap-vcpkg.sh
+
       - name: 'Setup NuGet Credentials'
         shell: 'bash'
         run: >
@@ -99,10 +105,6 @@ jobs:
           -name "GitHub"
           -username "free-audio"
           -password "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: 'Bootstrap VCPKG'
-        shell: bash
-        run: vcpkg/bootstrap-vcpkg.sh
 
       - name: Build
         shell: bash

@@ -26,6 +26,7 @@ namespace clap {
       [[nodiscard]] virtual bool hasEngineDomain() const;
       [[nodiscard]] virtual double toParam(double engineValue) const;
       [[nodiscard]] virtual double toEngine(double paramValue) const;
-      virtual void toEngine(AudioBuffer<double> &buffer, uint32_t numFrames) const;
+
+      void toEngine(AudioBuffer<double> &buffer, uint32_t numFrames) const;
    };
 } // namespace clap

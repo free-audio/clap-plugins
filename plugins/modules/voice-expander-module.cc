@@ -85,22 +85,26 @@ namespace clap {
    }
 
    VoiceModule *VoiceExpanderModule::assignVoice() {
-      if (_sleepingVoices.empty())
+      if (_sleepingVoices.empty() || _activeVoiceCount >= getVoiceCount())
          return nullptr; // TODO: steal voice instead
 
+      assert(_activeVoiceCount < MAX_VOICES);
       auto voice = containerOf(_sleepingVoices.front(), &VoiceModule::_stateHook);
       assert(!voice->isAssigned());
       voice->_stateHook.unlink();
       voice->assign();
       _activeVoices.pushBack(&voice->_stateHook);
+      ++_activeVoiceCount;
       return voice;
    }
 
    void VoiceExpanderModule::releaseVoice(VoiceModule &voice) {
       assert(voice.isAssigned());
+      assert(_activeVoiceCount > 0);
       voice._stateHook.unlink();
       voice._isAssigned = false;
       _sleepingVoices.pushBack(&voice._stateHook);
+      --_activeVoiceCount;
       _noteEndQueue.onNoteEnd(0, voice.channel(), voice.key());
 
       while (!voice._parametersToReset.empty()) {

@@ -44,6 +44,8 @@ namespace clap {
       IntrusiveList _activeVoices;   // uses VoiceModule._stateHook
       IntrusiveList _sleepingVoices; // uses VoiceModule._stateHook
 
+      uint32_t _activeVoiceCount = 0;
+
       std::array<std::unique_ptr<VoiceModule>, MAX_VOICES> _voices;
 
       AudioBuffer<double> _outputBuffer;

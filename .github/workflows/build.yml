@@ -47,7 +47,7 @@ jobs:
 
       - uses: nuget/setup-nuget@v1
         with:
-          version: latest
+          nuget-version: latest
 
       - name: Setup MacOS
         if: startsWith(matrix.os, 'macOS')
@@ -89,7 +89,6 @@ jobs:
           libxkbcommon-x11-dev
           libxrender-dev
           libatspi2.0-dev
-          mono
 
       - name: 'Bootstrap VCPKG'
         shell: bash

@@ -274,7 +274,10 @@ namespace clap {
          return;
 
       _lastVoiceInfo = info;
-      _host.voiceInfoChanged();
+
+      runOnMainThread([this] {
+         _host.voiceInfoChanged();
+      });
    }
 
    void CorePlugin::pushGuiToPluginEvent(const GuiToPluginEvent &event) {

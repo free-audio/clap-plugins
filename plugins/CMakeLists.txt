@@ -106,7 +106,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set_target_properties(clap-plugins PROPERTIES SUFFIX ".clap" PREFIX "")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   target_link_options(clap-plugins PRIVATE -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/macos-symbols.txt)
-  #target_link_libraries(clap-plugins PRIVATE -Wl,-z,defs)
 
   set_target_properties(clap-plugins PROPERTIES
             BUNDLE True

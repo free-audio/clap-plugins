@@ -94,7 +94,7 @@ namespace clap {
       voice._isAssigned = false;
       _sleepingVoices.pushBack(&voice._stateHook);
       --_activeVoiceCount;
-      _noteEndQueue.onNoteEnd(0, voice.channel(), voice.key());
+      _noteEndQueue.onNoteEnd(voice.nodeId(), voice.port(), voice.channel(), voice.key());
 
       while (!voice._parametersToReset.empty()) {
          auto paramVoice =
@@ -112,11 +112,11 @@ namespace clap {
    bool VoiceExpanderModule::wantsNoteEvents() const noexcept { return true; }
 
    void VoiceExpanderModule::onNoteOn(const clap_event_note &note) noexcept {
-      _noteEndQueue.onNoteOn(0, note.channel, note.key);
+      _noteEndQueue.onNoteOn(note.note_id, note.port_index, note.channel, note.key);
 
       auto voice = assignVoice();
       if (!voice) {
-         _noteEndQueue.onNoteEnd(0, note.channel, note.key);
+         _noteEndQueue.onNoteEnd(note.note_id, note.port_index, note.channel, note.key);
          return;
       }
 

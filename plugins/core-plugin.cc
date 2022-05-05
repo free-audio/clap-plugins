@@ -275,9 +275,7 @@ namespace clap {
 
       _lastVoiceInfo = info;
 
-      runOnMainThread([this] {
-         _host.voiceInfoChanged();
-      });
+      runOnMainThread([this] { _host.voiceInfoChanged(); });
    }
 
    void CorePlugin::pushGuiToPluginEvent(const GuiToPluginEvent &event) {
@@ -464,27 +462,32 @@ namespace clap {
 
                _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             } else if (isProcessing()) {
-               auto voiceIndex = findVoiceIndex(ev->channel, ev->key);
-               if (voiceIndex >= 0) {
-                  auto &voice = p->_voices[voiceIndex];
-                  if (!voice._hasValue) {
-                     voice._hasValue = true;
-                     voice._hasModulatedValue = true;
-                     voice._value.setImmediately(ev->value);
-                     auto voiceExpander = getVoiceExpander();
-                     auto voiceModule = voiceExpander->getVoice(voiceIndex);
-                     if (!voice._resetHook.isHooked())
-                        voiceModule->_parametersToReset.pushBack(&voice._resetHook);
-                  } else {
-                     voice._modulation.setSmoothed(ev->value, _paramSmoothingDuration);
-                  }
+               foreachActiveVoice(
+                  ev->note_id,
+                  ev->port_index,
+                  ev->channel,
+                  ev->key,
+                  [this, p, ev](VoiceModule &voiceModule) {
+                     auto voiceIndex = voiceModule.voiceIndex();
+                     auto &voice = p->_voices[voiceIndex];
+                     if (!voice._hasValue) {
+                        voice._hasValue = true;
+                        voice._hasModulatedValue = true;
+                        voice._value.setImmediately(ev->value);
+                        auto voiceExpander = getVoiceExpander();
+                        auto voiceModule = voiceExpander->getVoice(voiceIndex);
+                        if (!voice._resetHook.isHooked())
+                           voiceModule->_parametersToReset.pushBack(&voice._resetHook);
+                     } else {
+                        voice._modulation.setSmoothed(ev->value, _paramSmoothingDuration);
+                     }
 
-                  if (!voice._modulationToProcessHook.isHooked())
-                     _parameterModulationToProcess.pushBack(&voice._modulationToProcessHook);
-                  if (!voice._modulatedValueToProcessHook.isHooked())
-                     _parameterModulatedValueToProcess.pushBack(
-                        &voice._modulatedValueToProcessHook);
-               }
+                     if (!voice._modulationToProcessHook.isHooked())
+                        _parameterModulationToProcess.pushBack(&voice._modulationToProcessHook);
+                     if (!voice._modulatedValueToProcessHook.isHooked())
+                        _parameterModulatedValueToProcess.pushBack(
+                           &voice._modulatedValueToProcessHook);
+                  });
             }
 
             break;
@@ -523,27 +526,32 @@ namespace clap {
 
                _pluginToGuiQueue.set(p->info().id, {p->value(), p->modulation()});
             } else if (isProcessing()) {
-               auto voiceIndex = findVoiceIndex(ev->channel, ev->key);
-               if (voiceIndex >= 0) {
-                  auto &voice = p->_voices[voiceIndex];
-                  if (!voice._hasModulation) {
-                     voice._hasModulation = true;
-                     voice._hasModulatedValue = true;
-                     voice._modulation.setImmediately(ev->amount);
-                     auto voiceExpander = getVoiceExpander();
-                     auto voiceModule = voiceExpander->getVoice(voiceIndex);
-                     if (!voice._resetHook.isHooked())
-                        voiceModule->_parametersToReset.pushBack(&voice._resetHook);
-                  } else {
-                     voice._modulation.setSmoothed(ev->amount, _paramSmoothingDuration);
-                  }
+               foreachActiveVoice(
+                  ev->note_id,
+                  ev->port_index,
+                  ev->channel,
+                  ev->key,
+                  [this, p, ev](VoiceModule &voiceModule) {
+                     auto voiceIndex = voiceModule.voiceIndex();
+                     auto &voice = p->_voices[voiceIndex];
+                     if (!voice._hasModulation) {
+                        voice._hasModulation = true;
+                        voice._hasModulatedValue = true;
+                        voice._modulation.setImmediately(ev->amount);
+                        auto voiceExpander = getVoiceExpander();
+                        auto voiceModule = voiceExpander->getVoice(voiceIndex);
+                        if (!voice._resetHook.isHooked())
+                           voiceModule->_parametersToReset.pushBack(&voice._resetHook);
+                     } else {
+                        voice._modulation.setSmoothed(ev->amount, _paramSmoothingDuration);
+                     }
 
-                  if (!voice._modulationToProcessHook.isHooked())
-                     _parameterModulationToProcess.pushBack(&voice._modulationToProcessHook);
-                  if (!voice._modulatedValueToProcessHook.isHooked())
-                     _parameterModulatedValueToProcess.pushBack(
-                        &voice._modulatedValueToProcessHook);
-               }
+                     if (!voice._modulationToProcessHook.isHooked())
+                        _parameterModulationToProcess.pushBack(&voice._modulationToProcessHook);
+                     if (!voice._modulatedValueToProcessHook.isHooked())
+                        _parameterModulatedValueToProcess.pushBack(
+                           &voice._modulatedValueToProcessHook);
+                  });
             }
 
             break;
@@ -770,18 +778,6 @@ namespace clap {
       return p;
    }
 
-   int32_t CorePlugin::findVoiceIndex(int16_t channel, int16_t key) const noexcept {
-      auto voiceExpander = getVoiceExpander();
-      if (!voiceExpander)
-         return -1;
-
-      auto voice = voiceExpander->findActiveVoice(key, channel);
-      if (!voice)
-         return -1;
-
-      return voice->voiceIndex();
-   }
-
    bool CorePlugin::implementsVoiceInfo() const noexcept { return true; }
 
    bool CorePlugin::voiceInfoDoGet(clap_voice_info *info) noexcept {
@@ -803,6 +799,12 @@ namespace clap {
 
       _lastVoiceInfo = *info;
       return true;
+   }
+
+   template <class Callback>
+   void CorePlugin::foreachActiveVoice(
+      int16_t noteId, int16_t port, int32_t channel, int16_t key, const Callback &callback) const {
+      getVoiceExpander()->foreachActiveVoice(noteId, port, channel, key, callback);
    }
 
 } // namespace clap

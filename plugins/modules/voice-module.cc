@@ -42,8 +42,20 @@ namespace clap {
       _pan.setImmediately(0.5);
    }
 
-   bool VoiceModule::match(int32_t key_, int32_t channel_) const {
-      return key_ == key() && channel_ == channel();
+   bool VoiceModule::match(int32_t noteId, int16_t port, int16_t channel, int16_t key) const {
+      if (noteId != -1 && noteId != _noteId)
+         return false;
+
+      if (port != -1 && port != _port)
+         return false;
+
+      if (channel != -1 && channel != _channel)
+         return false;
+
+      if (key != -1 && key != _key)
+         return false;
+
+      return true;
    }
 
    bool VoiceModule::wantsNoteEvents() const noexcept { return true; }
@@ -54,6 +66,8 @@ namespace clap {
       _key = note.key;
       _channel = note.channel;
       _velocity = note.velocity;
+      _port = note.port_index;
+      _noteId = note.note_id;
       _keyFreq = _plugin.tuningProvider().getFreq(0, _channel, _key);
 
       // TODO: glide

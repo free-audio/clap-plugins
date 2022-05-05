@@ -24,12 +24,14 @@ namespace clap {
       [[nodiscard]] bool isAssigned() const noexcept { return _isAssigned; }
 
       // key and channel info
-      [[nodiscard]] bool match(int32_t key, int32_t channel) const;
-      [[nodiscard]] int32_t channel() const noexcept { return _channel; }
-      [[nodiscard]] int32_t key() const noexcept { return _key; }
-      [[nodiscard]] int32_t lowestKey() const noexcept;
-      [[nodiscard]] int32_t highestKey() const noexcept;
-      [[nodiscard]] int32_t startKey() const noexcept;
+      [[nodiscard]] bool match(int32_t noteId, int16_t port, int16_t channel, int16_t key) const;
+      [[nodiscard]] int32_t nodeId() const noexcept { return _noteId; }
+      [[nodiscard]] int16_t port() const noexcept { return _port; }
+      [[nodiscard]] int16_t channel() const noexcept { return _channel; }
+      [[nodiscard]] int16_t key() const noexcept { return _key; }
+      [[nodiscard]] int16_t lowestKey() const noexcept;
+      [[nodiscard]] int16_t highestKey() const noexcept;
+      [[nodiscard]] int16_t startKey() const noexcept;
 
       // note expressions for this voice
       [[nodiscard]] double velocity() const noexcept { return _velocity; }
@@ -64,13 +66,15 @@ namespace clap {
       uint32_t _voiceIndex = 0;
       bool _isAssigned = false;
       bool _wasJustAssigned = false;
-      int16_t _key;
-      int16_t _channel;
-      double _keyFreq;
+      int32_t _noteId = -1;
+      int16_t _port = 0;
+      int16_t _key = 0;
+      int16_t _channel = 0;
+      double _keyFreq = 440;
 
       IntrusiveList::Hook _stateHook;
 
-      double _velocity;
+      double _velocity = 0.75;
 
       SmoothedValue _tuning;
       SmoothedValue _brigthness;

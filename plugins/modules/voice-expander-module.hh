@@ -7,13 +7,17 @@
 
 #include "../constants.hh"
 #include "../intrusive-list.hh"
+#include "../container-of.hh"
 #include "module.hh"
 #include "voice-module.hh"
 
 namespace clap {
    class VoiceExpanderModule : public Module {
    public:
-      VoiceExpanderModule(CorePlugin &plugin, uint32_t moduleId, std::unique_ptr<Module> module, uint32_t channelCount);
+      VoiceExpanderModule(CorePlugin &plugin,
+                          uint32_t moduleId,
+                          std::unique_ptr<Module> module,
+                          uint32_t channelCount);
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
       void doDeactivate() override;
@@ -26,19 +30,34 @@ namespace clap {
       void onNoteChoke(const clap_event_note &note) noexcept override;
       void onNoteExpression(const clap_event_note_expression &noteExp) noexcept override;
 
-      auto& outputBuffer() const noexcept { return _outputBuffer; }
+      auto &outputBuffer() const noexcept { return _outputBuffer; }
 
-      VoiceModule* findActiveVoice(int32_t key, int32_t channel) const;
-      VoiceModule* getVoice(uint32_t voiceIndex) noexcept { return _voices[voiceIndex].get(); }
-      const VoiceModule* getVoice(uint32_t voiceIndex) const noexcept { return _voices[voiceIndex].get(); }
+      template <class Callback>
+      void foreachActiveVoice(int16_t noteId,
+                              int16_t port,
+                              int32_t channel,
+                              int16_t key,
+                              const Callback &callback) const {
+         for (auto it = _activeVoices.begin(); !it.end(); ++it) {
+            auto voice = containerOf(it.item(), &VoiceModule::_stateHook);
+            assert(voice->isAssigned());
+            if (voice->match(noteId, port, channel, key))
+               callback(*voice);
+         }
+      }
 
-      auto& noteEndQueue() { return _noteEndQueue; }
+      VoiceModule *getVoice(uint32_t voiceIndex) noexcept { return _voices[voiceIndex].get(); }
+      const VoiceModule *getVoice(uint32_t voiceIndex) const noexcept {
+         return _voices[voiceIndex].get();
+      }
+
+      auto &noteEndQueue() { return _noteEndQueue; }
 
       uint32_t getVoiceCount() const noexcept;
       uint32_t getVoiceCapacity() const noexcept;
 
    private:
-      VoiceModule* assignVoice();
+      VoiceModule *assignVoice();
       void releaseVoice(VoiceModule &);
 
       IntrusiveList _activeVoices;   // uses VoiceModule._stateHook

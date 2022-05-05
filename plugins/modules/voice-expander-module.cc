@@ -73,17 +73,6 @@ namespace clap {
       return status;
    }
 
-   VoiceModule *VoiceExpanderModule::findActiveVoice(int32_t key, int32_t channel) const {
-      for (auto it = _activeVoices.begin(); !it.end(); ++it) {
-         auto voice = containerOf(it.item(), &VoiceModule::_stateHook);
-         assert(voice->isAssigned());
-         if (voice->match(key, channel))
-            return voice;
-      }
-
-      return nullptr;
-   }
-
    VoiceModule *VoiceExpanderModule::assignVoice() {
       if (_sleepingVoices.empty() || _activeVoiceCount >= getVoiceCount())
          return nullptr; // TODO: steal voice instead
@@ -125,13 +114,7 @@ namespace clap {
    void VoiceExpanderModule::onNoteOn(const clap_event_note &note) noexcept {
       _noteEndQueue.onNoteOn(0, note.channel, note.key);
 
-      auto voice = findActiveVoice(note.key, note.channel);
-      if (voice) {
-         voice->onNoteOn(note);
-         return;
-      }
-
-      voice = assignVoice();
+      auto voice = assignVoice();
       if (!voice) {
          _noteEndQueue.onNoteEnd(0, note.channel, note.key);
          return;
@@ -141,21 +124,24 @@ namespace clap {
    }
 
    void VoiceExpanderModule::onNoteOff(const clap_event_note &note) noexcept {
-      auto voice = findActiveVoice(note.key, note.channel);
-      if (voice)
-         voice->onNoteOff(note);
+      foreachActiveVoice(
+         note.note_id, note.port_index, note.channel, note.key, [&note](VoiceModule &voice) {
+            voice.onNoteOff(note);
+         });
    }
 
    void VoiceExpanderModule::onNoteChoke(const clap_event_note &note) noexcept {
-      auto voice = findActiveVoice(note.key, note.channel);
-      if (voice)
-         voice->onNoteChoke(note);
+      foreachActiveVoice(
+         note.note_id, note.port_index, note.channel, note.key, [&note](VoiceModule &voice) {
+            voice.onNoteChoke(note);
+         });
    }
 
-   void VoiceExpanderModule::onNoteExpression(const clap_event_note_expression &noteExp) noexcept {
-      auto voice = findActiveVoice(noteExp.key, noteExp.channel);
-      if (voice)
-         voice->onNoteExpression(noteExp);
+   void VoiceExpanderModule::onNoteExpression(const clap_event_note_expression &note) noexcept {
+      foreachActiveVoice(
+         note.note_id, note.port_index, note.channel, note.key, [&note](VoiceModule &voice) {
+            voice.onNoteExpression(note);
+         });
    }
 
    uint32_t VoiceExpanderModule::getVoiceCount() const noexcept {

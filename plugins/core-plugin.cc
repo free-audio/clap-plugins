@@ -782,12 +782,16 @@ namespace clap {
 
    bool CorePlugin::voiceInfoDoGet(clap_voice_info *info) noexcept {
       auto voiceExpander = getVoiceExpander();
+      info->flags = 0;
       if (!voiceExpander) {
          info->voice_capacity = 1;
          info->voice_count = 1;
       } else {
          info->voice_count = voiceExpander->getVoiceCount();
          info->voice_capacity = voiceExpander->getVoiceCapacity();
+
+         if (info->voice_count > 1)
+            info->flags |= CLAP_VOICE_INFO_SUPPORTS_OVERLAPPING_NOTES;
       }
 
       return true;

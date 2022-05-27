@@ -6,9 +6,6 @@ namespace clap {
 
    AdsrModule::AdsrModule(CorePlugin &plugin, std::string name, uint32_t moduleId)
       : Module(plugin, name, moduleId) {
-      char moduleName[CLAP_MODULE_SIZE];
-      snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
-
       _attackParam =
          addParameter(0, "A", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(0, 1, 0.1));
       _decayParam =

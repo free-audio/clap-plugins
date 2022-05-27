@@ -14,9 +14,6 @@ namespace clap {
 
    SvfModule::SvfModule(CorePlugin &plugin, std::string name, uint32_t moduleId)
       : Module(plugin, name, moduleId) {
-      char moduleName[CLAP_MODULE_SIZE];
-      snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
-
       _freqParam = addParameter(
          0, "freq", Parameter::POLY_FLAGS, std::make_unique<FrequencyValueType>(20, 20000, 20000));
       _resoParam = addParameter(

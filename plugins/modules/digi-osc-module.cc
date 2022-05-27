@@ -9,9 +9,6 @@ namespace clap {
 
    DigiOscModule::DigiOscModule(CorePlugin &plugin, std::string name, uint32_t moduleId)
       : Module(plugin, name, moduleId) {
-      char moduleName[CLAP_MODULE_SIZE];
-      snprintf(moduleName, sizeof(moduleName), "/%s", _name.c_str());
-
       _tuningParam = addParameter(
          0, "tun", Parameter::POLY_FLAGS, std::make_unique<SimpleValueType>(-120, 120, 0));
 

@@ -13,20 +13,19 @@ namespace clap {
    };
 
    const clap_plugin_descriptor *TransportInfo::descriptor() {
-      static const char *features[] = {"utility", "analyzer", nullptr};
+      static const char *features[] = {
+         CLAP_PLUGIN_FEATURE_UTILITY, CLAP_PLUGIN_FEATURE_ANALYZER, nullptr};
 
-      static const clap_plugin_descriptor desc = {
-         CLAP_VERSION,
-         "com.github.free-audio.clap.transport-info",
-         "Transport Info",
-         "clap",
-         "https://github.com/free-audio/clap",
-         nullptr,
-         nullptr,
-         "0.1",
-         "Displays transport info",
-         features
-      };
+      static const clap_plugin_descriptor desc = {CLAP_VERSION,
+                                                  "com.github.free-audio.clap.transport-info",
+                                                  "Transport Info",
+                                                  "clap",
+                                                  "https://github.com/free-audio/clap",
+                                                  nullptr,
+                                                  nullptr,
+                                                  "0.1",
+                                                  "Displays transport info",
+                                                  features};
 
       return &desc;
    }
@@ -37,6 +36,6 @@ namespace clap {
 
    TransportInfo::TransportInfo(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "transport-info"), descriptor(), host) {
-         _rootModule = std::make_unique<TransportInfoModule>(*this);
-      }
+      _rootModule = std::make_unique<TransportInfoModule>(*this);
+   }
 } // namespace clap

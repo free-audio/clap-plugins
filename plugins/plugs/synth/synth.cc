@@ -205,7 +205,7 @@ namespace clap {
    } // namespace
 
    const clap_plugin_descriptor *Synth::descriptor() {
-      static const char *features[] = {"instrument", nullptr};
+      static const char *features[] = {CLAP_PLUGIN_FEATURE_INSTRUMENT, nullptr};
 
       static const clap_plugin_descriptor desc = {
 

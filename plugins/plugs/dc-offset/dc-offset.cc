@@ -19,7 +19,8 @@ namespace clap {
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
 
-         c.audioOutputs[0]->sum(*c.audioInputs[0], _offsetParam->voiceBuffer(_voiceModule), numFrames);
+         c.audioOutputs[0]->sum(
+            *c.audioInputs[0], _offsetParam->voiceBuffer(_voiceModule), numFrames);
 
          return CLAP_PROCESS_SLEEP;
       }
@@ -28,7 +29,8 @@ namespace clap {
    };
 
    const clap_plugin_descriptor *DcOffset::descriptor() {
-      static const char *features[] = {"utility", "audio_effect", nullptr};
+      static const char *features[] = {
+         CLAP_PLUGIN_FEATURE_AUDIO_EFFECT, CLAP_PLUGIN_FEATURE_UTILITY, nullptr};
 
       static const clap_plugin_descriptor desc = {
 

@@ -30,7 +30,8 @@ namespace clap {
    };
 
    const clap_plugin_descriptor *Gain::descriptor() {
-      static const char *features[] = {"mix", "gain", "audio_effect", nullptr};
+      static const char *features[] = {
+         CLAP_PLUGIN_FEATURE_AUDIO_EFFECT, CLAP_PLUGIN_FEATURE_UTILITY, nullptr};
 
       static const clap_plugin_descriptor desc = {
 

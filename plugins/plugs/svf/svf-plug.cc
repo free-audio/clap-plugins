@@ -34,7 +34,8 @@ namespace clap {
    };
 
    const clap_plugin_descriptor *SvfPlug::descriptor() {
-      static const char *features[] = {"audio_effect", "filter", nullptr};
+      static const char *features[] = {
+         CLAP_PLUGIN_FEATURE_AUDIO_EFFECT, CLAP_PLUGIN_FEATURE_FILTER, nullptr};
 
       static const clap_plugin_descriptor desc = {
 

@@ -67,6 +67,25 @@ namespace clap {
       _hasTrackInfo = true;
    }
 
+   //------------------------//
+   // clap_plugin_note_ports //
+   //------------------------//
+   bool CorePlugin::implementsNotePorts() const noexcept { return true; }
+
+   uint32_t CorePlugin::notePortsCount(bool is_input) const noexcept {
+      return is_input ? _noteInputs.size() : _noteOutputs.size();
+   }
+
+   bool CorePlugin::notePortsInfo(uint32_t index,
+                                  bool is_input,
+                                  clap_note_port_info *info) const noexcept {
+      *info = is_input ? _noteInputs[index] : _noteOutputs[index];
+      return true;
+   }
+
+   //-------------------------//
+   // clap_plugin_audio_ports //
+   //-------------------------//
    bool CorePlugin::implementsAudioPorts() const noexcept { return true; }
 
    uint32_t CorePlugin::audioPortsCount(bool is_input) const noexcept {

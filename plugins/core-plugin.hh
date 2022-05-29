@@ -68,6 +68,15 @@ namespace clap {
       bool implementsTrackInfo() const noexcept override { return true; }
       void trackInfoChanged() noexcept override;
 
+      //------------------------//
+      // clap_plugin_note_ports //
+      //------------------------//
+      bool implementsNotePorts() const noexcept override;
+      uint32_t notePortsCount(bool is_input) const noexcept override;
+      bool notePortsInfo(uint32_t index,
+                         bool is_input,
+                         clap_note_port_info *info) const noexcept override;
+
       //-------------------------//
       // clap_plugin_audio_ports //
       //-------------------------//
@@ -76,6 +85,10 @@ namespace clap {
       bool audioPortsInfo(uint32_t index,
                           bool is_input,
                           clap_audio_port_info *info) const noexcept override;
+
+      //--------------------------------//
+      // clap_plugin_audio_ports_config //
+      //--------------------------------//
       uint32_t audioPortsConfigCount() const noexcept override;
       bool audioPortsGetConfig(uint32_t index,
                                clap_audio_ports_config *config) const noexcept override;
@@ -188,10 +201,16 @@ namespace clap {
 
       Parameter *addParameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType);
 
-      VoiceExpanderModule *getVoiceExpander() const noexcept { return _rootModule->getVoiceExpander(); }
+      VoiceExpanderModule *getVoiceExpander() const noexcept {
+         return _rootModule->getVoiceExpander();
+      }
 
       template <class Callback>
-      void foreachActiveVoice(int16_t noteId, int16_t port, int32_t channel, int16_t key, const Callback& callback) const;
+      void foreachActiveVoice(int16_t noteId,
+                              int16_t port,
+                              int32_t channel,
+                              int16_t key,
+                              const Callback &callback) const;
 
       helpers::ParamQueue<GuiToPluginEvent, 32> _guiToPluginQueue;
       helpers::ReducingParamQueue<clap_id, PluginToGuiValue> _pluginToGuiQueue;
@@ -200,6 +219,9 @@ namespace clap {
 
       bool _hasTrackInfo = false;
       clap_track_info _trackInfo;
+
+      std::vector<clap_note_port_info> _noteInputs;
+      std::vector<clap_note_port_info> _noteOutputs;
 
       std::vector<clap_audio_port_info> _audioInputs;
       std::vector<clap_audio_port_info> _audioOutputs;

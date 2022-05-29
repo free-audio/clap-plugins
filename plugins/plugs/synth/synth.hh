@@ -14,6 +14,7 @@ namespace clap {
 
    protected:
       bool init() noexcept override;
+      void defineNotePorts() noexcept;
       void defineAudioPorts() noexcept;
    };
 } // namespace clap

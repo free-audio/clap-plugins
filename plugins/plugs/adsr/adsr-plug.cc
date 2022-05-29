@@ -71,7 +71,22 @@ namespace clap {
          return false;
 
       defineAudioPorts();
+      defineNotePorts();
       return true;
+   }
+
+   void AdsrPlug::defineNotePorts() noexcept {
+      assert(!isActive());
+
+      clap_note_port_info info;
+      info.id = 0;
+      strncpy(info.name, "main", sizeof(info.name));
+      info.preferred_dialect = CLAP_NOTE_DIALECT_CLAP;
+      info.supported_dialects = CLAP_NOTE_DIALECT_CLAP;
+
+      _noteInputs.clear();
+      _noteInputs.push_back(info);
+      _noteOutputs.clear();
    }
 
    void AdsrPlug::defineAudioPorts() noexcept {

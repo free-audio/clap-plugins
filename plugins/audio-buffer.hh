@@ -35,7 +35,7 @@ namespace clap {
             throw std::bad_alloc();
 
          // std::align modifies the input buffer argument if it succeeds which means
-         // when alloc was unaligned the free in the dtor woudl fail as mis-aligned.
+         // when alloc was unaligned the free in the dtor would fail as mis-aligned.
          // So take a copy and keep the _dataBase pointer around.
          auto tmp = _dataBase;
          _data = static_cast<T*>(std::align(alignment, dataSize, tmp, dataSizeLeft));
@@ -50,7 +50,9 @@ namespace clap {
       AudioBuffer(AudioBuffer<T> &&o) = delete;
 
       ~AudioBuffer() {
-         if(_dataBase) std::free(_dataBase);
+         std::free(_dataBase);
+         _data = nullptr;
+         _dataBase = nullptr;
       }
 
       [[nodiscard]] T *data() noexcept { return _data; }

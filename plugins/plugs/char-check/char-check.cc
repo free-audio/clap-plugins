@@ -19,13 +19,13 @@ namespace clap {
 
          CLAP_VERSION,
          "com.github.free-audio.clap.char-check",
-         "Character Check 🌶",
+         "Character Check",// 🌶",
          "clap",
          "https://github.com/free-audio/clap",
          nullptr,
          nullptr,
          "0.1",
-         "Plugin to check how well various languages are displayed 🌶",
+         "Plugin to check how well various languages are displayed", // 🌶",
          features};
       return &desc;
    }
@@ -48,7 +48,7 @@ namespace clap {
       addDumbParam("안녕하세요");
       addDumbParam("Pẹlẹ o");
       addDumbParam("Χαίρετε");
-      addDumbParam("Spicy? 🌶", "/🌶");
+      addDumbParam("Hot Pepper"); // 🌶", "/🌶");
    }
 
    void CharCheck::addDumbParam(const char *name, const char *module) {

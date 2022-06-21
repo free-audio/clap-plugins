@@ -10,3 +10,6 @@
 [submodule "yas"]
 	path = yas
 	url = ../../niXman/yas.git
+[submodule "catch2"]
+	path = catch2
+	url = ../../catchorg/Catch2.git

@@ -10,6 +10,8 @@ project(CLAP_PLUGINS C CXX)
 
 set(CMAKE_AUTOMOC ON)
 
+include_directories(catch2/single_include)
+
 find_package(Qt6 COMPONENTS Gui Qml Quick REQUIRED)
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 

@@ -2,7 +2,7 @@
 
 #include "char-check.hh"
 
-#if false
+#if true
 # define PEPPER " 🌶"
 #else
 # define PEPPER ""
@@ -19,7 +19,7 @@ namespace clap {
    };
 
    const clap_plugin_descriptor *CharCheck::descriptor() {
-      static const char *features[] = {"validation", nullptr};
+      static const char *features[] = {"validation", PEPPER, nullptr};
 
       static const clap_plugin_descriptor desc = {
 

@@ -169,7 +169,7 @@ namespace clap {
          clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
             auto status = _expanderModule.process(c, numFrames);
             c.audioOutputs[0]->copy(_expanderModule.outputBuffer(), numFrames);
-            c.audioOutputs[0]->compute([](double x) -> double { return std::tanh(x); }, numFrames);
+            c.audioOutputs[0]->compute([](double x) -> double { return 16. * std::tanh(x / 16.); }, numFrames);
             return status;
          }
 

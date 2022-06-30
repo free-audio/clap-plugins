@@ -1,3 +1,14 @@
+- [Example Clap Plugins](#example-clap-plugins)
+  - [Notes on GUI, static build vs dynamic build and symbols](#notes-on-gui-static-build-vs-dynamic-build-and-symbols)
+- [Building on various platforms](#building-on-various-platforms)
+  - [macOS, dynamic build with brew](#macos-dynamic-build-with-brew)
+  - [macOS with vcpkg](#macos-with-vcpkg)
+  - [Windows](#windows)
+    - [Enable long path support](#enable-long-path-support)
+    - [Build](#build)
+  - [Linux, using system libraries (dynamic)](#linux-using-system-libraries-dynamic)
+  - [Linux, using vcpkg (static)](#linux-using-vcpkg-static)
+
 # Example Clap Plugins
 
 This repo serves as an example to demonstrate how to create a CLAP plugin.

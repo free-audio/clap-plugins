@@ -2,6 +2,8 @@
 
 This repo serves as an example to demonstrate how to create a CLAP plugin.
 
+<br/><a href="https://repology.org/project/clap-plugins/versions" target="_blank" rel="noopener" title="Packaging status"><img src="https://repology.org/badge/vertical-allrepos/clap-plugins.svg"></a>
+
 ## Notes on GUI, static build vs dynamic build and symbols
 
 The plugins use Qt for the GUI.

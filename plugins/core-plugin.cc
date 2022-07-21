@@ -393,7 +393,7 @@ namespace clap {
 
       auto voiceExpander = getVoiceExpander();
       if (voiceExpander)
-         voiceExpander->noteEndQueue().flush(process->out_events);
+         voiceExpander->noteEndQueue().flush(process);
 
       // Try to pass the queue to the plugin GUI
       _pluginToGuiQueue.producerDone();

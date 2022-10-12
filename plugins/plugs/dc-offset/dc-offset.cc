@@ -1,7 +1,7 @@
 #include <cstring>
 
-#include "../audio-buffer.hh"
-#include "../modules/module.hh"
+#include "../../audio-buffer.hh"
+#include "../../modules/module.hh"
 #include "dc-offset.hh"
 
 namespace clap {

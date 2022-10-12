@@ -1,7 +1,7 @@
 #include <cstring>
 
 #include "../../audio-buffer.hh"
-#include "../modules/svf-module.hh"
+#include "../../modules/svf-module.hh"
 #include "svf-plug.hh"
 
 namespace clap {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../core-plugin.hh"
-#include "../modules/adsr-module.hh"
+#include "../../core-plugin.hh"
+#include "../../modules/adsr-module.hh"
 
 namespace clap {
    class AdsrPlug final : public CorePlugin {

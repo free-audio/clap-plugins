@@ -18,11 +18,13 @@
 
 #include "gui/abstract-gui.hh"
 
-#ifdef CLAP_REMOTE_GUI
-#   include "gui/remote-gui-factory-proxy.hh"
-#else
-#   include "gui/local-gui-factory.hh"
-#   include "gui/threaded-gui-factory.hh"
+#ifndef CLAP_PLUGINS_HEADLESS
+#   ifdef CLAP_REMOTE_GUI
+#      include "gui/remote-gui-factory-proxy.hh"
+#   else
+#      include "gui/local-gui-factory.hh"
+#      include "gui/threaded-gui-factory.hh"
+#   endif
 #endif
 
 namespace clap {
@@ -131,30 +133,18 @@ namespace clap {
       return true;
    }
 
-   bool CorePlugin::implementsGui() const noexcept {
-#ifdef CLAP_PLUGINS_HEADLESS
-      return false;
-#else
-      return true;
-#endif
-   }
+#ifndef CLAP_PLUGINS_HEADLESS
+   bool CorePlugin::implementsGui() const noexcept { return true; }
 
    bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept {
-#if defined(CLAP_PLUGINS_HEADLESS)
-      return false;
-#else
 #   if defined(__APPLE__) && defined(CLAP_REMOTE_GUI)
       return isFloating;
-#   endif
+#   else
       return true;
-#endif
+#   endif
    }
 
    bool CorePlugin::guiCreate(const char *api, bool isFloating) noexcept {
-#if defined(CLAP_PLUGINS_HEADLESS)
-      return false;
-#else
-
 #   ifdef CLAP_REMOTE_GUI
       auto guiPath = _pathProvider->getGuiExecutable();
       _guiFactory = RemoteGuiFactoryProxy::getInstance(guiPath);
@@ -176,13 +166,9 @@ namespace clap {
       _guiHandle->gui().setSkin(skinPath);
 
       return true;
-#endif
    }
 
    bool CorePlugin::guiSetParent(const clap_window *window) noexcept {
-#if defined(CLAP_PLUGINS_HEADLESS)
-      return false;
-#else
       if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
          return _guiHandle->gui().attachCocoa(window->cocoa);
 
@@ -193,13 +179,9 @@ namespace clap {
          return _guiHandle->gui().attachX11(window->x11);
 
       return false;
-#endif
    }
 
    bool CorePlugin::guiSetTransient(const clap_window *window) noexcept {
-#if defined(CLAP_PLUGINS_HEADLESS)
-      return false;
-#else
       if (!_guiHandle->gui().openWindow())
          return false;
 
@@ -214,7 +196,6 @@ namespace clap {
          _guiHandle->gui().setTransientX11(window->x11);
 
       return true;
-#endif
    }
 
    void CorePlugin::guiDefineParameters() {
@@ -332,6 +313,7 @@ namespace clap {
    void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
       runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
    }
+#   endif // CLAP_PLUGINS_HEADLESS
 
    //------------------//
    // Audio Processing //

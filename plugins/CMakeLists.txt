@@ -99,7 +99,10 @@ endif()
 
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 
-target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common clap-helpers)
+if (NOT CLAP_PLUGINS_HEADLESS)
+  target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common)
+endif()
+target_link_libraries(clap-plugins PUBLIC clap-helpers)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)

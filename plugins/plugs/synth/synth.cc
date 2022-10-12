@@ -2,13 +2,13 @@
 
 #include <cstring>
 
-#include "../audio-buffer.hh"
-#include "../modules/adsr-module.hh"
-#include "../modules/digi-osc-module.hh"
-#include "../modules/module.hh"
-#include "../modules/svf-module.hh"
-#include "../modules/voice-expander-module.hh"
-#include "../value-types/decibel-value-type.hh"
+#include "../../audio-buffer.hh"
+#include "../../modules/adsr-module.hh"
+#include "../../modules/digi-osc-module.hh"
+#include "../../modules/module.hh"
+#include "../../modules/svf-module.hh"
+#include "../../modules/voice-expander-module.hh"
+#include "../../value-types/decibel-value-type.hh"
 #include "synth.hh"
 
 namespace clap {

@@ -1,6 +1,7 @@
 - [Example Clap Plugins](#example-clap-plugins)
   - [Notes on GUI, static build vs dynamic build and symbols](#notes-on-gui-static-build-vs-dynamic-build-and-symbols)
 - [Building on various platforms](#building-on-various-platforms)
+  - [Headless](#headless)
   - [macOS, dynamic build with brew](#macos-dynamic-build-with-brew)
   - [macOS with vcpkg](#macos-with-vcpkg)
   - [Windows](#windows)
@@ -60,6 +61,15 @@ and you have an host that do not expose the Qt symbols.
 Static builds will require more time and space.
 
 # Building on various platforms
+
+## Headless
+
+```bash
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins
+cd clap-plugins
+cmake --preset ninja-headless
+cmake --build --preset ninja-headless
+```
 
 ## macOS, dynamic build with brew
 

@@ -4,6 +4,9 @@ set(CLAP_PLUGINS_HEADLESS FALSE CACHE BOOL "Compile the plugins without a GUI")
 
 if(CLAP_PLUGINS_HEADLESS)
   add_compile_definitions(CLAP_PLUGINS_HEADLESS)
+else()
+  find_package(Qt6 COMPONENTS Gui Qml Quick REQUIRED)
+  add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 endif()
 
 if(CLAP_PLUGINS_EMBED_QML)

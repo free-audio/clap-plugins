@@ -39,6 +39,7 @@ namespace clap {
          // So take a copy and keep the _dataBase pointer around.
          auto tmp = _dataBase;
          _data = static_cast<T*>(std::align(alignment, dataSize, tmp, dataSizeLeft));
+         setConstant(false);
 
          if (!_data)
             throw std::bad_alloc();

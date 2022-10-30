@@ -386,6 +386,7 @@ namespace clap {
    clap_process_status CorePlugin::processRange(const clap_process *process,
                                                 uint32_t frameOffset,
                                                 uint32_t frameCount) noexcept {
+      assert(frameOffset + frameCount <= process->frames_count);
       renderParameters(frameCount);
 
       for (uint32_t i = 0; i < process->audio_inputs_count; ++i) {

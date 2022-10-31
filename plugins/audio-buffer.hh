@@ -76,6 +76,8 @@ namespace clap {
 
       [[nodiscard]] double sampleRate() const noexcept { return _sampleRate; }
 
+      // fromClap and toClap requires _channelCount == buffer->channel_count
+      // TODO: add variants of these functions working with a channel map
       void
       fromClap(const clap_audio_buffer *buffer, uint32_t frameOffset, uint32_t frameCount) noexcept;
       void

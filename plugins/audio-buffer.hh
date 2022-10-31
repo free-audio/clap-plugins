@@ -29,7 +29,7 @@ namespace clap {
          const size_t dataSize = channelCount * frameCount * sizeof(T);
          const size_t dataBaseSize = alignment + dataSize;
          size_t dataSizeLeft = dataBaseSize;
-         _dataBase = std::malloc(alignment + channelCount * frameCount * sizeof(T));
+         _dataBase = std::malloc(alignment + dataSize);
 
          if (!_dataBase) [[unlikely]]
             throw std::bad_alloc();
@@ -39,10 +39,10 @@ namespace clap {
          // So take a copy and keep the _dataBase pointer around.
          auto tmp = _dataBase;
          _data = static_cast<T*>(std::align(alignment, dataSize, tmp, dataSizeLeft));
-         setConstant(false);
-
          if (!_data)
             throw std::bad_alloc();
+
+         setConstantValue(0);
       }
 
       AudioBuffer(const AudioBuffer<T> &other) = delete;

@@ -8,6 +8,7 @@ namespace clap {
    void AudioBuffer<T>::fromClap(const clap_audio_buffer *buffer,
                                  uint32_t frameOffset,
                                  uint32_t frameCount) noexcept {
+      assert(frameOffset + frameCount <= _frameCount);
       const uint32_t allConstantMask = (1 << _channelCount) - 1;
       const bool allConstant = (buffer->constant_mask & allConstantMask) == allConstantMask;
 
@@ -24,17 +25,17 @@ namespace clap {
       }
 
       if (buffer->data32) {
-         for (uint32_t c = 0; c < _channelCount; ++c) {
+         for (uint32_t c = 0; c < _channelCount && c < buffer->channel_count; ++c) {
             const uint32_t stride = (buffer->constant_mask & (1 << c)) ? 0 : 1;
-            for (uint32_t i = 0; i < _frameCount; ++i) {
+            for (uint32_t i = 0; i < frameCount; ++i) {
                const uint32_t index = stride * (i + frameOffset);
                _data[i * _channelCount + c] = static_cast<T>(buffer->data32[c][index]);
             }
          }
       } else {
-         for (uint32_t c = 0; c < _channelCount; ++c) {
+         for (uint32_t c = 0; c < _channelCount && c < buffer->channel_count; ++c) {
             const uint32_t stride = (buffer->constant_mask & (1 << c)) ? 0 : 1;
-            for (uint32_t i = 0; i < _frameCount; ++i) {
+            for (uint32_t i = 0; i < frameCount; ++i) {
                const uint32_t index = stride * (i + frameOffset);
                _data[i * _channelCount + c] = static_cast<T>(buffer->data64[c][index]);
             }
@@ -96,13 +97,15 @@ namespace clap {
 
       // Copy this block
       if (buffer->data32) {
-         for (uint32_t c = 0; c < _channelCount; ++c)
-            for (uint32_t i = 0; i < _frameCount; ++i)
+         for (uint32_t c = 0; c < _channelCount && c < buffer->channel_count; ++c)
+            for (uint32_t i = 0; i < frameCount; ++i) {
                buffer->data32[c][i + frameOffset] = static_cast<float>(_data[i * _stride + c]);
+            }
       } else {
-         for (uint32_t c = 0; c < _channelCount; ++c)
-            for (uint32_t i = 0; i < _frameCount; ++i)
+         for (uint32_t c = 0; c < _channelCount && c < buffer->channel_count; ++c)
+            for (uint32_t i = 0; i < frameCount; ++i) {
                buffer->data64[c][i + frameOffset] = static_cast<double>(_data[i * _stride + c]);
+            }
       }
       buffer->constant_mask = 0;
    }

@@ -17,7 +17,7 @@ add_library(clap-io STATIC
     ${CLAP_IO_SRC}
 )
 
-target_link_libraries(clap-io clap-core)
+target_link_libraries(clap-io clap)
 set_target_properties(clap-io PROPERTIES CXX_STANDARD 20)
 set_target_properties(clap-io PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_include_directories(clap-io INTERFACE .)

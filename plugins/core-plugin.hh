@@ -175,11 +175,15 @@ namespace clap {
       }
 
       uint32_t trackChannelCount() const noexcept {
-         return _hasTrackInfo ? _trackInfo.channel_count : 2;
+         if (_hasTrackInfo && _trackInfo.flags & CLAP_TRACK_INFO_HAS_AUDIO_CHANNEL)
+            return _trackInfo.audio_channel_count;
+         return 2;
       }
 
       const char *trackAudioPortType() const noexcept {
-         return _hasTrackInfo ? _trackInfo.audio_port_type : CLAP_PORT_STEREO;
+         if (_hasTrackInfo && _trackInfo.flags & CLAP_TRACK_INFO_HAS_AUDIO_CHANNEL)
+            return _trackInfo.audio_port_type;
+         return CLAP_PORT_STEREO;
       }
 
    protected:

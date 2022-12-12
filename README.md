@@ -1,6 +1,20 @@
+- [Example Clap Plugins](#example-clap-plugins)
+  - [Notes on GUI, static build vs dynamic build and symbols](#notes-on-gui-static-build-vs-dynamic-build-and-symbols)
+- [Building on various platforms](#building-on-various-platforms)
+  - [Headless](#headless)
+  - [macOS, dynamic build with brew](#macos-dynamic-build-with-brew)
+  - [macOS with vcpkg](#macos-with-vcpkg)
+  - [Windows](#windows)
+    - [Enable long path support](#enable-long-path-support)
+    - [Build](#build)
+  - [Linux, using system libraries (dynamic)](#linux-using-system-libraries-dynamic)
+  - [Linux, using vcpkg (static)](#linux-using-vcpkg-static)
+
 # Example Clap Plugins
 
 This repo serves as an example to demonstrate how to create a CLAP plugin.
+
+<br/><a href="https://repology.org/project/clap-plugins/versions" target="_blank" rel="noopener" title="Packaging status"><img src="https://repology.org/badge/vertical-allrepos/clap-plugins.svg"></a>
 
 ## Notes on GUI, static build vs dynamic build and symbols
 
@@ -47,6 +61,15 @@ and you have an host that do not expose the Qt symbols.
 Static builds will require more time and space.
 
 # Building on various platforms
+
+## Headless
+
+```bash
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins
+cd clap-plugins
+cmake --preset ninja-headless
+cmake --build --preset ninja-headless
+```
 
 ## macOS, dynamic build with brew
 

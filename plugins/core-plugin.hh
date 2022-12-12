@@ -28,7 +28,11 @@ namespace clap {
    class Module;
    class VoiceExpanderModule;
 
-   class CorePlugin : public PluginGlue, public AbstractGuiListener {
+   class CorePlugin : public PluginGlue
+#ifndef CLAP_PLUGINS_HEADLESS
+      , public AbstractGuiListener
+#endif
+   {
       using super = PluginGlue;
       friend class Module;
 
@@ -123,6 +127,7 @@ namespace clap {
       bool stateSave(const clap_ostream *stream) noexcept override;
       bool stateLoad(const clap_istream *stream) noexcept override;
 
+#ifndef CLAP_PLUGINS_HEADLESS
       //-----------------//
       // clap_plugin_gui //
       //-----------------//
@@ -151,6 +156,7 @@ namespace clap {
       void onGuiParamEndAdjust(clap_id paramId) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
       void onGuiWindowClosed(bool wasDestroyed) override;
+#endif
 
       //------------------------//
       // clap_plugin_voice_info //
@@ -227,9 +233,11 @@ namespace clap {
       std::vector<clap_audio_port_info> _audioOutputs;
       std::vector<clap_audio_ports_config> _audioConfigs;
 
+#ifndef CLAP_PLUGINS_HEADLESS
       clap_id _guiTimerId = CLAP_INVALID_ID;
       std::shared_ptr<AbstractGuiFactory> _guiFactory;
       std::unique_ptr<GuiHandle> _guiHandle;
+#endif
 
       Parameters _parameters;
       IntrusiveList _parameterValueToProcess;

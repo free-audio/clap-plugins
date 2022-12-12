@@ -116,7 +116,7 @@ namespace clap {
          double reso = resoBuffer.getSample(i);
          setFilter(freq, reso);
 
-         double v0 = std::tanh(in[i * inStride]);
+         double v0 = 16 * std::tanh(in[i * inStride] / 16.);
          double v3 = v0 - _ic2eq;
          double v1 = _ic1eq * _a1 + v3 * _a2;
          double v2 = _ic2eq + _ic1eq * _a2 + v3 * _a3;

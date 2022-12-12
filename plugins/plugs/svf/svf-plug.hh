@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core-plugin.hh"
+#include "../../core-plugin.hh"
 
 namespace clap {
    class SvfPlug final : public CorePlugin {

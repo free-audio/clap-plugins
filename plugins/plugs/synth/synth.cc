@@ -2,13 +2,13 @@
 
 #include <cstring>
 
-#include "../audio-buffer.hh"
-#include "../modules/adsr-module.hh"
-#include "../modules/digi-osc-module.hh"
-#include "../modules/module.hh"
-#include "../modules/svf-module.hh"
-#include "../modules/voice-expander-module.hh"
-#include "../value-types/decibel-value-type.hh"
+#include "../../audio-buffer.hh"
+#include "../../modules/adsr-module.hh"
+#include "../../modules/digi-osc-module.hh"
+#include "../../modules/module.hh"
+#include "../../modules/svf-module.hh"
+#include "../../modules/voice-expander-module.hh"
+#include "../../value-types/decibel-value-type.hh"
 #include "synth.hh"
 
 namespace clap {
@@ -169,7 +169,7 @@ namespace clap {
          clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
             auto status = _expanderModule.process(c, numFrames);
             c.audioOutputs[0]->copy(_expanderModule.outputBuffer(), numFrames);
-            c.audioOutputs[0]->compute([](double x) -> double { return std::tanh(x); }, numFrames);
+            c.audioOutputs[0]->compute([](double x) -> double { return 16. * std::tanh(x / 16.); }, numFrames);
             return status;
          }
 

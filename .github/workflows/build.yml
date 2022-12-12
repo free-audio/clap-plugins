@@ -1,5 +1,5 @@
 name: build
-on: [workflow_dispatch]
+on: [push, workflow_dispatch]
 
 jobs:
   VCPKG:
@@ -30,11 +30,6 @@ jobs:
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
 
     steps:
-      - name: 'Remove old VCPKG'
-        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')
-        shell: 'bash'
-        run: sudo rm -rf "$VCPKG_INSTALLATION_ROOT"
-
       - uses: actions/checkout@v3
         with:
           submodules: true
@@ -45,13 +40,9 @@ jobs:
       - uses: lukka/get-cmake@latest
         if: startsWith(matrix.os, 'win')
 
-      - uses: nuget/setup-nuget@v1
-        with:
-          nuget-version: latest
-
       - name: Setup MacOS
         if: startsWith(matrix.os, 'macOS')
-        run: brew install automake autoconf ninja cmake
+        run: brew upgrade && brew install automake autoconf ninja cmake nuget || true
 
       - name: Setup Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
@@ -89,12 +80,14 @@ jobs:
           libxkbcommon-x11-dev
           libxrender-dev
           libatspi2.0-dev
+          nuget
 
       - name: 'Bootstrap VCPKG'
         shell: bash
         run: vcpkg/bootstrap-vcpkg.sh
 
-      - name: 'Setup NuGet Credentials'
+      - name: 'Setup NuGet Credentials (windows)'
+        if: startsWith(matrix.os, 'win')
         shell: 'bash'
         run: >
           ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1`
@@ -105,9 +98,20 @@ jobs:
           -username "free-audio"
           -password "${{ secrets.GITHUB_TOKEN }}"
 
+      - name: 'Setup NuGet Credentials (unix)'
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macOS')
+        shell: 'bash'
+        run: >
+          nuget sources add
+          -source "https://nuget.pkg.github.com/free-audio/index.json"
+          -storepasswordincleartext
+          -name "GitHub"
+          -username "free-audio"
+          -password "${{ secrets.GITHUB_TOKEN }}"
+
       - name: Build
         shell: bash
-        run: scripts/build.sh
+        run: scripts/build.sh ${{ matrix.triplet }}
 
       - name: Archive artifact
         shell: bash
@@ -118,3 +122,7 @@ jobs:
         with:
           name: clap-plugins-${{ matrix.triplet }}.tar.xz
           path: clap-plugins.clap.tar.xz
+
+      - uses: actions/delete-package-versions@v3
+        with:
+          package-name: qtbase_${{ matrix.triplet }}-cp

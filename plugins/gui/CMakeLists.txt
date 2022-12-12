@@ -10,7 +10,7 @@ add_library(
 set_property(TARGET clap-plugin-gui-common PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-gui-common PROPERTY POSITION_INDEPENDENT_CODE
                                                     true)
-target_link_libraries(clap-plugin-gui-common PUBLIC clap-core)
+target_link_libraries(clap-plugin-gui-common PUBLIC clap)
 
 # Actual GUI implementation and display
 add_library(

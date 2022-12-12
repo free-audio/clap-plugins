@@ -2,7 +2,7 @@
 
 #include "../../audio-buffer.hh"
 #include "../../modules/voice-expander-module.hh"
-#include "../modules/module.hh"
+#include "../../modules/module.hh"
 #include "adsr-plug.hh"
 
 namespace clap {

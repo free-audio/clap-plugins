@@ -33,7 +33,7 @@ if [[ "$1" != "" ]]; then
 fi
 
 vcpkg_options="--triplet ${triplet}-cp --host-triplet ${triplet}-cp --x-buildtrees-root=$buildtrees"
-cmake_options="-DVCPKG_TARGET_TRIPLET=${triplet}-cp -DCMAKE_VCPKG_HOST_TRIPLET=${triplet}-cp"
+cmake_options="-DVCPKG_TARGET_TRIPLET=${triplet}-cp -DVCPKG_HOST_TRIPLET=${triplet}-cp"
 
 if [[ ! -x vcpkg/vcpkg ]] ; then
   vcpkg/bootstrap-vcpkg.sh

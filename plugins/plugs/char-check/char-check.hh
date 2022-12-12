@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core-plugin.hh"
+#include "../../core-plugin.hh"
 
 namespace clap {
    class CharCheck final : public CorePlugin {
@@ -13,7 +13,7 @@ namespace clap {
       static const clap_plugin_descriptor *descriptor();
 
    protected:
-      void addDumbParam(const char *name);
+      void addDumbParam(const char *name, const char *module = "");
 
    private:
       clap_id _nextParamId = 0;

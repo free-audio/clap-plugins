@@ -71,6 +71,20 @@
                     "value": false
                 }
             }
+        },
+        {
+            "name": "ninja-headless",
+            "description": "Ninja + System Libraries + Headless",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "inherits": [
+                "base"
+            ],
+            "cacheVariables": {
+                "CLAP_PLUGINS_HEADLESS": {
+                    "type": "BOOL",
+                    "value": true
+                }
+            }
         }
     ],
     "buildPresets": [
@@ -95,6 +109,12 @@
             "configurePreset": "ninja-system"
         },
         {
+            "name": "ninja-headless",
+            "inherits": "base",
+            "description": "Build using Ninja and system libraries (headless)",
+            "configurePreset": "ninja-headless"
+        },
+        {
             "name": "vs-vcpkg",
             "inherits": "base",
             "description": "Build using Visual Studio and VCPKG",
@@ -111,6 +131,11 @@
             "name": "ninja-system",
             "description": "Test using Ninja and system libraries",
             "configurePreset": "ninja-system"
+        },
+        {
+            "name": "ninja-headless",
+            "description": "Test using Ninja and system libraries (headless)",
+            "configurePreset": "ninja-headless"
         }
     ]
 }

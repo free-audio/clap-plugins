@@ -10,8 +10,7 @@ project(CLAP_PLUGINS C CXX)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 COMPONENTS Gui Qml Quick REQUIRED)
-add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
+include_directories(catch2/single_include)
 
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang|GNU")
   add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden

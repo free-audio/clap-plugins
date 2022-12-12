@@ -4,13 +4,14 @@ set(CLAP_PLUGINS_HEADLESS FALSE CACHE BOOL "Compile the plugins without a GUI")
 
 if(CLAP_PLUGINS_HEADLESS)
   add_compile_definitions(CLAP_PLUGINS_HEADLESS)
-endif()
+else()
+  find_package(Qt6 COMPONENTS Gui Qml Quick REQUIRED)
+  add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
 
-if(CLAP_PLUGINS_EMBED_QML)
-  add_compile_definitions(CLAP_PLUGINS_EMBED_QML)
-endif()
+  if(CLAP_PLUGINS_EMBED_QML)
+    add_compile_definitions(CLAP_PLUGINS_EMBED_QML)
+  endif()
 
-if(NOT CLAP_PLUGINS_HEADLESS)
   add_subdirectory(io)
   add_subdirectory(gui)
 endif()
@@ -98,7 +99,10 @@ endif()
 
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 
-target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common clap-helpers)
+if (NOT CLAP_PLUGINS_HEADLESS)
+  target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common)
+endif()
+target_link_libraries(clap-plugins PUBLIC clap-helpers)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)

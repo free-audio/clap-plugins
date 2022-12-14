@@ -205,11 +205,12 @@ namespace clap {
          _guiHandle->gui().updateParameter(p->info().id, p->value(), p->modulation());
 
          if (p->hasMappingIndication())
-            _guiHandle->gui().setParameterIndication(p->info().id,
-                                                     true,
-                                                     p->mappingIndicationColor(),
-                                                     p->mappingIndicationLabel().c_str(),
-                                                     p->mappingIndicationDescription().c_str());
+            _guiHandle->gui().setParameterMappingIndication(
+               p->info().id,
+               true,
+               p->mappingIndicationColor(),
+               p->mappingIndicationLabel().c_str(),
+               p->mappingIndicationDescription().c_str());
       }
    }
 
@@ -840,7 +841,8 @@ namespace clap {
 
 #ifndef CLAP_PLUGINS_HEADLESS
       if (_guiHandle)
-         _guiHandle->gui().setParameterIndication(param_id, has_mapping, c, label, description);
+         _guiHandle->gui().setParameterMappingIndication(
+            param_id, has_mapping, c, label ?: "", description ?: "");
 #endif
    }
 

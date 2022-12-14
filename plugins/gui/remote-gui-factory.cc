@@ -159,13 +159,13 @@ namespace clap {
          break;
       }
 
-      case messages::kSetParameterIndicationRequest: {
+      case messages::kSetParameterMappingIndicationRequest: {
          if (!c)
             return;
 
-         messages::SetParameterIndicationRequest rq;
+         messages::SetParameterMappingIndicationRequest rq;
          msg.get(rq);
-         c->setParameterIndication(rq.paramId, rq.hasIndication, rq.color, rq.label, rq.description);
+         c->setParameterMappingIndication(rq.paramId, rq.hasIndication, rq.color, rq.label, rq.description);
          break;
       }
 

@@ -18,7 +18,7 @@ namespace clap {
 
       virtual void defineParameter(const clap_param_info &paramInfo) = 0;
       virtual void updateParameter(clap_id paramId, double value, double modAmount) = 0;
-      virtual void setParameterIndication(clap_id paramId, bool hasIndication, clap_color color, const char *label, const char *description) = 0;
+      virtual void setParameterMappingIndication(clap_id paramId, bool hasIndication, clap_color color, const char *label, const char *description) = 0;
 
       virtual void clearTransport() = 0;
       virtual void updateTransport(const clap_event_transport &transport) = 0;

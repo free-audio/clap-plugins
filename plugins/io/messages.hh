@@ -16,7 +16,7 @@ namespace clap::messages {
 
       // DSP->GUI
       kDefineParameterRequest,
-      kSetParameterIndicationRequest,
+      kSetParameterMappingIndicationRequest,
       kParameterValueRequest,
       kUpdateTransportRequest,
 
@@ -111,8 +111,8 @@ namespace clap::messages {
       clap_param_info info;
    };
 
-   struct SetParameterIndicationRequest final {
-      static const constexpr Type type = kSetParameterIndicationRequest;
+   struct SetParameterMappingIndicationRequest final {
+      static const constexpr Type type = kSetParameterMappingIndicationRequest;
       clap_id paramId;
       bool hasIndication;
       clap_color color;

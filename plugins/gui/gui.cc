@@ -67,9 +67,12 @@ namespace clap {
       p->setModulationFromPlugin(modAmount);
    }
 
-   void Gui::setParameterIndication(clap_id paramId, bool hasIndication, clap_color color, const char *label, const char *description)
-   {
-      qDebug() << "clap-gui: setParameterIndication(" << paramId << ")";
+   void Gui::setParameterMappingIndication(clap_id paramId,
+                                           bool hasIndication,
+                                           clap_color color,
+                                           const char *label,
+                                           const char *description) {
+      qDebug() << "clap-gui: setParameterMappingIndication(" << paramId << ")";
       auto p = _pluginProxy->param(paramId);
       assert(p);
       if (!p)
@@ -230,8 +233,7 @@ namespace clap {
       return true;
    }
 
-   void Gui::setRootScale(double scale)
-   {
+   void Gui::setRootScale(double scale) {
       _rootScale = scale;
       _quickView->engine()->rootContext()->setContextProperty("rootScale", scale);
    }

@@ -28,6 +28,15 @@ Canvas {
       function onModulationChanged() {
          knob.requestPaint();
       }
+
+      function onHasIndicationChanged() {
+         knob.requestPaint();
+      }
+
+      function onIndicationColorChanged() {
+         if (param.hasIndication)
+            knob.requestPaint();
+      }
    }
 
    MouseArea {
@@ -168,10 +177,10 @@ Canvas {
          return;
 
       ctx.save();
-      ctx.translate(size / 2, size / 2);
       ctx.fillStyle = param.indicationColor;
       ctx.beginPath();
-      ctx.arc(0, 0, width * .1, 0, 2 * Math.PI, false)
+      var r = size / 10;
+      ctx.ellipse(size / 2 - r, size / 2 - r, 2 * r, 2 * r);
       ctx.fill();
       ctx.restore();
    }

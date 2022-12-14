@@ -93,7 +93,7 @@ namespace clap {
       const QColor& indicationColor() const noexcept { return _indicationColor; }
       void setIndication(clap_color color)
       {
-         QColor c(color.alpha, color.red, color.green, color.blue);
+         const auto c = QColor::fromRgb(color.red, color.green, color.blue, color.alpha);
 
          if (_indicationColor != c)
          {
@@ -144,7 +144,7 @@ namespace clap {
       bool _isHovered = false;
 
       bool _hasIndication = false;
-      QColor _indicationColor;
+      QColor _indicationColor = QColor::fromRgb(255, 0, 0, 255);
    };
 
 } // namespace clap

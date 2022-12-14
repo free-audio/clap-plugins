@@ -203,6 +203,9 @@ namespace clap {
          auto p = _parameters.getByIndex(i);
          _guiHandle->gui().defineParameter(p->info());
          _guiHandle->gui().updateParameter(p->info().id, p->value(), p->modulation());
+
+         if (p->hasIndication())
+            _guiHandle->gui().setParameterIndication(p->info().id, true, p->indicationColor());
       }
    }
 

@@ -169,6 +169,16 @@ namespace clap {
          break;
       }
 
+      case messages::kSetParameterAutomationIndicationRequest: {
+         if (!c)
+            return;
+
+         messages::SetParameterAutomationIndicationRequest rq;
+         msg.get(rq);
+         c->setParameterAutomationIndication(rq.paramId, rq.automationState, rq.color);
+         break;
+      }
+
       case messages::kParameterValueRequest: {
          if (!c)
             return;

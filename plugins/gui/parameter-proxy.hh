@@ -31,12 +31,16 @@ namespace clap {
       Q_PROPERTY(bool isHovered READ isHovered WRITE setIsHovered NOTIFY isHoveredChanged)
       Q_PROPERTY(
          bool hasMappingIndication READ hasMappingIndication NOTIFY hasMappingIndicationChanged)
-      Q_PROPERTY(
-         QColor mappingIndicationColor READ mappingIndicationColor NOTIFY mappingIndicationColorChanged)
+      Q_PROPERTY(QColor mappingIndicationColor READ mappingIndicationColor NOTIFY
+                    mappingIndicationColorChanged)
       Q_PROPERTY(QString mappingIndicationLabel READ mappingIndicationLabel NOTIFY
                     mappingIndicationLabelChanged)
       Q_PROPERTY(QString mappingIndicationDescription READ mappingIndicationDescription NOTIFY
                     mappingIndicationDescriptionChanged)
+      Q_PROPERTY(uint32_t automationIndicationState READ automationIndicationState NOTIFY
+                    automationIndicationStateChanged)
+      Q_PROPERTY(QColor automationIndicationColor READ automationIndicationColor NOTIFY
+                    automationIndicationColorChanged)
 
    public:
       explicit ParameterProxy(Gui &client, const clap_param_info &info);
@@ -137,6 +141,16 @@ namespace clap {
          return _mappingIndicationDescription;
       }
 
+      const QColor &automationIndicationColor() const noexcept {
+         return _automationIndicationColor;
+      }
+      uint32_t automationIndicationState() const noexcept { return _automationIndicationState; }
+      void setAutomationIndication(uint32_t automationState, clap_color color) {
+         const auto c = QColor::fromRgb(color.red, color.green, color.blue, color.alpha);
+         _automationIndicationColor = c;
+         _automationIndicationState = automationState;
+      }
+
    signals:
       void nameChanged();
       void moduleChanged();
@@ -152,6 +166,8 @@ namespace clap {
       void mappingIndicationColorChanged();
       void mappingIndicationLabelChanged();
       void mappingIndicationDescriptionChanged();
+      void automationIndicationStateChanged();
+      void automationIndicationColorChanged();
 
    private:
       Gui &_client;
@@ -167,9 +183,11 @@ namespace clap {
       bool _isHovered = false;
 
       bool _hasMappingIndication = false;
-      QColor _mappingIndicationColor = QColor::fromRgb(255, 0, 0, 255);
+      QColor _mappingIndicationColor;
       QString _mappingIndicationLabel;
       QString _mappingIndicationDescription;
+      uint32_t _automationIndicationState = 0;
+      QColor _automationIndicationColor;
    };
 
 } // namespace clap

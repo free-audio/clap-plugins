@@ -38,13 +38,23 @@ namespace clap {
                                                         clap_color color,
                                                         const char *label,
                                                         const char *description) {
+      const std::string _label(label);
+      const std::string _description(description);
       QMetaObject::invokeMethod(
-         const std::string _label(label);
-         const std::string _description(description) _gui.get(),
+         _gui.get(),
          [this, paramId, hasIndication, color, _label, _description] {
             _gui->setParameterMappingIndication(
                paramId, hasIndication, color, _label.c_str(), _description.c_str());
          },
+         Qt::QueuedConnection);
+   }
+
+   void ThreadedGuiProxy::setParameterAutomationIndication(clap_id paramId,
+                                                           uint32_t automationState,
+                                                           clap_color color) {
+      QMetaObject::invokeMethod(
+         _gui.get(),
+         [=, this] { _gui->setParameterAutomationIndication(paramId, automationState, color); },
          Qt::QueuedConnection);
    }
 

@@ -81,6 +81,16 @@ namespace clap {
       p->setMappingIndication(color, label, description);
    }
 
+   void Gui::setParameterAutomationIndication(clap_id paramId, uint32_t automationState, clap_color color) {
+      qDebug() << "clap-gui: setParameterAutomationIndication(" << paramId << ")";
+      auto p = _pluginProxy->param(paramId);
+      assert(p);
+      if (!p)
+         return;
+
+      p->setAutomationIndication(automationState, color);
+   }
+
    void Gui::clearTransport() { _transportProxy->clear(); }
 
    void Gui::updateTransport(const clap_event_transport &transport) {

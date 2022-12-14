@@ -17,6 +17,7 @@ namespace clap::messages {
       // DSP->GUI
       kDefineParameterRequest,
       kSetParameterMappingIndicationRequest,
+      kSetParameterAutomationIndicationRequest,
       kParameterValueRequest,
       kUpdateTransportRequest,
 
@@ -118,6 +119,13 @@ namespace clap::messages {
       clap_color color;
       char label[128];
       char description[512];
+   };
+
+   struct SetParameterAutomationIndicationRequest final {
+      static const constexpr Type type = kSetParameterAutomationIndicationRequest;
+      clap_id paramId;
+      uint32_t automationState;
+      clap_color color;
    };
 
    struct UpdateTransportRequest final {

@@ -24,6 +24,9 @@ namespace clap {
                                          clap_color color,
                                          const char *label,
                                          const char *description) override;
+      void setParameterAutomationIndication(clap_id paramId,
+                                            uint32_t automationState,
+                                            clap_color color) override;
 
       void clearTransport() override;
       void updateTransport(const clap_event_transport &transport) override;

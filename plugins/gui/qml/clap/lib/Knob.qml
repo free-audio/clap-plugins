@@ -29,12 +29,12 @@ Canvas {
          knob.requestPaint();
       }
 
-      function onHasIndicationChanged() {
+      function onHasMappingIndicationChanged() {
          knob.requestPaint();
       }
 
-      function onIndicationColorChanged() {
-         if (param.hasIndication)
+      function onMappingIndicationColorChanged() {
+         if (param.hasMappingIndication)
             knob.requestPaint();
       }
    }
@@ -103,7 +103,7 @@ Canvas {
       drawBackground(ctx);
       drawModulation(ctx);
       drawValue(ctx);
-      drawIndication(ctx);
+      drawMappingIndication(ctx);
    }
 
    function drawBackground(ctx) {
@@ -172,12 +172,12 @@ Canvas {
       ctx.restore();
    }
 
-   function drawIndication(ctx) {
-      if (!param.hasIndication)
+   function drawMappingIndication(ctx) {
+      if (!param.hasMappingIndication)
          return;
 
       ctx.save();
-      ctx.fillStyle = param.indicationColor;
+      ctx.fillStyle = param.mappingIndicationColor;
       ctx.beginPath();
       var r = size / 10;
       ctx.ellipse(size / 2 - r, size / 2 - r, 2 * r, 2 * r);

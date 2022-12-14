@@ -88,11 +88,24 @@ namespace clap {
       [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
       void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }
 
+      bool hasIndication() const noexcept { return _hasIndication; }
+      const clap_color &indicationColor() const {
+         assert(hasIndication());
+         return _indicationColor;
+      }
+      void setIndication(const clap_color &color) {
+         _hasIndication = true;
+         _indicationColor = color;
+      }
+      void clearIndication() { _hasIndication = false; }
+
    private:
       clap_param_info _info;
       std::unique_ptr<ValueType> _valueType;
 
       bool _hasGuiOverride = false;
+      bool _hasIndication = false;
+      clap_color _indicationColor{0, 0, 0, 0};
 
    public:
       struct Voice {

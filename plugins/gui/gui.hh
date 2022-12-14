@@ -35,6 +35,7 @@ namespace clap {
 
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;
+      void setParameterIndication(clap_id paramId, bool hasIndication, clap_color color) override;
 
       void clearTransport() override;
       void updateTransport(const clap_event_transport &transport) override;

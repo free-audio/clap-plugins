@@ -67,6 +67,17 @@ namespace clap {
       p->setModulationFromPlugin(modAmount);
    }
 
+   void Gui::setParameterIndication(clap_id paramId, bool hasIndication, clap_color color)
+   {
+      qDebug() << "clap-gui: setParameterIndication(" << paramId << ")";
+      auto p = _pluginProxy->param(paramId);
+      assert(p);
+      if (!p)
+         return;
+
+      p->setIndication(color);
+   }
+
    void Gui::clearTransport() { _transportProxy->clear(); }
 
    void Gui::updateTransport(const clap_event_transport &transport) {

@@ -30,7 +30,8 @@ namespace clap {
 
    class CorePlugin : public PluginGlue
 #ifndef CLAP_PLUGINS_HEADLESS
-      , public AbstractGuiListener
+      ,
+                      public AbstractGuiListener
 #endif
    {
       using super = PluginGlue;
@@ -107,18 +108,25 @@ namespace clap {
 
       bool paramsInfo(uint32_t paramIndex, clap_param_info *info) const noexcept override;
 
-      virtual bool paramsValue(clap_id paramId, double *value) noexcept override;
+      bool paramsValue(clap_id paramId, double *value) noexcept override;
 
-      virtual bool paramsValueToText(clap_id paramId,
-                                     double value,
-                                     char *display,
-                                     uint32_t size) noexcept override;
+      bool paramsValueToText(clap_id paramId,
+                             double value,
+                             char *display,
+                             uint32_t size) noexcept override;
 
-      virtual bool
-      paramsTextToValue(clap_id paramId, const char *display, double *value) noexcept override;
+      bool paramsTextToValue(clap_id paramId, const char *display, double *value) noexcept override;
 
-      virtual void paramsFlush(const clap_input_events *in,
-                               const clap_output_events *out) noexcept override;
+      void paramsFlush(const clap_input_events *in,
+                       const clap_output_events *out) noexcept override;
+
+      //------------------------------//
+      // clap_plugin_param_indication //
+      //------------------------------//
+      bool implementsParamIndication() const noexcept override { return true; }
+      void paramIndicationSet(clap_id param_id,
+                              bool has_indication,
+                              const clap_color_t *indication_color) noexcept override;
 
       //-------------------//
       // clap_plugin_state //

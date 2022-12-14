@@ -313,7 +313,7 @@ namespace clap {
    void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
       runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
    }
-#   endif // CLAP_PLUGINS_HEADLESS
+#endif // CLAP_PLUGINS_HEADLESS
 
    //------------------//
    // Audio Processing //
@@ -811,6 +811,28 @@ namespace clap {
    void CorePlugin::foreachActiveVoice(
       int16_t noteId, int16_t port, int32_t channel, int16_t key, const Callback &callback) const {
       getVoiceExpander()->foreachActiveVoice(noteId, port, channel, key, callback);
+   }
+
+   //------------------------------//
+   // clap_plugin_param_indication //
+   //------------------------------//
+   void CorePlugin::paramIndicationSet(clap_id param_id,
+                                       bool has_indication,
+                                       const clap_color_t *color) noexcept {
+      auto param = _parameters.getById(param_id);
+      if (!param)
+         return;
+
+      const clap_color c = color ? *color : clap_color{0,0,0,0};
+      if (has_indication)
+         param->setIndication(c);
+      else
+         param->clearIndication();
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         _guiHandle->gui().setParameterIndication(param_id, has_indication, c);
+#endif
    }
 
 } // namespace clap

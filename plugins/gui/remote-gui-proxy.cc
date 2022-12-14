@@ -35,6 +35,11 @@ namespace clap {
       _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
+   void RemoteGuiProxy::setParameterIndication(clap_id paramId, bool hasIndication, clap_color color) {
+      messages::SetParameterIndicationRequest rq{paramId, hasIndication, color};
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
+   }
+
    bool RemoteGuiProxy::canResize() {
       bool sent = false;
       messages::CanResizeRequest request;

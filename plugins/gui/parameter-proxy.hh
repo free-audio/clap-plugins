@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QColor>
 
 #include <algorithm>
 
@@ -28,6 +29,8 @@ namespace clap {
       Q_PROPERTY(double defaultValue READ getDefaultValue NOTIFY defaultValueChanged)
       Q_PROPERTY(bool isAdjusting READ isAdjusting WRITE setIsAdjusting NOTIFY isAdjustingChanged)
       Q_PROPERTY(bool isHovered READ isHovered WRITE setIsHovered NOTIFY isHoveredChanged)
+      Q_PROPERTY(bool hasIndication READ hasIndication NOTIFY hasIndicationChanged)
+      Q_PROPERTY(QColor indicationColor READ indicationColor NOTIFY indicationColorChanged)
 
    public:
       explicit ParameterProxy(Gui &client, const clap_param_info &info);
@@ -86,6 +89,33 @@ namespace clap {
       bool isHovered() const { return _isHovered; }
       void setIsHovered(bool value);
 
+      bool hasIndication() const noexcept { return _hasIndication; }
+      const QColor& indicationColor() const noexcept { return _indicationColor; }
+      void setIndication(clap_color color)
+      {
+         QColor c(color.alpha, color.red, color.green, color.blue);
+
+         if (_indicationColor != c)
+         {
+            _indicationColor = c;
+            indicationColorChanged();
+         }
+
+         if (!_hasIndication)
+         {
+            _hasIndication = true;
+            hasIndicationChanged();
+         }
+      }
+
+      void clearIndication()
+      {
+         if (!_hasIndication)
+            return;
+         _hasIndication = false;
+         hasIndicationChanged();
+      }
+
    signals:
       void nameChanged();
       void moduleChanged();
@@ -97,6 +127,8 @@ namespace clap {
       void defaultValueChanged();
       void isHoveredChanged();
       void isAdjustingChanged();
+      void hasIndicationChanged();
+      void indicationColorChanged();
 
    private:
       Gui &_client;
@@ -110,6 +142,9 @@ namespace clap {
       double _defaultValue = 0;
       bool _isAdjusting = false;
       bool _isHovered = false;
+
+      bool _hasIndication = false;
+      QColor _indicationColor;
    };
 
 } // namespace clap

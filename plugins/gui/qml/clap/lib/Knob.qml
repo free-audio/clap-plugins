@@ -94,6 +94,7 @@ Canvas {
       drawBackground(ctx);
       drawModulation(ctx);
       drawValue(ctx);
+      drawIndication(ctx);
    }
 
    function drawBackground(ctx) {
@@ -159,6 +160,19 @@ Canvas {
       ctx.arc(0, 0, size * (modulationMargin + 0.03), 0, 2 * Math.PI, false)
       ctx.fill();
 
+      ctx.restore();
+   }
+
+   function drawIndication(ctx) {
+      if (!param.hasIndication)
+         return;
+
+      ctx.save();
+      ctx.translate(size / 2, size / 2);
+      ctx.fillStyle = param.indicationColor;
+      ctx.beginPath();
+      ctx.arc(0, 0, width * .1, 0, 2 * Math.PI, false)
+      ctx.fill();
       ctx.restore();
    }
 

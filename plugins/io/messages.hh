@@ -116,6 +116,8 @@ namespace clap::messages {
       clap_id paramId;
       bool hasIndication;
       clap_color color;
+      char label[128];
+      char description[512];
    };
 
    struct UpdateTransportRequest final {
@@ -269,7 +271,6 @@ namespace clap::messages {
       static const constexpr Type type = kSetTransientResponse;
       bool succeed;
    };
-
 
    struct WindowClosedNotification final {
       static const constexpr Type type = kWindowClosedNotification;

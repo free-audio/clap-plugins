@@ -204,8 +204,12 @@ namespace clap {
          _guiHandle->gui().defineParameter(p->info());
          _guiHandle->gui().updateParameter(p->info().id, p->value(), p->modulation());
 
-         if (p->hasIndication())
-            _guiHandle->gui().setParameterIndication(p->info().id, true, p->indicationColor());
+         if (p->hasMappingIndication())
+            _guiHandle->gui().setParameterIndication(p->info().id,
+                                                     true,
+                                                     p->mappingIndicationColor(),
+                                                     p->mappingIndicationLabel().c_str(),
+                                                     p->mappingIndicationDescription().c_str());
       }
    }
 
@@ -819,22 +823,40 @@ namespace clap {
    //------------------------------//
    // clap_plugin_param_indication //
    //------------------------------//
-   void CorePlugin::paramIndicationSet(clap_id param_id,
-                                       bool has_indication,
-                                       const clap_color_t *color) noexcept {
+   void CorePlugin::paramIndicationSetMapping(clap_id param_id,
+                                              bool has_mapping,
+                                              const clap_color_t *color,
+                                              const char *label,
+                                              const char *description) noexcept {
       auto param = _parameters.getById(param_id);
       if (!param)
          return;
 
-      const clap_color c = color ? *color : clap_color{0,0,0,0};
-      if (has_indication)
-         param->setIndication(c);
+      const clap_color c = color ? *color : clap_color{0, 0, 0, 0};
+      if (has_mapping)
+         param->setMappingIndication(c, label, description);
       else
-         param->clearIndication();
+         param->clearMappingIndication();
 
 #ifndef CLAP_PLUGINS_HEADLESS
       if (_guiHandle)
-         _guiHandle->gui().setParameterIndication(param_id, has_indication, c);
+         _guiHandle->gui().setParameterIndication(param_id, has_mapping, c, label, description);
+#endif
+   }
+
+   void CorePlugin::paramIndicationSetAutomation(clap_id param_id,
+                                                 uint32_t automation_state,
+                                                 const clap_color_t *color) noexcept {
+      auto param = _parameters.getById(param_id);
+      if (!param)
+         return;
+
+      const clap_color c = color ? *color : clap_color{0, 0, 0, 0};
+      param->setAutomationIndication(automation_state, c);
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      // if (_guiHandle)
+      //    _guiHandle->gui().setParameterIndication(param_id, has_mapping, c);
 #endif
    }
 

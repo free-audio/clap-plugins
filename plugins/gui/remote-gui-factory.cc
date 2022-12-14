@@ -165,7 +165,7 @@ namespace clap {
 
          messages::SetParameterIndicationRequest rq;
          msg.get(rq);
-         c->setParameterIndication(rq.paramId, rq.hasIndication, rq.color);
+         c->setParameterIndication(rq.paramId, rq.hasIndication, rq.color, rq.label, rq.description);
          break;
       }
 

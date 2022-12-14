@@ -88,24 +88,33 @@ namespace clap {
       [[nodiscard]] bool hasGuiOverride() const noexcept { return _hasGuiOverride; }
       void setHasGuiOverride(bool isOverriden) noexcept { _hasGuiOverride = isOverriden; }
 
-      bool hasIndication() const noexcept { return _hasIndication; }
-      const clap_color &indicationColor() const {
-         assert(hasIndication());
-         return _indicationColor;
+      bool hasMappingIndication() const noexcept { return _hasMappingIndication; }
+      const clap_color &mappingIndicationColor() const {
+         assert(hasMappingIndication());
+         return _mappingIndicationColor;
       }
-      void setIndication(const clap_color &color) {
-         _hasIndication = true;
-         _indicationColor = color;
+      const std::string& mappingIndicationLabel() const noexcept { return _mappingIndicationLabel; }
+      const std::string& mappingIndicationDescription() const noexcept { return _mappingIndicationDescription; }
+      void setMappingIndication(const clap_color &color, const char *label, const char *desc);
+      void clearMappingIndication();
+
+      void setAutomationIndication(uint32_t state, const clap_color &color) {
+         _automationState = state;
+         _automationColor = color;
       }
-      void clearIndication() { _hasIndication = false; }
 
    private:
       clap_param_info _info;
       std::unique_ptr<ValueType> _valueType;
 
       bool _hasGuiOverride = false;
-      bool _hasIndication = false;
-      clap_color _indicationColor{0, 0, 0, 0};
+      bool _hasMappingIndication = false;
+      clap_color _mappingIndicationColor{0, 0, 0, 0};
+      std::string _mappingIndicationLabel;
+      std::string _mappingIndicationDescription;
+
+      uint32_t _automationState = CLAP_PARAM_INDICATION_AUTOMATION_NONE;
+      clap_color _automationColor{0, 0, 0, 0};
 
    public:
       struct Voice {

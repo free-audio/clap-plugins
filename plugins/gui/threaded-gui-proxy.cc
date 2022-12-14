@@ -33,11 +33,18 @@ namespace clap {
          Qt::QueuedConnection);
    }
 
-
-   void ThreadedGuiProxy::setParameterIndication(clap_id paramId, bool hasIndication, clap_color color) {
+   void ThreadedGuiProxy::setParameterIndication(clap_id paramId,
+                                                 bool hasIndication,
+                                                 clap_color color,
+                                                 const char *label,
+                                                 const char *description) {
       QMetaObject::invokeMethod(
-         _gui.get(),
-         [=, this] { _gui->setParameterIndication(paramId, hasIndication, color); },
+         const std::string _label(label);
+         const std::string _description(description) _gui.get(),
+         [this, paramId, hasIndication, color, _label, _description] {
+            _gui->setParameterIndication(
+               paramId, hasIndication, color, _label.c_str(), _description.c_str());
+         },
          Qt::QueuedConnection);
    }
 

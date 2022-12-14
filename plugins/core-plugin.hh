@@ -124,9 +124,16 @@ namespace clap {
       // clap_plugin_param_indication //
       //------------------------------//
       bool implementsParamIndication() const noexcept override { return true; }
-      void paramIndicationSet(clap_id param_id,
-                              bool has_indication,
-                              const clap_color_t *indication_color) noexcept override;
+
+      void paramIndicationSetMapping(clap_id param_id,
+                                     bool has_mapping,
+                                     const clap_color_t *color,
+                                     const char *label,
+                                     const char *description) noexcept override;
+
+      void paramIndicationSetAutomation(clap_id param_id,
+                                        uint32_t automation_state,
+                                        const clap_color_t *color) noexcept override;
 
       //-------------------//
       // clap_plugin_state //

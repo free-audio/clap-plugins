@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QObject>
 #include <QColor>
+#include <QObject>
 
 #include <algorithm>
 
@@ -29,8 +29,14 @@ namespace clap {
       Q_PROPERTY(double defaultValue READ getDefaultValue NOTIFY defaultValueChanged)
       Q_PROPERTY(bool isAdjusting READ isAdjusting WRITE setIsAdjusting NOTIFY isAdjustingChanged)
       Q_PROPERTY(bool isHovered READ isHovered WRITE setIsHovered NOTIFY isHoveredChanged)
-      Q_PROPERTY(bool hasIndication READ hasIndication NOTIFY hasIndicationChanged)
-      Q_PROPERTY(QColor indicationColor READ indicationColor NOTIFY indicationColorChanged)
+      Q_PROPERTY(
+         bool hasMappingIndication READ hasMappingIndication NOTIFY hasMappingIndicationChanged)
+      Q_PROPERTY(
+         QColor mappingIndicationColor READ mappingIndicationColor NOTIFY mappingIndicationColorChanged)
+      Q_PROPERTY(QString mappingIndicationLabel READ mappingIndicationLabel NOTIFY
+                    mappingIndicationLabelChanged)
+      Q_PROPERTY(QString mappingIndicationDescription READ mappingIndicationDescription NOTIFY
+                    mappingIndicationDescriptionChanged)
 
    public:
       explicit ParameterProxy(Gui &client, const clap_param_info &info);
@@ -89,31 +95,46 @@ namespace clap {
       bool isHovered() const { return _isHovered; }
       void setIsHovered(bool value);
 
-      bool hasIndication() const noexcept { return _hasIndication; }
-      const QColor& indicationColor() const noexcept { return _indicationColor; }
-      void setIndication(clap_color color)
-      {
+      bool hasMappingIndication() const noexcept { return _hasMappingIndication; }
+      const QColor &mappingIndicationColor() const noexcept { return _mappingIndicationColor; }
+      void setMappingIndication(clap_color color, const char *label, const char *description) {
          const auto c = QColor::fromRgb(color.red, color.green, color.blue, color.alpha);
 
-         if (_indicationColor != c)
-         {
-            _indicationColor = c;
-            indicationColorChanged();
+         if (_mappingIndicationColor != c) {
+            _mappingIndicationColor = c;
+            mappingIndicationColorChanged();
          }
 
-         if (!_hasIndication)
-         {
-            _hasIndication = true;
-            hasIndicationChanged();
+         if (_mappingIndicationLabel.compare(label)) {
+            _mappingIndicationLabel = label;
+            mappingIndicationLabelChanged();
+         }
+
+         if (_mappingIndicationDescription.compare(description)) {
+            _mappingIndicationDescription = description;
+            mappingIndicationDescriptionChanged();
+         }
+
+         if (!_hasMappingIndication) {
+            _hasMappingIndication = true;
+            hasMappingIndicationChanged();
          }
       }
 
-      void clearIndication()
-      {
-         if (!_hasIndication)
+      void clearMappingIndication() {
+         if (!_hasMappingIndication)
             return;
-         _hasIndication = false;
-         hasIndicationChanged();
+         _hasMappingIndication = false;
+         _mappingIndicationLabel.clear();
+         _mappingIndicationDescription.clear();
+         mappingIndicationLabelChanged();
+         mappingIndicationDescriptionChanged();
+         hasMappingIndicationChanged();
+      }
+
+      const QString &mappingIndicationLabel() const noexcept { return _mappingIndicationLabel; }
+      const QString &mappingIndicationDescription() const noexcept {
+         return _mappingIndicationDescription;
       }
 
    signals:
@@ -127,8 +148,10 @@ namespace clap {
       void defaultValueChanged();
       void isHoveredChanged();
       void isAdjustingChanged();
-      void hasIndicationChanged();
-      void indicationColorChanged();
+      void hasMappingIndicationChanged();
+      void mappingIndicationColorChanged();
+      void mappingIndicationLabelChanged();
+      void mappingIndicationDescriptionChanged();
 
    private:
       Gui &_client;
@@ -143,8 +166,10 @@ namespace clap {
       bool _isAdjusting = false;
       bool _isHovered = false;
 
-      bool _hasIndication = false;
-      QColor _indicationColor = QColor::fromRgb(255, 0, 0, 255);
+      bool _hasMappingIndication = false;
+      QColor _mappingIndicationColor = QColor::fromRgb(255, 0, 0, 255);
+      QString _mappingIndicationLabel;
+      QString _mappingIndicationDescription;
    };
 
 } // namespace clap

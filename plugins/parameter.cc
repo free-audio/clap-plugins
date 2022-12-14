@@ -71,4 +71,16 @@ namespace clap {
          return voiceBuffer(voice->voiceIndex());
       return mainBuffer();
    }
+   void
+   Parameter::setMappingIndication(const clap_color &color, const char *label, const char *desc) {
+      _hasMappingIndication = true;
+      _mappingIndicationColor = color;
+      _mappingIndicationLabel = label ?: "";
+      _mappingIndicationDescription = desc ?: "";
+   }
+   void Parameter::clearMappingIndication() {
+      _hasMappingIndication = false;
+      _mappingIndicationLabel.clear();
+      _mappingIndicationDescription.clear();
+   }
 } // namespace clap

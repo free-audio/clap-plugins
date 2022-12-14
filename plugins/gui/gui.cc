@@ -67,7 +67,7 @@ namespace clap {
       p->setModulationFromPlugin(modAmount);
    }
 
-   void Gui::setParameterIndication(clap_id paramId, bool hasIndication, clap_color color)
+   void Gui::setParameterIndication(clap_id paramId, bool hasIndication, clap_color color, const char *label, const char *description)
    {
       qDebug() << "clap-gui: setParameterIndication(" << paramId << ")";
       auto p = _pluginProxy->param(paramId);
@@ -75,7 +75,7 @@ namespace clap {
       if (!p)
          return;
 
-      p->setIndication(color);
+      p->setMappingIndication(color, label, description);
    }
 
    void Gui::clearTransport() { _transportProxy->clear(); }

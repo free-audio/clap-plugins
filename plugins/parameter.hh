@@ -98,6 +98,8 @@ namespace clap {
       void setMappingIndication(const clap_color &color, const char *label, const char *desc);
       void clearMappingIndication();
 
+      uint32_t automationIndicationState() const noexcept { return _automationState; }
+      const clap_color& automationIndicationColor() const noexcept { return _automationColor; }
       void setAutomationIndication(uint32_t state, const clap_color &color) {
          _automationState = state;
          _automationColor = color;

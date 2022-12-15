@@ -211,6 +211,10 @@ namespace clap {
                p->mappingIndicationColor(),
                p->mappingIndicationLabel().c_str(),
                p->mappingIndicationDescription().c_str());
+
+         if (p->automationIndicationState() != CLAP_PARAM_INDICATION_AUTOMATION_NONE)
+            _guiHandle->gui().setParameterAutomationIndication(
+               p->info().id, p->automationIndicationState(), p->automationIndicationColor());
       }
    }
 
@@ -857,8 +861,8 @@ namespace clap {
       param->setAutomationIndication(automation_state, c);
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      // if (_guiHandle)
-      //    _guiHandle->gui().setParameterIndication(param_id, has_mapping, c);
+      if (_guiHandle)
+         _guiHandle->gui().setParameterAutomationIndication(param_id, automation_state, c);
 #endif
    }
 

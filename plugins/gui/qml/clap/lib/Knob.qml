@@ -37,6 +37,14 @@ Canvas {
          if (param.hasMappingIndication)
             knob.requestPaint();
       }
+
+      function onAutomationIndicationStateChanged() {
+         knob.requestPaint();
+      }
+
+      function onAutomationIndicationColorChanged() {
+         knob.requestPaint();
+      }
    }
 
    MouseArea {
@@ -104,6 +112,7 @@ Canvas {
       drawModulation(ctx);
       drawValue(ctx);
       drawMappingIndication(ctx);
+      drawAutomationIndication(ctx);
    }
 
    function drawBackground(ctx) {
@@ -181,6 +190,19 @@ Canvas {
       ctx.beginPath();
       var r = size / 10;
       ctx.ellipse(size / 2 - r, size / 2 - r, 2 * r, 2 * r);
+      ctx.fill();
+      ctx.restore();
+   }
+
+   function drawAutomationIndication(ctx) {
+      if (param.automationIndicationState == 0)
+         return;
+
+      ctx.save();
+      ctx.fillStyle = param.automationIndicationColor;
+      ctx.beginPath();
+      var r = size / 20;
+      ctx.ellipse(size - 2 * r, 0, 2 * r, 2 * r);
       ctx.fill();
       ctx.restore();
    }

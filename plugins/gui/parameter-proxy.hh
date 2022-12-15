@@ -147,8 +147,16 @@ namespace clap {
       uint32_t automationIndicationState() const noexcept { return _automationIndicationState; }
       void setAutomationIndication(uint32_t automationState, clap_color color) {
          const auto c = QColor::fromRgb(color.red, color.green, color.blue, color.alpha);
-         _automationIndicationColor = c;
-         _automationIndicationState = automationState;
+
+         if (c != _automationIndicationColor) {
+            _automationIndicationColor = c;
+            automationIndicationColorChanged();
+         }
+
+         if (_automationIndicationState != automationState) {
+            _automationIndicationState = automationState;
+            automationIndicationStateChanged();
+         }
       }
 
    signals:

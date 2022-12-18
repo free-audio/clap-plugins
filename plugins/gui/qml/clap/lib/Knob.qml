@@ -195,8 +195,12 @@ Canvas {
    }
 
    function drawAutomationIndication(ctx) {
-      if (param.automationIndicationState == 0)
+      var r = size / 20;
+
+      if (param.automationIndicationState == 0) {
+         ctx.clearRect(size - 2 * r, 0, 2 * r, 2 * r)
          return;
+      }
 
       ctx.save();
       ctx.fillStyle = param.automationIndicationColor;

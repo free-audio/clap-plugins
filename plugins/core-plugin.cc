@@ -751,6 +751,11 @@ namespace clap {
       return true;
    }
 
+   int32_t CorePlugin::getParamIndexForParamId(clap_id paramId) const noexcept {
+      auto param = _parameters.getById(paramId);
+      return param ? param->getParamIndex() : -1;
+   }
+
    bool CorePlugin::paramsValue(clap_id paramId, double *value) noexcept {
       auto param = _parameters.getById(paramId);
       if (!param)

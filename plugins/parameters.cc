@@ -7,7 +7,7 @@ namespace clap {
                                              std::unique_ptr<ValueType> valueType) {
       assert(_id2param.find(info.id) == _id2param.end());
 
-      auto p = std::make_unique<Parameter>(info, std::move(valueType));
+      auto p = std::make_unique<Parameter>(info, std::move(valueType), _params.size());
       auto ptr = p.get();
       auto ret = _id2param.insert_or_assign(info.id, p.get());
       if (!ret.second)

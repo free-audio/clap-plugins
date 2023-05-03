@@ -1,8 +1,8 @@
 #include "parameter.hh"
 
 namespace clap {
-   Parameter::Parameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType)
-      : _info(info), _valueType(std::move(valueType)) {
+   Parameter::Parameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType, uint32_t paramIndex)
+      : _index(paramIndex), _info(info), _valueType(std::move(valueType)) {
       _info.cookie = this;
       reset();
 

@@ -120,6 +120,8 @@ namespace clap {
       void paramsFlush(const clap_input_events *in,
                        const clap_output_events *out) noexcept override;
 
+      int32_t getParamIndexForParamId(clap_id paramId) const noexcept override;
+
       //------------------------------//
       // clap_plugin_param_indication //
       //------------------------------//

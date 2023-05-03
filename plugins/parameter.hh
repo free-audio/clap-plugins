@@ -23,7 +23,7 @@ namespace clap {
       friend class CorePlugin;
 
    public:
-      explicit Parameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType);
+      explicit Parameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType, uint32_t paramIndex);
 
       Parameter(const Parameter &) = delete;
       Parameter(Parameter &&) = delete;
@@ -105,7 +105,12 @@ namespace clap {
          _automationColor = color;
       }
 
+      int32_t getParamIndex() const noexcept { return _index; }
+
    private:
+      // cached param index in the plugin
+      const int32_t _index = -1;
+
       clap_param_info _info;
       std::unique_ptr<ValueType> _valueType;
 

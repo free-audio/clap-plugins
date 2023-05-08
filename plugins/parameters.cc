@@ -19,7 +19,7 @@ namespace clap {
    size_t Parameters::count() const noexcept { return _params.size(); }
 
    Parameter *Parameters::getByIndex(size_t index) const noexcept {
-      if (index > _params.size())
+      if (index >= _params.size())
          return nullptr;
       return _params[index].get();
    }

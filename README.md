@@ -127,6 +127,9 @@ scripts/build.sh
 ## Linux, using system libraries (dynamic)
 
 ```bash
+# on unbuntu, adapt to your distribution and package manager
+sudo apt install qt6-declarative-dev git ninja-build cmake
+
 # on archlinux, adapt to your distribution and package manager
 sudo pacman -S qt boost git ninja cmake
 

@@ -25,7 +25,7 @@ else
   cmake_preset="vs-vcpkg"
   gui_model=local
   triplet=$cpu-win
-  buildtrees="C:\B"
+  buildtrees="C:\temp\B"
 fi
 
 if [[ "$1" != "" ]]; then

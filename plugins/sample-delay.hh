@@ -9,6 +9,7 @@ namespace clap {
       SampleDelay(uint32_t channels) : _channels(channels) {}
 
       void setDelayTime(uint32_t delayTimeInFrames);
+      uint32_t getDelayTime() const noexcept { return _delayTime; }
       void reset(const T& value);
 
       void process(const AudioBuffer<T> &in, AudioBuffer<T> &out, uint32_t numFrames);

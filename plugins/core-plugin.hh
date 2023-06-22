@@ -189,6 +189,12 @@ namespace clap {
       bool renderHasHardRealtimeRequirement() noexcept override;
       bool renderSetMode(clap_plugin_render_mode mode) noexcept override;
 
+      //---------------------//
+      // clap_plugin_latency //
+      //---------------------//
+      bool implementsLatency() const noexcept override { return true; }
+      uint32_t latencyGet() const noexcept override { return _rootModule->latency(); }
+
       //////////////////////
       // Cached Host Info //
       //////////////////////

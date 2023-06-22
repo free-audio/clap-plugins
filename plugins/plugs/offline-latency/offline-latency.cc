@@ -13,9 +13,8 @@ namespace clap {
       }
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
-         if (!isRealTime)
-            _delay.setDelayTime(sampleRate);
-
+         _delay.setDelayTime(isRealTime ? 0 : sampleRate);
+         _delay.reset(0);
          return true;
       }
 
@@ -25,12 +24,13 @@ namespace clap {
          auto& in = *c.audioInputs[0];
          auto& out = *c.audioOutputs[0];
 
-         if (c.isRealTimeRendering())
-            out.copy(in, numFrames);
-         else
-            _delay.process(in, out, numFrames);
+         _delay.process(in, out, numFrames);
 
          return CLAP_PROCESS_CONTINUE;
+      }
+
+      uint32_t latency() const noexcept override {
+         return _delay.getDelayTime();
       }
 
       SampleDelay<double> _delay{1};
@@ -89,9 +89,5 @@ namespace clap {
       _audioInputs.push_back(info);
       _audioOutputs.clear();
       _audioOutputs.push_back(info);
-   }
-
-   uint32_t OfflineLatency::latencyGet() const noexcept {
-      return _context.isRealTimeRendering() ? 0 : _context.sampleRateD;
    }
 } // namespace clap

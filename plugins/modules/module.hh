@@ -71,6 +71,8 @@ namespace clap {
          return nullptr;
       }
 
+      virtual uint32_t latency() const noexcept { return 0; }
+
    protected:
       // Registers all parameters from this modules
       Parameter *addParameter(uint32_t id,

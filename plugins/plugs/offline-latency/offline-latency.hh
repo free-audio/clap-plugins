@@ -18,9 +18,6 @@ namespace clap {
       void defineAudioPorts() noexcept;
       clap_process_status processBackup(const clap_process *process) noexcept;
 
-      bool implementsLatency() const noexcept override { return true; }
-      uint32_t latencyGet() const noexcept override;
-
    private:
       int _channelCount = 1;
    };

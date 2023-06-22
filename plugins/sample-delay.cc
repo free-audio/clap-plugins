@@ -8,7 +8,7 @@ namespace clap {
    }
 
    template <typename T>
-   void SampleDelay<T>::reset(const T& value) {
+   void SampleDelay<T>::reset(const T &value) {
       std::fill(_data.begin(), _data.end(), value);
    }
 
@@ -19,17 +19,24 @@ namespace clap {
       assert(numFrames <= in.frameCount());
       assert(numFrames <= out.frameCount());
 
+      if (_delayTime == 0) {
+         out.copy(in, numFrames);
+         return;
+      }
+
       out.setConstant(false);
 
       // Naive impl
+      const auto dataSz = _data.size();
       for (uint32_t i = 0; i < numFrames; ++i) {
          assert(_pos % _channels == 0);
          assert(_pos < _data.size());
 
          for (uint32_t c = 0; c < _channels; ++c) {
             out.setSample(i, c, _data[_pos]);
-            _data[_pos] = in.getSample(i, c);
-            _pos = (_pos + 1) % _data.size();
+            const auto rpos = (_pos + dataSz - _delayTime) % dataSz;
+            _data[rpos] = in.getSample(i, c);
+            _pos = (_pos + 1) % dataSz;
          }
       }
    }

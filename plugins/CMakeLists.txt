@@ -68,6 +68,7 @@ add_library(
   plugs/svf/svf-plug.hh
   plugs/svf/svf-plug.cc
   smoothed-value.hh
+  stream-helper.cc
   stream-helper.hh
   tuning-provider.cc
   tuning-provider.hh

@@ -17,9 +17,9 @@ namespace clap {
          return std::make_unique<AdsrPlugModule>(*this);
       }
 
-      bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
+      bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
          bool succeed = true;
-         succeed &= _adsr.activate(sampleRate, maxFrameCount);
+         succeed &= _adsr.activate(sampleRate, maxFrameCount, isRealTime);
 
          if (succeed)
             return true;

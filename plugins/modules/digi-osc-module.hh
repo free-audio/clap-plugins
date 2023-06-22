@@ -14,7 +14,7 @@ namespace clap {
 
       void trigger();
 
-      bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
+      bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override;
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override;
 
       void setPmInput(const AudioBuffer<double> *in) noexcept { _pmInput = in; }

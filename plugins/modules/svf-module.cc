@@ -44,7 +44,7 @@ namespace clap {
       return std::make_unique<SvfModule>(*this);
    }
 
-   bool SvfModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
+   bool SvfModule::doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) {
       _sampleRate = sampleRate;
       reset();
       return true;

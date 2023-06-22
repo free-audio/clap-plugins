@@ -11,9 +11,9 @@ namespace clap {
       SvfPlugModule(SvfPlug &SvfPlug) : Module(SvfPlug, "", 0), _svf(SvfPlug, "amp", 1) {}
       SvfPlugModule(const SvfPlugModule &m) : Module(m), _svf(m._svf) {}
 
-      bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
+      bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
          bool succeed = true;
-         succeed &= _svf.activate(sampleRate, maxFrameCount);
+         succeed &= _svf.activate(sampleRate, maxFrameCount, isRealTime);
 
          if (succeed)
             return true;

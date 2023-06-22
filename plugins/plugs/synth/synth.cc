@@ -62,14 +62,14 @@ namespace clap {
             //_filter.setFmInput(&_digiOsc2.outputBuffer());
          }
 
-         bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
+         bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
             bool succeed = true;
 
-            succeed &= _ampAdsr.activate(sampleRate, maxFrameCount);
-            succeed &= _filterAdsr.activate(sampleRate, maxFrameCount);
-            succeed &= _filter.activate(sampleRate, maxFrameCount);
-            succeed &= _digiOsc1.activate(sampleRate, maxFrameCount);
-            succeed &= _digiOsc2.activate(sampleRate, maxFrameCount);
+            succeed &= _ampAdsr.activate(sampleRate, maxFrameCount, isRealTime);
+            succeed &= _filterAdsr.activate(sampleRate, maxFrameCount, isRealTime);
+            succeed &= _filter.activate(sampleRate, maxFrameCount, isRealTime);
+            succeed &= _digiOsc1.activate(sampleRate, maxFrameCount, isRealTime);
+            succeed &= _digiOsc2.activate(sampleRate, maxFrameCount, isRealTime);
 
             if (succeed)
                return true;
@@ -160,8 +160,8 @@ namespace clap {
 
          SynthModule(const SynthModule &m) = delete;
 
-         bool doActivate(double sampleRate, uint32_t maxFrameCount) override {
-            return _expanderModule.activate(sampleRate, maxFrameCount);
+         bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
+            return _expanderModule.activate(sampleRate, maxFrameCount, isRealTime);
          }
 
          void doDeactivate() override { _expanderModule.deactivate(); }

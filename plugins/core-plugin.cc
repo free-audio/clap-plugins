@@ -359,7 +359,7 @@ namespace clap {
       setupBuffers(_audioInputs, _context.audioInputs);
       setupBuffers(_audioOutputs, _context.audioOutputs);
 
-      return _rootModule->activate(sampleRate, maxFrameCount);
+      return _rootModule->activate(sampleRate, maxFrameCount, _context.isRealTimeRendering());
    }
 
    void CorePlugin::deactivate() noexcept { _rootModule->deactivate(); }
@@ -878,6 +878,15 @@ namespace clap {
       if (_guiHandle)
          _guiHandle->gui().setParameterAutomationIndication(param_id, automation_state, c);
 #endif
+   }
+
+   bool CorePlugin::implementsRender() const noexcept { return true; }
+
+   bool CorePlugin::renderHasHardRealtimeRequirement() noexcept { return false; }
+
+   bool CorePlugin::renderSetMode(clap_plugin_render_mode mode) noexcept {
+      _context.renderMode = mode;
+      return true;
    }
 
 } // namespace clap

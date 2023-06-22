@@ -182,6 +182,13 @@ namespace clap {
       bool voiceInfoDoGet(clap_voice_info *info) noexcept;
       bool voiceInfoGet(clap_voice_info *info) noexcept override;
 
+      //--------------------//
+      // clap_plugin_render //
+      //--------------------//
+      bool implementsRender() const noexcept override;
+      bool renderHasHardRealtimeRequirement() noexcept override;
+      bool renderSetMode(clap_plugin_render_mode mode) noexcept override;
+
       //////////////////////
       // Cached Host Info //
       //////////////////////

@@ -35,10 +35,10 @@ namespace clap {
                                         std::vector<std::string>{"Legato", "Mono", "Poly"}, 2));
    }
 
-   bool VoiceExpanderModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
+   bool VoiceExpanderModule::doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) {
       for (auto &voice : _voices) {
          if (voice) {
-            if (!voice->activate(sampleRate, maxFrameCount)) {
+            if (!voice->activate(sampleRate, maxFrameCount, isRealTime)) {
                deactivate();
                return false;
             }

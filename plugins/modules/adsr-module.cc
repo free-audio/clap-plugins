@@ -76,7 +76,7 @@ namespace clap {
 
    void AdsrModule::onNoteChoke(const clap_event_note &note) noexcept { choke(); }
 
-   bool AdsrModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
+   bool AdsrModule::doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) {
       _conv = DomainConverter<ExpCoeff>(ExpCoeff(sampleRate), 0);
       return true;
    }

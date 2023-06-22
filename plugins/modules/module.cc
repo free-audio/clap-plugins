@@ -32,9 +32,9 @@ namespace clap {
       return _plugin.addParameter(info, std::move(valueType));
    }
 
-   bool Module::activate(double sampleRate, uint32_t maxFrameCount) {
+   bool Module::activate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) {
       assert(!_isActive);
-      _isActive = doActivate(sampleRate, maxFrameCount);
+      _isActive = doActivate(sampleRate, maxFrameCount, isRealTime);
       return _isActive;
    }
 
@@ -45,7 +45,7 @@ namespace clap {
       _isActive = false;
    }
 
-   bool Module::doActivate(double sampleRate, uint32_t maxFrameCount) { return true; }
+   bool Module::doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) { return true; }
 
    void Module::doDeactivate() {}
 } // namespace clap

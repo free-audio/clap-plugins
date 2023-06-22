@@ -61,6 +61,8 @@ add_library(
   plugs/dc-offset/dc-offset.hh
   plugs/gain/gain.cc
   plugs/gain/gain.hh
+  plugs/offline-latency/offline-latency.hh
+  plugs/offline-latency/offline-latency.cc
   plugs/transport/transport-info.cc
   plugs/transport/transport-info.hh
   plugs/synth/synth.hh
@@ -68,6 +70,8 @@ add_library(
   plugs/svf/svf-plug.hh
   plugs/svf/svf-plug.cc
   smoothed-value.hh
+  sample-delay.cc
+  sample-delay.hh
   stream-helper.cc
   stream-helper.hh
   tuning-provider.cc

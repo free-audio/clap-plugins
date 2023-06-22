@@ -19,7 +19,7 @@ namespace clap {
                           std::unique_ptr<Module> module,
                           uint32_t channelCount);
 
-      bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
+      bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override;
       void doDeactivate() override;
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override;

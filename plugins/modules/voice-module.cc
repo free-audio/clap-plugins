@@ -160,8 +160,8 @@ namespace clap {
       return status;
    }
 
-   bool VoiceModule::doActivate(double sampleRate, uint32_t maxFrameCount) {
-      return _module->activate(sampleRate, maxFrameCount);
+   bool VoiceModule::doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) {
+      return _module->activate(sampleRate, maxFrameCount, isRealTime);
    }
 
    void VoiceModule::doDeactivate() { _module->deactivate(); }

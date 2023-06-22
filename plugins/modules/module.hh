@@ -36,8 +36,8 @@ namespace clap {
 
       [[nodiscard]] virtual std::unique_ptr<Module> cloneVoice() const;
 
-      bool activate(double sampleRate, uint32_t maxFrameCount);
-      [[nodiscard]] virtual bool doActivate(double sampleRate, uint32_t maxFrameCount);
+      bool activate(double sampleRate, uint32_t maxFrameCount, bool isRealTime);
+      [[nodiscard]] virtual bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime);
       void deactivate();
       virtual void doDeactivate();
       [[nodiscard]] bool isActive() const noexcept { return _isActive; }

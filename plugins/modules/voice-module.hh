@@ -45,7 +45,7 @@ namespace clap {
       [[nodiscard]] auto &volume() const noexcept { return _volumeBuffer; }
       [[nodiscard]] auto &pan() const noexcept { return _panBuffer; }
 
-      bool doActivate(double sampleRate, uint32_t maxFrameCount) override;
+      bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override;
       void doDeactivate() override;
 
       bool wantsNoteEvents() const noexcept override;

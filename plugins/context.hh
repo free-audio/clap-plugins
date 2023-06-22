@@ -22,6 +22,8 @@ namespace clap {
          sampleRateInvF = static_cast<float>(sampleRateInvD);
       }
 
+      [[nodiscard]] bool isRealTimeRendering() const noexcept { return renderMode == CLAP_RENDER_REALTIME; }
+
       // current sampleRate
       double sampleRateD;
       float sampleRateF;
@@ -32,6 +34,8 @@ namespace clap {
 
       bool isPlaying;
       bool isRecording;
+
+      clap_plugin_render_mode renderMode = CLAP_RENDER_REALTIME;
 
       // pre-calculated array of beat time for each frames
       std::array<FixedPoint, BLOCK_SIZE> beatTime;

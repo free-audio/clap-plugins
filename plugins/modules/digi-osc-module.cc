@@ -25,7 +25,7 @@ namespace clap {
       return std::make_unique<DigiOscModule>(*this);
    }
 
-   bool DigiOscModule::doActivate(double sampleRate, uint32_t maxFrameCount) { return true; }
+   bool DigiOscModule::doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) { return true; }
 
    clap_process_status DigiOscModule::process(const Context &c, uint32_t numFrames) noexcept {
       assert(_isActive);

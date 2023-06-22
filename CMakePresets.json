@@ -91,7 +91,7 @@
         },
         {
             "name": "vs-vcpkg",
-            "description": "Configure with vcpkg toolchain and generate Visual Studio project files for all configurations",
+            "description": "Visual Studio + VCPKG",
             "inherits": [
                 "vs",
                 "vcpkg"
@@ -99,7 +99,7 @@
         },
         {
             "name": "vs-headless",
-            "description": "Configure and generate Visual Studio project files for all configurations",
+            "description": "Visual Studio + Headless",
             "inherits": [
                 "vs",
                 "headless"
@@ -138,6 +138,12 @@
             "inherits": "base",
             "description": "Build using Visual Studio and VCPKG",
             "configurePreset": "vs-vcpkg"
+        },
+        {
+            "name": "vs-headless",
+            "inherits": "base",
+            "description": "Build using Visual Studio (headless)",
+            "configurePreset": "vs-headless"
         }
     ],
     "testPresets": [
@@ -155,6 +161,11 @@
             "name": "ninja-headless",
             "description": "Test using Ninja and system libraries (headless)",
             "configurePreset": "ninja-headless"
+        },
+        {
+            "name": "vs-headless",
+            "description": "Test using Visual Studio (headless)",
+            "configurePreset": "vs-headless"
         }
     ]
 }

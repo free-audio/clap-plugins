@@ -75,8 +75,8 @@ namespace clap {
    Parameter::setMappingIndication(const clap_color &color, const char *label, const char *desc) {
       _hasMappingIndication = true;
       _mappingIndicationColor = color;
-      _mappingIndicationLabel = label ?: "";
-      _mappingIndicationDescription = desc ?: "";
+      _mappingIndicationLabel = label ? label : "";
+      _mappingIndicationDescription = desc ? desc : "";
    }
    void Parameter::clearMappingIndication() {
       _hasMappingIndication = false;

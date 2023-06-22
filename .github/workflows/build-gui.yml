@@ -1,5 +1,5 @@
 name: build
-on: [push, workflow_dispatch]
+on: [workflow_dispatch]
 
 jobs:
   VCPKG:
@@ -111,7 +111,7 @@ jobs:
 
       - name: Build
         shell: bash
-        run: scripts/build.sh ${{ matrix.triplet }}
+        run: scripts/build-gui.sh ${{ matrix.triplet }}
 
       - name: Archive artifact
         shell: bash

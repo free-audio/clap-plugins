@@ -64,6 +64,8 @@ Static builds will require more time and space.
 
 ## Headless
 
+This build variant doesn't include the GUI and is **much** faster to build due to the lack of dependencies.
+
 ```bash
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins
 cd clap-plugins
@@ -95,7 +97,7 @@ brew install cmake ninja
 # Checkout the code
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins
 cd clap-plugins
-scripts/build.sh
+scripts/build-gui.sh
 ```
 
 ## Windows
@@ -121,7 +123,7 @@ cd c:\
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins c-p
 cd c-p
 
-scripts/build.sh
+scripts/build-gui.sh
 ```
 
 ## Linux, using system libraries (dynamic)
@@ -144,5 +146,5 @@ cmake --build --preset ninja-system
 ```bash
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins
 cd clap-plugins
-scripts/build.sh
+scripts/build-gui.sh
 ```

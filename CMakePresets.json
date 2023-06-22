@@ -19,6 +19,25 @@
             }
         },
         {
+            "name": "vs",
+            "hidden": true,
+            "inherits": [
+                "base"
+            ],
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64"
+        },
+        {
+            "name": "headless",
+            "hidden": true,
+            "cacheVariables": {
+                "CLAP_PLUGINS_HEADLESS": {
+                    "type": "BOOL",
+                    "value": true
+                }
+            }
+        },
+        {
             "name": "vcpkg",
             "hidden": true,
             "cacheVariables": {
@@ -45,16 +64,6 @@
             ]
         },
         {
-            "name": "vs-vcpkg",
-            "description": "Configure with vcpkg toolchain and generate Visual Studio project files for all configurations",
-            "inherits": [
-                "base",
-                "vcpkg"
-            ],
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64"
-        },
-        {
             "name": "ninja-system",
             "description": "Ninja + System Libraries",
             "binaryDir": "${sourceDir}/builds/${presetName}",
@@ -77,14 +86,24 @@
             "description": "Ninja + System Libraries + Headless",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
-                "base"
-            ],
-            "cacheVariables": {
-                "CLAP_PLUGINS_HEADLESS": {
-                    "type": "BOOL",
-                    "value": true
-                }
-            }
+                "base", "headless"
+            ]
+        },
+        {
+            "name": "vs-vcpkg",
+            "description": "Configure with vcpkg toolchain and generate Visual Studio project files for all configurations",
+            "inherits": [
+                "vs",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "vs-headless",
+            "description": "Configure and generate Visual Studio project files for all configurations",
+            "inherits": [
+                "vs",
+                "headless"
+            ]
         }
     ],
     "buildPresets": [

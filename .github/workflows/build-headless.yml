@@ -39,12 +39,11 @@ jobs:
 
       - name: Setup MacOS
         if: startsWith(matrix.os, 'macOS')
-        run: brew upgrade && brew install automake autoconf ninja cmake nuget || true
+        run: brew install automake autoconf ninja cmake nuget || true
 
       - name: Setup Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt update && sudo apt upgrade && sudo apt install
-          build-essential gperf ninja-build cmake
+        run: sudo apt install build-essential gperf ninja-build cmake
 
       - name: Build
         shell: bash

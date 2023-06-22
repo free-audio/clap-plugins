@@ -115,7 +115,7 @@ namespace clap {
    bool CorePlugin::stateSave(const clap_ostream *stream) noexcept {
       try {
          ClapOStream os(stream);
-         yas::binary_oarchive<ClapOStream> ar(os);
+         yas::binary_oarchive ar(os);
          ar &_parameters;
       } catch (...) {
          return false;
@@ -134,7 +134,7 @@ namespace clap {
 #else
          ClapIStream is(stream);
 #endif
-         yas::binary_iarchive<ClapIStream> ar(is);
+         yas::binary_iarchive ar(is);
          ar &_parameters;
       } catch (...) {
          return false;

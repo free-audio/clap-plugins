@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 
+#include <yas/mem_streams.hpp>
 #include <yas/binary_iarchive.hpp>
 #include <yas/binary_oarchive.hpp>
 
@@ -124,7 +125,15 @@ namespace clap {
 
    bool CorePlugin::stateLoad(const clap_istream *stream) noexcept {
       try {
+#ifdef _MSC_VER
+         std::string data;
+         if (!clap::readAll(stream, data))
+            return false;
+
+         yas::mem_istream is(data.data(), data.size());
+#else
          ClapIStream is(stream);
+#endif
          yas::binary_iarchive<ClapIStream> ar(is);
          ar &_parameters;
       } catch (...) {

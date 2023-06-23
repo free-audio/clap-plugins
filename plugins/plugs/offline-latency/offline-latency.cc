@@ -1,7 +1,7 @@
 #include <cstring>
 
-#include "offline-latency.hh"
 #include "../../sample-delay.hh"
+#include "offline-latency.hh"
 
 namespace clap {
 
@@ -9,8 +9,7 @@ namespace clap {
       using super = Module;
 
    public:
-      OfflineLatencyModule(OfflineLatency &plugin) : Module(plugin, "", 0) {
-      }
+      OfflineLatencyModule(OfflineLatency &plugin) : Module(plugin, "", 0) {}
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
          _delay.setDelayTime(isRealTime ? 0 : sampleRate);
@@ -21,17 +20,15 @@ namespace clap {
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
 
-         auto& in = *c.audioInputs[0];
-         auto& out = *c.audioOutputs[0];
+         auto &in = *c.audioInputs[0];
+         auto &out = *c.audioOutputs[0];
 
          _delay.process(in, out, numFrames);
 
          return CLAP_PROCESS_CONTINUE;
       }
 
-      uint32_t latency() const noexcept override {
-         return _delay.getDelayTime();
-      }
+      uint32_t latency() const noexcept override { return _delay.getDelayTime(); }
 
       SampleDelay<double> _delay{1};
    };
@@ -50,7 +47,8 @@ namespace clap {
          nullptr,
          nullptr,
          "0.1",
-         "Offline Latency",
+         "Test plugin used to determine if the host correctly handles a plugin introducing latency "
+         "when activated in offline rendering",
          features};
       return &desc;
    }

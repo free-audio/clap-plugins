@@ -55,10 +55,6 @@ namespace clap {
       return &desc;
    }
 
-   enum {
-      kParamIdGain = 0,
-   };
-
    OfflineLatency::OfflineLatency(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "Offline Latency"), descriptor(), host) {
       _rootModule = std::make_unique<OfflineLatencyModule>(*this);

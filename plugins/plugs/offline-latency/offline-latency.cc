@@ -30,7 +30,7 @@ namespace clap {
 
       uint32_t latency() const noexcept override { return _delay.getDelayTime(); }
 
-      SampleDelay<double> _delay{1};
+      SampleDelay<double> _delay{2};
    };
 
    const clap_plugin_descriptor *OfflineLatency::descriptor() {

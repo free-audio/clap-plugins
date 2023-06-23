@@ -40,8 +40,8 @@ namespace clap {
       static const clap_plugin_descriptor desc = {
 
          CLAP_VERSION,
-         "com.github.free-audio.clap.gain",
-         "Gain",
+         "com.github.free-audio.clap.offline-latency",
+         "Offline Latency",
          "clap",
          "https://github.com/free-audio/clap",
          nullptr,

@@ -15,6 +15,7 @@
 #include "plugs/synth/synth.hh"
 #include "plugs/svf/svf-plug.hh"
 #include "plugs/offline-latency/offline-latency.hh"
+#include "plugs/realtime-requirement/realtime-requirement.hh"
 
 struct PluginEntry {
    using create_func = std::function<const clap_plugin *(const clap_host *)>;
@@ -48,6 +49,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::AdsrPlug>();
    addPlugin<clap::SvfPlug>();
    addPlugin<clap::OfflineLatency>();
+   addPlugin<clap::RealtimeRequirement>();
    return true;
 }
 

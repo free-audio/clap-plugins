@@ -63,10 +63,12 @@ add_library(
   plugs/gain/gain.hh
   plugs/offline-latency/offline-latency.hh
   plugs/offline-latency/offline-latency.cc
-  plugs/transport/transport-info.cc
-  plugs/transport/transport-info.hh
+  plugs/realtime-requirement/realtime-requirement.hh
+  plugs/realtime-requirement/realtime-requirement.cc
   plugs/synth/synth.hh
   plugs/synth/synth.cc
+  plugs/transport/transport-info.cc
+  plugs/transport/transport-info.hh
   plugs/svf/svf-plug.hh
   plugs/svf/svf-plug.cc
   smoothed-value.hh

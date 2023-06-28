@@ -3,12 +3,12 @@
 #include "../../core-plugin.hh"
 
 namespace clap {
-   class OfflineLatency final : public CorePlugin {
+   class RealtimeRequirement final : public CorePlugin {
    private:
       using super = CorePlugin;
 
    public:
-      OfflineLatency(const std::string &pluginPath, const clap_host *host);
+      RealtimeRequirement(const std::string &pluginPath, const clap_host *host);
 
       static const clap_plugin_descriptor *descriptor();
 
@@ -16,5 +16,7 @@ namespace clap {
       // clap_plugin
       bool init() noexcept override;
       void defineAudioPorts() noexcept;
+
+      bool renderHasHardRealtimeRequirement() noexcept override;
    };
 } // namespace clap

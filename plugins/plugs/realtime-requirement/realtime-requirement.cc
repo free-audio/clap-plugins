@@ -1,21 +1,15 @@
 #include <cstring>
 
 #include "../../sample-delay.hh"
-#include "offline-latency.hh"
+#include "realtime-requirement.hh"
 
 namespace clap {
 
-   class OfflineLatencyModule final : public Module {
+   class RealtimeRequirementModule final : public Module {
       using super = Module;
 
    public:
-      OfflineLatencyModule(OfflineLatency &plugin) : Module(plugin, "", 0) {}
-
-      bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
-         _delay.setDelayTime(isRealTime ? 0 : sampleRate);
-         _delay.reset(0);
-         return true;
-      }
+      RealtimeRequirementModule(RealtimeRequirement &plugin) : Module(plugin, "", 0) {}
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);
@@ -23,42 +17,38 @@ namespace clap {
          auto &in = *c.audioInputs[0];
          auto &out = *c.audioOutputs[0];
 
-         _delay.process(in, out, numFrames);
+         out.copy(in, numFrames);
 
-         return CLAP_PROCESS_CONTINUE;
+         return CLAP_PROCESS_SLEEP;
       }
-
-      uint32_t latency() const noexcept override { return _delay.getDelayTime(); }
-
-      SampleDelay<double> _delay{2};
    };
 
-   const clap_plugin_descriptor *OfflineLatency::descriptor() {
+   const clap_plugin_descriptor *RealtimeRequirement::descriptor() {
       static const char *features[] = {
          CLAP_PLUGIN_FEATURE_AUDIO_EFFECT, CLAP_PLUGIN_FEATURE_UTILITY, nullptr};
 
       static const clap_plugin_descriptor desc = {
 
          CLAP_VERSION,
-         "com.github.free-audio.clap.offline-latency",
-         "Offline Latency",
+         "com.github.free-audio.clap.realtime-requirement",
+         "Realtime Requirement",
          "clap",
          "https://github.com/free-audio/clap",
          nullptr,
          nullptr,
          "0.1",
-         "Test plugin used to determine if the host correctly handles a plugin introducing latency "
-         "when activated in offline rendering",
+         "Test plugin used to determine if the host correctly handles a plugin having a realtime "
+         "requirement",
          features};
       return &desc;
    }
 
-   OfflineLatency::OfflineLatency(const std::string &pluginPath, const clap_host *host)
+   RealtimeRequirement::RealtimeRequirement(const std::string &pluginPath, const clap_host *host)
       : CorePlugin(PathProvider::create(pluginPath, "Offline Latency"), descriptor(), host) {
-      _rootModule = std::make_unique<OfflineLatencyModule>(*this);
+      _rootModule = std::make_unique<RealtimeRequirementModule>(*this);
    }
 
-   bool OfflineLatency::init() noexcept {
+   bool RealtimeRequirement::init() noexcept {
       if (!super::init())
          return false;
 
@@ -66,7 +56,7 @@ namespace clap {
       return true;
    }
 
-   void OfflineLatency::defineAudioPorts() noexcept {
+   void RealtimeRequirement::defineAudioPorts() noexcept {
       assert(!isActive());
 
       clap_audio_port_info info;
@@ -82,4 +72,6 @@ namespace clap {
       _audioOutputs.clear();
       _audioOutputs.push_back(info);
    }
+
+   bool RealtimeRequirement::renderHasHardRealtimeRequirement() noexcept { return true; }
 } // namespace clap

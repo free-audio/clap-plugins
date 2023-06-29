@@ -14,6 +14,7 @@
 #include "plugs/char-check/char-check.hh"
 #include "plugs/synth/synth.hh"
 #include "plugs/svf/svf-plug.hh"
+#include "plugs/latency/latency.hh"
 #include "plugs/offline-latency/offline-latency.hh"
 #include "plugs/realtime-requirement/realtime-requirement.hh"
 
@@ -48,6 +49,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::CharCheck>();
    addPlugin<clap::AdsrPlug>();
    addPlugin<clap::SvfPlug>();
+   addPlugin<clap::Latency>();
    addPlugin<clap::OfflineLatency>();
    addPlugin<clap::RealtimeRequirement>();
    return true;

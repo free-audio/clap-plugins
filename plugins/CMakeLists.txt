@@ -61,6 +61,8 @@ add_library(
   plugs/dc-offset/dc-offset.hh
   plugs/gain/gain.cc
   plugs/gain/gain.hh
+  plugs/latency/latency.cc
+  plugs/latency/latency.hh
   plugs/offline-latency/offline-latency.hh
   plugs/offline-latency/offline-latency.cc
   plugs/realtime-requirement/realtime-requirement.hh

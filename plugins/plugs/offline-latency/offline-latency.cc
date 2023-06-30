@@ -12,7 +12,7 @@ namespace clap {
       OfflineLatencyModule(OfflineLatency &plugin) : Module(plugin, "", 0) {}
 
       bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
-         _delay.setDelayTime(isRealTime ? 0 : sampleRate);
+         _delay.setDelayTime(isRealTime ? 0 : (.2 * sampleRate));
          _delay.reset(0);
          return true;
       }

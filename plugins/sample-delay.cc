@@ -33,9 +33,9 @@ namespace clap {
          assert(_pos < _data.size());
 
          for (uint32_t c = 0; c < _channels; ++c) {
-            out.setSample(i, c, _data[_pos]);
-            const auto rpos = (_pos + dataSz - _delayTime) % dataSz;
-            _data[rpos] = in.getSample(i, c);
+            const auto rpos = (_pos + dataSz - _delayTime * _channels) % dataSz;
+            out.setSample(i, c, _data[rpos]);
+            _data[_pos] = in.getSample(i, c);
             _pos = (_pos + 1) % dataSz;
          }
       }

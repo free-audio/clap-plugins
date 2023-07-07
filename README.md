@@ -92,7 +92,7 @@ cmake --build --preset ninja-system
 
 ```shell
 # Install build tools
-brew install cmake ninja
+brew install cmake ninja autoconf automake
 
 # Checkout the code
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins

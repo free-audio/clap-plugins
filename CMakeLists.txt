@@ -22,6 +22,10 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang")
   add_compile_options(-Wmost -Wsuper-class-method-mismatch)
 endif()
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  add_compile_options(/utf-8)
+endif()
+
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)
 

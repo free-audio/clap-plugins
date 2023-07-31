@@ -860,7 +860,7 @@ namespace clap {
 #ifndef CLAP_PLUGINS_HEADLESS
       if (_guiHandle)
          _guiHandle->gui().setParameterMappingIndication(
-            param_id, has_mapping, c, label ?: "", description ?: "");
+            param_id, has_mapping, c, label ? label : "", description ? description : "");
 #endif
    }
 

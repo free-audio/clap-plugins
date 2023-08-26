@@ -7,6 +7,6 @@
 namespace clap {
    double TuningProvider::getFreq(int16_t port, int16_t channel, int16_t key) const {
       assert(key >= 0 && key < 128);
-      return 440 * tuningToRatio(key - 12 * 6);
+      return 440 * tuningToRatio(key - 69);
    }
 } // namespace clap

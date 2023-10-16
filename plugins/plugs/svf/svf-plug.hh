@@ -8,7 +8,7 @@ namespace clap {
       using super = CorePlugin;
 
    public:
-      SvfPlug(const std::string &pluginPath, const clap_host *host);
+      SvfPlug(const std::string &pluginPath, const clap_host &host);
 
       static const clap_plugin_descriptor *descriptor();
 

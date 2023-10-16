@@ -8,7 +8,7 @@ namespace clap {
       using super = CorePlugin;
 
    public:
-      RealtimeRequirement(const std::string &pluginPath, const clap_host *host);
+      RealtimeRequirement(const std::string &pluginPath, const clap_host &host);
 
       static const clap_plugin_descriptor *descriptor();
 

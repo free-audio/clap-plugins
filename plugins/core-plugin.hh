@@ -42,7 +42,7 @@ namespace clap {
    public:
       CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
                  const clap_plugin_descriptor *desc,
-                 const clap_host *host);
+                 const clap_host &host);
       ~CorePlugin() override;
 
       const PathProvider &pathProvider() const noexcept { return *_pathProvider; }

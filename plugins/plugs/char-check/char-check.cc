@@ -36,7 +36,7 @@ namespace clap {
       return &desc;
    }
 
-   CharCheck::CharCheck(const std::string &pluginPath, const clap_host *host)
+   CharCheck::CharCheck(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "char-check"), descriptor(), host) {
       _rootModule = std::make_unique<CharCheckModule>(*this);
 

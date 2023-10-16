@@ -53,7 +53,7 @@ namespace clap {
       return &desc;
    }
 
-   OfflineLatency::OfflineLatency(const std::string &pluginPath, const clap_host *host)
+   OfflineLatency::OfflineLatency(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "Offline Latency"), descriptor(), host) {
       _rootModule = std::make_unique<OfflineLatencyModule>(*this);
    }

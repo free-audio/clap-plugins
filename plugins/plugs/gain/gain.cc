@@ -52,7 +52,7 @@ namespace clap {
       kParamIdGain = 0,
    };
 
-   Gain::Gain(const std::string &pluginPath, const clap_host *host)
+   Gain::Gain(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "gain"), descriptor(), host) {
       _rootModule = std::make_unique<GainModule>(*this);
    }

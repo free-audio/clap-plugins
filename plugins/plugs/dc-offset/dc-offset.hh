@@ -8,7 +8,7 @@ namespace clap {
       using super = CorePlugin;
 
    public:
-      DcOffset(const std::string& pluginPath, const clap_host *host);
+      DcOffset(const std::string& pluginPath, const clap_host &host);
 
       static const clap_plugin_descriptor *descriptor();
 

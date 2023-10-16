@@ -52,7 +52,7 @@ namespace clap {
       return &desc;
    }
 
-   SvfPlug::SvfPlug(const std::string &pluginPath, const clap_host *host)
+   SvfPlug::SvfPlug(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "svf"), descriptor(), host) {
       _rootModule = std::make_unique<SvfPlugModule>(*this);
    }

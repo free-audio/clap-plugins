@@ -9,7 +9,7 @@ namespace clap {
       using super = CorePlugin;
 
    public:
-      AdsrPlug(const std::string &pluginPath, const clap_host *host);
+      AdsrPlug(const std::string &pluginPath, const clap_host &host);
 
       static const clap_plugin_descriptor *descriptor();
 

@@ -37,7 +37,7 @@ namespace clap {
 
    CorePlugin::CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
                           const clap_plugin_descriptor *desc,
-                          const clap_host *host)
+                          const clap_host &host)
       : Plugin(desc, host), _pathProvider(std::move(pathProvider)) {
       assert(_pathProvider);
    }

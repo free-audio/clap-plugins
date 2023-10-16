@@ -8,7 +8,7 @@ namespace clap {
       using super = CorePlugin;
 
    public:
-      Synth(const std::string &pluginPath, const clap_host *host);
+      Synth(const std::string &pluginPath, const clap_host &host);
 
       static const clap_plugin_descriptor *descriptor();
 

@@ -61,7 +61,7 @@ namespace clap {
       return &desc;
    }
 
-   AdsrPlug::AdsrPlug(const std::string &pluginPath, const clap_host *host)
+   AdsrPlug::AdsrPlug(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "AdsrPlug"), descriptor(), host) {
       _rootModule = std::make_unique<AdsrPlugModule>(*this);
    }

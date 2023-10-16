@@ -8,7 +8,7 @@ namespace clap {
       using super = CorePlugin;
 
    public:
-      TransportInfo(const std::string& pluginPath, const clap_host *host);
+      TransportInfo(const std::string& pluginPath, const clap_host &host);
 
       static const clap_plugin_descriptor *descriptor();
    };

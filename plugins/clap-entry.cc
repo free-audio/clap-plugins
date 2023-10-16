@@ -19,13 +19,13 @@
 #include "plugs/realtime-requirement/realtime-requirement.hh"
 
 struct PluginEntry {
-   using create_func = std::function<const clap_plugin *(const clap_host *)>;
+   using create_func = std::function<const clap_plugin *(const clap_host &)>;
 
    PluginEntry(const clap_plugin_descriptor *d, create_func &&func)
       : desc(d), create(std::move(func)) {}
 
    const clap_plugin_descriptor *desc;
-   std::function<const clap_plugin *(const clap_host *)> create;
+   std::function<const clap_plugin *(const clap_host &)> create;
 };
 
 static std::vector<PluginEntry> g_plugins;
@@ -33,7 +33,7 @@ static std::string g_pluginPath;
 
 template <typename T>
 static void addPlugin() {
-   g_plugins.emplace_back(T::descriptor(), [](const clap_host *host) -> const clap_plugin * {
+   g_plugins.emplace_back(T::descriptor(), [](const clap_host &host) -> const clap_plugin * {
       auto plugin = new T(g_pluginPath, host);
       return plugin->clapPlugin();
    });
@@ -77,7 +77,7 @@ static const clap_plugin *
 clap_create_plugin(const clap_plugin_factory *, const clap_host *host, const char *plugin_id) {
    for (auto &entry : g_plugins)
       if (!strcmp(entry.desc->id, plugin_id))
-         return entry.create(host);
+         return entry.create(*host);
    return nullptr;
 }
 

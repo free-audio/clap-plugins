@@ -222,7 +222,7 @@ namespace clap {
       return &desc;
    }
 
-   Synth::Synth(const std::string &pluginPath, const clap_host *host)
+   Synth::Synth(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "synth"), descriptor(), host) {
       _rootModule = std::make_unique<SynthModule>(*this);
    }

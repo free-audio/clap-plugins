@@ -52,7 +52,7 @@ namespace clap {
       return &desc;
    }
 
-   Latency::Latency(const std::string &pluginPath, const clap_host *host)
+   Latency::Latency(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "Latency"), descriptor(), host) {
       _rootModule = std::make_unique<LatencyModule>(*this);
    }

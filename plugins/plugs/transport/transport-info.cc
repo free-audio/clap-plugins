@@ -34,7 +34,7 @@ namespace clap {
       kParamIdOffset = 0,
    };
 
-   TransportInfo::TransportInfo(const std::string &pluginPath, const clap_host *host)
+   TransportInfo::TransportInfo(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "transport-info"), descriptor(), host) {
       _rootModule = std::make_unique<TransportInfoModule>(*this);
    }

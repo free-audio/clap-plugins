@@ -1,7 +1,6 @@
 #include <QRgb>
 
 #include "../io/messages.hh"
-#include "abstract-gui-listener.hh"
 #include "gui.hh"
 #include "track-info-proxy.hh"
 

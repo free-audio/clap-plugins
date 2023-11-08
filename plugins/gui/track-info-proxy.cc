@@ -24,6 +24,14 @@ namespace clap {
       const auto &c = info.color;
       update<QColor>(
          _color, QColor(c.red, c.green, c.blue, c.alpha), &TrackInfoProxy::colorChanged);
+      update<bool>(
+         _isForBus, info.flags & CLAP_TRACK_INFO_IS_FOR_BUS, &TrackInfoProxy::isForBusChanged);
+      update<bool>(_isForReturn,
+                   info.flags & CLAP_TRACK_INFO_IS_FOR_RETURN_TRACK,
+                   &TrackInfoProxy::isForReturnChanged);
+      update<bool>(_isForMaster,
+                   info.flags & CLAP_TRACK_INFO_IS_FOR_MASTER,
+                   &TrackInfoProxy::isForMasterChanged);
 
       emit updated();
    }

@@ -22,6 +22,9 @@ Rectangle {
         text += "Flags: " + trackInfo.flags + "\n";
         text += "Audio Port Type: " + trackInfo.audioPortType + "\n";
         text += "Audio Channel Count: " + trackInfo.audioChannelCount + "\n";
+        text += "IsForReturn: " + trackInfo.isForReturn + "\n";
+        text += "IsForBus: " + trackInfo.isForBus + "\n";
+        text += "IsForMaster: " + trackInfo.isForMaster + "\n";
 
         return text;
     }

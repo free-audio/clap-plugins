@@ -138,7 +138,7 @@ namespace clap::messages {
    struct UpdateTrackInfoRequest final {
       static const constexpr Type type = kUpdateTrackInfoRequest;
       bool hasTrackInfo;
-      clap_track_info track_info;
+      clap_track_info trackInfo;
    };
 
    struct SubscribeToTransportRequest final {

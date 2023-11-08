@@ -129,6 +129,16 @@ namespace clap {
          break;
       }
 
+      case messages::kUpdateTrackInfoRequest: {
+         if (!c)
+            return;
+
+         messages::UpdateTrackInfoRequest rq;
+         msg.get(rq);
+         c->updateTrackInfo(rq.hasTrackInfo, rq.trackInfo);
+         break;
+      }
+
       case messages::kAddImportPathRequest: {
          if (!c)
             return;

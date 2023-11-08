@@ -55,7 +55,6 @@ namespace clap {
    void CorePlugin::updateTrackInfo() noexcept {
       checkMainThread();
 
-      assert(!_hasTrackInfo);
       if (!_host.canUseTrackInfo())
          return;
 

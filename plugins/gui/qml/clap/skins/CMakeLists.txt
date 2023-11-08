@@ -9,4 +9,5 @@ qt6_add_qml_module(clap-qml-skins
                 transport-info/main.qml
                 char-check/main.qml
                 synth/main.qml
+                track-info/main.qml
 )

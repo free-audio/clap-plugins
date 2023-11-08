@@ -254,6 +254,11 @@ namespace clap {
       _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
    }
 
+   void RemoteGuiProxy::updateTrackInfo(bool hasTrackInfo, const clap_track_info &info) {
+      messages::UpdateTrackInfoRequest rq{hasTrackInfo, info};
+      _clientFactory.exec([&] { _clientFactory._channel->sendRequestAsync(_clientId, rq); });
+   }
+
    void RemoteGuiProxy::onMessage(const RemoteChannel::Message &msg) {
       assert(msg.header.clientId == _clientId);
 

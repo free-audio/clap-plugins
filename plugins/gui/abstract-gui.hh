@@ -24,6 +24,8 @@ namespace clap {
       virtual void clearTransport() = 0;
       virtual void updateTransport(const clap_event_transport &transport) = 0;
 
+      virtual void updateTrackInfo(bool hasTrackInfo, const clap_track_info &info) = 0;
+
       [[nodiscard]] virtual bool openWindow() = 0;
 
       [[nodiscard]] virtual bool attachCocoa(clap_nsview nsView) = 0;

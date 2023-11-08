@@ -6,6 +6,7 @@
 #include "abstract-gui.hh"
 #include "plugin-proxy.hh"
 #include "transport-proxy.hh"
+#include "track-info-proxy.hh"
 
 QT_BEGIN_NAMESPACE
 class QQuickView;
@@ -47,6 +48,8 @@ namespace clap {
       void clearTransport() override;
       void updateTransport(const clap_event_transport &transport) override;
 
+      void updateTrackInfo(bool hasTrackInfo, const clap_track_info &info) override;
+
       bool openWindow() override;
 
       bool attachCocoa(clap_nsview nsView) override;
@@ -85,6 +88,7 @@ namespace clap {
       // QML proxy objects
       std::unique_ptr<PluginProxy> _pluginProxy;
       std::unique_ptr<TransportProxy> _transportProxy;
+      std::unique_ptr<TrackInfoProxy> _trackInfoProxy;
 
       double _rootScale = 1.;
    };

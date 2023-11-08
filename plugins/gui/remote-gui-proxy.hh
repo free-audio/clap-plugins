@@ -31,6 +31,8 @@ namespace clap {
       void clearTransport() override;
       void updateTransport(const clap_event_transport &transport) override;
 
+      void updateTrackInfo(bool hasTrackInfo, const clap_track_info &info) override;
+
       bool openWindow() override;
 
       bool attachCocoa(clap_nsview nsView) override;

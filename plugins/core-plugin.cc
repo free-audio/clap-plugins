@@ -4,9 +4,9 @@
 #include <thread>
 #include <vector>
 
-#include <yas/mem_streams.hpp>
 #include <yas/binary_iarchive.hpp>
 #include <yas/binary_oarchive.hpp>
+#include <yas/mem_streams.hpp>
 
 #include <clap/helpers/host-proxy.hxx>
 #include <clap/helpers/plugin.hxx>
@@ -45,11 +45,14 @@ namespace clap {
    CorePlugin::~CorePlugin() = default;
 
    bool CorePlugin::init() noexcept {
-      initTrackInfo();
+      updateTrackInfo();
       return true;
    }
 
-   void CorePlugin::initTrackInfo() noexcept {
+   //-----------------//
+   // clap_track_info //
+   //-----------------//
+   void CorePlugin::updateTrackInfo() noexcept {
       checkMainThread();
 
       assert(!_hasTrackInfo);
@@ -57,18 +60,22 @@ namespace clap {
          return;
 
       _hasTrackInfo = _host.trackInfoGet(&_trackInfo);
+      if (!_hasTrackInfo)
+         memset(&_trackInfo, 0, sizeof(_trackInfo));
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      guiDefineTrackInfo();
+#endif
    }
 
-   void CorePlugin::trackInfoChanged() noexcept {
-      if (!_host.trackInfoGet(&_trackInfo)) {
-         _hasTrackInfo = false;
-         hostMisbehaving(
-            "clap_host_track_info.get() failed after calling clap_plugin_track_info.changed()");
-         return;
-      }
-
-      _hasTrackInfo = true;
+   void CorePlugin::guiDefineTrackInfo() noexcept {
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         _guiHandle->gui().updateTrackInfo(_hasTrackInfo, _trackInfo);
+#endif
    }
+
+   void CorePlugin::trackInfoChanged() noexcept { updateTrackInfo(); }
 
    //------------------------//
    // clap_plugin_note_ports //
@@ -169,6 +176,7 @@ namespace clap {
          return false;
 
       guiDefineParameters();
+      guiDefineTrackInfo();
 
       auto skinPath = _pathProvider->getQmlSkinPath();
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());

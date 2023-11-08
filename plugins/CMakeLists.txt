@@ -69,6 +69,8 @@ add_library(
   plugs/realtime-requirement/realtime-requirement.cc
   plugs/synth/synth.hh
   plugs/synth/synth.cc
+  plugs/track-info/track-info.cc
+  plugs/track-info/track-info.hh
   plugs/transport/transport-info.cc
   plugs/transport/transport-info.hh
   plugs/svf/svf-plug.hh

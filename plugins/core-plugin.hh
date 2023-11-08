@@ -53,7 +53,6 @@ namespace clap {
       // clap_plugin //
       //-------------//
       bool init() noexcept override;
-      void initTrackInfo() noexcept;
 
       bool
       activate(double sampleRate, uint32_t minFrameCount, uint32_t maxFrameCount) noexcept override;
@@ -72,6 +71,9 @@ namespace clap {
       //------------------------//
       bool implementsTrackInfo() const noexcept override { return true; }
       void trackInfoChanged() noexcept override;
+
+      void updateTrackInfo() noexcept;
+      void guiDefineTrackInfo() noexcept;
 
       //------------------------//
       // clap_plugin_note_ports //

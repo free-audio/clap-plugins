@@ -21,6 +21,8 @@ add_library(
   parameter-proxy.cc
   plugin-proxy.hh
   plugin-proxy.cc
+  track-info-proxy.hh
+  track-info-proxy.cc
   transport-proxy.hh
   transport-proxy.cc)
 set_property(TARGET clap-plugin-gui PROPERTY CXX_STANDARD 20)

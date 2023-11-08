@@ -20,6 +20,7 @@ namespace clap::messages {
       kSetParameterAutomationIndicationRequest,
       kParameterValueRequest,
       kUpdateTransportRequest,
+      kUpdateTrackInfoRequest,
 
       // GUI->DSP
       kParamBeginAdjustRequest,
@@ -132,6 +133,12 @@ namespace clap::messages {
       static const constexpr Type type = kUpdateTransportRequest;
       bool hasTransport;
       clap_event_transport transport;
+   };
+
+   struct UpdateTrackInfoRequest final {
+      static const constexpr Type type = kUpdateTrackInfoRequest;
+      bool hasTrackInfo;
+      clap_track_info track_info;
    };
 
    struct SubscribeToTransportRequest final {

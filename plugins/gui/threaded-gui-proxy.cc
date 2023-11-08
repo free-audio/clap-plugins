@@ -68,6 +68,11 @@ namespace clap {
          _gui.get(), [=, this] { _gui->updateTransport(transport); }, Qt::QueuedConnection);
    }
 
+   void ThreadedGuiProxy::updateTrackInfo(bool hasTrackInfo, const clap_track_info &info) {
+      QMetaObject::invokeMethod(
+         _gui.get(), [=, this] { _gui->updateTrackInfo(hasTrackInfo, info); }, Qt::QueuedConnection);
+   }
+
    bool ThreadedGuiProxy::openWindow() {
       bool succeed = false;
       QMetaObject::invokeMethod(

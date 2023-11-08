@@ -24,6 +24,7 @@ namespace clap {
 
       _pluginProxy = std::make_unique<PluginProxy>(*this);
       _transportProxy = std::make_unique<TransportProxy>(*this);
+      _trackInfoProxy = std::make_unique<TrackInfoProxy>(*this);
 
       ////////////////////////
       // QML initialization //
@@ -33,6 +34,7 @@ namespace clap {
 
       qmlContext->setContextProperty("plugin", _pluginProxy.get());
       qmlContext->setContextProperty("transport", _transportProxy.get());
+      qmlContext->setContextProperty("trackInfo", _trackInfoProxy.get());
       setRootScale(1);
 
       connect(
@@ -95,6 +97,10 @@ namespace clap {
 
    void Gui::updateTransport(const clap_event_transport &transport) {
       _transportProxy->update(transport);
+   }
+
+   void Gui::updateTrackInfo(bool hasTrackInfo, const clap_track_info &info) {
+      _trackInfoProxy->update(hasTrackInfo, info);
    }
 
    void Gui::showLater() {

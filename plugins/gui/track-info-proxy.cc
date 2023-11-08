@@ -12,8 +12,9 @@ namespace clap {
 
    void TrackInfoProxy::update(bool hasTrackInfo, const clap_track_info &info) {
       update<bool>(_hasInfo, hasTrackInfo, &TrackInfoProxy::hasInfoChanged);
-      update<QString>(
-         _name, QString::fromUtf8(info.name, sizeof(info.name)), &TrackInfoProxy::nameChanged);
+
+      const QString name = QString::fromUtf8(info.name, strnlen(info.name, sizeof(info.name)));
+      update<QString>(_name, name, &TrackInfoProxy::nameChanged);
       update<uint64_t>(_flags, info.flags, &TrackInfoProxy::flagsChanged);
       update<int32_t>(
          _audioChannelCount, info.audio_channel_count, &TrackInfoProxy::audioChannelCountChanged);
@@ -23,7 +24,7 @@ namespace clap {
 
       const auto &c = info.color;
       update<QColor>(
-         _color, QColor(c.alpha, c.red, c.green, c.blue), &TrackInfoProxy::colorChanged);
+         _color, QColor(c.red, c.green, c.blue, c.alpha), &TrackInfoProxy::colorChanged);
 
       emit updated();
    }

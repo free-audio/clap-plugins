@@ -13,7 +13,7 @@ Rectangle {
     }
 
     function computeText() {
-        if (!transport.hasInfo)
+        if (!trackInfo.hasInfo)
             return "No info";
 
         var text = "";

@@ -24,7 +24,7 @@ namespace clap {
                                                   nullptr,
                                                   nullptr,
                                                   "0.1",
-                                                  "Displays track info",
+                                                  "Displays current track info",
                                                   features};
 
       return &desc;

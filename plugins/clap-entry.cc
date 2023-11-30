@@ -62,6 +62,27 @@ static void clap_deinit(void) {
    g_pluginPath.clear();
 }
 
+static std::mutex g_entry_init_guard;
+static int g_entry_init_counter = 0;
+
+static bool clap_init_guard(const char *plugin_path) {
+   std::lock_guard<std::mutex> guard(g_entry_init_guard);
+   const int cnt = ++g_entry_init_counter;
+   if (cnt > 1)
+      return true;
+   if (clap_init(plugin_path))
+      return true;
+   g_entry_init_counter = 0;
+   return false;
+}
+
+static void clap_deinit_guard(void) {
+   std::lock_guard<std::mutex> guard(g_entry_init_guard);
+   const int cnt = --g_entry_init_counter;
+   if (cnt == 0)
+      clap_deinit();
+}
+
 static uint32_t clap_get_plugin_count(const clap_plugin_factory *) { return g_plugins.size(); }
 
 static const clap_plugin_descriptor *clap_get_plugin_descriptor(const clap_plugin_factory *,
@@ -98,7 +119,7 @@ const void *clap_get_factory(const char *factory_id)
 
 CLAP_EXPORT const clap_plugin_entry clap_entry = {
    CLAP_VERSION,
-   clap_init,
-   clap_deinit,
+   clap_init_guard,
+   clap_deinit_guard,
    clap_get_factory,
 };

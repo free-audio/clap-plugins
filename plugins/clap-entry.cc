@@ -1,12 +1,11 @@
 #include <clap/clap.h>
 
 #include <cstring>
-#include <exception>
 #include <functional>
-#include <sstream>
 #include <vector>
+#include <mutex>
+#include <iostream>
 
-#include "path-provider.hh"
 #include "plugs/adsr/adsr-plug.hh"
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/gain/gain.hh"
@@ -88,9 +87,8 @@ static uint32_t clap_get_plugin_count(const clap_plugin_factory *) { return g_pl
 static const clap_plugin_descriptor *clap_get_plugin_descriptor(const clap_plugin_factory *,
                                                                 uint32_t index) {
    if (index < 0 || index >= g_plugins.size()) {
-      std::ostringstream msg;
-      msg << "index out of bounds: " << index << " not in 0.." << g_plugins.size();
-      throw std::invalid_argument(msg.str());
+      std::cerr << "index out of bounds: " << index << " not in 0.." << g_plugins.size() << std::endl;
+      std::terminate();
    }
 
    return g_plugins[index].desc;

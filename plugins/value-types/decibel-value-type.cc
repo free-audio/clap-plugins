@@ -25,7 +25,7 @@ namespace clap {
    }
 
    double DecibelValueType::toParam(double engineValue) const {
-      return std::log10(20.0 * engineValue);
+      return 20.0 * std::log10(engineValue);
    }
    bool DecibelValueType::hasEngineDomain() const { return true; }
 } // namespace clap

@@ -142,3 +142,21 @@ if(NOT CLAP_PLUGINS_HEADLESS AND NOT CLAP_PLUGINS_EMBED_QML)
     DESTINATION "lib/clap-plugins"
     PATTERN CMakeLists.txt EXCLUDE)
 endif()
+
+# CLAP_BUILD_TESTS is inherited from clap
+if (${CLAP_BUILD_TESTS})
+    enable_testing()
+    find_package(Catch2 3 QUIET)
+
+    if (Catch2_FOUND)
+        add_executable(clap-plugins-tests EXCLUDE_FROM_ALL
+            tests/value-type-tests.cc)
+        set_target_properties(clap-plugins-tests PROPERTIES CXX_STANDARD 11)
+        target_link_libraries(clap-plugins-tests clap-helpers clap Catch2::Catch2WithMain)
+        target_compile_definitions(clap-plugins-tests PUBLIC -DCATCH_CONFIG_PREFIX_ALL)
+        add_test(NAME test-clap-plugins COMMAND clap-plugins-tests)
+        add_dependencies(clap-tests clap-plugins-tests)
+    else()
+        message(STATUS "Catch2 >= 3 isn't found -> disable clap-plugins unit tests")
+    endif()
+endif()

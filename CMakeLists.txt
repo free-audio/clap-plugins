@@ -10,8 +10,6 @@ project(CLAP_PLUGINS C CXX)
 
 set(CMAKE_AUTOMOC ON)
 
-include_directories(catch2/single_include)
-
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang|GNU")
   add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden
     -Werror=return-type -Werror=unused-result -Wno-unused-parameter

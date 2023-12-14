@@ -17,7 +17,7 @@ else()
 endif()
 
 add_library(
-  clap-plugins MODULE
+  clap-plugins-core STATIC
 
   audio-buffer.cc
   audio-buffer.hh
@@ -93,27 +93,32 @@ add_library(
   value-types/enumerated-value-type.hh
   value-types/enumerated-value-type.cc
   )
-target_compile_definitions(clap-plugins PRIVATE _USE_MATH_DEFINES)
+target_compile_definitions(clap-plugins-core PRIVATE _USE_MATH_DEFINES)
+set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
+set_target_properties(clap-plugins-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 if(NOT CLAP_PLUGINS_HEADLESS)
   if(CLAP_PLUGINS_REMOTE_GUI)
-    target_compile_definitions(clap-plugins PUBLIC CLAP_REMOTE_GUI)
-    target_link_libraries(clap-plugins PUBLIC clap-plugin-remote-gui)
-    add_dependencies(clap-plugins clap-gui)
+    target_compile_definitions(clap-plugins-core PUBLIC CLAP_REMOTE_GUI)
+    target_link_libraries(clap-plugins-core PUBLIC clap-plugin-remote-gui)
+    add_dependencies(clap-plugins-core clap-gui)
   else()
-    target_compile_definitions(clap-plugins PUBLIC CLAP_LOCAL_GUI)
-    target_link_libraries(clap-plugins PUBLIC clap-plugin-local-gui)
+    target_compile_definitions(clap-plugins-core PUBLIC CLAP_LOCAL_GUI)
+    target_link_libraries(clap-plugins-core PUBLIC clap-plugin-local-gui)
   endif()
 
-  target_link_libraries(clap-plugins PUBLIC clap-io)
+  target_link_libraries(clap-plugins-core PUBLIC clap-io)
 endif()
 
-set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
+set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
 
 if (NOT CLAP_PLUGINS_HEADLESS)
-  target_link_libraries(clap-plugins PUBLIC clap-plugin-gui-common)
+  target_link_libraries(clap-plugins-core PUBLIC clap-plugin-gui-common)
 endif()
-target_link_libraries(clap-plugins PUBLIC clap-helpers)
+target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
+
+add_library(clap-plugins MODULE)
+target_link_libraries(clap-plugins PUBLIC clap-plugins-core)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)
@@ -149,13 +154,13 @@ if (${CLAP_BUILD_TESTS})
     find_package(Catch2 3 QUIET)
 
     if (Catch2_FOUND)
-        add_executable(clap-plugins-tests EXCLUDE_FROM_ALL
-            tests/value-type-tests.cc)
-        set_target_properties(clap-plugins-tests PROPERTIES CXX_STANDARD 11)
-        target_link_libraries(clap-plugins-tests clap-helpers clap Catch2::Catch2WithMain)
-        target_compile_definitions(clap-plugins-tests PUBLIC -DCATCH_CONFIG_PREFIX_ALL)
-        add_test(NAME test-clap-plugins COMMAND clap-plugins-tests)
-        add_dependencies(clap-tests clap-plugins-tests)
+      add_executable(clap-plugins-tests EXCLUDE_FROM_ALL
+          tests/value-type-tests.cc)
+      set_target_properties(clap-plugins-tests PROPERTIES CXX_STANDARD 20)
+      target_link_libraries(clap-plugins-tests clap-plugins-core clap Catch2::Catch2WithMain)
+      target_compile_definitions(clap-plugins-tests PUBLIC -DCATCH_CONFIG_PREFIX_ALL)
+      add_test(NAME test-clap-plugins COMMAND clap-plugins-tests)
+      add_dependencies(clap-tests clap-plugins-tests)
     else()
         message(STATUS "Catch2 >= 3 isn't found -> disable clap-plugins unit tests")
     endif()

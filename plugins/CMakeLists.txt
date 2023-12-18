@@ -21,7 +21,6 @@ add_library(
 
   audio-buffer.cc
   audio-buffer.hh
-  clap-entry.cc
   constants.hh
   container-of.hh
   context.hh
@@ -93,7 +92,7 @@ add_library(
   value-types/enumerated-value-type.hh
   value-types/enumerated-value-type.cc
   )
-target_compile_definitions(clap-plugins-core PRIVATE _USE_MATH_DEFINES)
+target_compile_definitions(clap-plugins-core PUBLIC _USE_MATH_DEFINES)
 set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
 set_target_properties(clap-plugins-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
@@ -110,15 +109,14 @@ if(NOT CLAP_PLUGINS_HEADLESS)
   target_link_libraries(clap-plugins-core PUBLIC clap-io)
 endif()
 
-set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
-
 if (NOT CLAP_PLUGINS_HEADLESS)
   target_link_libraries(clap-plugins-core PUBLIC clap-plugin-gui-common)
 endif()
 target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 
-add_library(clap-plugins MODULE)
+add_library(clap-plugins MODULE clap-entry.cc)
 target_link_libraries(clap-plugins PUBLIC clap-plugins-core)
+set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)

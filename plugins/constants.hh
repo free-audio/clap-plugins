@@ -3,7 +3,7 @@
 #include <cstdint>
 
 namespace clap {
-   static const constexpr uint32_t MAX_VOICES = 8;
+   static const constexpr uint32_t MAX_VOICES = 32;
 
    // Internal block size used to divide large process calls
    static const constexpr uint32_t BLOCK_SIZE = 128;

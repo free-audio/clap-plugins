@@ -116,7 +116,7 @@ target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 
 add_library(clap-plugins MODULE clap-entry.cc)
 target_link_libraries(clap-plugins PUBLIC clap-plugins-core)
-set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
+set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(clap-plugins PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/linux-clap-plugins.version)

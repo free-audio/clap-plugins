@@ -21,5 +21,8 @@ namespace clap {
       virtual void onGuiSetTransportIsSubscribed(bool isSubscribed) = 0;
 
       virtual void onGuiWindowClosed(bool wasDestroyed) = 0;
+
+      virtual void onGuiUndo() = 0;
+      virtual void onGuiRedo() = 0;
    };
 } // namespace clap

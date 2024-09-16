@@ -45,10 +45,6 @@
                     "type": "FILEPATH",
                     "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
-                "CLAP_PLUGINS_REMOTE_GUI": {
-                    "type": "BOOL",
-                    "value": false
-                },
                 "CLAP_PLUGINS_EMBED_QML": {
                     "type": "BOOL",
                     "value": true
@@ -62,24 +58,6 @@
                 "base",
                 "vcpkg"
             ]
-        },
-        {
-            "name": "ninja-system",
-            "description": "Ninja + System Libraries",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
-            "inherits": [
-                "base"
-            ],
-            "cacheVariables": {
-                "CLAP_PLUGINS_REMOTE_GUI": {
-                    "type": "BOOL",
-                    "value": true
-                },
-                "CLAP_PLUGINS_EMBED_QML": {
-                    "type": "BOOL",
-                    "value": false
-                }
-            }
         },
         {
             "name": "ninja-headless",
@@ -122,12 +100,6 @@
             "inherits": "base"
         },
         {
-            "name": "ninja-system",
-            "inherits": "base",
-            "description": "Build using Ninja and system libraries",
-            "configurePreset": "ninja-system"
-        },
-        {
             "name": "ninja-headless",
             "inherits": "base",
             "description": "Build using Ninja and system libraries (headless)",
@@ -151,11 +123,6 @@
             "name": "ninja-vcpkg",
             "description": "Test using Ninja and VCPKG",
             "configurePreset": "ninja-vcpkg"
-        },
-        {
-            "name": "ninja-system",
-            "description": "Test using Ninja and system libraries",
-            "configurePreset": "ninja-system"
         },
         {
             "name": "ninja-headless",

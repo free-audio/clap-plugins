@@ -70,7 +70,9 @@ namespace clap {
 
    void ThreadedGuiProxy::updateTrackInfo(bool hasTrackInfo, const clap_track_info &info) {
       QMetaObject::invokeMethod(
-         _gui.get(), [=, this] { _gui->updateTrackInfo(hasTrackInfo, info); }, Qt::QueuedConnection);
+         _gui.get(),
+         [=, this] { _gui->updateTrackInfo(hasTrackInfo, info); },
+         Qt::QueuedConnection);
    }
 
    bool ThreadedGuiProxy::openWindow() {
@@ -198,5 +200,25 @@ namespace clap {
    void ThreadedGuiProxy::destroy() {
       QMetaObject::invokeMethod(
          _gui.get(), [=, this] { _gui->destroy(); }, Qt::BlockingQueuedConnection);
+   }
+
+   void ThreadedGuiProxy::setCanUndo(bool can_undo) {
+      QMetaObject::invokeMethod(
+         _gui.get(), [=, this] { _gui->setCanUndo(can_undo); }, Qt::BlockingQueuedConnection);
+   }
+
+   void ThreadedGuiProxy::setCanRedo(bool can_redo) {
+      QMetaObject::invokeMethod(
+         _gui.get(), [=, this] { _gui->setCanRedo(can_redo); }, Qt::BlockingQueuedConnection);
+   }
+
+   void ThreadedGuiProxy::setUndoName(std::string name) {
+      QMetaObject::invokeMethod(
+         _gui.get(), [=, this] { _gui->setUndoName(name); }, Qt::BlockingQueuedConnection);
+   }
+
+   void ThreadedGuiProxy::setRedoName(std::string name) {
+      QMetaObject::invokeMethod(
+         _gui.get(), [=, this] { _gui->setRedoName(name); }, Qt::BlockingQueuedConnection);
    }
 } // namespace clap

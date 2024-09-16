@@ -1,4 +1,3 @@
-set(CLAP_PLUGINS_REMOTE_GUI TRUE CACHE BOOL "Should the GUI be ran from another process?")
 set(CLAP_PLUGINS_EMBED_QML TRUE CACHE BOOL "Embed QML resources into the plugin")
 set(CLAP_PLUGINS_HEADLESS FALSE CACHE BOOL "Compile the plugins without a GUI")
 
@@ -99,21 +98,10 @@ set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
 set_target_properties(clap-plugins-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 if(NOT CLAP_PLUGINS_HEADLESS)
-  if(CLAP_PLUGINS_REMOTE_GUI)
-    target_compile_definitions(clap-plugins-core PUBLIC CLAP_REMOTE_GUI)
-    target_link_libraries(clap-plugins-core PUBLIC clap-plugin-remote-gui)
-    add_dependencies(clap-plugins-core clap-gui)
-  else()
-    target_compile_definitions(clap-plugins-core PUBLIC CLAP_LOCAL_GUI)
-    target_link_libraries(clap-plugins-core PUBLIC clap-plugin-local-gui)
-  endif()
-
-  target_link_libraries(clap-plugins-core PUBLIC clap-io)
+  target_compile_definitions(clap-plugins-core PUBLIC CLAP_LOCAL_GUI)
+  target_link_libraries(clap-plugins-core PUBLIC clap-plugin-local-gui clap-io clap-plugin-gui-common)
 endif()
 
-if (NOT CLAP_PLUGINS_HEADLESS)
-  target_link_libraries(clap-plugins-core PUBLIC clap-plugin-gui-common)
-endif()
 target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 
 add_library(clap-plugins MODULE clap-entry.cc)

@@ -122,7 +122,7 @@ namespace clap {
       try {
          ClapOStream os(stream);
          yas::binary_oarchive ar(os);
-         ar &_parameters;
+         ar & _parameters;
       } catch (...) {
          return false;
       }
@@ -141,7 +141,7 @@ namespace clap {
          ClapIStream is(stream);
 #endif
          yas::binary_iarchive ar(is);
-         ar &_parameters;
+         ar & _parameters;
       } catch (...) {
          return false;
       }
@@ -341,6 +341,21 @@ namespace clap {
    void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
       runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
    }
+
+   void CorePlugin::onGuiUndo() {
+      runOnMainThread([this] {
+         if (_host.canUseUndo())
+            _host.undoUndo();
+      });
+   }
+
+   void CorePlugin::onGuiRedo() {
+      runOnMainThread([this] {
+         if (_host.canUseUndo())
+            _host.undoRedo();
+      });
+   }
+
 #endif // CLAP_PLUGINS_HEADLESS
 
    //------------------//

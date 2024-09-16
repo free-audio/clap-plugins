@@ -53,6 +53,11 @@ namespace clap {
 
       void destroy() override;
 
+      void setCanUndo(bool can_undo) override;
+      void setCanRedo(bool can_redo) override;
+      void setUndoName(std::string name) override;
+      void setRedoName(std::string name) override;
+
       auto gui() { return _gui; }
 
    private:

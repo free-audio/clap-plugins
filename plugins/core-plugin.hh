@@ -175,6 +175,8 @@ namespace clap {
       void onGuiParamEndAdjust(clap_id paramId) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
       void onGuiWindowClosed(bool wasDestroyed) override;
+      void onGuiUndo() override;
+      void onGuiRedo() override;
 #endif
 
       //------------------------//

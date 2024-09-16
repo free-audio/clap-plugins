@@ -7,6 +7,7 @@
 #include "plugin-proxy.hh"
 #include "transport-proxy.hh"
 #include "track-info-proxy.hh"
+#include "undo-proxy.hh"
 
 QT_BEGIN_NAMESPACE
 class QQuickView;
@@ -71,6 +72,11 @@ namespace clap {
 
       void destroy() override;
 
+      void setCanUndo(bool can_undo) override;
+      void setCanRedo(bool can_redo) override;
+      void setUndoName(std::string name) override;
+      void setRedoName(std::string name) override;
+
       auto &guiListener() const { return _listener; }
 
    private:
@@ -89,6 +95,7 @@ namespace clap {
       std::unique_ptr<PluginProxy> _pluginProxy;
       std::unique_ptr<TransportProxy> _transportProxy;
       std::unique_ptr<TrackInfoProxy> _trackInfoProxy;
+      std::unique_ptr<UndoProxy> _undoProxy;
 
       double _rootScale = 1.;
    };

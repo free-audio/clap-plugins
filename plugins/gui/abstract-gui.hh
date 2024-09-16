@@ -47,6 +47,11 @@ namespace clap {
 
       virtual void destroy() = 0;
 
+      virtual void setCanUndo(bool can_undo) = 0;
+      virtual void setCanRedo(bool can_redo) = 0;
+      virtual void setUndoName(std::string name) = 0;
+      virtual void setRedoName(std::string name) = 0;
+
       AbstractGuiListener& listener() const { return _listener; }
 
    protected:

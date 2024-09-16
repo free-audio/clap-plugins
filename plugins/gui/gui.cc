@@ -25,6 +25,7 @@ namespace clap {
       _pluginProxy = std::make_unique<PluginProxy>(*this);
       _transportProxy = std::make_unique<TransportProxy>(*this);
       _trackInfoProxy = std::make_unique<TrackInfoProxy>(*this);
+      _undoProxy = std::make_unique<UndoProxy>(*this);
 
       ////////////////////////
       // QML initialization //
@@ -35,6 +36,7 @@ namespace clap {
       qmlContext->setContextProperty("plugin", _pluginProxy.get());
       qmlContext->setContextProperty("transport", _transportProxy.get());
       qmlContext->setContextProperty("trackInfo", _trackInfoProxy.get());
+      qmlContext->setContextProperty("undo", _undoProxy.get());
       setRootScale(1);
 
       connect(
@@ -83,7 +85,9 @@ namespace clap {
       p->setMappingIndication(color, label, description);
    }
 
-   void Gui::setParameterAutomationIndication(clap_id paramId, uint32_t automationState, clap_color color) {
+   void Gui::setParameterAutomationIndication(clap_id paramId,
+                                              uint32_t automationState,
+                                              clap_color color) {
       qDebug() << "clap-gui: setParameterAutomationIndication(" << paramId << ")";
       auto p = _pluginProxy->param(paramId);
       assert(p);
@@ -307,5 +311,17 @@ namespace clap {
       _transportProxy.reset();
       _pluginProxy.reset();
       _isFloating = false;
+   }
+
+   void Gui::setCanUndo(bool can_undo) { _undoProxy->setCanUndo(can_undo); }
+
+   void Gui::setCanRedo(bool can_redo) { _undoProxy->setCanRedo(can_redo); }
+
+   void Gui::setUndoName(std::string name) {
+      _undoProxy->setUndoName(QString::fromStdString(name));
+   }
+
+   void Gui::setRedoName(std::string name) {
+      _undoProxy->setRedoName(QString::fromStdString(name));
    }
 } // namespace clap

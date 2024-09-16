@@ -59,6 +59,8 @@ namespace clap::messages {
       kResizeRequest,
       kResizeResponse,
       kWindowClosedNotification,
+      kUndoRequest,
+      kRedoRequest,
    };
 
    struct CreateClientRequest final {
@@ -290,5 +292,13 @@ namespace clap::messages {
    struct WindowClosedNotification final {
       static const constexpr Type type = kWindowClosedNotification;
       bool wasDestroyed;
+   };
+
+   struct UndoRequest final {
+      static const constexpr Type type = kUndoRequest;
+   };
+
+   struct RedoRequest final {
+      static const constexpr Type type = kRedoRequest;
    };
 } // namespace clap::messages

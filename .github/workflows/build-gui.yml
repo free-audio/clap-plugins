@@ -118,11 +118,11 @@ jobs:
         run: tar -cvJf clap-plugins.clap.tar.xz --strip-components 4 builds/${{matrix.build_dir}}/plugins/Release/clap-plugins.clap
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: clap-plugins-${{ matrix.triplet }}.tar.xz
           path: clap-plugins.clap.tar.xz
 
-      - uses: actions/delete-package-versions@v3
+      - uses: actions/delete-package-versions@v5
         with:
           package-name: qtbase_${{ matrix.triplet }}-cp

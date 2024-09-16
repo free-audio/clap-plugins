@@ -74,6 +74,8 @@ add_library(
   plugs/transport/transport-info.hh
   plugs/svf/svf-plug.hh
   plugs/svf/svf-plug.cc
+  plugs/undo-test/undo-test.hh
+  plugs/undo-test/undo-test.cc
   smoothed-value.hh
   sample-delay.cc
   sample-delay.hh

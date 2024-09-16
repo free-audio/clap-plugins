@@ -126,4 +126,14 @@ namespace clap {
       delta.new_value = ++_state;
       _host.undoChangeMade("inc", &delta, sizeof(delta), true);
    }
+
+   void UndoTest::requestHostUndo() {
+      if (_canUndo && _host.canUseUndo())
+         _host.undoUndo();
+   }
+
+   void UndoTest::requestHostRedo() {
+      if (_canRedo && _host.canUseUndo())
+         _host.undoRedo();
+   }
 } // namespace clap

@@ -25,14 +25,15 @@ namespace clap {
       void undoSetUndoName(const char *name) noexcept;
       void undoSetRedoName(const char *name) noexcept;
 
-   protected:
-
       void incrementState();
+      void requestHostUndo();
+      void requestHostRedo();
 
-      uint32_t _state = 0;
+   private:
+      uint32_t _state{0};
 
-      bool _canUndo;
-      bool _canRedo;
+      bool _canUndo{false};
+      bool _canRedo{false};
       std::optional<std::string> _undoName;
       std::optional<std::string> _redoName;
    };

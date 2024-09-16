@@ -20,12 +20,8 @@
 #include "gui/abstract-gui.hh"
 
 #ifndef CLAP_PLUGINS_HEADLESS
-#   ifdef CLAP_REMOTE_GUI
-#      include "gui/remote-gui-factory-proxy.hh"
-#   else
-#      include "gui/local-gui-factory.hh"
-#      include "gui/threaded-gui-factory.hh"
-#   endif
+#   include "gui/local-gui-factory.hh"
+#   include "gui/threaded-gui-factory.hh"
 #endif
 
 namespace clap {
@@ -151,23 +147,12 @@ namespace clap {
 #ifndef CLAP_PLUGINS_HEADLESS
    bool CorePlugin::implementsGui() const noexcept { return true; }
 
-   bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept {
-#   if defined(__APPLE__) && defined(CLAP_REMOTE_GUI)
-      return isFloating;
-#   else
-      return true;
-#   endif
-   }
+   bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept { return true; }
 
    bool CorePlugin::guiCreate(const char *api, bool isFloating) noexcept {
-#   ifdef CLAP_REMOTE_GUI
-      auto guiPath = _pathProvider->getGuiExecutable();
-      _guiFactory = RemoteGuiFactoryProxy::getInstance(guiPath);
-#   else
       _guiFactory = LocalGuiFactory::getInstance();
       if (!_guiFactory)
          _guiFactory = ThreadedGuiFactory::getInstance();
-#   endif
 
       _guiHandle = _guiFactory->createGui(*this);
 
@@ -176,6 +161,7 @@ namespace clap {
 
       guiDefineParameters();
       guiDefineTrackInfo();
+      guiSubscribeUndo();
 
       auto skinPath = _pathProvider->getQmlSkinPath();
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
@@ -234,7 +220,10 @@ namespace clap {
       }
    }
 
-   void CorePlugin::guiDestroy() noexcept { _guiHandle.reset(); }
+   void CorePlugin::guiDestroy() noexcept {
+      guiUnsubscribeUndo();
+      _guiHandle.reset();
+   }
 
    bool CorePlugin::guiGetSize(uint32_t *width, uint32_t *height) noexcept {
       if (!_guiHandle)
@@ -263,13 +252,31 @@ namespace clap {
    bool CorePlugin::guiShow() noexcept {
       if (!_guiHandle)
          return false;
-      return _guiHandle->gui().show();
+      if (!_guiHandle->gui().show())
+         return false;
+
+      guiSubscribeUndo();
+      return true;
    }
 
    bool CorePlugin::guiHide() noexcept {
       if (!_guiHandle)
          return false;
-      return _guiHandle->gui().hide();
+      if (!_guiHandle->gui().hide())
+         return false;
+
+      guiUnsubscribeUndo();
+      return true;
+   }
+
+   void CorePlugin::guiSubscribeUndo() {
+      if (implementsUndo() && _host.canUseUndo())
+         _host.undoSetWantsContextUpdates(true);
+   }
+
+   void CorePlugin::guiUnsubscribeUndo() {
+      if (implementsUndo() && _host.canUseUndo())
+         _host.undoSetWantsContextUpdates(false);
    }
 
    //---------------------//
@@ -344,14 +351,14 @@ namespace clap {
 
    void CorePlugin::onGuiUndo() {
       runOnMainThread([this] {
-         if (_host.canUseUndo())
+         if (_canUndo && _host.canUseUndo())
             _host.undoUndo();
       });
    }
 
    void CorePlugin::onGuiRedo() {
       runOnMainThread([this] {
-         if (_host.canUseUndo())
+         if (_canRedo && _host.canUseUndo())
             _host.undoRedo();
       });
    }
@@ -911,4 +918,55 @@ namespace clap {
       return true;
    }
 
+   void CorePlugin::undoSetCanUndo(bool can_undo) noexcept {
+      _canUndo = can_undo;
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         _guiHandle->gui().setCanUndo(can_undo);
+#endif
+
+      if (!can_undo)
+         undoSetUndoName(nullptr);
+   }
+
+   void CorePlugin::undoSetCanRedo(bool can_redo) noexcept {
+      _canRedo = can_redo;
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         _guiHandle->gui().setCanRedo(can_redo);
+#endif
+
+      if (!can_redo)
+         undoSetRedoName(nullptr);
+   }
+
+   void CorePlugin::undoSetUndoName(const char *name) noexcept {
+      if (name && *name) {
+         if (!_canUndo)
+            hostMisbehaving("set undo name while it isn't possible to undo");
+         _undoName = name;
+      } else
+         _undoName.reset();
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         _guiHandle->gui().setUndoName(_undoName.value_or("(none)"));
+#endif
+   }
+
+   void CorePlugin::undoSetRedoName(const char *name) noexcept {
+      if (name && *name) {
+         if (!_canRedo)
+            hostMisbehaving("set undo name while it isn't possible to redo");
+         _redoName = name;
+      } else
+         _redoName.reset();
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         _guiHandle->gui().setRedoName(_undoName.value_or("(none)"));
+#endif
+   }
 } // namespace clap

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <clap/helpers/param-queue.hh>
 #include <clap/helpers/plugin.hh>
@@ -164,6 +165,8 @@ namespace clap {
       bool guiShow() noexcept override;
       bool guiHide() noexcept override;
       void guiDefineParameters();
+      void guiSubscribeUndo();
+      void guiUnsubscribeUndo();
 
       //---------------------//
       // AbstractGuiListener //
@@ -198,6 +201,14 @@ namespace clap {
       //---------------------//
       bool implementsLatency() const noexcept override { return true; }
       uint32_t latencyGet() const noexcept override { return _rootModule->latency(); }
+
+      //------------------//
+      // clap_plugin_undo //
+      //------------------//
+      void undoSetCanUndo(bool can_undo) noexcept override;
+      void undoSetCanRedo(bool can_redo) noexcept override;
+      void undoSetUndoName(const char *name) noexcept override;
+      void undoSetRedoName(const char *name) noexcept override;
 
       //////////////////////
       // Cached Host Info //
@@ -295,5 +306,10 @@ namespace clap {
       std::unique_ptr<Module> _rootModule;
 
       TuningProvider _tuningProvider;
+
+      bool _canUndo{false};
+      bool _canRedo{false};
+      std::optional<std::string> _undoName;
+      std::optional<std::string> _redoName;
    };
 } // namespace clap

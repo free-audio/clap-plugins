@@ -10,4 +10,5 @@ qt6_add_qml_module(clap-qml-skins
                 char-check/main.qml
                 synth/main.qml
                 track-info/main.qml
+                undo-test/main.qml
 )

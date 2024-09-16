@@ -1,5 +1,5 @@
-import QtQuick 2.1
-import QtQuick.Controls 2.1
+import QtQuick 6.0
+import QtQuick.Controls 6.0
 import clap.lib
 
 Rectangle {

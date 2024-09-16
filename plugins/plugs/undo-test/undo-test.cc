@@ -16,7 +16,7 @@ namespace clap {
       UndoTestModule(UndoTest &plugin) : Module(plugin, "", 0) {}
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
-         return CLAP_PROCESS_CONTINUE;
+         return CLAP_PROCESS_SLEEP;
       }
    };
 
@@ -37,10 +37,6 @@ namespace clap {
 
       return &desc;
    }
-
-   enum {
-      kParamIdOffset = 0,
-   };
 
    UndoTest::UndoTest(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "undo-test"), descriptor(), host) {
@@ -87,36 +83,6 @@ namespace clap {
       return false;
    }
 
-   void UndoTest::undoSetCanUndo(bool can_undo) noexcept {
-      _canUndo = can_undo;
-      if (!can_undo)
-         _undoName.reset();
-   }
-
-   void UndoTest::undoSetCanRedo(bool can_redo) noexcept {
-      _canRedo = can_redo;
-      if (!can_redo)
-         _redoName.reset();
-   }
-
-   void UndoTest::undoSetUndoName(const char *name) noexcept {
-      if (name && *name) {
-         if (!_canUndo)
-            hostMisbehaving("set undo name while it isn't possible to undo");
-         _undoName = name;
-      } else
-         _undoName.reset();
-   }
-
-   void UndoTest::undoSetRedoName(const char *name) noexcept {
-      if (name && *name) {
-         if (!_canRedo)
-            hostMisbehaving("set undo name while it isn't possible to redo");
-         _redoName = name;
-      } else
-         _redoName.reset();
-   }
-
    void UndoTest::incrementState() {
       if (!_host.canUseUndo())
          return;
@@ -126,14 +92,13 @@ namespace clap {
       delta.new_value = ++_state;
       _host.undoChangeMade("inc", &delta, sizeof(delta), true);
    }
+   bool UndoTest::init() noexcept {
+      if (!super::init())
+         return false;
 
-   void UndoTest::requestHostUndo() {
-      if (_canUndo && _host.canUseUndo())
-         _host.undoUndo();
-   }
-
-   void UndoTest::requestHostRedo() {
-      if (_canRedo && _host.canUseUndo())
-         _host.undoRedo();
+      if (_host.canUseUndo()) {
+         _host.undoSetWantsContextUpdates(true);
+      }
+      return true;
    }
 } // namespace clap

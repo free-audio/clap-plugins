@@ -52,7 +52,7 @@ namespace clap {
                       pluginPath, UndoTest<hasDelta, areDeltasPersistant>::descriptor()->name),
                    descriptor(),
                    host) {
-      _rootModule = std::make_unique<UndoTestModule>(*this);
+      _rootModule = std::make_unique<UndoTestModule<hasDelta, areDeltasPersistant>>(*this);
    }
 
    template <bool hasDelta, bool areDeltasPersistant>

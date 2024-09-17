@@ -17,7 +17,7 @@
 #include "plugs/synth/synth.hh"
 #include "plugs/track-info/track-info.hh"
 #include "plugs/transport/transport-info.hh"
-#include "plugs/undo-test/undo-test.hh"
+#include "plugs/undo-test/undo-test.hxx"
 
 struct PluginEntry {
    using create_func = std::function<const clap_plugin *(const clap_host &)>;
@@ -32,7 +32,7 @@ struct PluginEntry {
 static std::vector<PluginEntry> g_plugins;
 static std::string g_pluginPath;
 
-template <typename T>
+template <class T>
 static void addPlugin() {
    g_plugins.emplace_back(T::descriptor(), [](const clap_host &host) -> const clap_plugin * {
       auto plugin = new T(g_pluginPath, host);

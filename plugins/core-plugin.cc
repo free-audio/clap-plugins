@@ -996,7 +996,7 @@ namespace clap {
 
 #ifndef CLAP_PLUGINS_HEADLESS
       if (_guiHandle)
-         _guiHandle->gui().setRedoName(_undoName.value_or("(none)"));
+         _guiHandle->gui().setRedoName(_redoName.value_or("(none)"));
 #endif
    }
 } // namespace clap

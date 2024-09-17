@@ -19,6 +19,7 @@ RUN apt update \
       -o Acquire::BrokenProxy="true" \
       -o Acquire::http::No-Cache="true" \
       -o Acquire::http::Pipeline-Depth="0" \
+      curl zip unzip tar \
       coreutils \
       cmake \
       chrpath \

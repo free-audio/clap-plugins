@@ -3,6 +3,9 @@
 #include <memory>
 #include <optional>
 
+#include <yas/binary_iarchive.hpp>
+#include <yas/binary_oarchive.hpp>
+
 #include <clap/helpers/param-queue.hh>
 #include <clap/helpers/plugin.hh>
 #include <clap/helpers/reducing-param-queue.hxx>
@@ -147,6 +150,9 @@ namespace clap {
       bool implementsState() const noexcept override { return true; }
       bool stateSave(const clap_ostream *stream) noexcept override;
       bool stateLoad(const clap_istream *stream) noexcept override;
+
+      virtual std::vector<uint8_t> stateSaveExtra() noexcept { return {}; }
+      virtual bool stateLoadExtra(const std::vector<uint8_t>& data) noexcept { return true; }
 
 #ifndef CLAP_PLUGINS_HEADLESS
       //-----------------//

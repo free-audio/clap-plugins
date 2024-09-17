@@ -119,6 +119,9 @@ namespace clap {
          ClapOStream os(stream);
          yas::binary_oarchive ar(os);
          ar & _parameters;
+
+         std::vector<uint8_t> extra = stateSaveExtra();
+         ar & extra;
       } catch (...) {
          return false;
       }
@@ -138,6 +141,11 @@ namespace clap {
 #endif
          yas::binary_iarchive ar(is);
          ar & _parameters;
+
+         std::vector<uint8_t> extra;
+         ar & extra;
+         if (!stateLoadExtra(extra))
+            return false;
       } catch (...) {
          return false;
       }

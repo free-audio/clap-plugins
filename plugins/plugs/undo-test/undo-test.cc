@@ -132,4 +132,16 @@ namespace clap {
          super::onGuiInvoke(method, args);
    }
 #endif
+
+   std::vector<uint8_t> UndoTest::stateSaveExtra() noexcept {
+      return std::vector<uint8_t>((const uint8_t *)&_state, (const uint8_t *)(&_state + 1));
+   }
+
+   bool UndoTest::stateLoadExtra(const std::vector<uint8_t> &data) noexcept {
+      if (data.size() != sizeof(_state))
+         return false;
+      _state = *(const uint32_t *)data.data();
+      return true;
+   }
+
 } // namespace clap

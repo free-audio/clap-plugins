@@ -149,6 +149,12 @@ namespace clap {
       } catch (...) {
          return false;
       }
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         guiPopulateProperties();
+#endif
+
       return true;
    }
 
@@ -967,8 +973,8 @@ namespace clap {
 
    void CorePlugin::undoSetUndoName(const char *name) noexcept {
       if (name && *name) {
-         if (!_canUndo)
-            hostMisbehaving("set undo name while it isn't possible to undo");
+         // if (!_canUndo)
+         //    hostMisbehaving("set undo name while it isn't possible to undo");
          _undoName = name;
       } else
          _undoName.reset();
@@ -981,8 +987,8 @@ namespace clap {
 
    void CorePlugin::undoSetRedoName(const char *name) noexcept {
       if (name && *name) {
-         if (!_canRedo)
-            hostMisbehaving("set undo name while it isn't possible to redo");
+         // if (!_canRedo)
+         //    hostMisbehaving("set undo name while it isn't possible to redo");
          _redoName = name;
       } else
          _redoName.reset();

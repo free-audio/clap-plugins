@@ -972,11 +972,9 @@ namespace clap {
    }
 
    void CorePlugin::undoSetUndoName(const char *name) noexcept {
-      if (name && *name) {
-         if (!_canUndo && false)
-            hostMisbehaving("set undo name while it isn't possible to undo");
+      if (name && *name)
          _undoName = name;
-      } else
+      else
          _undoName.reset();
 
 #ifndef CLAP_PLUGINS_HEADLESS
@@ -986,11 +984,9 @@ namespace clap {
    }
 
    void CorePlugin::undoSetRedoName(const char *name) noexcept {
-      if (name && *name) {
-         if (!_canRedo && false)
-            hostMisbehaving("set undo name while it isn't possible to redo");
+      if (name && *name)
          _redoName = name;
-      } else
+      else
          _redoName.reset();
 
 #ifndef CLAP_PLUGINS_HEADLESS

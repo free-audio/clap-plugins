@@ -6,8 +6,8 @@
 #include "../../core-plugin.hh"
 
 namespace clap {
+   template <bool hasDelta, bool areDeltasPersistant>
    class UndoTest final : public CorePlugin {
-   private:
       using super = CorePlugin;
 
    public:

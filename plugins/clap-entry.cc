@@ -2,21 +2,21 @@
 
 #include <cstring>
 #include <functional>
-#include <vector>
-#include <mutex>
 #include <iostream>
+#include <mutex>
+#include <vector>
 
 #include "plugs/adsr/adsr-plug.hh"
+#include "plugs/char-check/char-check.hh"
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/gain/gain.hh"
-#include "plugs/transport/transport-info.hh"
-#include "plugs/char-check/char-check.hh"
-#include "plugs/synth/synth.hh"
-#include "plugs/svf/svf-plug.hh"
 #include "plugs/latency/latency.hh"
 #include "plugs/offline-latency/offline-latency.hh"
 #include "plugs/realtime-requirement/realtime-requirement.hh"
+#include "plugs/svf/svf-plug.hh"
+#include "plugs/synth/synth.hh"
 #include "plugs/track-info/track-info.hh"
+#include "plugs/transport/transport-info.hh"
 #include "plugs/undo-test/undo-test.hh"
 
 struct PluginEntry {
@@ -54,7 +54,9 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::OfflineLatency>();
    addPlugin<clap::RealtimeRequirement>();
    addPlugin<clap::TrackInfo>();
-   addPlugin<clap::UndoTest>();
+   addPlugin<clap::UndoTest<true, true>>();
+   addPlugin<clap::UndoTest<true, false>>();
+   addPlugin<clap::UndoTest<false, false>>();
    return true;
 }
 
@@ -89,7 +91,8 @@ static uint32_t clap_get_plugin_count(const clap_plugin_factory *) { return g_pl
 static const clap_plugin_descriptor *clap_get_plugin_descriptor(const clap_plugin_factory *,
                                                                 uint32_t index) {
    if (index < 0 || index >= g_plugins.size()) {
-      std::cerr << "index out of bounds: " << index << " not in 0.." << g_plugins.size() << std::endl;
+      std::cerr << "index out of bounds: " << index << " not in 0.." << g_plugins.size()
+                << std::endl;
       std::terminate();
    }
 
@@ -110,8 +113,7 @@ static const clap_plugin_factory g_clap_plugin_factory = {
    clap_create_plugin,
 };
 
-const void *clap_get_factory(const char *factory_id)
-{
+const void *clap_get_factory(const char *factory_id) {
    if (!::strcmp(factory_id, CLAP_PLUGIN_FACTORY_ID))
       return &g_clap_plugin_factory;
    return nullptr;

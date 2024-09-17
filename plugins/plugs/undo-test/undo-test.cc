@@ -11,51 +11,79 @@ namespace clap {
       };
    } // namespace
 
+   template <bool hasDelta, bool areDeltasPersistant>
    class UndoTestModule final : public Module {
    public:
-      UndoTestModule(UndoTest &plugin) : Module(plugin, "", 0) {}
+      UndoTestModule(UndoTest<hasDelta, areDeltasPersistant> &plugin) : Module(plugin, "", 0) {}
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          return CLAP_PROCESS_SLEEP;
       }
    };
 
-   const clap_plugin_descriptor *UndoTest::descriptor() {
+   template <bool hasDelta, bool areDeltasPersistant>
+   const clap_plugin_descriptor *UndoTest<hasDelta, areDeltasPersistant>::descriptor() {
       static const char *features[] = {
          CLAP_PLUGIN_FEATURE_UTILITY, CLAP_PLUGIN_FEATURE_ANALYZER, nullptr};
 
-      static const clap_plugin_descriptor desc = {CLAP_VERSION,
-                                                  "com.github.free-audio.clap.undo-test",
-                                                  "Undo Test",
-                                                  "clap",
-                                                  "https://github.com/free-audio/clap",
-                                                  nullptr,
-                                                  nullptr,
-                                                  "0.1",
-                                                  "Help testing the undo extension",
-                                                  features};
+      static const clap_plugin_descriptor desc = {
+         CLAP_VERSION,
+         areDeltasPersistant ? "com.github.free-audio.clap.undo-test"
+         : hasDelta          ? "com.github.free-audio.clap.undo-test-not-persistent"
+                             : "com.github.free-audio.clap.undo-test-no-deltas",
+         areDeltasPersistant ? "Undo Test"
+         : hasDelta          ? "UndoTest (deltas not persistent)"
+                             : "UndoTest (no deltas)",
+         "clap",
+         "https://github.com/free-audio/clap",
+         nullptr,
+         nullptr,
+         "0.1",
+         "Help testing the undo extension",
+         features};
 
       return &desc;
    }
 
-   UndoTest::UndoTest(const std::string &pluginPath, const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "undo-test"), descriptor(), host) {
+   template <bool hasDelta, bool areDeltasPersistant>
+   UndoTest<hasDelta, areDeltasPersistant>::UndoTest(const std::string &pluginPath,
+                                                     const clap_host &host)
+      : CorePlugin(PathProvider::create(
+                      pluginPath, UndoTest<hasDelta, areDeltasPersistant>::descriptor()->name),
+                   descriptor(),
+                   host) {
       _rootModule = std::make_unique<UndoTestModule>(*this);
    }
 
-   bool UndoTest::implementsUndo() const noexcept { return true; }
-
-   void UndoTest::undoGetDeltaProperties(clap_undo_delta_properties_t *properties) noexcept {
-      properties->has_delta = true;
-      properties->are_deltas_persistent = true;
-      properties->format_version = UNDO_FORMAT_VERSION;
+   template <bool hasDelta, bool areDeltasPersistant>
+   bool UndoTest<hasDelta, areDeltasPersistant>::implementsUndo() const noexcept {
+      return true;
    }
 
-   bool UndoTest::undoCanUseDeltaFormatVersion(clap_id format_version) noexcept {
+   template <bool hasDelta, bool areDeltasPersistant>
+   void UndoTest<hasDelta, areDeltasPersistant>::undoGetDeltaProperties(
+      clap_undo_delta_properties_t *properties) noexcept {
+      properties->has_delta = hasDelta;
+      properties->are_deltas_persistent = areDeltasPersistant;
+      properties->format_version = hasDelta ? UNDO_FORMAT_VERSION : CLAP_INVALID_ID;
+   }
+
+   template <bool hasDelta, bool areDeltasPersistant>
+   bool UndoTest<hasDelta, areDeltasPersistant>::undoCanUseDeltaFormatVersion(
+      clap_id format_version) noexcept {
+      if constexpr (!hasDelta)
+         return false;
+
       return format_version == UNDO_FORMAT_VERSION;
    }
 
-   bool UndoTest::undoUndo(clap_id format_version, const void *delta, size_t delta_size) noexcept {
+   template <bool hasDelta, bool areDeltasPersistant>
+   bool UndoTest<hasDelta, areDeltasPersistant>::undoUndo(clap_id format_version,
+                                                          const void *delta,
+                                                          size_t delta_size) noexcept {
+      if constexpr (!hasDelta)
+         return false;
+
       if (format_version != UNDO_FORMAT_VERSION) {
          hostMisbehaving("invalid undo delta format version");
          return false;
@@ -76,7 +104,13 @@ namespace clap {
       return true;
    }
 
-   bool UndoTest::undoRedo(clap_id format_version, const void *delta, size_t delta_size) noexcept {
+   template <bool hasDelta, bool areDeltasPersistant>
+   bool UndoTest<hasDelta, areDeltasPersistant>::undoRedo(clap_id format_version,
+                                                          const void *delta,
+                                                          size_t delta_size) noexcept {
+      if constexpr (!hasDelta)
+         return false;
+
       if (format_version != UNDO_FORMAT_VERSION) {
          hostMisbehaving("invalid undo delta format version");
          return false;
@@ -97,7 +131,8 @@ namespace clap {
       return true;
    }
 
-   void UndoTest::incrementState() {
+   template <bool hasDelta, bool areDeltasPersistant>
+   void UndoTest<hasDelta, areDeltasPersistant>::incrementState() {
       if (!_host.canUseUndo())
          return;
 
@@ -109,10 +144,14 @@ namespace clap {
       snprintf(buffer, sizeof(buffer), "UNDO increment %d -> %d", delta.old_value, delta.new_value);
       _host.log(CLAP_LOG_INFO, buffer);
 
-      _host.undoChangeMade(buffer, &delta, sizeof(delta), true);
+      if constexpr (hasDelta)
+         _host.undoChangeMade(buffer, &delta, sizeof(delta), true);
+      else
+         _host.undoChangeMade(buffer, nullptr, 0, 0);
    }
 
-   bool UndoTest::init() noexcept {
+   template <bool hasDelta, bool areDeltasPersistant>
+   bool UndoTest<hasDelta, areDeltasPersistant>::init() noexcept {
       if (!super::init())
          return false;
 
@@ -123,7 +162,8 @@ namespace clap {
    }
 
 #ifndef CLAP_PLUGINS_HEADLESS
-   void UndoTest::onGuiInvoke(
+   template <bool hasDelta, bool areDeltasPersistant>
+   void UndoTest<hasDelta, areDeltasPersistant>::onGuiInvoke(
       const std::string &method,
       const std::vector<std::variant<bool, int64_t, double, std::string>> &args) {
       if (method == "incrementState")
@@ -133,11 +173,14 @@ namespace clap {
    }
 #endif
 
-   std::vector<uint8_t> UndoTest::stateSaveExtra() noexcept {
+   template <bool hasDelta, bool areDeltasPersistant>
+   std::vector<uint8_t> UndoTest<hasDelta, areDeltasPersistant>::stateSaveExtra() noexcept {
       return std::vector<uint8_t>((const uint8_t *)&_state, (const uint8_t *)(&_state + 1));
    }
 
-   bool UndoTest::stateLoadExtra(const std::vector<uint8_t> &data) noexcept {
+   template <bool hasDelta, bool areDeltasPersistant>
+   bool UndoTest<hasDelta, areDeltasPersistant>::stateLoadExtra(
+      const std::vector<uint8_t> &data) noexcept {
       if (data.size() != sizeof(_state))
          return false;
       _state = *(const uint32_t *)data.data();

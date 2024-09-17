@@ -182,6 +182,11 @@ namespace clap {
       guiSubscribeUndo();
       guiPopulateProperties();
 
+      _guiHandle->gui().setCanRedo(_canRedo);
+      _guiHandle->gui().setCanUndo(_canUndo);
+      _guiHandle->gui().setRedoName(_redoName.value_or("(none)"));
+      _guiHandle->gui().setUndoName(_undoName.value_or("(none)"));
+
       auto skinPath = _pathProvider->getQmlSkinPath();
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
       _guiHandle->gui().setSkin(skinPath);

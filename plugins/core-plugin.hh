@@ -10,6 +10,7 @@
 #include "context.hh"
 #include "gui/abstract-gui-factory.hh"
 #include "gui/abstract-gui-listener.hh"
+#include "gui/threaded-gui-listener-proxy.hh"
 #include "intrusive-list.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
@@ -171,6 +172,7 @@ namespace clap {
       //---------------------//
       // AbstractGuiListener //
       //---------------------//
+      void onGuiRunOnMainThread(std::function<void()> callback) override;
       void onGuiPoll() override;
       void pollVoiceInfo();
       void onGuiParamBeginAdjust(clap_id paramId) override;
@@ -314,5 +316,7 @@ namespace clap {
       bool _canRedo{false};
       std::optional<std::string> _undoName;
       std::optional<std::string> _redoName;
+
+      std::unique_ptr<ThreadedGuiListenerProxy> _threadedGuiListenerProxy;
    };
 } // namespace clap

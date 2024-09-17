@@ -3,6 +3,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <functional>
 
 #include <clap/clap.h>
 
@@ -16,6 +17,8 @@ namespace clap {
    class AbstractGuiListener {
    public:
       virtual ~AbstractGuiListener();
+
+      virtual void onGuiRunOnMainThread(std::function<void()> callback) = 0;
 
       // timer based polling of new parameter changes, transport value, ...
       // the plugin shall transmit them via

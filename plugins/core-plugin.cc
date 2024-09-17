@@ -151,10 +151,14 @@ namespace clap {
 
    bool CorePlugin::guiCreate(const char *api, bool isFloating) noexcept {
       _guiFactory = LocalGuiFactory::getInstance();
-      if (!_guiFactory)
+      if (_guiFactory) {
+         _guiHandle = _guiFactory->createGui(*this);
+      } else {
          _guiFactory = ThreadedGuiFactory::getInstance();
-
-      _guiHandle = _guiFactory->createGui(*this);
+         if (!_threadedGuiListenerProxy)
+            _threadedGuiListenerProxy = std::make_unique<ThreadedGuiListenerProxy>(*this);
+         _guiHandle = _guiFactory->createGui(*_threadedGuiListenerProxy);
+      }
 
       if (!_guiHandle)
          return false;
@@ -282,6 +286,10 @@ namespace clap {
    //---------------------//
    // AbstractGuiListener //
    //---------------------//
+   void CorePlugin::onGuiRunOnMainThread(std::function<void()> callback) {
+      runOnMainThread(std::move(callback));
+   }
+
    void CorePlugin::onGuiPoll() {
       _pluginToGuiQueue.consume([this](clap_id paramId, const CorePlugin::PluginToGuiValue &value) {
          _guiHandle->gui().updateParameter(paramId, value.value, value.mod);

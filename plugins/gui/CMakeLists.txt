@@ -47,6 +47,8 @@ add_library(
   threaded-gui-factory.cc
   threaded-gui-proxy.hh
   threaded-gui-proxy.cc
+  threaded-gui-listener-proxy.hh
+  threaded-gui-listener-proxy.cc
   timer.hh
   timer.cc
   cf-timer.hh

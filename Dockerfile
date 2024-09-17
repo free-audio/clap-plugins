@@ -41,33 +41,12 @@ RUN apt install -y \
     libvulkan-dev \
     libx11-dev \
     libx11-xcb-dev \
-    libxcb-composite0-dev \
-    libxcb-cursor-dev \
-    libxcb-damage0-dev \
-    libxcb-dpms0-dev \
-    libxcb-dri2-0-dev \
-    libxcb-dri3-dev \
-    libxcb-ewmh-dev \
-    libxcb-glx0-dev \
-    libxcb-icccm4-dev \
-    libxcb-image0-dev \
-    libxcb-imdkit-dev \
-    libxcb-keysyms1-dev \
-    libxcb-present-dev \
-    libxcb-randr0-dev \
-    libxcb-record0-dev \
-    libxcb-render-util0-dev \
-    libxcb-render0-dev \
-    libxcb-res0-dev \
-    libxcb-screensaver0-dev \
-    libxcb-shape0-dev \
-    libxcb-shm0-dev \
-    libxcb-sync-dev \
-    libxcb-util-dev \
-    libxcb-xinput-dev \
-    libxcb-xkb-dev \
-    libxcb1-dev \
-    libxcb1-dev \
+    '^libxcb.*-dev' \
+    libglu1-mesa-dev \
+    libxrender-dev \
+    libxkbcommon-dev \
+    libxkbcommon-x11-dev \
+    libegl1-mesa-dev \
     libxi-dev \
     libxinerama-dev \
     libxmu-dev \

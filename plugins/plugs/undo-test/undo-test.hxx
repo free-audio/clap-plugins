@@ -32,8 +32,8 @@ namespace clap {
          : hasDelta          ? "com.github.free-audio.clap.undo-test-not-persistent"
                              : "com.github.free-audio.clap.undo-test-no-deltas",
          areDeltasPersistant ? "Undo Test"
-         : hasDelta          ? "UndoTest (deltas not persistent)"
-                             : "UndoTest (no deltas)",
+         : hasDelta          ? "Undo Test (deltas not persistent)"
+                             : "Undo Test (no deltas)",
          "clap",
          "https://github.com/free-audio/clap",
          nullptr,

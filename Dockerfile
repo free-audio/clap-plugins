@@ -20,6 +20,8 @@ RUN apt update \
       -o Acquire::http::No-Cache="true" \
       -o Acquire::http::Pipeline-Depth="0" \
       curl zip unzip tar pkg-config \
+      make autoconf autoconf-archive automake libtool \
+      nasm virtualenv \
       coreutils \
       cmake \
       chrpath \

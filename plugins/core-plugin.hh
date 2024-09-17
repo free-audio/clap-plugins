@@ -291,6 +291,7 @@ namespace clap {
       clap_id _guiTimerId = CLAP_INVALID_ID;
       std::shared_ptr<AbstractGuiFactory> _guiFactory;
       std::unique_ptr<GuiHandle> _guiHandle;
+      std::unique_ptr<ThreadedGuiListenerProxy> _threadedGuiListenerProxy;
 #endif
 
       Parameters _parameters;
@@ -316,7 +317,5 @@ namespace clap {
       bool _canRedo{false};
       std::optional<std::string> _undoName;
       std::optional<std::string> _redoName;
-
-      std::unique_ptr<ThreadedGuiListenerProxy> _threadedGuiListenerProxy;
    };
 } // namespace clap

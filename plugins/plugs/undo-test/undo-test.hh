@@ -28,9 +28,9 @@ namespace clap {
 
       void incrementState();
       void notifyGuiStateProperties();
-      void guiPopulateProperties() override;
 
 #ifndef CLAP_PLUGINS_HEADLESS
+      void guiPopulateProperties() override;
       void onGuiInvoke(
          const std::string &method,
          const std::vector<std::variant<bool, int64_t, double, std::string>> &args) override;

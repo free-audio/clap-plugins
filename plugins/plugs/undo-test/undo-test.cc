@@ -109,7 +109,7 @@ namespace clap {
       snprintf(buffer, sizeof (buffer), "UNDO increment %d -> %d", delta.old_value, delta.new_value);
       _host.log(CLAP_LOG_INFO, buffer);
 
-      _host.undoChangeMade("inc", &delta, sizeof(delta), true);
+      _host.undoChangeMade(buffer, &delta, sizeof(delta), true);
    }
 
    bool UndoTest::init() noexcept {

@@ -69,7 +69,7 @@ namespace clap {
       auto undoDelta = static_cast<const UndoDelta *>(delta);
 
       char buffer[128];
-      snprintf(buffer, sizeof (buffer), "UNDO undo %d -> %d", _state, undoDelta->old_value);
+      snprintf(buffer, sizeof(buffer), "UNDO undo %d -> %d", _state, undoDelta->old_value);
       _host.log(CLAP_LOG_INFO, buffer);
 
       _state = undoDelta->old_value;
@@ -90,7 +90,7 @@ namespace clap {
       auto undoDelta = static_cast<const UndoDelta *>(delta);
 
       char buffer[128];
-      snprintf(buffer, sizeof (buffer), "UNDO redo %d -> %d", _state, undoDelta->new_value);
+      snprintf(buffer, sizeof(buffer), "UNDO redo %d -> %d", _state, undoDelta->new_value);
       _host.log(CLAP_LOG_INFO, buffer);
 
       _state = undoDelta->new_value;
@@ -106,7 +106,7 @@ namespace clap {
       delta.new_value = ++_state;
 
       char buffer[128];
-      snprintf(buffer, sizeof (buffer), "UNDO increment %d -> %d", delta.old_value, delta.new_value);
+      snprintf(buffer, sizeof(buffer), "UNDO increment %d -> %d", delta.old_value, delta.new_value);
       _host.log(CLAP_LOG_INFO, buffer);
 
       _host.undoChangeMade(buffer, &delta, sizeof(delta), true);
@@ -122,6 +122,7 @@ namespace clap {
       return true;
    }
 
+#ifndef CLAP_PLUGINS_HEADLESS
    void UndoTest::onGuiInvoke(
       const std::string &method,
       const std::vector<std::variant<bool, int64_t, double, std::string>> &args) {
@@ -130,4 +131,5 @@ namespace clap {
       else
          super::onGuiInvoke(method, args);
    }
+#endif
 } // namespace clap

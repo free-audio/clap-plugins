@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM debian:stable-slim AS clap-plugin-build
+FROM debian:stable-slim AS clap-plugins-build
 ARG DEBIAN_FRONTEND=noninteractive
 ARG CACHE_DATE=2024-09-04
 

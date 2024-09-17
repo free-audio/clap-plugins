@@ -48,10 +48,7 @@ namespace clap {
    template <bool hasDelta, bool areDeltasPersistant>
    UndoTest<hasDelta, areDeltasPersistant>::UndoTest(const std::string &pluginPath,
                                                      const clap_host &host)
-      : CorePlugin(PathProvider::create(
-                      pluginPath, UndoTest<hasDelta, areDeltasPersistant>::descriptor()->name),
-                   descriptor(),
-                   host) {
+      : CorePlugin(PathProvider::create(pluginPath, "undo-test"), descriptor(), host) {
       _rootModule = std::make_unique<UndoTestModule<hasDelta, areDeltasPersistant>>(*this);
    }
 

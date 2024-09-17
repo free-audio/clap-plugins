@@ -8,13 +8,15 @@ namespace clap {
 
    class Gui;
 
-   class ThreadedGuiProxy : public AbstractGui {
+   class ThreadedGuiProxy final : public AbstractGui {
    public:
       ThreadedGuiProxy(AbstractGuiListener &listener, std::shared_ptr<Gui> &guiClient);
       ~ThreadedGuiProxy() override;
 
       void addImportPath(const std::string &importPath) override;
       void setSkin(const std::string &skinUrl) override;
+
+      void setGuiProperty(const std::string &name, const PropertyValue &value) override;
 
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;

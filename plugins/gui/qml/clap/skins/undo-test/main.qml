@@ -35,5 +35,8 @@ Rectangle {
                 text: "Do something"
                 onClicked: plugin.invoke("incrementState")
         }
+        Text {
+                text: plugin.props["counter"]
+        }
     }
 }

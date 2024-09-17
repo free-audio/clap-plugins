@@ -3,6 +3,7 @@
 #include <clap/clap.h>
 
 #include <string>
+#include <variant>
 
 namespace clap {
 
@@ -10,11 +11,15 @@ namespace clap {
    class AbstractGuiListener;
    class AbstractGui {
    public:
+      using PropertyValue = std::variant<bool, int64_t, double, std::string>;
+
       AbstractGui(AbstractGuiListener &listener);
       virtual ~AbstractGui();
 
       virtual void addImportPath(const std::string& importPath) = 0;
       virtual void setSkin(const std::string& skinUrl) = 0;
+
+      virtual void setGuiProperty(const std::string& name, const PropertyValue& value) = 0;
 
       virtual void defineParameter(const clap_param_info &paramInfo) = 0;
       virtual void updateParameter(clap_id paramId, double value, double modAmount) = 0;

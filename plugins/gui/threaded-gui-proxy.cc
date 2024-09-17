@@ -21,6 +21,11 @@ namespace clap {
          _gui.get(), [=, this] { _gui->setSkin(skinUrl); }, Qt::QueuedConnection);
    }
 
+   void ThreadedGuiProxy::setGuiProperty(const std::string &name, const PropertyValue &value) {
+      QMetaObject::invokeMethod(
+         _gui.get(), [=, this] { _gui->setGuiProperty(name, value); }, Qt::QueuedConnection);
+   }
+
    void ThreadedGuiProxy::defineParameter(const clap_param_info &paramInfo) {
       QMetaObject::invokeMethod(
          _gui.get(), [=, this] { _gui->defineParameter(paramInfo); }, Qt::QueuedConnection);

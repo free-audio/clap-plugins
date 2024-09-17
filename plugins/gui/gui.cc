@@ -55,6 +55,11 @@ namespace clap {
       _quickView->setSource(QUrl(skinUrl.c_str()));
    }
 
+   void Gui::setGuiProperty(const std::string &name, const PropertyValue &value)
+   {
+      _pluginProxy->setGuiProperty(name, value);
+   }
+
    void Gui::defineParameter(const clap_param_info &paramInfo) {
       qDebug() << "clap-gui: defineParam(" << paramInfo.id << ")";
       _pluginProxy->defineParameter(paramInfo);

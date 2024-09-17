@@ -35,6 +35,8 @@ namespace clap {
       void addImportPath(const std::string &importPath) override;
       void setSkin(const std::string &skinPath) override;
 
+      void setGuiProperty(const std::string &name, const PropertyValue &value) override;
+
       void defineParameter(const clap_param_info &paramInfo) override;
       void updateParameter(clap_id paramId, double value, double modAmount) override;
       void setParameterMappingIndication(clap_id paramId,

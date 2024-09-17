@@ -1,7 +1,9 @@
-#include "plugin-proxy.hh"
+#include <variant>
+
 #include "../modules/module.hh"
 #include "abstract-gui-listener.hh"
 #include "gui.hh"
+#include "plugin-proxy.hh"
 
 namespace clap {
    PluginProxy::PluginProxy(Gui &client) : super(&client), _client(client) {}
@@ -46,4 +48,15 @@ namespace clap {
       }
       _client.guiListener().onGuiInvoke(method.toStdString(), targetArgs);
    }
+
+   void PluginProxy::setGuiProperty(const std::string &name,
+                                    const AbstractGui::PropertyValue &value) {
+      const auto qname = QString::fromStdString(name);
+      const auto qvalue = QVariant::fromStdVariant(value);
+
+      _properties.insert(qname, qvalue);
+      guiPropertiesChanged();
+   }
+
+   const QVariantMap &PluginProxy::guiProperties() const noexcept { return _properties; }
 } // namespace clap

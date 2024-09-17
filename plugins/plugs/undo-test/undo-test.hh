@@ -27,6 +27,8 @@ namespace clap {
       bool undoRedo(clap_id format_version, const void *delta, size_t delta_size) noexcept override;
 
       void incrementState();
+      void notifyGuiStateProperties();
+      void guiPopulateProperties() override;
 
 #ifndef CLAP_PLUGINS_HEADLESS
       void onGuiInvoke(
@@ -35,6 +37,6 @@ namespace clap {
 #endif
 
    private:
-      uint32_t _state{0};
+      uint32_t _counter{0};
    };
 } // namespace clap

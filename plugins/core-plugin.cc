@@ -174,6 +174,7 @@ namespace clap {
       guiDefineParameters();
       guiDefineTrackInfo();
       guiSubscribeUndo();
+      guiPopulateProperties();
 
       auto skinPath = _pathProvider->getQmlSkinPath();
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());

@@ -54,6 +54,8 @@ namespace clap {
       const TuningProvider &tuningProvider() const noexcept { return _tuningProvider; }
 
    protected:
+      bool enableDraftExtensions() const noexcept override { return true; }
+
       //-------------//
       // clap_plugin //
       //-------------//
@@ -152,7 +154,7 @@ namespace clap {
       bool stateLoad(const clap_istream *stream) noexcept override;
 
       virtual std::vector<uint8_t> stateSaveExtra() noexcept { return {}; }
-      virtual bool stateLoadExtra(const std::vector<uint8_t>& data) noexcept { return true; }
+      virtual bool stateLoadExtra(const std::vector<uint8_t> &data) noexcept { return true; }
 
 #ifndef CLAP_PLUGINS_HEADLESS
       //-----------------//
@@ -174,6 +176,7 @@ namespace clap {
       void guiDefineParameters();
       void guiSubscribeUndo();
       void guiUnsubscribeUndo();
+      virtual void guiPopulateProperties() {}
 
       //---------------------//
       // AbstractGuiListener //

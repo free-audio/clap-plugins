@@ -1,5 +1,7 @@
 #include <cstring>
 
+#include "../gui/abstract-gui.hh"
+#include "../gui/gui-handle.hh"
 #include "undo-test.hh"
 
 namespace clap {
@@ -94,10 +96,12 @@ namespace clap {
       auto undoDelta = static_cast<const UndoDelta *>(delta);
 
       char buffer[128];
-      snprintf(buffer, sizeof(buffer), "UNDO undo %d -> %d", _state, undoDelta->old_value);
+      snprintf(buffer, sizeof(buffer), "UNDO undo %d -> %d", _counter, undoDelta->old_value);
       _host.log(CLAP_LOG_INFO, buffer);
 
-      _state = undoDelta->old_value;
+      _counter = undoDelta->old_value;
+
+      notifyGuiStateProperties();
       return true;
    }
 
@@ -121,10 +125,12 @@ namespace clap {
       auto undoDelta = static_cast<const UndoDelta *>(delta);
 
       char buffer[128];
-      snprintf(buffer, sizeof(buffer), "UNDO redo %d -> %d", _state, undoDelta->new_value);
+      snprintf(buffer, sizeof(buffer), "UNDO redo %d -> %d", _counter, undoDelta->new_value);
       _host.log(CLAP_LOG_INFO, buffer);
 
-      _state = undoDelta->new_value;
+      _counter = undoDelta->new_value;
+
+      notifyGuiStateProperties();
       return true;
    }
 
@@ -134,8 +140,8 @@ namespace clap {
          return;
 
       UndoDelta delta;
-      delta.old_value = _state;
-      delta.new_value = ++_state;
+      delta.old_value = _counter;
+      delta.new_value = ++_counter;
 
       char buffer[128];
       snprintf(buffer, sizeof(buffer), "UNDO increment %d -> %d", delta.old_value, delta.new_value);
@@ -145,6 +151,8 @@ namespace clap {
          _host.undoChangeMade(buffer, &delta, sizeof(delta), true);
       else
          _host.undoChangeMade(buffer, nullptr, 0, 0);
+
+      notifyGuiStateProperties();
    }
 
    template <bool hasDelta, bool areDeltasPersistant>
@@ -168,19 +176,33 @@ namespace clap {
       else
          super::onGuiInvoke(method, args);
    }
+
+   template <bool hasDelta, bool areDeltasPersistant>
+   void UndoTest<hasDelta, areDeltasPersistant>::guiPopulateProperties() {
+      super::guiPopulateProperties();
+      notifyGuiStateProperties();
+   }
 #endif
 
    template <bool hasDelta, bool areDeltasPersistant>
+   void UndoTest<hasDelta, areDeltasPersistant>::notifyGuiStateProperties() {
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_guiHandle)
+         _guiHandle->gui().setGuiProperty("counter", _counter);
+#endif
+   }
+
+   template <bool hasDelta, bool areDeltasPersistant>
    std::vector<uint8_t> UndoTest<hasDelta, areDeltasPersistant>::stateSaveExtra() noexcept {
-      return std::vector<uint8_t>((const uint8_t *)&_state, (const uint8_t *)(&_state + 1));
+      return std::vector<uint8_t>((const uint8_t *)&_counter, (const uint8_t *)(&_counter + 1));
    }
 
    template <bool hasDelta, bool areDeltasPersistant>
    bool UndoTest<hasDelta, areDeltasPersistant>::stateLoadExtra(
       const std::vector<uint8_t> &data) noexcept {
-      if (data.size() != sizeof(_state))
+      if (data.size() != sizeof(_counter))
          return false;
-      _state = *(const uint32_t *)data.data();
+      _counter = *(const uint32_t *)data.data();
       return true;
    }
 

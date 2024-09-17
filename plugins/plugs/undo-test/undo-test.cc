@@ -66,7 +66,14 @@ namespace clap {
          return false;
       }
 
-      return false;
+      auto undoDelta = static_cast<const UndoDelta *>(delta);
+
+      char buffer[128];
+      snprintf(buffer, sizeof (buffer), "UNDO undo %d -> %d", _state, undoDelta->old_value);
+      _host.log(CLAP_LOG_INFO, buffer);
+
+      _state = undoDelta->old_value;
+      return true;
    }
 
    bool UndoTest::undoRedo(clap_id format_version, const void *delta, size_t delta_size) noexcept {
@@ -80,7 +87,14 @@ namespace clap {
          return false;
       }
 
-      return false;
+      auto undoDelta = static_cast<const UndoDelta *>(delta);
+
+      char buffer[128];
+      snprintf(buffer, sizeof (buffer), "UNDO redo %d -> %d", _state, undoDelta->new_value);
+      _host.log(CLAP_LOG_INFO, buffer);
+
+      _state = undoDelta->new_value;
+      return true;
    }
 
    void UndoTest::incrementState() {
@@ -90,6 +104,11 @@ namespace clap {
       UndoDelta delta;
       delta.old_value = _state;
       delta.new_value = ++_state;
+
+      char buffer[128];
+      snprintf(buffer, sizeof (buffer), "UNDO increment %d -> %d", delta.old_value, delta.new_value);
+      _host.log(CLAP_LOG_INFO, buffer);
+
       _host.undoChangeMade("inc", &delta, sizeof(delta), true);
    }
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <optional>
+#include <string>
 
 #include "../../core-plugin.hh"
 
@@ -24,6 +24,12 @@ namespace clap {
       bool undoRedo(clap_id format_version, const void *delta, size_t delta_size) noexcept override;
 
       void incrementState();
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      void onGuiInvoke(
+         const std::string &method,
+         const std::vector<std::variant<bool, int64_t, double, std::string>> &args) override;
+#endif
 
    private:
       uint32_t _state{0};

@@ -1,6 +1,7 @@
 #include "plugin-proxy.hh"
-#include "gui.hh"
 #include "../modules/module.hh"
+#include "abstract-gui-listener.hh"
+#include "gui.hh"
 
 namespace clap {
    PluginProxy::PluginProxy(Gui &client) : super(&client), _client(client) {}
@@ -25,5 +26,24 @@ namespace clap {
       auto it = _parameters.emplace(info.id, new ParameterProxy(_client, info));
       if (!it.second)
          it.first->second->redefine(info);
+   }
+
+   void PluginProxy::invoke(const QString &method) {
+      _client.guiListener().onGuiInvoke(method.toStdString(), {});
+   }
+
+   void PluginProxy::invoke(const QString &method, const QVariantList &args) {
+      InvocationArgumentsType targetArgs;
+      for (auto &a : args) {
+         if (get_if<double>(&a))
+            targetArgs.push_back(get<double>(a));
+         else if (get_if<int64_t>(&a))
+            targetArgs.push_back(get<int64_t>(a));
+         else if (get_if<bool>(&a))
+            targetArgs.push_back(get<bool>(a));
+         else if (get_if<QString>(&a))
+            targetArgs.push_back(get<QString>(a).toStdString());
+      }
+      _client.guiListener().onGuiInvoke(method.toStdString(), targetArgs);
    }
 } // namespace clap

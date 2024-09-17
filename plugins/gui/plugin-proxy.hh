@@ -24,6 +24,8 @@ namespace clap {
       Q_INVOKABLE ParameterProxy *param(clap_id paramId);
       Q_INVOKABLE ParameterProxy *param(clap_id moduleId, clap_id paramId);
       Q_INVOKABLE QString toString() const;
+      Q_INVOKABLE void invoke(const QString &method);
+      Q_INVOKABLE void invoke(const QString &method, const QVariantList &args);
 
    private:
       Gui &_client;

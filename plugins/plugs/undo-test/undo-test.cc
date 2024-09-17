@@ -92,6 +92,7 @@ namespace clap {
       delta.new_value = ++_state;
       _host.undoChangeMade("inc", &delta, sizeof(delta), true);
    }
+
    bool UndoTest::init() noexcept {
       if (!super::init())
          return false;
@@ -100,5 +101,14 @@ namespace clap {
          _host.undoSetWantsContextUpdates(true);
       }
       return true;
+   }
+
+   void UndoTest::onGuiInvoke(
+      const std::string &method,
+      const std::vector<std::variant<bool, int64_t, double, std::string>> &args) {
+      if (method == "incrementState")
+         incrementState();
+      else
+         super::onGuiInvoke(method, args);
    }
 } // namespace clap

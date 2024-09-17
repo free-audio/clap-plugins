@@ -363,6 +363,12 @@ namespace clap {
       });
    }
 
+   void CorePlugin::onGuiInvoke(
+      const std::string &method,
+      const std::vector<std::variant<bool, int64_t, double, std::string>> &args) {
+      std::cerr << "Unhandled gui method invocation: " << method << std::endl;
+   }
+
 #endif // CLAP_PLUGINS_HEADLESS
 
    //------------------//

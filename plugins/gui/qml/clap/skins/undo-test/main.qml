@@ -31,5 +31,9 @@ Rectangle {
                         text: undo.redoName
                 }
         }
+        Button {
+                text: "Do something"
+                onClicked: plugin.invoke("incrementState")
+        }
     }
 }

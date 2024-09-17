@@ -180,6 +180,9 @@ namespace clap {
       void onGuiWindowClosed(bool wasDestroyed) override;
       void onGuiUndo() override;
       void onGuiRedo() override;
+      void onGuiInvoke(
+         const std::string &method,
+         const std::vector<std::variant<bool, int64_t, double, std::string>> &args) override;
 #endif
 
       //------------------------//

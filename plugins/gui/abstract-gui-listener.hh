@@ -1,8 +1,15 @@
 #pragma once
 
+#include <string>
+#include <variant>
+#include <vector>
+
 #include <clap/clap.h>
 
 namespace clap {
+   using InvocationArgumentType = std::variant<bool, int64_t, double, std::string>;
+   using InvocationArgumentsType = std::vector<InvocationArgumentType>;
+
    // Listener for events produced by the Gui, to the destination of the plugin.
    //
    // Beaware that the callbacks happen on the plugin's GUI thread, not the host's main thread.
@@ -24,5 +31,7 @@ namespace clap {
 
       virtual void onGuiUndo() = 0;
       virtual void onGuiRedo() = 0;
+
+      virtual void onGuiInvoke(const std::string &method, const InvocationArgumentsType &args) = 0;
    };
 } // namespace clap

@@ -1,7 +1,7 @@
 #include <cstring>
 
-#include "../gui/abstract-gui.hh"
-#include "../gui/gui-handle.hh"
+#include "../../gui/abstract-gui.hh"
+#include "../../gui/gui-handle.hh"
 #include "undo-test.hh"
 
 namespace clap {

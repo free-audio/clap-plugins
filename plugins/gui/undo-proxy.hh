@@ -11,8 +11,8 @@ namespace clap {
 
       Q_OBJECT
 
-      Q_PROPERTY(bool hasUndo READ hasUndo NOTIFY canUndoChanged)
-      Q_PROPERTY(bool hasRedo READ hasRedo NOTIFY canRedoChanged)
+      Q_PROPERTY(bool canUndo READ canUndo NOTIFY canUndoChanged)
+      Q_PROPERTY(bool canRedo READ canRedo NOTIFY canRedoChanged)
       Q_PROPERTY(QString undoName READ undoName NOTIFY undoNameChanged)
       Q_PROPERTY(QString redoName READ redoName NOTIFY redoNameChanged)
 
@@ -25,8 +25,8 @@ namespace clap {
       void setUndoName(QString name);
       void setRedoName(QString name);
 
-      [[nodiscard]] const bool hasUndo() const noexcept { return _canUndo; }
-      [[nodiscard]] const bool hasRedo() const noexcept { return _canRedo; }
+      [[nodiscard]] const bool canUndo() const noexcept { return _canUndo; }
+      [[nodiscard]] const bool canRedo() const noexcept { return _canRedo; }
 
       [[nodiscard]] const QString &undoName() const noexcept { return _undoName; }
       [[nodiscard]] const QString &redoName() const noexcept { return _redoName; }

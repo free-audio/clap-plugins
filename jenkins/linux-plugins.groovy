@@ -33,11 +33,13 @@ pipeline {
         timeout(time: 4, unit: 'HOURS')
       }
       steps {
-        if (CLEAN_BUILD) {
-          sh 'rm -rf builds'
-        }
-        if (REBUILD_VCPKG) {
-          sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
+        script {
+          if (CLEAN_BUILD) {
+            sh 'rm -rf builds'
+          }
+          if (REBUILD_VCPKG) {
+            sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
+          }
         }
         sh 'scripts/build-gui.sh'
       }

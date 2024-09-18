@@ -20,11 +20,11 @@ namespace clap {
       std::vector<uint8_t> stateSaveExtra() noexcept override;
       bool stateLoadExtra(const std::vector<uint8_t> &data) noexcept override;
 
-      bool implementsUndo() const noexcept override;
-      void undoGetDeltaProperties(clap_undo_delta_properties_t *properties) noexcept override;
-      bool undoCanUseDeltaFormatVersion(clap_id format_version) noexcept override;
-      bool undoUndo(clap_id format_version, const void *delta, size_t delta_size) noexcept override;
-      bool undoRedo(clap_id format_version, const void *delta, size_t delta_size) noexcept override;
+      bool implementsUndoDelta() const noexcept override;
+      void undoDeltaGetDeltaProperties(clap_undo_delta_properties_t *properties) noexcept override;
+      bool undoDeltaCanUseDeltaFormatVersion(clap_id format_version) noexcept override;
+      bool undoDeltaUndo(clap_id format_version, const void *delta, size_t delta_size) noexcept override;
+      bool undoDeltaRedo(clap_id format_version, const void *delta, size_t delta_size) noexcept override;
 
       void incrementState();
       void notifyGuiStateProperties();

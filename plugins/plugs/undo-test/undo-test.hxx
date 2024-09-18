@@ -55,12 +55,12 @@ namespace clap {
    }
 
    template <bool hasDelta, bool areDeltasPersistant>
-   bool UndoTest<hasDelta, areDeltasPersistant>::implementsUndo() const noexcept {
+   bool UndoTest<hasDelta, areDeltasPersistant>::implementsUndoDelta() const noexcept {
       return true;
    }
 
    template <bool hasDelta, bool areDeltasPersistant>
-   void UndoTest<hasDelta, areDeltasPersistant>::undoGetDeltaProperties(
+   void UndoTest<hasDelta, areDeltasPersistant>::undoDeltaGetDeltaProperties(
       clap_undo_delta_properties_t *properties) noexcept {
       properties->has_delta = hasDelta;
       properties->are_deltas_persistent = areDeltasPersistant;
@@ -68,7 +68,7 @@ namespace clap {
    }
 
    template <bool hasDelta, bool areDeltasPersistant>
-   bool UndoTest<hasDelta, areDeltasPersistant>::undoCanUseDeltaFormatVersion(
+   bool UndoTest<hasDelta, areDeltasPersistant>::undoDeltaCanUseDeltaFormatVersion(
       clap_id format_version) noexcept {
       if constexpr (!hasDelta)
          return false;
@@ -77,9 +77,9 @@ namespace clap {
    }
 
    template <bool hasDelta, bool areDeltasPersistant>
-   bool UndoTest<hasDelta, areDeltasPersistant>::undoUndo(clap_id format_version,
-                                                          const void *delta,
-                                                          size_t delta_size) noexcept {
+   bool UndoTest<hasDelta, areDeltasPersistant>::undoDeltaUndo(clap_id format_version,
+                                                               const void *delta,
+                                                               size_t delta_size) noexcept {
       if constexpr (!hasDelta)
          return false;
 
@@ -106,9 +106,9 @@ namespace clap {
    }
 
    template <bool hasDelta, bool areDeltasPersistant>
-   bool UndoTest<hasDelta, areDeltasPersistant>::undoRedo(clap_id format_version,
-                                                          const void *delta,
-                                                          size_t delta_size) noexcept {
+   bool UndoTest<hasDelta, areDeltasPersistant>::undoDeltaRedo(clap_id format_version,
+                                                               const void *delta,
+                                                               size_t delta_size) noexcept {
       if constexpr (!hasDelta)
          return false;
 

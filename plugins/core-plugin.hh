@@ -219,10 +219,11 @@ namespace clap {
       //------------------//
       // clap_plugin_undo //
       //------------------//
-      void undoSetCanUndo(bool can_undo) noexcept override;
-      void undoSetCanRedo(bool can_redo) noexcept override;
-      void undoSetUndoName(const char *name) noexcept override;
-      void undoSetRedoName(const char *name) noexcept override;
+      bool implementsUndoContext() const noexcept override { return true; }
+      void undoContextSetCanUndo(bool can_undo) noexcept override;
+      void undoContextSetCanRedo(bool can_redo) noexcept override;
+      void undoContextSetUndoName(const char *name) noexcept override;
+      void undoContextSetRedoName(const char *name) noexcept override;
 
       //////////////////////
       // Cached Host Info //

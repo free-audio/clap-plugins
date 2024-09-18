@@ -294,12 +294,12 @@ namespace clap {
    }
 
    void CorePlugin::guiSubscribeUndo() {
-      if (implementsUndo() && _host.canUseUndo())
+      if (_host.canUseUndo())
          _host.undoSetWantsContextUpdates(true);
    }
 
    void CorePlugin::guiUnsubscribeUndo() {
-      if (implementsUndo() && _host.canUseUndo())
+      if (_host.canUseUndo())
          _host.undoSetWantsContextUpdates(false);
    }
 
@@ -952,7 +952,7 @@ namespace clap {
       return true;
    }
 
-   void CorePlugin::undoSetCanUndo(bool can_undo) noexcept {
+   void CorePlugin::undoContextSetCanUndo(bool can_undo) noexcept {
       _canUndo = can_undo;
 
 #ifndef CLAP_PLUGINS_HEADLESS
@@ -961,10 +961,10 @@ namespace clap {
 #endif
 
       if (!can_undo)
-         undoSetUndoName(nullptr);
+         undoContextSetUndoName(nullptr);
    }
 
-   void CorePlugin::undoSetCanRedo(bool can_redo) noexcept {
+   void CorePlugin::undoContextSetCanRedo(bool can_redo) noexcept {
       _canRedo = can_redo;
 
 #ifndef CLAP_PLUGINS_HEADLESS
@@ -973,10 +973,10 @@ namespace clap {
 #endif
 
       if (!can_redo)
-         undoSetRedoName(nullptr);
+         undoContextSetRedoName(nullptr);
    }
 
-   void CorePlugin::undoSetUndoName(const char *name) noexcept {
+   void CorePlugin::undoContextSetUndoName(const char *name) noexcept {
       if (name && *name)
          _undoName = name;
       else
@@ -988,7 +988,7 @@ namespace clap {
 #endif
    }
 
-   void CorePlugin::undoSetRedoName(const char *name) noexcept {
+   void CorePlugin::undoContextSetRedoName(const char *name) noexcept {
       if (name && *name)
          _redoName = name;
       else

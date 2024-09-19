@@ -380,14 +380,14 @@ namespace clap {
    void CorePlugin::onGuiUndo() {
       runOnMainThread([this] {
          if (_canUndo && _host.canUseUndo())
-            _host.undoUndo();
+            _host.undoRequestUndo();
       });
    }
 
    void CorePlugin::onGuiRedo() {
       runOnMainThread([this] {
          if (_canRedo && _host.canUseUndo())
-            _host.undoRedo();
+            _host.undoRequestRedo();
       });
    }
 

@@ -87,6 +87,7 @@ cd c:\
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins c-p
 cd c-p
 
+.\vcpkg\bootstrap-vcpkg.bat
 Powershell.exe -noexit -executionpolicy bypass -File .\scripts\build-gui.ps1
 ```
 

@@ -5,6 +5,7 @@ cmake_policy(SET CMP0100 NEW) # handle .hh files
 enable_testing()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0)
 
 project(CLAP_PLUGINS C CXX)
 

@@ -1,9 +1,6 @@
 #!/usr/bin/env groovy
 pipeline {
     agent none
-    agent {
-        label 'docker'
-    }
 
     parameters {
         string(

@@ -105,8 +105,9 @@ pipeline {
                                 glob: 'buildtrees/**/*.log, installed/vcpkg/issue_body.md',
                                 dir: 'vcpkg/'
 
+                            // macOS produces a bundle which is a directory itself
                             zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: '*.clap',
+                                glob: '*.clap/**',
                                 dir: 'builds/ninja-vcpkg/plugins/Release/'
                         }
                     }

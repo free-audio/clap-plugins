@@ -67,11 +67,11 @@ pipeline {
                     post {
                         always {
                             zip zipFile: 'linux-vcpkg-logs.zip', archive: true, overwrite: true,
-                                glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md',
+                                glob: 'buildtrees/**/*.log, installed/vcpkg/issue_body.md',
                                 dir: 'vcpkg/'
 
                             zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/ninja-vcpkg/plugins/Release/*.clap',
+                                file: 'clap-plugins.clap',
                                 dir: 'builds/ninja-vcpkg/plugins/Release/'
                         }
                     }
@@ -102,11 +102,11 @@ pipeline {
                     post {
                         always {
                             zip zipFile: 'macOS-vcpkg-logs.zip', archive: true, overwrite: true,
-                                glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md',
+                                glob: 'buildtrees/**/*.log, installed/vcpkg/issue_body.md',
                                 dir: 'vcpkg/'
 
                             zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/ninja-vcpkg/plugins/Release/*.clap',
+                                file: 'clap-plugins.clap',
                                 dir: 'builds/ninja-vcpkg/plugins/Release/'
                         }
                     }
@@ -139,11 +139,11 @@ pipeline {
                     post {
                         always {
                             zip zipFile: 'windows-vcpkg-logs.zip', archive: true, overwrite: true,
-                                glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md',
+                                glob: 'buildtrees/**/*.log, installed/vcpkg/issue_body.md',
                                 dir: 'vcpkg/'
 
                             zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/vs-vcpkg/plugins/Release/*.clap',
+                                file: 'clap-plugins.clap',
                                 dir: 'builds/vs-vcpkg/plugins/Release/'
                         }
                     }

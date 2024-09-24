@@ -22,7 +22,11 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  add_compile_options(/utf-8)
+  add_compile_options(/utf-8 /Zi)
+  add_link_options($<$<CONFIG:Release>:/OPT:REF>)
+  add_link_options($<$<CONFIG:Release>:/OPT:ICF=3>)
+  add_link_options($<$<CONFIG:Release>:/Qvec>)
+  add_link_options($<$<CONFIG:Release>:/GR>)
 endif()
 
 add_subdirectory(clap EXCLUDE_FROM_ALL)

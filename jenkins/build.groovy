@@ -68,8 +68,9 @@ pipeline {
           }
           post {
             always {
-              zip zipFile: 'linux-clap-plugins.zip', archive: true: overwrite: true,
+              zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
                 glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
+
               zip zipFile: 'linux-vcpkg-logs.zip', archive: true, overwrite: true,
                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
             }

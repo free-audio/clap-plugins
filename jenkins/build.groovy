@@ -1,4 +1,5 @@
 #!/usr/bin/env groovy
+/* groovylint-disable NestedBlockDepth */
 pipeline {
     agent none
 
@@ -8,29 +9,29 @@ pipeline {
       description: 'Git branch name or commit hash to build. Defaults to tip of main branch.')
 
         booleanParam(
-      defaultValue: false,
-      description: 'Cleanups the build directory.',
-      name: 'CLEAN_BUILD')
+            defaultValue: false,
+            description: 'Cleanups the build directory.',
+            name: 'CLEAN_BUILD')
 
         booleanParam(
-      defaultValue: false,
-      description: 'Rebuilds VCPKG dependencies.',
-      name: 'REBUILD_VCPKG')
+            defaultValue: false,
+            description: 'Rebuilds VCPKG dependencies.',
+            name: 'REBUILD_VCPKG')
 
         booleanParam(
-      defaultValue: true,
-      description: 'Check to enable Linux build',
-      name: 'shouldBuildLinux')
+            defaultValue: true,
+            description: 'Check to enable Linux build',
+            name: 'shouldBuildLinux')
 
         booleanParam(
-      defaultValue: true,
-      description: 'Check to enable Windows build',
-      name: 'shouldBuildWindows')
+            defaultValue: true,
+            description: 'Check to enable Windows build',
+            name: 'shouldBuildWindows')
 
         booleanParam(
-      defaultValue: true,
-      description: 'Check to enable macOS build',
-      name: 'shouldBuildMac')
+            defaultValue: true,
+            description: 'Check to enable macOS build',
+            name: 'shouldBuildMac')
     }
 
     stages {
@@ -66,10 +67,10 @@ pipeline {
                     post {
                         always {
                             zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
-                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
+                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
 
                             zip zipFile: 'linux-vcpkg-logs.zip', archive: true, overwrite: true,
-                glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
+                                glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
                         }
                     }
                 }

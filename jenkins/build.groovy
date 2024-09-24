@@ -81,7 +81,7 @@ pipeline {
                         }
                     }
                     agent {
-                        label 'mac-build'
+                        label 'macos-build'
                     }
                     options {
                         timeout(time: 4, unit: 'HOURS')
@@ -133,7 +133,7 @@ pipeline {
                     post {
                         always {
                             zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
+                                glob: 'builds/vs-vcpkg/plugins/Release/clap-plugins.clap'
 
                             zip zipFile: 'windows-vcpkg-logs.zip', archive: true, overwrite: true,
                                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'

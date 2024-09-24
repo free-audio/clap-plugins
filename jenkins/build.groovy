@@ -55,10 +55,10 @@ pipeline {
                     }
                     steps {
                         script {
-                            if (CLEAN_BUILD) {
+                            if (params.CLEAN_BUILD) {
                                 sh 'rm -rf builds'
                             }
-                            if (REBUILD_VCPKG) {
+                            if (params.REBUILD_VCPKG) {
                                 sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
                             }
                         }
@@ -88,10 +88,10 @@ pipeline {
                     }
                     steps {
                         script {
-                            if (CLEAN_BUILD) {
+                            if (params.CLEAN_BUILD) {
                                 sh 'rm -rf builds'
                             }
-                            if (REBUILD_VCPKG) {
+                            if (params.REBUILD_VCPKG) {
                                 sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
                             }
                         }
@@ -121,10 +121,10 @@ pipeline {
                     }
                     steps {
                         // script {
-                        //     if (CLEAN_BUILD) {
+                        //     if (params.CLEAN_BUILD) {
                         //         sh 'rm -rf builds'
                         //     }
-                        //     if (REBUILD_VCPKG) {
+                        //     if (params.REBUILD_VCPKG) {
                         //         sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
                         //     }
                         // }

@@ -5,8 +5,8 @@ pipeline {
 
     parameters {
         string(
-      defaultValue: 'main', name: 'BRANCH_OR_COMMIT_HASH',
-      description: 'Git branch name or commit hash to build. Defaults to tip of main branch.')
+            defaultValue: 'main', name: 'BRANCH_OR_COMMIT_HASH',
+            description: 'Git branch name or commit hash to build. Defaults to tip of main branch.')
 
         booleanParam(
             defaultValue: false,
@@ -66,11 +66,11 @@ pipeline {
                     }
                     post {
                         always {
-                            zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
-
                             zip zipFile: 'linux-vcpkg-logs.zip', archive: true, overwrite: true,
                                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
+
+                            zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
+                                file: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
                         }
                     }
                 }
@@ -99,11 +99,11 @@ pipeline {
                     }
                     post {
                         always {
-                            zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
-
                             zip zipFile: 'macOS-vcpkg-logs.zip', archive: true, overwrite: true,
                                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
+
+                            zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
+                                file: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
                         }
                     }
                 }
@@ -134,11 +134,11 @@ pipeline {
                     }
                     post {
                         always {
-                            zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/vs-vcpkg/plugins/Release/clap-plugins.clap'
-
                             zip zipFile: 'windows-vcpkg-logs.zip', archive: true, overwrite: true,
                                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
+
+                            zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
+                                file: 'builds/vs-vcpkg/plugins/Release/clap-plugins.clap'
                         }
                     }
                 }

@@ -120,15 +120,17 @@ pipeline {
                         timeout(time: 4, unit: 'HOURS')
                     }
                     steps {
-                        script {
-                            if (CLEAN_BUILD) {
-                                sh 'rm -rf builds'
-                            }
-                            if (REBUILD_VCPKG) {
-                                sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
-                            }
-                        }
-                        sh 'scripts/build-gui.sh'
+                        // script {
+                        //     if (CLEAN_BUILD) {
+                        //         sh 'rm -rf builds'
+                        //     }
+                        //     if (REBUILD_VCPKG) {
+                        //         sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
+                        //     }
+                        // }
+                        // sh 'scripts/build-gui.sh'
+
+                        powershell 'Powershell.exe -noexit -executionpolicy bypass -File ./scripts/build-gui.ps1'
                     }
                     post {
                         always {

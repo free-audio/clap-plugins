@@ -70,7 +70,7 @@ pipeline {
                                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
 
                             zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
-                                file: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
+                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
                         }
                     }
                 }
@@ -103,7 +103,7 @@ pipeline {
                                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
 
                             zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
-                                file: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
+                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
                         }
                     }
                 }
@@ -138,7 +138,7 @@ pipeline {
                                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
 
                             zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
-                                file: 'builds/vs-vcpkg/plugins/Release/clap-plugins.clap'
+                                glob: 'builds/vs-vcpkg/plugins/Release/clap-plugins.clap'
                         }
                     }
                 }

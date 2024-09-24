@@ -71,7 +71,7 @@ pipeline {
                                 dir: 'vcpkg/'
 
                             zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap',
+                                glob: 'builds/ninja-vcpkg/plugins/Release/*.clap',
                                 dir: 'builds/ninja-vcpkg/plugins/Release/'
                         }
                     }
@@ -106,7 +106,7 @@ pipeline {
                                 dir: 'vcpkg/'
 
                             zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap',
+                                glob: 'builds/ninja-vcpkg/plugins/Release/*.clap',
                                 dir: 'builds/ninja-vcpkg/plugins/Release/'
                         }
                     }
@@ -143,7 +143,7 @@ pipeline {
                                 dir: 'vcpkg/'
 
                             zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
-                                glob: 'builds/vs-vcpkg/plugins/Release/clap-plugins.clap',
+                                glob: 'builds/vs-vcpkg/plugins/Release/*.clap',
                                 dir: 'builds/vs-vcpkg/plugins/Release/'
                         }
                     }

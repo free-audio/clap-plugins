@@ -1,5 +1,6 @@
 #!/usr/bin/env groovy
 pipeline {
+  agent none
   agent {
     label 'docker'
   }
@@ -18,39 +19,62 @@ pipeline {
       defaultValue: false,
       description: 'Rebuilds VCPKG dependencies.',
       name: 'REBUILD_VCPKG')
+
+    booleanParam(
+      defaultValue: true,
+      description: 'Check to enable Linux build',
+      name: 'shouldBuildLinux')
+
+    booleanParam(
+      defaultValue: true,
+      description: 'Check to enable Windows build',
+      name: 'shouldBuildWindows')
+
+    booleanParam(
+      defaultValue: true,
+      description: 'Check to enable macOS build',
+      name: 'shouldBuildMac')
   }
 
   stages {
     stage('Build') {
-      agent {
-        dockerfile {
-          additionalBuildArgs '--target clap-plugins-build'
-          filename 'Dockerfile'
-          reuseNode true
-        }
-      }
-      options {
-        timeout(time: 4, unit: 'HOURS')
-      }
-      steps {
-        script {
-          if (CLEAN_BUILD) {
-            sh 'rm -rf builds'
+      parallel {
+        stage('Linux') {
+          when {
+            expression {
+              return params.shouldBuildLinux
+            }
           }
-          if (REBUILD_VCPKG) {
-            sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
+          agent {
+            dockerfile {
+              additionalBuildArgs '--target clap-plugins-build'
+              filename 'Dockerfile'
+              reuseNode true
+            }
           }
-        }
-        sh 'scripts/build-gui.sh'
-      }
-    }
-  }
-
-  post {
-    always {
-      archiveArtifacts artifacts: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap', fingerprint: true
-      zip zipFile: 'linux-vcpkg-logs.zip', archive: true, overwrite: true,
+          options {
+            timeout(time: 4, unit: 'HOURS')
+          }
+          steps {
+            script {
+              if (CLEAN_BUILD) {
+                sh 'rm -rf builds'
+              }
+              if (REBUILD_VCPKG) {
+                sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
+              }
+            }
+            sh 'scripts/build-gui.sh'
+          }
+          post {
+            always {
+              archiveArtifacts artifacts: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap', fingerprint: true
+              zip zipFile: 'linux-vcpkg-logs.zip', archive: true, overwrite: true,
                 glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -74,6 +74,72 @@ pipeline {
                         }
                     }
                 }
+                stage('macOS') {
+                    when {
+                        expression {
+                            return params.shouldBuildMac
+                        }
+                    }
+                    agent {
+                        label 'mac-build'
+                    }
+                    options {
+                        timeout(time: 4, unit: 'HOURS')
+                    }
+                    steps {
+                        script {
+                            if (CLEAN_BUILD) {
+                                sh 'rm -rf builds'
+                            }
+                            if (REBUILD_VCPKG) {
+                                sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
+                            }
+                        }
+                        sh 'scripts/build-gui.sh'
+                    }
+                    post {
+                        always {
+                            zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
+                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
+
+                            zip zipFile: 'macOS-vcpkg-logs.zip', archive: true, overwrite: true,
+                                glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
+                        }
+                    }
+                }
+                stage('Windows') {
+                    when {
+                        expression {
+                            return params.shouldBuildWindows
+                        }
+                    }
+                    agent {
+                        label 'windows-build'
+                    }
+                    options {
+                        timeout(time: 4, unit: 'HOURS')
+                    }
+                    steps {
+                        script {
+                            if (CLEAN_BUILD) {
+                                sh 'rm -rf builds'
+                            }
+                            if (REBUILD_VCPKG) {
+                                sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
+                            }
+                        }
+                        sh 'scripts/build-gui.sh'
+                    }
+                    post {
+                        always {
+                            zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
+                                glob: 'builds/ninja-vcpkg/plugins/Release/clap-plugins.clap'
+
+                            zip zipFile: 'windows-vcpkg-logs.zip', archive: true, overwrite: true,
+                                glob: 'vcpkg/buildtrees/**/*.log, vcpkg/installed/vcpkg/issue_body.md'
+                        }
+                    }
+                }
             }
         }
     }

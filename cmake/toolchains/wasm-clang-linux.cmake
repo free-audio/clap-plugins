@@ -5,13 +5,15 @@ set(CMAKE_CROSSCOMPILING TRUE)
 
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS FALSE)
 
-set(triple "wasm32-unknown-wasi")
+set(triple "wasm32-wasi")
 
 set(CMAKE_C_COMPILER "/usr/bin/clang")
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 set(CMAKE_ASM_COMPILER "/usr/bin/clang")
 set(CMAKE_AR "/usr/bin/llvm-ar")
 set(CMAKE_RANLIB "/usr/bin/llvm-ranlib")
+
+set(CMAKE_SYSROOT "/usr/share/wasi-sysroot")
 
 set(CMAKE_C_COMPILER_TARGET ${triple})
 set(CMAKE_CXX_COMPILER_TARGET ${triple})

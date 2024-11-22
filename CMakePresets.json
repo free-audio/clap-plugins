@@ -50,11 +50,8 @@
         {
             "name": "vcpkg",
             "hidden": true,
+            "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-                },
                 "CLAP_PLUGINS_EMBED_QML": {
                     "type": "BOOL",
                     "value": true

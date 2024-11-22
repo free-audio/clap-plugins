@@ -43,6 +43,11 @@
             "toolchainFile": "cmake/toolchains/wasm-clang-linux.cmake"
         },
         {
+            "name": "wasi-linux",
+            "hidden": true,
+            "toolchainFile": "/opt/wasi-sdk/share/cmake/wasi-sdk-pthread.cmake"
+        },
+        {
             "name": "emscripten-linux",
             "hidden": true,
             "toolchainFile": "/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake"
@@ -99,6 +104,14 @@
             ]
         },
         {
+            "name": "ninja-wasi-headless",
+            "description": "Ninja + System Libraries + Headless / WASM",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "inherits": [
+                "base", "headless", "wasi-linux"
+            ]
+        },
+        {
             "name": "ninja-emscripten-headless",
             "description": "Ninja + System Libraries + Headless / WASM",
             "binaryDir": "${sourceDir}/builds/${presetName}",
@@ -133,6 +146,12 @@
             "inherits": "base",
             "description": "Build using Ninja and system libraries (headless)",
             "configurePreset": "ninja-wasm-headless"
+        },
+        {
+            "name": "ninja-wasi-headless",
+            "inherits": "base",
+            "description": "Build using Ninja and system libraries (headless)",
+            "configurePreset": "ninja-wasi-headless"
         },
         {
             "name": "ninja-emscripten-headless",

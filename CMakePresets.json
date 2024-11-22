@@ -38,6 +38,16 @@
             }
         },
         {
+            "name": "wasm-clang-linux",
+            "hidden": true,
+            "toolchainFile": "cmake/toolchains/wasm-clang-linux.cmake"
+        },
+        {
+            "name": "emscripten-linux",
+            "hidden": true,
+            "toolchainFile": "/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+        },
+        {
             "name": "vcpkg",
             "hidden": true,
             "cacheVariables": {
@@ -82,6 +92,22 @@
                 "vs",
                 "headless"
             ]
+        },
+        {
+            "name": "ninja-wasm-headless",
+            "description": "Ninja + System Libraries + Headless / WASM",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "inherits": [
+                "base", "headless", "wasm-clang-linux"
+            ]
+        },
+        {
+            "name": "ninja-emscripten-headless",
+            "description": "Ninja + System Libraries + Headless / WASM",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "inherits": [
+                "base", "headless", "emscripten-linux"
+            ]
         }
     ],
     "buildPresets": [
@@ -104,6 +130,18 @@
             "inherits": "base",
             "description": "Build using Ninja and system libraries (headless)",
             "configurePreset": "ninja-headless"
+        },
+        {
+            "name": "ninja-wasm-headless",
+            "inherits": "base",
+            "description": "Build using Ninja and system libraries (headless)",
+            "configurePreset": "ninja-wasm-headless"
+        },
+        {
+            "name": "ninja-emscripten-headless",
+            "inherits": "base",
+            "description": "Build using Ninja and system libraries (headless)",
+            "configurePreset": "ninja-emscripten-headless"
         },
         {
             "name": "vs-vcpkg",

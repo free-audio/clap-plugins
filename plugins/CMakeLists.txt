@@ -104,7 +104,14 @@ endif()
 
 target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 
-add_library(clap-plugins MODULE clap-entry.cc)
+set(clap_plugins_src clap-entry.cc)
+
+if (CMAKE_SYSTEM_PROCESSOR MATCHES wasm)
+  add_executable(clap-plugins MODULE ${clap_plugins_src})
+else()
+  add_library(clap-plugins MODULE ${clap_plugins_src})
+endif()
+
 target_link_libraries(clap-plugins PUBLIC clap-plugins-core)
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 

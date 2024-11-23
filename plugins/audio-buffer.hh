@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include <clap/clap.h>
+#include <clap/helpers/macros.hh>
 
 #include "constants.hh"
 
@@ -24,7 +25,11 @@ namespace clap {
          : _channelCount(channelCount), _frameCount(frameCount), _sampleRate(sampleRate) {
 
          if (_channelCount > MAX_AUDIO_CHANNELS)
+#ifdef __cpp_exceptions
             throw std::invalid_argument("too many audio channels");
+#else
+            std::terminate();
+#endif
 
          const size_t dataSize = channelCount * frameCount * sizeof(T);
          const size_t dataBaseSize = alignment + dataSize;
@@ -32,7 +37,7 @@ namespace clap {
          _dataBase = std::malloc(alignment + dataSize);
 
          if (!_dataBase) [[unlikely]]
-            throw std::bad_alloc();
+            CLAP_HELPERS_THROW(std::bad_alloc());
 
          // std::align modifies the input buffer argument if it succeeds which means
          // when alloc was unaligned the free in the dtor would fail as mis-aligned.
@@ -40,7 +45,7 @@ namespace clap {
          auto tmp = _dataBase;
          _data = static_cast<T*>(std::align(alignment, dataSize, tmp, dataSizeLeft));
          if (!_data)
-            throw std::bad_alloc();
+            CLAP_HELPERS_THROW(std::bad_alloc());
 
          setConstantValue(0);
       }

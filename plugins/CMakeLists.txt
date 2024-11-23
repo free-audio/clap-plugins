@@ -94,6 +94,7 @@ add_library(
   value-types/enumerated-value-type.cc
   )
 target_compile_definitions(clap-plugins-core PUBLIC _USE_MATH_DEFINES)
+target_compile_options(clap-plugins-core PUBLIC -fno-exceptions)
 set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
 set_target_properties(clap-plugins-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
@@ -107,7 +108,8 @@ target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 set(clap_plugins_src clap-entry.cc)
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES wasm)
-  add_executable(clap-plugins ${clap_plugins_src})
+  add_executable(clap-plugins ${clap_plugins_src}) # cxx-except-workaround.cc)
+  target_link_options(clap-plugins PRIVATE -Wl,--export=clap_entry -Wl,--export-table)
 else()
   add_library(clap-plugins MODULE ${clap_plugins_src})
 endif()

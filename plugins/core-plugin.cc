@@ -115,21 +115,27 @@ namespace clap {
    bool CorePlugin::audioPortsSetConfig(clap_id config_id) noexcept { return false; }
 
    bool CorePlugin::stateSave(const clap_ostream *stream) noexcept {
+#ifdef __cpp_exceptions
       try {
+#endif
          ClapOStream os(stream);
          yas::binary_oarchive ar(os);
          ar & _parameters;
 
          std::vector<uint8_t> extra = stateSaveExtra();
          ar & extra;
+#ifdef __cpp_exceptions
       } catch (...) {
          return false;
       }
+#endif
       return true;
    }
 
    bool CorePlugin::stateLoad(const clap_istream *stream) noexcept {
+#ifdef __cpp_exceptions
       try {
+#endif
 #ifdef _MSC_VER
          std::string data;
          if (!clap::readAll(stream, data))
@@ -146,9 +152,11 @@ namespace clap {
          ar & extra;
          if (!stateLoadExtra(extra))
             return false;
+#ifdef __cpp_exceptions
       } catch (...) {
          return false;
       }
+#endif
 
 #ifndef CLAP_PLUGINS_HEADLESS
       if (_guiHandle)

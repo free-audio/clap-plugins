@@ -11,7 +11,7 @@ namespace clap {
       auto ptr = p.get();
       auto ret = _id2param.insert_or_assign(info.id, p.get());
       if (!ret.second)
-         throw std::logic_error("same parameter id was inserted twice");
+         CLAP_HELPERS_THROW(std::logic_error("same parameter id was inserted twice"));
       _params.emplace_back(std::move(p));
       return ptr;
    }

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <optional>
+#include <iostream>
 
 #include <yas/binary_iarchive.hpp>
 #include <yas/binary_oarchive.hpp>

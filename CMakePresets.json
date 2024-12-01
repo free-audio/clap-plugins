@@ -27,9 +27,9 @@
             "generator": "Visual Studio 17 2022",
             "architecture": "x64",
             "condition": {
-              "type": "equals",
-              "lhs": "${hostSystemName}",
-              "rhs": "Windows"
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
             }
         },
         {
@@ -43,33 +43,44 @@
             }
         },
         {
+            "name": "wasm",
+            "hidden": true,
+            "cacheVariables": {
+                "CLAP_PLUGINS_WASM": true
+            }
+        },
+        {
             "name": "wasm-clang-linux",
             "hidden": true,
-            "toolchainFile": "cmake/toolchains/wasm-clang-linux.cmake"
+            "toolchainFile": "cmake/toolchains/wasm-clang-linux.cmake",
+            "inherits": "wasm"
         },
         {
             "name": "wasi-linux",
             "hidden": true,
-            "toolchainFile": "/opt/wasi-sdk/share/cmake/wasi-sdk-pthread.cmake"
+            "toolchainFile": "/opt/wasi-sdk/share/cmake/wasi-sdk-pthread.cmake",
+            "inherits": "wasm"
         },
         {
             "name": "emscripten-linux",
             "hidden": true,
             "toolchainFile": "/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+            "inherits": "wasm",
             "condition": {
-              "type": "equals",
-              "lhs": "${hostSystemName}",
-              "rhs": "Linux"
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
             }
         },
         {
             "name": "emscripten-macOS",
             "hidden": true,
             "toolchainFile": "/opt/homebrew/Cellar/emscripten/3.1.73/libexec/cmake/Modules/Platform/Emscripten.cmake",
+            "inherits": "wasm",
             "condition": {
-              "type": "equals",
-              "lhs": "${hostSystemName}",
-              "rhs": "Darwin"
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
             }
         },
         {
@@ -96,7 +107,8 @@
             "description": "Ninja + System Libraries + Headless",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
-                "base", "headless"
+                "base",
+                "headless"
             ]
         },
         {
@@ -120,7 +132,9 @@
             "description": "Ninja + System Libraries + Headless / WASM",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
-                "base", "headless", "wasm-clang-linux"
+                "base",
+                "headless",
+                "wasm-clang-linux"
             ]
         },
         {
@@ -128,7 +142,9 @@
             "description": "Ninja + System Libraries + Headless / WASM",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
-                "base", "headless", "wasi-linux"
+                "base",
+                "headless",
+                "wasi-linux"
             ]
         },
         {
@@ -136,7 +152,9 @@
             "description": "Ninja + System Libraries + Headless / WASM",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
-                "base", "headless", "emscripten-linux"
+                "base",
+                "headless",
+                "emscripten-linux"
             ]
         },
         {
@@ -144,7 +162,9 @@
             "description": "Ninja + System Libraries + Headless / WASM",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
-                "base", "headless", "emscripten-macOS"
+                "base",
+                "headless",
+                "emscripten-macOS"
             ]
         }
     ],

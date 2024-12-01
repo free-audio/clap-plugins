@@ -1,5 +1,6 @@
 set(CLAP_PLUGINS_EMBED_QML TRUE CACHE BOOL "Embed QML resources into the plugin")
 set(CLAP_PLUGINS_HEADLESS FALSE CACHE BOOL "Compile the plugins without a GUI")
+set(CLAP_PLUGINS_WASM FALSE CACHE BOOL "Build plugins for WASM")
 
 if(CLAP_PLUGINS_HEADLESS)
   add_compile_definitions(CLAP_PLUGINS_HEADLESS)
@@ -107,7 +108,7 @@ target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 
 set(clap_plugins_src clap-entry.cc)
 
-if (CMAKE_SYSTEM_PROCESSOR MATCHES wasm)
+if (CLAP_PLUGINS_WASM)
   add_executable(clap-plugins ${clap_plugins_src}) # cxx-except-workaround.cc)
   target_link_options(clap-plugins PRIVATE -Wl,--export=clap_entry -Wl,--export-table)
 else()

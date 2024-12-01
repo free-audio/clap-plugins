@@ -50,7 +50,22 @@
         {
             "name": "emscripten-linux",
             "hidden": true,
-            "toolchainFile": "/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+            "toolchainFile": "/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+            "condition": {
+              "type": "equals",
+              "lhs": "${hostSystemName}",
+              "rhs": "Linux"
+            }
+        },
+        {
+            "name": "emscripten-macOS",
+            "hidden": true,
+            "toolchainFile": "/opt/homebrew/Cellar/emscripten/3.1.73/libexec/cmake/Modules/Platform/Emscripten.cmake",
+            "condition": {
+              "type": "equals",
+              "lhs": "${hostSystemName}",
+              "rhs": "Darwin"
+            }
         },
         {
             "name": "vcpkg",
@@ -112,11 +127,19 @@
             ]
         },
         {
-            "name": "ninja-emscripten-headless",
+            "name": "ninja-emscripten-linux-headless",
             "description": "Ninja + System Libraries + Headless / WASM",
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
                 "base", "headless", "emscripten-linux"
+            ]
+        },
+        {
+            "name": "ninja-emscripten-macOS-headless",
+            "description": "Ninja + System Libraries + Headless / WASM",
+            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "inherits": [
+                "base", "headless", "emscripten-macOS"
             ]
         }
     ],
@@ -154,10 +177,16 @@
             "configurePreset": "ninja-wasi-headless"
         },
         {
-            "name": "ninja-emscripten-headless",
+            "name": "ninja-emscripten-linux-headless",
             "inherits": "base",
             "description": "Build using Ninja and system libraries (headless)",
-            "configurePreset": "ninja-emscripten-headless"
+            "configurePreset": "ninja-emscripten-linux-headless"
+        },
+        {
+            "name": "ninja-emscripten-macOS-headless",
+            "inherits": "base",
+            "description": "Build using Ninja and system libraries (headless)",
+            "configurePreset": "ninja-emscripten-macOS-headless"
         },
         {
             "name": "vs-vcpkg",

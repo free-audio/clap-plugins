@@ -18,6 +18,7 @@
 #include "plugs/track-info/track-info.hh"
 #include "plugs/transport/transport-info.hh"
 #include "plugs/undo-test/undo-test.hxx"
+#include "plugs/scratch-memory/scratch-memory.hh"
 
 struct PluginEntry {
    using create_func = std::function<const clap_plugin *(const clap_host &)>;
@@ -57,6 +58,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::UndoTest<true, true>>();
    addPlugin<clap::UndoTest<true, false>>();
    addPlugin<clap::UndoTest<false, false>>();
+   addPlugin<clap::ScratchMemory>();
    return true;
 }
 

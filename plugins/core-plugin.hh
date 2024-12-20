@@ -40,11 +40,12 @@ namespace clap {
 #endif
    {
       using super = PluginGlue;
-      friend class Module;
 
       static const constexpr uint32_t max_frames = 256;
 
    public:
+      friend class Module;
+
       CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
                  const clap_plugin_descriptor *desc,
                  const clap_host &host);
@@ -52,6 +53,8 @@ namespace clap {
 
       const PathProvider &pathProvider() const noexcept { return *_pathProvider; }
       const TuningProvider &tuningProvider() const noexcept { return _tuningProvider; }
+
+      auto& host() const noexcept { return _host; }
 
    protected:
       bool enableDraftExtensions() const noexcept override { return true; }

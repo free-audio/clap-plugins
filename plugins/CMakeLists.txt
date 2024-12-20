@@ -75,6 +75,8 @@ add_library(
   plugs/svf/svf-plug.cc
   plugs/undo-test/undo-test.hh
   plugs/undo-test/undo-test.hxx
+  plugs/scratch-memory/scratch-memory.cc
+  plugs/scratch-memory/scratch-memory.hh
   smoothed-value.hh
   sample-delay.cc
   sample-delay.hh

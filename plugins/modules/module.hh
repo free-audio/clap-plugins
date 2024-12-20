@@ -37,7 +37,8 @@ namespace clap {
       [[nodiscard]] virtual std::unique_ptr<Module> cloneVoice() const;
 
       bool activate(double sampleRate, uint32_t maxFrameCount, bool isRealTime);
-      [[nodiscard]] virtual bool doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime);
+      [[nodiscard]] virtual bool
+      doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime);
       void deactivate();
       virtual void doDeactivate();
       [[nodiscard]] bool isActive() const noexcept { return _isActive; }
@@ -63,13 +64,9 @@ namespace clap {
          _voiceModule = voiceModule;
       }
 
-      virtual VoiceExpanderModule *getVoiceExpander() noexcept {
-         return nullptr;
-      }
+      virtual VoiceExpanderModule *getVoiceExpander() noexcept { return nullptr; }
 
-      virtual const VoiceExpanderModule *getVoiceExpander() const noexcept {
-         return nullptr;
-      }
+      virtual const VoiceExpanderModule *getVoiceExpander() const noexcept { return nullptr; }
 
       virtual uint32_t latency() const noexcept { return 0; }
 

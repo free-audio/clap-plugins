@@ -77,6 +77,8 @@ add_library(
   plugs/undo-test/undo-test.hxx
   plugs/scratch-memory/scratch-memory.cc
   plugs/scratch-memory/scratch-memory.hh
+  plugs/location/location.cc
+  plugs/location/location.hh
   smoothed-value.hh
   sample-delay.cc
   sample-delay.hh

@@ -11,14 +11,15 @@
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/gain/gain.hh"
 #include "plugs/latency/latency.hh"
+#include "plugs/location/location.hh"
 #include "plugs/offline-latency/offline-latency.hh"
 #include "plugs/realtime-requirement/realtime-requirement.hh"
+#include "plugs/scratch-memory/scratch-memory.hh"
 #include "plugs/svf/svf-plug.hh"
 #include "plugs/synth/synth.hh"
 #include "plugs/track-info/track-info.hh"
 #include "plugs/transport/transport-info.hh"
 #include "plugs/undo-test/undo-test.hxx"
-#include "plugs/scratch-memory/scratch-memory.hh"
 
 struct PluginEntry {
    using create_func = std::function<const clap_plugin *(const clap_host &)>;
@@ -44,21 +45,22 @@ static void addPlugin() {
 static bool clap_init(const char *plugin_path) {
    g_pluginPath = plugin_path;
 
-   addPlugin<clap::Synth>();
-   addPlugin<clap::DcOffset>();
-   addPlugin<clap::TransportInfo>();
-   addPlugin<clap::Gain>();
-   addPlugin<clap::CharCheck>();
    addPlugin<clap::AdsrPlug>();
-   addPlugin<clap::SvfPlug>();
+   addPlugin<clap::CharCheck>();
+   addPlugin<clap::DcOffset>();
+   addPlugin<clap::Gain>();
    addPlugin<clap::Latency>();
+   addPlugin<clap::Location>();
    addPlugin<clap::OfflineLatency>();
    addPlugin<clap::RealtimeRequirement>();
-   addPlugin<clap::TrackInfo>();
-   addPlugin<clap::UndoTest<true, true>>();
-   addPlugin<clap::UndoTest<true, false>>();
-   addPlugin<clap::UndoTest<false, false>>();
    addPlugin<clap::ScratchMemory>();
+   addPlugin<clap::SvfPlug>();
+   addPlugin<clap::Synth>();
+   addPlugin<clap::TrackInfo>();
+   addPlugin<clap::TransportInfo>();
+   addPlugin<clap::UndoTest<false, false>>();
+   addPlugin<clap::UndoTest<true, false>>();
+   addPlugin<clap::UndoTest<true, true>>();
    return true;
 }
 

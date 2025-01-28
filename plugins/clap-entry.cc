@@ -10,6 +10,7 @@
 #include "plugs/char-check/char-check.hh"
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/gain/gain.hh"
+#include "plugs/gain-metering/gain-metering.hh"
 #include "plugs/latency/latency.hh"
 #include "plugs/location/location.hh"
 #include "plugs/offline-latency/offline-latency.hh"
@@ -49,6 +50,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::CharCheck>();
    addPlugin<clap::DcOffset>();
    addPlugin<clap::Gain>();
+   addPlugin<clap::GainMetering>();
    addPlugin<clap::Latency>();
    addPlugin<clap::Location>();
    addPlugin<clap::OfflineLatency>();

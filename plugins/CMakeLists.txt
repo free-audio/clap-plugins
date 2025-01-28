@@ -59,6 +59,8 @@ add_library(
   plugs/dc-offset/dc-offset.hh
   plugs/gain/gain.cc
   plugs/gain/gain.hh
+  plugs/gain-metering/gain-metering.cc
+  plugs/gain-metering/gain-metering.hh
   plugs/latency/latency.cc
   plugs/latency/latency.hh
   plugs/offline-latency/offline-latency.hh

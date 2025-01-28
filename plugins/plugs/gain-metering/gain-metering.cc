@@ -20,7 +20,10 @@ namespace clap {
          return CLAP_PROCESS_CONTINUE;
       }
 
-      double getGainAdjustmentMetering() const noexcept { return std::sin(_phase * 2 * M_PI); }
+      double getGainAdjustmentMetering() const noexcept {
+         // 24 dB of amplitude, -12..12
+         return 12 * std::sin(_phase * 2 * M_PI);
+      }
 
       double _phase = 0;
    };

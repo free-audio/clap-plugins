@@ -45,8 +45,8 @@ namespace clap {
          auto &elt = path[i];
 
          loc << "{ " << "kind: " << elt.kind << ", name: " << elt.name << ", id: " << elt.id
-             << ", index: " << elt.index << ", color: {" << elt.color.red << ", " << elt.color.green
-             << ", " << elt.color.blue << ", " << elt.color.alpha << " }, " << " }, ";
+             << ", index: " << elt.index << ", color: {" << (int)elt.color.red << ", " << (int)elt.color.green
+             << ", " << (int)elt.color.blue << ", " << (int)elt.color.alpha << " }, " << " }, ";
       }
       loc << "]";
       auto msg = loc.str();

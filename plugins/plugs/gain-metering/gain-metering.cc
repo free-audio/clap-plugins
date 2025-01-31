@@ -13,16 +13,27 @@ namespace clap {
 
          c.audioOutputs[0]->copy(*c.audioInputs[0], numFrames);
 
-         const double phaseInc = numFrames * c.sampleRateInvD;
+         const double phaseInc = 0.5 * numFrames * c.sampleRateInvD;
          _phase += phaseInc;
-         _phase -= std::floor(phaseInc);
+         _phase -= std::floor(_phase);
+
+         assert(_phase >= 0);
+         assert(_phase < 1);
 
          return CLAP_PROCESS_CONTINUE;
       }
 
       double getGainAdjustmentMetering() const noexcept {
-         // 24 dB of amplitude, -12..12
-         return 12 * std::sin(_phase * 2 * M_PI);
+         assert(_phase >= 0);
+         assert(_phase < 1);
+
+         // -24..0
+         const double g = -12 * (std::sin(_phase * 2 * M_PI) + 1);
+
+         assert(-24 <= g);
+         assert(g <= 0);
+
+         return g;
       }
 
       double _phase = 0;

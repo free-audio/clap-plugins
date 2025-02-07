@@ -56,7 +56,7 @@ cmake --build --preset ninja-headless
 
 ```shell
 # Install build tools
-brew install cmake ninja autoconf automake
+brew install cmake ninja autoconf automake pkg-config
 
 # Checkout the code
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins

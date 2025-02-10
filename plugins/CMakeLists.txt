@@ -57,6 +57,8 @@ add_library(
   plugs/char-check/char-check.hh
   plugs/dc-offset/dc-offset.cc
   plugs/dc-offset/dc-offset.hh
+  plugs/dc-offset-with-latency/dc-offset-with-latency.cc
+  plugs/dc-offset-with-latency/dc-offset-with-latency.hh
   plugs/gain/gain.cc
   plugs/gain/gain.hh
   plugs/gain-metering/gain-metering.cc

@@ -9,6 +9,7 @@
 #include "plugs/adsr/adsr-plug.hh"
 #include "plugs/char-check/char-check.hh"
 #include "plugs/dc-offset/dc-offset.hh"
+#include "plugs/dc-offset-with-latency/dc-offset-with-latency.hh"
 #include "plugs/gain/gain.hh"
 #include "plugs/gain-metering/gain-metering.hh"
 #include "plugs/latency/latency.hh"
@@ -49,6 +50,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::AdsrPlug>();
    addPlugin<clap::CharCheck>();
    addPlugin<clap::DcOffset>();
+   addPlugin<clap::DcOffsetWithLatency>();
    addPlugin<clap::Gain>();
    addPlugin<clap::GainMetering>();
    addPlugin<clap::Latency>();

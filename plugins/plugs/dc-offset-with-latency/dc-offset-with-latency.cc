@@ -22,7 +22,7 @@ namespace clap {
       [[nodiscard]] bool
       doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override
       {
-         const uint32_t delayTimeInFrames = sampleRate * 0.05; // 50ms
+         const uint32_t delayTimeInFrames = sampleRate * 0.2; // 200ms
          _delay.setDelayTime(delayTimeInFrames);
          _delay.reset(0);
 
@@ -64,13 +64,13 @@ namespace clap {
 
          CLAP_VERSION,
          "com.github.free-audio.clap.dc-offset-with-latency",
-         "DC Offset (with 50ms latency)",
+         "DC Offset (with latency)",
          "clap",
          "https://github.com/free-audio/clap-plugins",
          nullptr,
          nullptr,
          "0.2",
-         "Example DC Offset plugin with 50ms latency",
+         "Example DC Offset plugin with latency",
          features};
       return &desc;
    }

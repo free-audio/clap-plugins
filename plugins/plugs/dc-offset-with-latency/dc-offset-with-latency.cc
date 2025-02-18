@@ -17,11 +17,11 @@ namespace clap {
                                      CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
                                         CLAP_PARAM_REQUIRES_PROCESS,
                                      std::make_unique<SimpleValueType>(-1, 1, 0));
+         _offsetParam->enableSmoothing(false);
       }
 
       [[nodiscard]] bool
-      doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override
-      {
+      doActivate(double sampleRate, uint32_t maxFrameCount, bool isRealTime) override {
          const uint32_t delayTimeInFrames = sampleRate * 0.2; // 200ms
          _delay.setDelayTime(delayTimeInFrames);
          _delay.reset(0);
@@ -31,10 +31,7 @@ namespace clap {
          return super::doActivate(sampleRate, maxFrameCount, isRealTime);
       }
 
-      void doDeactivate() override
-      {
-         _paramOut.reset();
-      }
+      void doDeactivate() override { _paramOut.reset(); }
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          assert(_isActive);

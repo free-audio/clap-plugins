@@ -23,7 +23,9 @@ namespace clap {
       friend class CorePlugin;
 
    public:
-      explicit Parameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType, uint32_t paramIndex);
+      explicit Parameter(const clap_param_info &info,
+                         std::unique_ptr<ValueType> valueType,
+                         uint32_t paramIndex);
 
       Parameter(const Parameter &) = delete;
       Parameter(Parameter &&) = delete;
@@ -43,6 +45,9 @@ namespace clap {
       auto &valueType() const noexcept { return _valueType; }
       const clap_param_info &info() const noexcept { return _info; }
 
+      bool isSmoothingEnabled() const noexcept { return !_disableSmoothing; }
+      void enableSmoothing(bool isEnabled) noexcept { _disableSmoothing = !isEnabled; }
+
       /* Mostly useful for the GUI */
       double value() const noexcept { return _mainVoice._value.value(); }
       double modulation() const noexcept { return _mainVoice._modulation.value(); }
@@ -59,14 +64,14 @@ namespace clap {
       void setModulationImmediately(double mod) { _mainVoice._modulation.setImmediately(mod); }
 
       void setValueSmoothed(double val, uint16_t steps) noexcept {
-         if (_valueType->isStepped())
+         if (_valueType->isStepped() || _disableSmoothing)
             _mainVoice._value.setImmediately(val);
          else
             _mainVoice._value.setSmoothed(val, steps);
       }
 
       void setModulationSmoothed(double mod, uint16_t steps) noexcept {
-         if (_valueType->isStepped())
+         if (_valueType->isStepped() || _disableSmoothing)
             _mainVoice._modulation.setImmediately(mod);
          else
             _mainVoice._modulation.setSmoothed(mod, steps);
@@ -93,13 +98,15 @@ namespace clap {
          assert(hasMappingIndication());
          return _mappingIndicationColor;
       }
-      const std::string& mappingIndicationLabel() const noexcept { return _mappingIndicationLabel; }
-      const std::string& mappingIndicationDescription() const noexcept { return _mappingIndicationDescription; }
+      const std::string &mappingIndicationLabel() const noexcept { return _mappingIndicationLabel; }
+      const std::string &mappingIndicationDescription() const noexcept {
+         return _mappingIndicationDescription;
+      }
       void setMappingIndication(const clap_color &color, const char *label, const char *desc);
       void clearMappingIndication();
 
       uint32_t automationIndicationState() const noexcept { return _automationState; }
-      const clap_color& automationIndicationColor() const noexcept { return _automationColor; }
+      const clap_color &automationIndicationColor() const noexcept { return _automationColor; }
       void setAutomationIndication(uint32_t state, const clap_color &color) {
          _automationState = state;
          _automationColor = color;
@@ -165,6 +172,7 @@ namespace clap {
          IntrusiveList::Hook _modulatedValueToProcessHook;
       };
 
+      bool _disableSmoothing = false;
       Voice _mainVoice;
       std::array<Voice, MAX_VOICES> _voices;
    };

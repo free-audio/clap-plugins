@@ -10,9 +10,9 @@ namespace clap {
    public:
       Location(const std::string &pluginPath, const clap_host &host);
 
-      bool implementsLocation() const noexcept override { return true; }
-      void locationSetLocation(const clap_plugin_location_element_t *path,
-                               uint32_t num_elements) noexcept override;
+      bool implementsProjectLocation() const noexcept override { return true; }
+      void projectLocationSet(const clap_project_location_element *path,
+                              uint32_t num_elements) noexcept override;
 
       static const clap_plugin_descriptor *descriptor();
    };

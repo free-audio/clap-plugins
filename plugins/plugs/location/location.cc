@@ -36,8 +36,8 @@ namespace clap {
       _rootModule = std::make_unique<LocationModule>(*this);
    }
 
-   void Location::locationSetLocation(const clap_plugin_location_element_t *path,
-                                      uint32_t num_elements) noexcept {
+   void Location::projectLocationSet(const clap_project_location_element *path,
+                                     uint32_t num_elements) noexcept {
       std::ostringstream loc;
 
       loc << "plugin location: [";
@@ -45,8 +45,9 @@ namespace clap {
          auto &elt = path[i];
 
          loc << "{ " << "kind: " << elt.kind << ", name: " << elt.name << ", id: " << elt.id
-             << ", index: " << elt.index << ", color: {" << (int)elt.color.red << ", " << (int)elt.color.green
-             << ", " << (int)elt.color.blue << ", " << (int)elt.color.alpha << " }, " << " }, ";
+             << ", index: " << elt.index << ", color: {" << (int)elt.color.red << ", "
+             << (int)elt.color.green << ", " << (int)elt.color.blue << ", " << (int)elt.color.alpha
+             << " }, " << " }, ";
       }
       loc << "]";
       auto msg = loc.str();

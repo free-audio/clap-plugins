@@ -65,6 +65,8 @@ add_library(
   plugs/gain-metering/gain-metering.hh
   plugs/latency/latency.cc
   plugs/latency/latency.hh
+  plugs/mini-curve-display/mini-curve-display.cc
+  plugs/mini-curve-display/mini-curve-display.hh
   plugs/offline-latency/offline-latency.hh
   plugs/offline-latency/offline-latency.cc
   plugs/realtime-requirement/realtime-requirement.hh

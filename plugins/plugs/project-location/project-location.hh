@@ -3,12 +3,12 @@
 #include "../../core-plugin.hh"
 
 namespace clap {
-   class Location final : public CorePlugin {
+   class ProjectLocation final : public CorePlugin {
    private:
       using super = CorePlugin;
 
    public:
-      Location(const std::string &pluginPath, const clap_host &host);
+      ProjectLocation(const std::string &pluginPath, const clap_host &host);
 
       bool implementsProjectLocation() const noexcept override { return true; }
       void projectLocationSet(const clap_project_location_element *path,

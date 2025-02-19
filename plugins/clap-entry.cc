@@ -13,7 +13,7 @@
 #include "plugs/gain/gain.hh"
 #include "plugs/gain-metering/gain-metering.hh"
 #include "plugs/latency/latency.hh"
-#include "plugs/location/location.hh"
+#include "plugs/project-location/project-location.hh"
 #include "plugs/offline-latency/offline-latency.hh"
 #include "plugs/realtime-requirement/realtime-requirement.hh"
 #include "plugs/scratch-memory/scratch-memory.hh"
@@ -54,7 +54,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::Gain>();
    addPlugin<clap::GainMetering>();
    addPlugin<clap::Latency>();
-   addPlugin<clap::Location>();
+   addPlugin<clap::ProjectLocation>();
    addPlugin<clap::OfflineLatency>();
    addPlugin<clap::RealtimeRequirement>();
    addPlugin<clap::ScratchMemory>();

@@ -1,19 +1,19 @@
 #include <cstring>
 #include <sstream>
 
-#include "location.hh"
+#include "project-location.hh"
 
 namespace clap {
    class LocationModule final : public Module {
    public:
-      LocationModule(Location &plugin) : Module(plugin, "", 0) {}
+      LocationModule(ProjectLocation &plugin) : Module(plugin, "", 0) {}
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          return CLAP_PROCESS_SLEEP;
       }
    };
 
-   const clap_plugin_descriptor *Location::descriptor() {
+   const clap_plugin_descriptor *ProjectLocation::descriptor() {
       static const char *features[] = {
          CLAP_PLUGIN_FEATURE_UTILITY, CLAP_PLUGIN_FEATURE_ANALYZER, nullptr};
 
@@ -31,12 +31,12 @@ namespace clap {
       return &desc;
    }
 
-   Location::Location(const std::string &pluginPath, const clap_host &host)
+   ProjectLocation::ProjectLocation(const std::string &pluginPath, const clap_host &host)
       : CorePlugin(PathProvider::create(pluginPath, "track-info"), descriptor(), host) {
       _rootModule = std::make_unique<LocationModule>(*this);
    }
 
-   void Location::projectLocationSet(const clap_project_location_element *path,
+   void ProjectLocation::projectLocationSet(const clap_project_location_element *path,
                                      uint32_t num_elements) noexcept {
       std::ostringstream loc;
 

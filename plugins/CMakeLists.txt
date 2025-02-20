@@ -92,6 +92,8 @@ add_library(
   stream-helper.hh
   tuning-provider.cc
   tuning-provider.hh
+  value-types/boolean-value-type.hh
+  value-types/boolean-value-type.cc
   value-types/decibel-value-type.hh
   value-types/decibel-value-type.cc
   value-types/simple-value-type.hh

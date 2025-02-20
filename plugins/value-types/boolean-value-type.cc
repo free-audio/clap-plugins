@@ -5,7 +5,7 @@
 
 namespace clap {
 
-   BooleanValueType::BooleanValueType(std::vector<std::string> entries, bool defaultValue)
+   BooleanValueType::BooleanValueType(bool defaultValue)
       : _defaultValue(defaultValue) {}
 
    std::string BooleanValueType::toText(double paramValue) const {

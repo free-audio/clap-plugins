@@ -8,7 +8,7 @@
 namespace clap {
    class BooleanValueType final : public ValueType {
    public:
-      BooleanValueType(std::vector<std::string> entries, bool defaultValue);
+      BooleanValueType(bool defaultValue);
 
       bool isStepped() const noexcept override { return true; }
 

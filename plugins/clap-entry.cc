@@ -55,7 +55,8 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::Gain>();
    addPlugin<clap::GainMetering>();
    addPlugin<clap::Latency>();
-   addPlugin<clap::MiniCurveDisplay>();
+   addPlugin<clap::MiniCurveDisplay<false>>();
+   addPlugin<clap::MiniCurveDisplay<true>>();
    addPlugin<clap::ProjectLocation>();
    addPlugin<clap::OfflineLatency>();
    addPlugin<clap::RealtimeRequirement>();

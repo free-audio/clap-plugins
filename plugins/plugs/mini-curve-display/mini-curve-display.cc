@@ -90,23 +90,35 @@ namespace clap {
    }
 
    template <bool IsDynamic>
-   bool MiniCurveDisplay<IsDynamic>::miniCurveDisplayRender(uint16_t *data,
-                                                            uint32_t data_size) noexcept {
+   uint32_t
+   MiniCurveDisplay<IsDynamic>::miniCurveDisplayRender(clap_mini_display_curve_data_t *data,
+                                                       uint32_t data_size) noexcept {
+      if (data_size == 0)
+         return 0;
+
       double phaseOffset = 0;
       if (IsDynamic) {
          const auto now = std::chrono::system_clock::now();
-         const auto d = now.time_since_epoch();
          const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             now.time_since_epoch() % std::chrono::seconds(4));
          phaseOffset = 2.0 * M_PI * ms.count() / 4000.0;
       }
 
+      data[0].curve_kind = CLAP_MINI_CURVE_DISPLAY_CURVE_KIND_TIME_SERIES;
+
+      if (data_size >= 2)
+         data[1].curve_kind = CLAP_MINI_CURVE_DISPLAY_CURVE_KIND_TIME_SERIES;
+
       const double k = (2.0 * M_PI) / data_size;
-      for (uint32_t i = 0; i < data_size; ++i) {
-         const double phase = i * k + phaseOffset;
-         data[i] = (std::sin(phase) + 1) * std::numeric_limits<uint16_t>::max() / 2;
+      for (uint32_t j = 0; j < data_size; ++j) {
+         const double phase = j * k + phaseOffset;
+         data[0].values[j] = (std::sin(phase) + 1) * std::numeric_limits<uint16_t>::max() / 2;
+
+         if (data_size >= 2)
+            data[1].values[j] = (std::cos(phase) + 1) * std::numeric_limits<uint16_t>::max() / 2;
       }
-      return true;
+
+      return std::min<uint32_t>(2, data_size);
    }
 
    template <bool IsDynamic>
@@ -115,15 +127,19 @@ namespace clap {
    }
 
    template <bool IsDynamic>
-   bool MiniCurveDisplay<IsDynamic>::miniCurveDisplayGetAxisName(char *x_name,
+   bool MiniCurveDisplay<IsDynamic>::miniCurveDisplayGetAxisName(uint32_t curve_index,
+                                                                 char *x_name,
                                                                  char *y_name,
                                                                  uint32_t name_capacity) noexcept {
       if (x_name)
          snprintf(x_name, name_capacity, "x");
       if (y_name)
-         snprintf(y_name, name_capacity, "x");
+         snprintf(y_name, name_capacity, "y");
       return true;
    }
+
+   template <bool IsDynamic>
+   uint32_t MiniCurveDisplay<IsDynamic>::miniCurveDisplayGetCurveCount() const noexcept { return 2; }
 } // namespace clap
 
 template class clap::MiniCurveDisplay<false>;

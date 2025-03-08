@@ -20,9 +20,12 @@ namespace clap {
       clap_process_status processBackup(const clap_process *process) noexcept;
 
       bool implementsMiniCurveDisplay() const noexcept override;
-      bool miniCurveDisplayRender(uint16_t *data, uint32_t data_size) noexcept override;
+      uint32_t miniCurveDisplayGetCurveCount() const noexcept override;
+      uint32_t miniCurveDisplayRender(clap_mini_display_curve_data_t *data,
+                                      uint32_t data_size) noexcept override;
       void miniCurveDisplaySetObserved(bool is_observed) noexcept override;
-      bool miniCurveDisplayGetAxisName(char *x_name,
+      bool miniCurveDisplayGetAxisName(uint32_t curve_index,
+                                       char *x_name,
                                        char *y_name,
                                        uint32_t name_capacity) noexcept override;
 

@@ -104,21 +104,17 @@ namespace clap {
          phaseOffset = 2.0 * M_PI * ms.count() / 4000.0;
       }
 
-      data[0].curve_kind = CLAP_MINI_CURVE_DISPLAY_CURVE_KIND_TIME_SERIES;
-
-      if (data_size >= 2)
-         data[1].curve_kind = CLAP_MINI_CURVE_DISPLAY_CURVE_KIND_TIME_SERIES;
-
-      const double k = (2.0 * M_PI) / data_size;
-      for (uint32_t j = 0; j < data_size; ++j) {
-         const double phase = j * k + phaseOffset;
-         data[0].values[j] = (std::sin(phase) + 1) * std::numeric_limits<uint16_t>::max() / 2;
-
-         if (data_size >= 2)
-            data[1].values[j] = (std::cos(phase) + 1) * std::numeric_limits<uint16_t>::max() / 2;
+      for (uint32_t i = 0; i < data_size; ++i) {
+         auto &curve = data[i];
+         curve.curve_kind = CLAP_MINI_CURVE_DISPLAY_CURVE_KIND_TIME_SERIES;
+         const double k = (2.0 * M_PI) / curve.values_count;
+         for (uint32_t j = 0; j < curve.values_count; ++j) {
+            const double phase = j * k + phaseOffset + i * M_PI_4;
+            curve.values[j] = (std::sin(phase) + 1) * std::numeric_limits<uint16_t>::max() / 2;
+         }
       }
 
-      return std::min<uint32_t>(2, data_size);
+      return data_size;
    }
 
    template <bool IsDynamic>

@@ -21,7 +21,7 @@ namespace clap {
 
       bool implementsMiniCurveDisplay() const noexcept override;
       uint32_t miniCurveDisplayGetCurveCount() const noexcept override;
-      uint32_t miniCurveDisplayRender(clap_mini_display_curve_data_t *data,
+      uint32_t miniCurveDisplayRender(clap_mini_curve_display_curve_data_t *data,
                                       uint32_t data_size) noexcept override;
       void miniCurveDisplaySetObserved(bool is_observed) noexcept override;
       bool miniCurveDisplayGetAxisName(uint32_t curve_index,

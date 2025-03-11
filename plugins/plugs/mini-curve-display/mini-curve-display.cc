@@ -3,8 +3,6 @@
 
 #include "mini-curve-display.hh"
 
-#include "../../value-types/boolean-value-type.hh"
-
 namespace clap {
 
    static const auto T0 = std::chrono::system_clock::now();
@@ -91,7 +89,7 @@ namespace clap {
 
    template <bool IsDynamic>
    uint32_t
-   MiniCurveDisplay<IsDynamic>::miniCurveDisplayRender(clap_mini_display_curve_data_t *data,
+   MiniCurveDisplay<IsDynamic>::miniCurveDisplayRender(clap_mini_curve_display_curve_data_t *data,
                                                        uint32_t data_size) noexcept {
       if (data_size == 0)
          return 0;

@@ -134,6 +134,13 @@ namespace clap {
 
       int32_t getParamIndexForParamId(clap_id paramId) const noexcept override;
 
+      //--------------------------//
+      // clap_plugin_flush_events //
+      //--------------------------//
+      bool implementsFlushEvents() const noexcept override { return true; }
+      void flushEventsFlush(const clap_input_events *in,
+                            const clap_output_events *out) noexcept override;
+
       //------------------------------//
       // clap_plugin_param_indication //
       //------------------------------//

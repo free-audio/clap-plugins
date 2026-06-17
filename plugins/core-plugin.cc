@@ -869,6 +869,20 @@ namespace clap {
       return p;
    }
 
+   //---------------------------//
+   // clap_plugin_params_origin //
+   //---------------------------//
+   bool CorePlugin::implementsParamsOrigin() const noexcept { return true; }
+
+   bool CorePlugin::paramsOriginGet(clap_id param_id, double *out_value) noexcept {
+      auto param = _parameters.getById(param_id);
+      if (!param)
+         return false;
+
+      *out_value = param->valueType()->originValue();
+      return true;
+   }
+
    bool CorePlugin::implementsVoiceInfo() const noexcept { return true; }
 
    bool CorePlugin::voiceInfoDoGet(clap_voice_info *info) noexcept {

@@ -18,6 +18,7 @@ namespace clap {
       [[nodiscard]] virtual double defaultValue() const noexcept { return std::numeric_limits<double>::lowest(); }
       [[nodiscard]] virtual double minValue() const noexcept { return std::numeric_limits<double>::lowest(); }
       [[nodiscard]] virtual double maxValue() const noexcept { return std::numeric_limits<double>::max(); }
+      [[nodiscard]] virtual double originValue() const noexcept { return minValue(); }
 
       [[nodiscard]] virtual std::string toText(double paramValue) const = 0;
       [[nodiscard]] virtual double fromText(const std::string &paramValueText) const = 0;

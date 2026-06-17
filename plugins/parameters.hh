@@ -19,7 +19,8 @@ namespace clap {
       Parameters() = default;
       Parameters(const Parameters &parameters);
 
-      Parameter *addParameter(const clap_param_info &info, std::unique_ptr<ValueType> valueType);
+      Parameter *addParameter(const clap_param_info &info,
+                              std::unique_ptr<ValueType> valueType);
 
       size_t count() const noexcept;
 

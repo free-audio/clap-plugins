@@ -149,6 +149,12 @@ namespace clap {
                                         uint32_t automation_state,
                                         const clap_color_t *color) noexcept override;
 
+      //---------------------------//
+      // clap_plugin_params_origin //
+      //---------------------------//
+      bool implementsParamsOrigin() const noexcept override;
+      bool paramsOriginGet(clap_id param_id, double *out_value) noexcept override;
+
       //-------------------//
       // clap_plugin_state //
       //-------------------//

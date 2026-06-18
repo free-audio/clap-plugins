@@ -13,7 +13,7 @@ namespace clap {
                                    "gain",
                                    CLAP_PARAM_IS_AUTOMATABLE | CLAP_PARAM_IS_MODULATABLE |
                                       CLAP_PARAM_REQUIRES_PROCESS,
-                                   std::make_unique<DecibelValueType>(-40, 40, 0));
+                                   std::make_unique<DecibelValueType>(-40, 40, 0, 0));
       }
 
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {

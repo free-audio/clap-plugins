@@ -7,11 +7,15 @@
 namespace clap {
    class DecibelValueType final : public ValueType {
    public:
-      DecibelValueType(double min = -120, double max = +120, double defaultValue = 0);
+      DecibelValueType(double min = -120,
+                       double max = +120,
+                       double defaultValue = 0,
+                       double originValue = 0);
 
       double minValue() const noexcept override { return _minValue; }
       double maxValue() const noexcept override { return _maxValue; }
       double defaultValue() const noexcept override { return _defaultValue; }
+      double originValue() const noexcept override { return _originValue; }
 
       std::string toText(double paramValue) const override;
       double fromText(const std::string &paramValueText) const override;
@@ -24,5 +28,6 @@ namespace clap {
       const double _minValue;
       const double _maxValue;
       const double _defaultValue;
+      const double _originValue;
    };
 } // namespace clap

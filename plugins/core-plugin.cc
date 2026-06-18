@@ -342,16 +342,25 @@ namespace clap {
    }
 
    void CorePlugin::pushGuiToPluginEvent(const GuiToPluginEvent &event) {
+      if (!_host.canUseFlushEvents() && !_host.canUseParams())
+         return;
+
       // very highly likely to succeed
       while (!_guiToPluginQueue.tryPush(event)) {
-         if (_host.canUseParams())
+         if (_host.canUseFlushEvents())
+            _host.flushEventsRequestFlush();
+         else if (_host.canUseParams())
             _host.paramsRequestFlush();
 
          std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
 
-      if (!isProcessing() && _host.canUseParams())
-         _host.paramsRequestFlush();
+      if (!isProcessing() && _host.canUseParams()) {
+         if (_host.canUseFlushEvents())
+            _host.flushEventsRequestFlush();
+         else if (_host.canUseParams())
+            _host.paramsRequestFlush();
+      }
    }
 
    void CorePlugin::onGuiSetTransportIsSubscribed(bool isSubscribed) {
@@ -714,6 +723,11 @@ namespace clap {
 
    void CorePlugin::paramsFlush(const clap_input_events *in,
                                 const clap_output_events *out) noexcept {
+      flushEventsFlush(in, out);
+   }
+
+   void CorePlugin::flushEventsFlush(const clap_input_events *in,
+                                     const clap_output_events *out) noexcept {
       if (in) {
          const uint32_t N = in->size(in);
          for (uint32_t i = 0; i < N; ++i) {
@@ -867,6 +881,20 @@ namespace clap {
       _parameterModulationToProcess.pushBack(&p->_mainVoice._modulationToProcessHook);
       _parameterModulatedValueToProcess.pushBack(&p->_mainVoice._modulatedValueToProcessHook);
       return p;
+   }
+
+   //---------------------------//
+   // clap_plugin_params_origin //
+   //---------------------------//
+   bool CorePlugin::implementsParamsOrigin() const noexcept { return true; }
+
+   bool CorePlugin::paramsOriginGet(clap_id param_id, double *out_value) noexcept {
+      auto param = _parameters.getById(param_id);
+      if (!param)
+         return false;
+
+      *out_value = param->valueType()->originValue();
+      return true;
    }
 
    bool CorePlugin::implementsVoiceInfo() const noexcept { return true; }

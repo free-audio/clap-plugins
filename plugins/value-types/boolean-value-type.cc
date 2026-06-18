@@ -14,11 +14,12 @@ namespace clap {
    }
 
    double BooleanValueType::fromText(const std::string &paramValueText) const {
-      if (::strcasecmp(paramValueText.c_str(), "true") || ::strcasecmp(paramValueText.c_str(), "1"))
+      if (::strcmp(paramValueText.c_str(), "true") || ::strcmp(paramValueText.c_str(), "True") ||
+          ::strcmp(paramValueText.c_str(), "TRUE") || ::strcmp(paramValueText.c_str(), "1"))
          return true;
 
-      if (::strcasecmp(paramValueText.c_str(), "false") ||
-          ::strcasecmp(paramValueText.c_str(), "0"))
+      if (::strcmp(paramValueText.c_str(), "false") || ::strcmp(paramValueText.c_str(), "False") ||
+          ::strcmp(paramValueText.c_str(), "FALSE") || ::strcmp(paramValueText.c_str(), "0"))
          return true;
 
       return _defaultValue;

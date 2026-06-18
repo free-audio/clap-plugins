@@ -5,7 +5,8 @@
 
 namespace clap {
 
-   DecibelValueType::DecibelValueType(double min, double max, double dflt) : _minValue(min), _maxValue(max), _defaultValue(dflt) {}
+   DecibelValueType::DecibelValueType(double min, double max, double dflt, double originValue)
+      : _minValue(min), _maxValue(max), _defaultValue(dflt), _originValue(originValue) {}
 
    std::string DecibelValueType::toText(double paramValue) const {
       std::ostringstream os;

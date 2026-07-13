@@ -727,7 +727,7 @@ namespace clap {
                return;
 
             if (_host.canUseParamHovered())
-               _host.paramHoveredUpdate(value.paramId);
+               runOnMainThread([this, value] { _host.paramHoveredUpdate(value.paramId); });
 
             break;
          }

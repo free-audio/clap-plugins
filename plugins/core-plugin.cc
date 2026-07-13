@@ -383,8 +383,12 @@ namespace clap {
    }
 
    void CorePlugin::onGuiParamIsHovered(clap_id paramId) {
-      GuiToPluginEvent item{paramId, GuiToPluginEvent::Hovered, 0.};
-      pushGuiToPluginEvent(item);
+      auto param = _parameters.getById(paramId);
+      if (!param) [[unlikely]]
+         return;
+
+      if (_host.canUseParamHovered())
+         runOnMainThread([this, paramId] { _host.paramHoveredUpdate(paramId); });
    }
 
    void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
@@ -718,17 +722,6 @@ namespace clap {
 
             if (!out->try_push(out, &ev.header)) [[unlikely]]
                return;
-            break;
-         }
-
-         case GuiToPluginEvent::Hovered: {
-            auto param = _parameters.getById(value.paramId);
-            if (!param) [[unlikely]]
-               return;
-
-            if (_host.canUseParamHovered())
-               runOnMainThread([this, value] { _host.paramHoveredUpdate(value.paramId); });
-
             break;
          }
          }

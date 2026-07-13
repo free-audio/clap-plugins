@@ -272,7 +272,7 @@ namespace clap {
       processEvents(const clap_process *process, uint32_t &index, uint32_t count, uint32_t time);
 
       struct GuiToPluginEvent {
-         enum Type : uint8_t { Begin, Value, End, Hovered };
+         enum Type : uint8_t { Begin, Value, End };
 
          clap_id paramId;
          Type type;

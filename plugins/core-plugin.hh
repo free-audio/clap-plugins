@@ -203,6 +203,7 @@ namespace clap {
       void onGuiParamBeginAdjust(clap_id paramId) override;
       void onGuiParamAdjust(clap_id paramId, double value) override;
       void onGuiParamEndAdjust(clap_id paramId) override;
+      void onGuiParamIsHovered(clap_id paramId) override;
       void onGuiSetTransportIsSubscribed(bool isSubscribed) override;
       void onGuiWindowClosed(bool wasDestroyed) override;
       void onGuiUndo() override;
@@ -271,7 +272,7 @@ namespace clap {
       processEvents(const clap_process *process, uint32_t &index, uint32_t count, uint32_t time);
 
       struct GuiToPluginEvent {
-         enum Type : uint8_t { Begin, Value, End };
+         enum Type : uint8_t { Begin, Value, End, Hovered };
 
          clap_id paramId;
          Type type;

@@ -24,6 +24,10 @@ namespace clap {
       onGuiRunOnMainThread([this, paramId] { _guiListener.onGuiParamEndAdjust(paramId); });
    }
 
+   void ThreadedGuiListenerProxy::onGuiParamIsHovered(clap_id paramId) {
+      onGuiRunOnMainThread([this, paramId] { _guiListener.onGuiParamIsHovered(paramId); });
+   }
+
    void ThreadedGuiListenerProxy::onGuiSetTransportIsSubscribed(bool isSubscribed) {
       onGuiRunOnMainThread(
          [this, isSubscribed] { _guiListener.onGuiSetTransportIsSubscribed(isSubscribed); });

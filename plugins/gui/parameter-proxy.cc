@@ -116,6 +116,7 @@ namespace clap {
       if (_isHovered == value)
          return;
       _isHovered = value;
+      _client.guiListener().onGuiParamIsHovered(value ? _id : CLAP_INVALID_ID);
       emit isHoveredChanged();
    }
 

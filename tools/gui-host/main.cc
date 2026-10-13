@@ -3,7 +3,8 @@
 // Usage: clap-gui-host [--x11 | --wayland] [--floating] [--scale <factor>]
 //                      <plugin.clap> [plugin-id]
 //
-// Without --x11 or --wayland, it uses the plugin's preferred window API. The plugin's GUI is
+// Without --x11 or --wayland, it uses the plugin's preferred window API. With X11, it gives the
+// plugin the desktop's scale, unless --scale overrides it. The plugin's GUI is
 // embedded into the host's window, or floats above it; then clicking the host's window shows
 // or hides the plugin's window. With Wayland, the GUI is always floating, see
 // plugins/gui/wayland-floating.h.
@@ -17,6 +18,7 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
 #include <vector>
@@ -36,6 +38,7 @@
 #include "xdg-activation-v1-client-protocol.h"
 #include "xdg-decoration-unstable-v1-client-protocol.h"
 #include "xdg-foreign-unstable-v2-client-protocol.h"
+#include "xdg-output-unstable-v1-client-protocol.h"
 #include "xdg-shell-client-protocol.h"
 
 namespace {
@@ -74,6 +77,10 @@ namespace {
       virtual clap_window clapWindow() const = 0;
 
       virtual void resize(uint32_t width, uint32_t height) = 0;
+
+      // The scale which the host gives to the plugin, 0 for none.
+      // source tells where it comes from.
+      virtual double desktopScale(std::string &source) { return 0; }
 
       // Waits for the window system's events, up to the timeout
       virtual void dispatch(int timeoutMs) = 0;
@@ -397,6 +404,79 @@ namespace {
    /////////
    // X11 //
    /////////
+
+   // Right edge of the Wayland outputs' logical layout, 0 without a Wayland compositor
+   int32_t waylandLogicalWidth() {
+      wl_display *display = wl_display_connect(nullptr);
+      if (!display)
+         return 0;
+
+      struct OutputGeometry {
+         int32_t x = 0;
+         int32_t width = 0;
+      };
+
+      struct State {
+         zxdg_output_manager_v1 *manager = nullptr;
+         std::vector<wl_output *> outputs;
+      } state;
+
+      static const wl_registry_listener registryListener = {
+         .global =
+            [](void *data, wl_registry *registry, uint32_t name, const char *interface, uint32_t version) {
+               auto &state = *static_cast<State *>(data);
+               // We don't need wl_output's events: without listener, they are discarded
+               if (!strcmp(interface, wl_output_interface.name))
+                  state.outputs.push_back(static_cast<wl_output *>(
+                     wl_registry_bind(registry, name, &wl_output_interface, 1)));
+               else if (!strcmp(interface, zxdg_output_manager_v1_interface.name) && version >= 2)
+                  state.manager = static_cast<zxdg_output_manager_v1 *>(
+                     wl_registry_bind(registry, name, &zxdg_output_manager_v1_interface, 2));
+            },
+         .global_remove = [](void *, wl_registry *, uint32_t) {},
+      };
+
+      static const zxdg_output_v1_listener xdgOutputListener = {
+         .logical_position = [](void *data, zxdg_output_v1 *, int32_t x, int32_t) {
+            static_cast<OutputGeometry *>(data)->x = x;
+         },
+         .logical_size = [](void *data, zxdg_output_v1 *, int32_t width, int32_t) {
+            static_cast<OutputGeometry *>(data)->width = width;
+         },
+         .done = [](void *, zxdg_output_v1 *) {},
+         .name = [](void *, zxdg_output_v1 *, const char *) {},
+         .description = [](void *, zxdg_output_v1 *, const char *) {},
+      };
+
+      auto registry = wl_display_get_registry(display);
+      wl_registry_add_listener(registry, &registryListener, &state);
+      wl_display_roundtrip(display);
+
+      int32_t right = 0;
+      if (state.manager) {
+         std::vector<OutputGeometry> geometries(state.outputs.size());
+         std::vector<zxdg_output_v1 *> xdgOutputs;
+         for (size_t i = 0; i < state.outputs.size(); ++i) {
+            auto xdgOutput = zxdg_output_manager_v1_get_xdg_output(state.manager, state.outputs[i]);
+            zxdg_output_v1_add_listener(xdgOutput, &xdgOutputListener, &geometries[i]);
+            xdgOutputs.push_back(xdgOutput);
+         }
+         wl_display_roundtrip(display);
+
+         for (auto &g : geometries)
+            right = std::max(right, g.x + g.width);
+         for (auto xdgOutput : xdgOutputs)
+            zxdg_output_v1_destroy(xdgOutput);
+         zxdg_output_manager_v1_destroy(state.manager);
+      }
+
+      for (auto output : state.outputs)
+         wl_output_destroy(output);
+      wl_registry_destroy(registry);
+      wl_display_disconnect(display);
+      return right;
+   }
+
    class X11HostWindow final : public HostWindow {
    public:
       using HostWindow::HostWindow;
@@ -405,12 +485,16 @@ namespace {
       bool open(const char *title) override;
       clap_window clapWindow() const override;
       void resize(uint32_t width, uint32_t height) override;
+      double desktopScale(std::string &source) override;
       void dispatch(int timeoutMs) override;
 
    private:
       uint32_t internAtom(const char *name);
+      std::optional<double> xftDpi();
 
       xcb_connection_t *_connection = nullptr;
+      xcb_window_t _root = 0;
+      uint32_t _screenWidth = 0;
       xcb_window_t _window = 0;
       uint32_t _wmProtocols = 0;
       uint32_t _wmDeleteWindow = 0;
@@ -446,6 +530,8 @@ namespace {
       for (int i = 0; i < screenIndex && screens.rem > 0; ++i)
          xcb_screen_next(&screens);
       const xcb_screen_t *screen = screens.data;
+      _root = screen->root;
+      _screenWidth = screen->width_in_pixels;
 
       _window = xcb_generate_id(_connection);
       const uint32_t values[] = {kBackgroundColor,
@@ -511,6 +597,47 @@ namespace {
       xcb_configure_window(
          _connection, _window, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
       xcb_flush(_connection);
+   }
+
+   // Like a real host, we give the plugin the scale of our own GUI
+   double X11HostWindow::desktopScale(std::string &source) {
+      if (auto dpi = xftDpi()) {
+         source = "Xft.dpi";
+         return *dpi / 96;
+      }
+
+      // With XWayland, the X11 screen is either in logical pixels, if the compositor scales the
+      // X11 clients, or in physical pixels, if it doesn't (COSMIC's descaling)
+      if (const int32_t logicalWidth = waylandLogicalWidth(); logicalWidth > 0) {
+         source = "the X11 screen's width over the Wayland outputs' logical width";
+         return double(_screenWidth) / logicalWidth;
+      }
+
+      source = "default";
+      return 1;
+   }
+
+   // As set by the desktop environment in the X resources
+   std::optional<double> X11HostWindow::xftDpi() {
+      auto reply = xcb_get_property_reply(
+         _connection,
+         xcb_get_property(
+            _connection, 0, _root, XCB_ATOM_RESOURCE_MANAGER, XCB_ATOM_STRING, 0, 1 << 20),
+         nullptr);
+      if (!reply)
+         return std::nullopt;
+
+      const std::string resources(static_cast<const char *>(xcb_get_property_value(reply)),
+                                  xcb_get_property_value_length(reply));
+      free(reply);
+
+      constexpr const char key[] = "Xft.dpi:";
+      const auto pos = resources.find(key);
+      if (pos == std::string::npos)
+         return std::nullopt;
+
+      const double dpi = std::strtod(resources.c_str() + pos + strlen(key), nullptr);
+      return dpi > 0 ? std::optional(dpi) : std::nullopt;
    }
 
    void X11HostWindow::dispatch(int timeoutMs) {
@@ -816,15 +943,20 @@ namespace {
       _isGuiCreated = true;
       _isGuiFloating = isFloating;
 
+      std::string scaleSource = "--scale";
+      const double scale = options.scale > 0 ? options.scale : _window->desktopScale(scaleSource);
+      if (scale > 0) {
+         std::cout << "scale: " << scale << ", from " << scaleSource << std::endl;
+         if (!_pluginGui->set_scale(_plugin, scale))
+            std::cerr << "the plugin ignored the scale" << std::endl;
+      }
+
       const clap_window window = _window->clapWindow();
       if (isFloating) {
          if (window.ptr && !_pluginGui->set_transient(_plugin, &window))
             std::cerr << "the plugin refused the transient window" << std::endl;
          _pluginGui->suggest_title(_plugin, "Plugin (CLAP GUI Host)");
       } else {
-         if (options.scale > 0 && !_pluginGui->set_scale(_plugin, options.scale))
-            std::cerr << "the plugin ignored the scale" << std::endl;
-
          uint32_t width = 0;
          uint32_t height = 0;
          if (!_pluginGui->get_size(_plugin, &width, &height)) {

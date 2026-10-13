@@ -127,6 +127,8 @@ By default it uses the plugin's preferred window API. The options:
 - `--x11` or `--wayland`: the window API
 - `--floating`: a floating window rather than an embedded one; Wayland is always floating.
   Click in the host's window to show or hide the plugin's window.
-- `--scale <factor>`: the scale given to the plugin, for X11
+- `--scale <factor>`: the scale given to the plugin with X11. By default, like a real host, it
+  gives the desktop's scale: `Xft.dpi`, or with XWayland, the ratio between the X11 screen and
+  the Wayland outputs' logical layout. The plugins don't guess it: they use the host's.
 
 Without a plugin id, it shows the gain plugin. With an unknown one, it lists the plugins.

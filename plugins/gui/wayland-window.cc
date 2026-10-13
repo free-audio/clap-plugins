@@ -45,7 +45,20 @@ namespace clap {
                uint32_t name,
                const char *interface,
                uint32_t version) { self(data).onGlobal(registry, name, interface, version); },
-         .global_remove = [](void *, wl_registry *, uint32_t) {},
+         .global_remove = [](void *data, wl_registry *, uint32_t name) {
+            self(data).onGlobalRemove(name);
+         },
+      };
+
+      const wl_output_listener outputListener = {
+         .geometry = [](void *, wl_output *, int32_t, int32_t, int32_t, int32_t, int32_t, const char *, const char *, int32_t) {},
+         .mode = [](void *, wl_output *, uint32_t, int32_t, int32_t, int32_t) {},
+         .done = [](void *data, wl_output *output) { self(data).onOutputDone(output); },
+         .scale = [](void *data, wl_output *output, int32_t factor) {
+            self(data).onOutputScale(output, factor);
+         },
+         .name = [](void *, wl_output *, const char *) {},
+         .description = [](void *, wl_output *, const char *) {},
       };
 
       const xdg_wm_base_listener wmBaseListener = {
@@ -87,8 +100,12 @@ namespace clap {
       };
 
       const wl_surface_listener surfaceListener = {
-         .enter = [](void *, wl_surface *, wl_output *) {},
-         .leave = [](void *, wl_surface *, wl_output *) {},
+         .enter = [](void *data, wl_surface *, wl_output *output) {
+            self(data).onSurfaceEnter(output);
+         },
+         .leave = [](void *data, wl_surface *, wl_output *output) {
+            self(data).onSurfaceLeave(output);
+         },
          .preferred_buffer_scale = [](void *data, wl_surface *, int32_t factor) {
             self(data).onPreferredBufferScale(factor);
          },
@@ -336,6 +353,11 @@ namespace clap {
          _cursorShapeManager = nullptr;
       }
 
+      _enteredOutputs.clear();
+      for (auto &output : _outputs)
+         destroyOutput(output);
+      _outputs.clear();
+
       if (_embedding) {
          clap_surface_embedding_v1_destroy(_embedding);
          _embedding = nullptr;
@@ -451,6 +473,12 @@ namespace clap {
       } else if (!strcmp(interface, wp_cursor_shape_manager_v1_interface.name)) {
          _cursorShapeManager =
             bind<wp_cursor_shape_manager_v1>(registry, name, wp_cursor_shape_manager_v1_interface, 1);
+      } else if (!strcmp(interface, wl_output_interface.name) && version >= 2) {
+         // v2: scale and done, v4: name and description
+         const uint32_t outputVersion = std::min(version, 4u);
+         auto output = bind<wl_output>(registry, name, wl_output_interface, outputVersion);
+         wl_output_add_listener(output, &outputListener, this);
+         _outputs.push_back({output, name, outputVersion});
       } else if (!strcmp(interface, clap_surface_embedding_v1_interface.name)) {
          _embedding =
             bind<clap_surface_embedding_v1>(registry, name, clap_surface_embedding_v1_interface, 1);
@@ -512,21 +540,91 @@ namespace clap {
       }
    }
 
-   void WaylandWindow::onPreferredBufferScale(int32_t factor) {
-      if (_fractionalScale || factor < 1 || factor == _scale)
-         return;
+   ///////////
+   // Scale //
+   ///////////
 
-      _scale = factor;
-      _listener.onScaleChanged();
-   }
+   // The host doesn't give the scale: CLAP's Wayland window APIs use logical sizes, and the
+   // compositor knows the scale, from the best source to the worst:
+   // - wp_fractional_scale_v1, which may be fractional
+   // - wl_surface.preferred_buffer_scale, since wl_compositor v6
+   // - the biggest scale of the outputs which the surface is on
+   void WaylandWindow::updateScale() {
+      double scale = 1;
+      if (_fractionalScaleValue > 0)
+         scale = _fractionalScaleValue;
+      else if (_preferredBufferScale > 0)
+         scale = _preferredBufferScale;
+      else {
+         for (auto &output : _outputs)
+            if (std::find(_enteredOutputs.begin(), _enteredOutputs.end(), output.output) !=
+                _enteredOutputs.end())
+               scale = std::max<double>(scale, output.scale);
+      }
 
-   void WaylandWindow::onPreferredFractionalScale(uint32_t scale120) {
-      const double scale = scale120 / 120.;
-      if (scale <= 0 || scale == _scale)
+      if (scale == _scale)
          return;
 
       _scale = scale;
       _listener.onScaleChanged();
+   }
+
+   void WaylandWindow::onPreferredFractionalScale(uint32_t scale120) {
+      if (scale120 == 0)
+         return;
+      _fractionalScaleValue = scale120 / 120.;
+      updateScale();
+   }
+
+   void WaylandWindow::onPreferredBufferScale(int32_t factor) {
+      if (factor < 1)
+         return;
+      _preferredBufferScale = factor;
+      updateScale();
+   }
+
+   void WaylandWindow::onSurfaceEnter(wl_output *output) {
+      if (std::find(_enteredOutputs.begin(), _enteredOutputs.end(), output) == _enteredOutputs.end())
+         _enteredOutputs.push_back(output);
+      updateScale();
+   }
+
+   void WaylandWindow::onSurfaceLeave(wl_output *output) {
+      std::erase(_enteredOutputs, output);
+      updateScale();
+   }
+
+   void WaylandWindow::onOutputScale(wl_output *output, int32_t factor) {
+      for (auto &o : _outputs)
+         if (o.output == output)
+            o.pendingScale = std::max(factor, 1);
+   }
+
+   // The output's properties are atomic
+   void WaylandWindow::onOutputDone(wl_output *output) {
+      for (auto &o : _outputs)
+         if (o.output == output)
+            o.scale = o.pendingScale;
+      updateScale();
+   }
+
+   void WaylandWindow::onGlobalRemove(uint32_t name) {
+      auto it = std::find_if(
+         _outputs.begin(), _outputs.end(), [name](auto &o) { return o.name == name; });
+      if (it == _outputs.end())
+         return;
+
+      std::erase(_enteredOutputs, it->output);
+      destroyOutput(*it);
+      _outputs.erase(it);
+      updateScale();
+   }
+
+   void WaylandWindow::destroyOutput(Output &output) {
+      if (output.version >= WL_OUTPUT_RELEASE_SINCE_VERSION)
+         wl_output_release(output.output);
+      else
+         wl_output_destroy(output.output);
    }
 
    ///////////////

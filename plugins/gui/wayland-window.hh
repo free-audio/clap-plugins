@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstddef>
 #include <string>
+#include <vector>
 
 #include "platform-window.hh"
 
@@ -11,6 +12,7 @@ struct wl_buffer;
 struct wl_callback;
 struct wl_compositor;
 struct wl_display;
+struct wl_output;
 struct wl_pointer;
 struct wl_registry;
 struct wl_seat;
@@ -77,8 +79,13 @@ namespace clap {
 
       // Called by the Wayland listeners
       void onGlobal(wl_registry *registry, uint32_t name, const char *interface, uint32_t version);
+      void onGlobalRemove(uint32_t name);
       void onPreferredBufferScale(int32_t factor);
       void onPreferredFractionalScale(uint32_t scale120);
+      void onSurfaceEnter(wl_output *output);
+      void onSurfaceLeave(wl_output *output);
+      void onOutputScale(wl_output *output, int32_t factor);
+      void onOutputDone(wl_output *output);
       void onSurfaceConfigure(uint32_t serial);
       void onToplevelConfigure(int32_t width, int32_t height);
       void onToplevelClose();
@@ -97,6 +104,14 @@ namespace clap {
       void onPointerFrame();
 
    private:
+      struct Output {
+         wl_output *output = nullptr;
+         uint32_t name = 0; // in the registry
+         uint32_t version = 0;
+         int32_t scale = 1;
+         int32_t pendingScale = 1;
+      };
+
       struct ShmBuffer {
          wl_buffer *buffer = nullptr;
          void *data = nullptr;
@@ -106,6 +121,8 @@ namespace clap {
       };
 
       bool connect(wl_display *display);
+      void updateScale();
+      void destroyOutput(Output &output);
       void createSurface();
       void destroy();
       void destroyPointer();
@@ -156,8 +173,12 @@ namespace clap {
       std::string _title;
 
       // With wp_fractional_scale_v1, the buffer is round(size * scale) and the viewport maps it
-      // to the logical size. Otherwise the scale is an integer, from wl_surface.
+      // to the logical size. Otherwise the scale is an integer, see updateScale().
       double _scale = 1;
+      double _fractionalScaleValue = 0; // 0 until the compositor gives it
+      int32_t _preferredBufferScale = 0;
+      std::vector<Output> _outputs;
+      std::vector<wl_output *> _enteredOutputs;
 
       bool _isEmbedded = false;
       bool _isVisible = false;

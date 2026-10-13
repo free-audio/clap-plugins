@@ -70,7 +70,11 @@ namespace clap {
    // calling onTimer(); on Windows and macOS the window has its own timer.
    //
    // Sizes are logical, except in getSize(), setSize() and roundSize() which use the CLAP
-   // window API's unit: physical pixels for X11 and Win32.
+   // window API's unit: physical pixels for X11 and Win32, with the scale from the host.
+   //
+   // Wayland's window APIs use logical sizes, even though CLAP's gui.h still says physical for
+   // CLAP_WINDOW_API_WAYLAND, which is going to be corrected: the host doesn't call set_scale(),
+   // and the window gets the scale from the compositor. Cocoa is logical too.
    class ImGuiGui final : private PlatformWindow::Listener {
    public:
       // The CLAP window APIs that this platform supports
@@ -138,7 +142,7 @@ namespace clap {
       bool setSize(uint32_t width, uint32_t height);
       bool roundSize(uint32_t *width, uint32_t *height) const;
 
-      // Only for the APIs which use physical pixels
+      // Only for the APIs which use physical pixels: X11 and Win32
       bool setScale(double scale);
 
       bool show();

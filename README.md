@@ -143,5 +143,7 @@ By default it uses the plugin's preferred window API. The options:
 - `--scale <factor>`: the scale given to the plugin with X11. By default, like a real host, it
   gives the desktop's scale: `Xft.dpi`, or with XWayland, the ratio between the X11 screen and
   the Wayland outputs' logical layout. The plugins don't guess it: they use the host's.
+  With Wayland, the sizes are logical and the host doesn't give the scale: the plugin gets it
+  from the compositor.
 
 Without a plugin id, it shows the gain plugin. With an unknown one, it lists the plugins.

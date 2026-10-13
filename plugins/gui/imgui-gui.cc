@@ -531,7 +531,7 @@ namespace clap {
    }
 
    bool ImGuiGui::setScale(double scale) {
-      // The other window systems give it to us
+      // The other window systems give it to us: Wayland's compositor, and Cocoa's backing store
       if (!isApiPhysical() || scale <= 0)
          return false;
 

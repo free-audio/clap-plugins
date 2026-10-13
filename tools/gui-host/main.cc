@@ -3,11 +3,13 @@
 // Usage: clap-gui-host [--x11 | --wayland] [--floating] [--scale <factor>]
 //                      <plugin.clap> [plugin-id]
 //
-// Without --x11 or --wayland, it uses the plugin's preferred window API. With X11, it gives the
-// plugin the desktop's scale, unless --scale overrides it. The plugin's GUI is
+// Without --x11 or --wayland, it uses the plugin's preferred window API. The plugin's GUI is
 // embedded into the host's window, or floats above it; then clicking the host's window shows
 // or hides the plugin's window. With Wayland, the GUI is always floating, see
 // clap-wayland-experiment.
+//
+// With X11, it gives the plugin the desktop's scale, unless --scale overrides it. Wayland uses
+// logical sizes: the host doesn't give the scale, the plugin gets it from the compositor.
 //
 // It only shows the GUI: the plugin isn't activated, and the parameter changes are flushed with
 // clap_plugin_params.flush() and printed.
@@ -81,9 +83,9 @@ namespace {
 
       virtual void resize(uint32_t width, uint32_t height) = 0;
 
-      // The scale which the host gives to the plugin, 0 for none.
+      // The scale which the host gives to the plugin, for X11.
       // source tells where it comes from.
-      virtual double desktopScale(std::string &source) { return 0; }
+      virtual double desktopScale(std::string &source) { return 1; }
 
       // Waits for the window system's events, up to the timeout
       virtual void dispatch(int timeoutMs) = 0;
@@ -958,13 +960,19 @@ namespace {
       _isGuiCreated = true;
       _isGuiFloating = isFloating;
 
-      std::string scaleSource = "--scale";
-      const double scale = options.scale > 0 ? options.scale : _window->desktopScale(scaleSource);
-      if (scale > 0) {
+      // Wayland's window APIs use logical sizes, even if CLAP's gui.h still says physical: the
+      // plugin gets the scale from the compositor
+      if (!strcmp(api, CLAP_WINDOW_API_X11)) {
+         std::string scaleSource = "--scale";
+         const double scale =
+            options.scale > 0 ? options.scale : _window->desktopScale(scaleSource);
          std::cout << "scale: " << scale << ", from " << scaleSource << std::endl;
          if (!_pluginGui->set_scale(_plugin, scale))
             std::cerr << "the plugin ignored the scale" << std::endl;
-      }
+      } else if (options.scale > 0)
+         std::cerr << "--scale is for X11, with Wayland the plugin gets the scale from the "
+                      "compositor"
+                   << std::endl;
 
       const clap_window window = _window->clapWindow();
       if (isFloating) {

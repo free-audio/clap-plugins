@@ -328,9 +328,12 @@ namespace clap {
 #ifndef CLAP_PLUGINS_HEADLESS
       clap_id _guiTimerId = CLAP_INVALID_ID;
       std::unique_ptr<ImGuiGui> _gui;
-      // Floating windows on Wayland, see clap-wayland-experiment
+      // Wayland, see clap-wayland-experiment: floating windows, and embedding through the host's
+      // compositor
       static const clap_plugin_gui_xdg_foreign_v2 _guiXdgForeignV2;
       static const clap_plugin_gui_xdg_activation_v1 _guiXdgActivationV1;
+      static const clap_plugin_gui_wayland_nested_compositor _guiWaylandNestedCompositor;
+      const clap_host_gui_wayland_nested_compositor *_hostGuiWaylandNestedCompositor = nullptr;
 #endif
 
       Parameters _parameters;

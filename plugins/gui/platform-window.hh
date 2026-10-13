@@ -45,6 +45,10 @@ namespace clap {
          // The window system or the title bar asks to close the window
          virtual void onCloseRequested() = 0;
 
+         // The window is gone: the connection to the window system is lost, or the host ended
+         // the embedding
+         virtual void onWindowLost() = 0;
+
          // Periodically, from the windows which have their own timer
          virtual void onTimer() = 0;
       };

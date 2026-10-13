@@ -28,6 +28,8 @@ add_library(
 set_property(TARGET clap-plugins-gui PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugins-gui PROPERTY POSITION_INDEPENDENT_CODE true)
 target_link_libraries(clap-plugins-gui PUBLIC clap clap-plugins-imgui)
+# Its window APIs, for every platform
+target_link_libraries(clap-plugins-gui PRIVATE clap-wayland-experiment)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   include(${CLAP_PLUGINS_SOURCE_DIR}/cmake/wayland-protocols.cmake)
@@ -48,6 +50,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     unstable/tablet/tablet-unstable-v2.xml
     unstable/xdg-decoration/xdg-decoration-unstable-v1.xml
     unstable/xdg-foreign/xdg-foreign-unstable-v2.xml)
+  # clap_surface_embedding_v1, for the embedding through the host's compositor
+  clap_wayland_experiment_target_protocols(clap-plugins-gui CLIENT)
   target_link_libraries(clap-plugins-gui PRIVATE PkgConfig::WAYLAND_CLIENT PkgConfig::XCB)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_sources(clap-plugins-gui PRIVATE win32-window.hh win32-window.cc)

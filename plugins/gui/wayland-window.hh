@@ -16,6 +16,8 @@ struct wl_registry;
 struct wl_seat;
 struct wl_shm;
 struct wl_surface;
+struct clap_embedded_surface_v1;
+struct clap_surface_embedding_v1;
 struct wp_cursor_shape_device_v1;
 struct wp_cursor_shape_manager_v1;
 struct wp_fractional_scale_manager_v1;
@@ -33,15 +35,27 @@ struct zxdg_toplevel_decoration_v1;
 
 namespace clap {
 
-   // A floating window, with its own connection to the compositor.
+   // A window with its own connection to a compositor, either:
+   // - floating: an xdg_toplevel on the system compositor
+   // - embedded: a surface which the host's own compositor embeds into the host's window
+   //   (clap_surface_embedding_v1)
+   //
    // See clap-wayland-experiment for the contract with the host.
    class WaylandWindow final : public PlatformWindow {
    public:
       explicit WaylandWindow(Listener &listener);
       ~WaylandWindow() override;
 
-      // Connects to the compositor and creates the window, without showing it
+      // Floating: connects to the system compositor and creates the window, without showing it
       [[nodiscard]] bool open();
+
+      // Embedded: connects to the host's compositor with fd, which it owns, and creates the
+      // surface
+      [[nodiscard]] bool openEmbedded(int fd);
+
+      // Embedded: places the surface where the host's embedding token says. It may be called
+      // again with another token.
+      bool embed(const char *token);
 
       // Keeps the window above the host's window, exported with xdg-foreign.
       // NULL removes the parent.
@@ -70,6 +84,8 @@ namespace clap {
       void onToplevelClose();
       void onDecorationConfigure(uint32_t mode);
       void onImportedDestroyed();
+      void onEmbeddedPosition(int32_t x, int32_t y);
+      void onEmbeddedClosed();
       void onFrameDone();
       void onSeatCapabilities(uint32_t capabilities);
       void onPointerEnter(uint32_t serial, wl_surface *surface, double x, double y);
@@ -89,6 +105,8 @@ namespace clap {
          Framebuffer framebuffer;
       };
 
+      bool connect(wl_display *display);
+      void createSurface();
       void destroy();
       void destroyPointer();
       void destroyImported();
@@ -113,6 +131,7 @@ namespace clap {
       zxdg_importer_v2 *_importer = nullptr;
       xdg_activation_v1 *_activation = nullptr;
       wp_cursor_shape_manager_v1 *_cursorShapeManager = nullptr;
+      clap_surface_embedding_v1 *_embedding = nullptr;
       wl_seat *_seat = nullptr;
       wl_pointer *_pointer = nullptr;
       wp_cursor_shape_device_v1 *_cursorShapeDevice = nullptr;
@@ -122,6 +141,7 @@ namespace clap {
       xdg_toplevel *_toplevel = nullptr;
       zxdg_toplevel_decoration_v1 *_decoration = nullptr;
       zxdg_imported_v2 *_imported = nullptr;
+      clap_embedded_surface_v1 *_embeddedSurface = nullptr;
       wp_viewport *_viewport = nullptr;
       wp_fractional_scale_v1 *_fractionalScale = nullptr;
       wl_callback *_frameCallback = nullptr;
@@ -139,6 +159,7 @@ namespace clap {
       // to the logical size. Otherwise the scale is an integer, from wl_surface.
       double _scale = 1;
 
+      bool _isEmbedded = false;
       bool _isVisible = false;
       // An xdg_surface is mapped in three steps: a commit without buffer, the acknowledgement
       // of the configure event which follows, and a commit with a buffer. Unmapping it starts

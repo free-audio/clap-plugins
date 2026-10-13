@@ -20,6 +20,8 @@
 #include "xdg-decoration-unstable-v1-client-protocol.h"
 #include "xdg-foreign-unstable-v2-client-protocol.h"
 #include "xdg-shell-client-protocol.h"
+// After xdg-shell, whose interfaces it uses
+#include "clap-surface-embedding-v1-client-protocol.h"
 
 namespace clap {
 
@@ -75,6 +77,13 @@ namespace clap {
 
       const zxdg_imported_v2_listener importedListener = {
          .destroyed = [](void *data, zxdg_imported_v2 *) { self(data).onImportedDestroyed(); },
+      };
+
+      const clap_embedded_surface_v1_listener embeddedSurfaceListener = {
+         .position = [](void *data, clap_embedded_surface_v1 *, int32_t x, int32_t y) {
+            self(data).onEmbeddedPosition(x, y);
+         },
+         .closed = [](void *data, clap_embedded_surface_v1 *) { self(data).onEmbeddedClosed(); },
       };
 
       const wl_surface_listener surfaceListener = {
@@ -152,10 +161,10 @@ namespace clap {
 
    WaylandWindow::~WaylandWindow() { destroy(); }
 
-   bool WaylandWindow::open() {
+   bool WaylandWindow::connect(wl_display *display) {
       assert(!_display);
 
-      _display = wl_display_connect(nullptr);
+      _display = display;
       if (!_display) {
          std::cerr << "clap-gui: failed to connect to the wayland compositor" << std::endl;
          return false;
@@ -163,12 +172,15 @@ namespace clap {
 
       _registry = wl_display_get_registry(_display);
       wl_registry_add_listener(_registry, &registryListener, this);
-      if (wl_display_roundtrip(_display) < 0 || !_compositor || !_shm || !_wmBase) {
+      if (wl_display_roundtrip(_display) < 0 || !_compositor || !_shm) {
          std::cerr << "clap-gui: missing wayland globals" << std::endl;
          destroy();
          return false;
       }
+      return true;
+   }
 
+   void WaylandWindow::createSurface() {
       _surface = wl_compositor_create_surface(_compositor);
       wl_surface_add_listener(_surface, &surfaceListener, this);
 
@@ -178,6 +190,19 @@ namespace clap {
             wp_fractional_scale_manager_v1_get_fractional_scale(_fractionalScaleManager, _surface);
          wp_fractional_scale_v1_add_listener(_fractionalScale, &fractionalScaleListener, this);
       }
+   }
+
+   bool WaylandWindow::open() {
+      if (!connect(wl_display_connect(nullptr)))
+         return false;
+
+      if (!_wmBase) {
+         std::cerr << "clap-gui: the compositor has no xdg_wm_base" << std::endl;
+         destroy();
+         return false;
+      }
+
+      createSurface();
 
       _xdgSurface = xdg_wm_base_get_xdg_surface(_wmBase, _surface);
       xdg_surface_add_listener(_xdgSurface, &xdgSurfaceListener, this);
@@ -199,6 +224,59 @@ namespace clap {
       return true;
    }
 
+   // wl_display_connect_to_fd() closes the socket, even on failure
+   bool WaylandWindow::openEmbedded(int fd) {
+      _isEmbedded = true;
+      if (!connect(wl_display_connect_to_fd(fd)))
+         return false;
+
+      if (!_embedding) {
+         std::cerr << "clap-gui: the host's compositor has no clap_surface_embedding_v1"
+                   << std::endl;
+         destroy();
+         return false;
+      }
+
+      createSurface();
+      flush();
+      return true;
+   }
+
+   bool WaylandWindow::embed(const char *token) {
+      if (!_embedding || !_surface || !token)
+         return false;
+
+      // The previous embedding ends, and the surface is unmapped
+      if (_embeddedSurface) {
+         clap_embedded_surface_v1_destroy(_embeddedSurface);
+         _embeddedSurface = nullptr;
+         _isMapped = false;
+         destroyFrameCallback();
+         leavePointer();
+      }
+
+      _embeddedSurface =
+         clap_surface_embedding_v1_get_embedded_surface(_embedding, _surface, token);
+      clap_embedded_surface_v1_add_listener(_embeddedSurface, &embeddedSurfaceListener, this);
+
+      // Unlike an xdg_surface, there is no configure event: the next buffer maps the surface
+      _isConfigured = true;
+      flush();
+      return true;
+   }
+
+   // Where the surface is in the host's surface, for the popups: we have none yet
+   void WaylandWindow::onEmbeddedPosition(int32_t x, int32_t y) {}
+
+   // The host refused the token, or removed the place
+   void WaylandWindow::onEmbeddedClosed() {
+      _isConfigured = false;
+      _isMapped = false;
+      destroyFrameCallback();
+      leavePointer();
+      _listener.onWindowLost();
+   }
+
    void WaylandWindow::destroy() {
       destroyFrameCallback();
 
@@ -217,6 +295,11 @@ namespace clap {
       }
 
       destroyImported();
+
+      if (_embeddedSurface) {
+         clap_embedded_surface_v1_destroy(_embeddedSurface);
+         _embeddedSurface = nullptr;
+      }
 
       if (_decoration) {
          zxdg_toplevel_decoration_v1_destroy(_decoration);
@@ -251,6 +334,11 @@ namespace clap {
       if (_cursorShapeManager) {
          wp_cursor_shape_manager_v1_destroy(_cursorShapeManager);
          _cursorShapeManager = nullptr;
+      }
+
+      if (_embedding) {
+         clap_surface_embedding_v1_destroy(_embedding);
+         _embedding = nullptr;
       }
 
       if (_activation) {
@@ -363,6 +451,9 @@ namespace clap {
       } else if (!strcmp(interface, wp_cursor_shape_manager_v1_interface.name)) {
          _cursorShapeManager =
             bind<wp_cursor_shape_manager_v1>(registry, name, wp_cursor_shape_manager_v1_interface, 1);
+      } else if (!strcmp(interface, clap_surface_embedding_v1_interface.name)) {
+         _embedding =
+            bind<clap_surface_embedding_v1>(registry, name, clap_surface_embedding_v1_interface, 1);
       } else if (!strcmp(interface, wl_seat_interface.name) && !_seat) {
          // v5: axis_discrete and wl_seat.release
          _seatVersion = std::min(version, 5u);
@@ -525,7 +616,7 @@ namespace clap {
          return;
       }
 
-      if (!_isInitialCommitDone) {
+      if (!_isEmbedded && !_isInitialCommitDone) {
          // Asks for the configure event, we map the window once we have it
          wl_surface_commit(_surface);
          _isInitialCommitDone = true;
@@ -544,8 +635,11 @@ namespace clap {
       flush();
 
       _isMapped = false;
-      _isConfigured = false;
-      _isInitialCommitDone = false;
+      // An xdg_surface starts over, an embedded surface only needs a buffer
+      if (!_isEmbedded) {
+         _isConfigured = false;
+         _isInitialCommitDone = false;
+      }
 
       // The GUI would still show the hovered items when the window is shown again
       leavePointer();
@@ -701,7 +795,7 @@ namespace clap {
          std::cerr << "clap-gui: lost the wayland connection: " << strerror(error) << std::endl;
 
       destroy();
-      _listener.onCloseRequested();
+      _listener.onWindowLost();
       return false;
    }
 

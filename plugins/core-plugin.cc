@@ -37,6 +37,13 @@ namespace clap {
 
    bool CorePlugin::init() noexcept {
       updateTrackInfo();
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      // clap-helpers doesn't know this experimental extension
+      const clap_host *host = _host.host();
+      _hostGuiWaylandNestedCompositor = static_cast<const clap_host_gui_wayland_nested_compositor *>(
+         host->get_extension(host, CLAP_EXT_GUI_WAYLAND_NESTED_COMPOSITOR));
+#endif
       return true;
    }
 
@@ -157,17 +164,32 @@ namespace clap {
    bool CorePlugin::implementsGui() const noexcept { return true; }
 
    bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept {
-      return ImGuiGui::windowApi(api, isFloating).has_value();
+      const auto windowApi = ImGuiGui::windowApi(api, isFloating);
+
+      // The embedding goes through the host's compositor
+      if (windowApi == WindowApi::WaylandSurfaceEmbedding)
+         return _hostGuiWaylandNestedCompositor != nullptr;
+      return windowApi.has_value();
    }
 
    bool CorePlugin::guiGetPreferredApi(const char **api, bool *isFloating) noexcept {
+#ifdef __linux__
+      // The host offers it because it runs a compositor: embedding is more integrated
+      if (_hostGuiWaylandNestedCompositor) {
+         *api = CLAP_WINDOW_API_WAYLAND_SURFACE_EMBEDDING_V1;
+         *isFloating = false;
+         return true;
+      }
+#endif
+
       ImGuiGui::preferredApi(api, isFloating);
       return true;
    }
 
    bool CorePlugin::guiCreate(const char *api, bool isFloating) noexcept {
       const auto windowApi = ImGuiGui::windowApi(api, isFloating);
-      if (!windowApi)
+      if (!windowApi ||
+          (windowApi == WindowApi::WaylandSurfaceEmbedding && !_hostGuiWaylandNestedCompositor))
          return false;
 
       // On Linux, the GUI has no event loop: a timer drives it on the main thread
@@ -234,12 +256,28 @@ namespace clap {
          },
    };
 
+   const clap_plugin_gui_wayland_nested_compositor CorePlugin::_guiWaylandNestedCompositor = {
+      .set_parent =
+         [](const clap_plugin *plugin, const char *token) {
+            auto &self = static_cast<CorePlugin &>(from(plugin));
+            auto *compositor = self._hostGuiWaylandNestedCompositor;
+            if (!self._gui || !compositor)
+               return false;
+
+            const clap_host *host = self._host.host();
+            return self._gui->setWaylandEmbeddingParent(
+               token, [compositor, host] { return compositor->open_connection(host); });
+         },
+   };
+
    const void *CorePlugin::extension(const char *id) noexcept {
 #ifdef __linux__
       if (!strcmp(id, CLAP_EXT_GUI_XDG_FOREIGN_V2))
          return &_guiXdgForeignV2;
       if (!strcmp(id, CLAP_EXT_GUI_XDG_ACTIVATION_V1))
          return &_guiXdgActivationV1;
+      if (!strcmp(id, CLAP_EXT_GUI_WAYLAND_NESTED_COMPOSITOR))
+         return &_guiWaylandNestedCompositor;
 #endif
       return super::extension(id);
    }

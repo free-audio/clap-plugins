@@ -24,9 +24,14 @@ nor any GPU context: each platform only has to show the pixels and to report the
 | Platform | Window API | Embedded | Floating |
 |----------|------------|----------|----------|
 | Linux    | X11        | yes      | yes      |
-| Linux    | Wayland    | no       | yes, experimental, see [clap-wayland-experiment](https://github.com/free-audio/clap-wayland-experiment) |
+| Linux    | Wayland    | experimental, through the host's compositor (1) | experimental (1) |
 | Windows  | Win32      | yes      | no       |
 | macOS    | Cocoa      | yes      | no       |
+
+(1) With the extensions from [clap-wayland-experiment](https://github.com/free-audio/clap-wayland-experiment),
+a submodule. Embedding uses the `wayland-surface-embedding-v1` window API: the host runs a Wayland
+compositor of its own, and the plugin's surface goes into the host's window through it, with the
+`clap_surface_embedding_v1` protocol. `clap-gui-host` doesn't test it yet.
 
 Everything runs on the main thread. On Linux, the host's timer drives the GUI
 ([`clap.timer-support`](https://github.com/free-audio/clap/blob/main/include/clap/ext/timer-support.h));

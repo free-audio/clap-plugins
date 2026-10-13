@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -53,7 +54,13 @@ namespace clap {
       void (*draw)(ImGuiGui &gui);
    };
 
-   enum class WindowApi { X11, Wayland, Win32, Cocoa };
+   enum class WindowApi {
+      X11,
+      Wayland,                 // floating
+      WaylandSurfaceEmbedding, // embedded through the host's compositor
+      Win32,
+      Cocoa,
+   };
 
    // GUI implemented with Dear ImGui and rendered in software.
    //
@@ -117,6 +124,10 @@ namespace clap {
       // clap_plugin_gui_xdg_activation_v1
       void setActivationToken(const char *token);
 
+      // clap_plugin_gui_wayland_nested_compositor: embeds the window where the token says.
+      // openConnection gives the socket to the host's compositor, the first time.
+      bool setWaylandEmbeddingParent(const char *token, const std::function<int()> &openConnection);
+
       bool isApiPhysical() const noexcept {
          return _api == WindowApi::X11 || _api == WindowApi::Win32;
       }
@@ -177,6 +188,7 @@ namespace clap {
       void onScaleChanged() override;
       void onResized(uint32_t width, uint32_t height) override;
       void onCloseRequested() override;
+      void onWindowLost() override;
 
       [[nodiscard]] bool attachWindow(std::unique_ptr<PlatformWindow> window);
       PlatformWindow::Listener &windowListener() noexcept { return *this; }
@@ -210,6 +222,7 @@ namespace clap {
       // The host may destroy the GUI when we tell it that the window is closed, so we do it
       // at the end of onTimer().
       bool _isCloseRequested = false;
+      bool _isWindowLost = false;
 
       // ImGui needs a few frames to process the input events and update its state
       int _framesToRender = 0;

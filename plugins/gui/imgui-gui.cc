@@ -7,6 +7,8 @@
 
 #include <imgui.h>
 
+#include <clap/ext/draft/wayland-experiment.h>
+
 #include "imgui-gui.hh"
 #include "skins.hh"
 #include "software-renderer.hh"
@@ -86,6 +88,10 @@ namespace clap {
       // Wayland can't embed a window from another connection, see clap-wayland-experiment
       if (isFloating && !strcmp(api, CLAP_WINDOW_API_WAYLAND))
          return WindowApi::Wayland;
+
+      // Unless the host runs a compositor of its own
+      if (!isFloating && !strcmp(api, CLAP_WINDOW_API_WAYLAND_SURFACE_EMBEDDING_V1))
+         return WindowApi::WaylandSurfaceEmbedding;
 #elif defined(_WIN32)
       if (!isFloating && !isBlank && !strcmp(api, CLAP_WINDOW_API_WIN32))
          return WindowApi::Win32;
@@ -414,8 +420,37 @@ namespace clap {
 
    void ImGuiGui::setActivationToken(const char *token) {
 #ifdef __linux__
-      if (_waylandWindow)
+      if (_waylandWindow && _isFloating)
          _waylandWindow->setActivationToken(token);
+#endif
+   }
+
+   bool ImGuiGui::setWaylandEmbeddingParent(const char *token,
+                                            const std::function<int()> &openConnection) {
+#ifdef __linux__
+      if (_api != WindowApi::WaylandSurfaceEmbedding || !token)
+         return false;
+
+      if (!_window) {
+         const int fd = openConnection();
+         if (fd < 0)
+            return false;
+
+         // It owns the socket
+         auto window = std::make_unique<WaylandWindow>(windowListener());
+         if (!window->openEmbedded(fd))
+            return false;
+
+         auto *waylandWindow = window.get();
+         if (!attachWindow(std::move(window)))
+            return false;
+         _waylandWindow = waylandWindow;
+      }
+
+      requestRedraw();
+      return _waylandWindow->embed(token);
+#else
+      return false;
 #endif
    }
 
@@ -508,6 +543,8 @@ namespace clap {
 
    void ImGuiGui::onCloseRequested() { _isCloseRequested = true; }
 
+   void ImGuiGui::onWindowLost() { _isWindowLost = true; }
+
    ///////////////
    // Rendering //
    ///////////////
@@ -523,10 +560,14 @@ namespace clap {
       if (_window && _isVisible && _framesToRender > 0)
          render();
 
-      if (_isCloseRequested) {
+      // Last thing we do: the host may destroy us
+      if (_isWindowLost) {
+         _isWindowLost = false;
+         _isCloseRequested = false;
+         _listener.onGuiWindowClosed(true);
+      } else if (_isCloseRequested) {
          _isCloseRequested = false;
          hide();
-         // Last thing we do: the host may destroy us
          _listener.onGuiWindowClosed(false);
       }
    }

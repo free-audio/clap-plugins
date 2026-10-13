@@ -327,8 +327,7 @@ namespace clap {
       if (xcb_connection_has_error(_connection)) {
          std::cerr << "clap-gui: lost the connection to the X server" << std::endl;
          destroy();
-         if (_isFloating)
-            _listener.onCloseRequested();
+         _listener.onWindowLost();
       }
    }
 

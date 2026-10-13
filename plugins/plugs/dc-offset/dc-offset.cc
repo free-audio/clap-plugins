@@ -48,7 +48,7 @@ namespace clap {
    }
 
    DcOffset::DcOffset(const std::string &pluginPath, const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "dc-offset"), descriptor(), host) {
+      : CorePlugin("dc-offset", descriptor(), host) {
       _rootModule = std::make_unique<DcOffsetModule>(*this);
    }
 

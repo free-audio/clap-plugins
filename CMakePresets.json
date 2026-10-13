@@ -19,7 +19,7 @@
             }
         },
         {
-            "name": "vs",
+            "name": "vs-base",
             "hidden": true,
             "inherits": [
                 "base"
@@ -38,126 +38,77 @@
             }
         },
         {
-            "name": "imgui",
-            "hidden": true,
-            "cacheVariables": {
-                "CLAP_PLUGINS_GUI": {
-                    "type": "STRING",
-                    "value": "imgui"
-                }
-            }
-        },
-        {
-            "name": "vcpkg",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": {
-                    "type": "FILEPATH",
-                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-                },
-                "CLAP_PLUGINS_EMBED_QML": {
-                    "type": "BOOL",
-                    "value": true
-                }
-            }
-        },
-        {
-            "name": "ninja-vcpkg",
-            "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
+            "name": "ninja",
+            "description": "Ninja",
             "inherits": [
-                "base",
-                "vcpkg"
+                "base"
             ]
         },
         {
             "name": "ninja-headless",
-            "description": "Ninja + System Libraries + Headless",
-            "binaryDir": "${sourceDir}/builds/${presetName}",
+            "description": "Ninja, without the GUI",
             "inherits": [
-                "base", "headless"
+                "base",
+                "headless"
             ]
         },
         {
-            "name": "ninja-imgui",
-            "description": "Ninja + System Libraries + ImGui GUI (experimental)",
+            "name": "vs",
+            "description": "Visual Studio 2022",
             "inherits": [
-                "base", "imgui"
-            ]
-        },
-        {
-            "name": "vs-vcpkg",
-            "description": "Visual Studio + VCPKG",
-            "inherits": [
-                "vs",
-                "vcpkg"
+                "vs-base"
             ]
         },
         {
             "name": "vs-headless",
-            "description": "Visual Studio + Headless",
+            "description": "Visual Studio 2022, without the GUI",
             "inherits": [
-                "vs",
+                "vs-base",
                 "headless"
             ]
         }
     ],
     "buildPresets": [
         {
-            "name": "base",
-            "hidden": true,
-            "targets": [
-                "clap-plugins",
-                "install"
-            ]
-        },
-        {
-            "name": "ninja-vcpkg",
-            "description": "Build using Ninja and VCPKG",
-            "configurePreset": "ninja-vcpkg",
-            "inherits": "base"
+            "name": "ninja",
+            "description": "Build using Ninja",
+            "configurePreset": "ninja"
         },
         {
             "name": "ninja-headless",
-            "inherits": "base",
-            "description": "Build using Ninja and system libraries (headless)",
+            "description": "Build using Ninja, without the GUI",
             "configurePreset": "ninja-headless"
         },
         {
-            "name": "ninja-imgui",
-            "description": "Build using Ninja and system libraries, with the ImGui GUI (experimental)",
-            "configurePreset": "ninja-imgui",
-            "targets": [
-                "clap-plugins",
-                "clap-wayland-host"
-            ]
-        },
-        {
-            "name": "vs-vcpkg",
-            "inherits": "base",
-            "description": "Build using Visual Studio and VCPKG",
-            "configurePreset": "vs-vcpkg"
+            "name": "vs",
+            "description": "Build using Visual Studio",
+            "configurePreset": "vs"
         },
         {
             "name": "vs-headless",
-            "inherits": "base",
-            "description": "Build using Visual Studio (headless)",
+            "description": "Build using Visual Studio, without the GUI",
             "configurePreset": "vs-headless"
         }
     ],
     "testPresets": [
         {
-            "name": "ninja-vcpkg",
-            "description": "Test using Ninja and VCPKG",
-            "configurePreset": "ninja-vcpkg"
+            "name": "ninja",
+            "description": "Test using Ninja",
+            "configurePreset": "ninja"
         },
         {
             "name": "ninja-headless",
-            "description": "Test using Ninja and system libraries (headless)",
+            "description": "Test using Ninja, without the GUI",
             "configurePreset": "ninja-headless"
         },
         {
+            "name": "vs",
+            "description": "Test using Visual Studio",
+            "configurePreset": "vs"
+        },
+        {
             "name": "vs-headless",
-            "description": "Test using Visual Studio (headless)",
+            "description": "Test using Visual Studio, without the GUI",
             "configurePreset": "vs-headless"
         }
     ]

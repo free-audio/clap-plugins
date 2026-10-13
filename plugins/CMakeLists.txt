@@ -1,26 +1,9 @@
-set(CLAP_PLUGINS_EMBED_QML TRUE CACHE BOOL "Embed QML resources into the plugin")
 set(CLAP_PLUGINS_HEADLESS FALSE CACHE BOOL "Compile the plugins without a GUI")
-set(CLAP_PLUGINS_GUI "qt" CACHE STRING "GUI implementation: qt, or imgui (experimental)")
-set_property(CACHE CLAP_PLUGINS_GUI PROPERTY STRINGS qt imgui)
 
 if(CLAP_PLUGINS_HEADLESS)
   add_compile_definitions(CLAP_PLUGINS_HEADLESS)
-elseif(CLAP_PLUGINS_GUI STREQUAL "imgui")
-  add_compile_definitions(CLAP_PLUGINS_GUI_IMGUI)
-  add_subdirectory(gui)
-elseif(CLAP_PLUGINS_GUI STREQUAL "qt")
-  set(CMAKE_AUTOMOC ON)
-  find_package(Qt6 COMPONENTS Gui Qml Quick REQUIRED)
-  add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)
-
-  if(CLAP_PLUGINS_EMBED_QML)
-    add_compile_definitions(CLAP_PLUGINS_EMBED_QML)
-  endif()
-
-  add_subdirectory(io)
-  add_subdirectory(gui)
 else()
-  message(FATAL_ERROR "Unknown CLAP_PLUGINS_GUI: ${CLAP_PLUGINS_GUI}")
+  add_subdirectory(gui)
 endif()
 
 add_library(
@@ -57,8 +40,6 @@ add_library(
   parameter.hh
   parameters.cc
   parameters.hh
-  path-provider.cc
-  path-provider.hh
   plugs/adsr/adsr-plug.cc
   plugs/adsr/adsr-plug.hh
   plugs/char-check/char-check.cc
@@ -117,12 +98,8 @@ target_compile_definitions(clap-plugins-core PUBLIC _USE_MATH_DEFINES)
 set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
 set_target_properties(clap-plugins-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
-if(CLAP_PLUGINS_HEADLESS)
-elseif(CLAP_PLUGINS_GUI STREQUAL "imgui")
-  target_link_libraries(clap-plugins-core PUBLIC clap-plugin-imgui-gui)
-else()
-  target_compile_definitions(clap-plugins-core PUBLIC CLAP_LOCAL_GUI)
-  target_link_libraries(clap-plugins-core PUBLIC clap-plugin-local-gui clap-io clap-plugin-gui-common)
+if(NOT CLAP_PLUGINS_HEADLESS)
+  target_link_libraries(clap-plugins-core PUBLIC clap-plugins-gui)
 endif()
 
 target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
@@ -152,12 +129,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 install(TARGETS clap-plugins DESTINATION "lib/clap" COMPONENT plugins)
-
-if(NOT CLAP_PLUGINS_HEADLESS AND CLAP_PLUGINS_GUI STREQUAL "qt" AND NOT CLAP_PLUGINS_EMBED_QML)
-  install(DIRECTORY gui/qml
-    DESTINATION "lib/clap-plugins"
-    PATTERN CMakeLists.txt EXCLUDE)
-endif()
 
 # CLAP_BUILD_TESTS is inherited from clap
 if (${CLAP_BUILD_TESTS})

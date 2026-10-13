@@ -45,7 +45,7 @@ namespace clap {
    template <bool IsDynamic>
    MiniCurveDisplay<IsDynamic>::MiniCurveDisplay(const std::string &pluginPath,
                                                  const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "mini-curve-display"), descriptor(), host) {
+      : CorePlugin("mini-curve-display", descriptor(), host) {
       _rootModule = std::make_unique<MiniCurveDisplayModule<IsDynamic>>(*this);
    }
 

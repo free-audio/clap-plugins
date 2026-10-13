@@ -32,7 +32,7 @@ namespace clap {
    }
 
    ProjectLocation::ProjectLocation(const std::string &pluginPath, const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "track-info"), descriptor(), host) {
+      : CorePlugin("track-info", descriptor(), host) {
       _rootModule = std::make_unique<LocationModule>(*this);
    }
 

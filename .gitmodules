@@ -4,9 +4,6 @@
 [submodule "clap-helpers"]
 	path = clap-helpers
 	url = ../clap-helpers
-[submodule "vcpkg"]
-	path = vcpkg
-	url = ../../microsoft/vcpkg
 [submodule "yas"]
 	path = yas
 	url = ../../niXman/yas.git

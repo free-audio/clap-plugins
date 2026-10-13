@@ -11,15 +11,12 @@
 #include <clap/helpers/reducing-param-queue.hxx>
 
 #include "context.hh"
-#include "gui/abstract-gui-factory.hh"
 #include "gui/abstract-gui-listener.hh"
-#include "gui/threaded-gui-listener-proxy.hh"
-#if !defined(CLAP_PLUGINS_HEADLESS) && defined(CLAP_PLUGINS_GUI_IMGUI)
+#ifndef CLAP_PLUGINS_HEADLESS
 #   include "gui/wayland-floating.h"
 #endif
 #include "intrusive-list.hh"
 #include "parameters.hh"
-#include "path-provider.hh"
 #include "tuning-provider.hh"
 
 #include "modules/root-module.hh"
@@ -31,8 +28,7 @@ namespace clap {
    extern template class helpers::Plugin<helpers::MisbehaviourHandler::Terminate,
                                          helpers::CheckingLevel::Maximal>;
 
-   class AbstractGui;
-   class AbstractGuiFactory;
+   class ImGuiGui;
    class Module;
    class VoiceExpanderModule;
 
@@ -49,12 +45,10 @@ namespace clap {
    public:
       friend class Module;
 
-      CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
-                 const clap_plugin_descriptor *desc,
-                 const clap_host &host);
+      // skinName selects how the GUI looks, see gui/skins.cc
+      CorePlugin(std::string skinName, const clap_plugin_descriptor *desc, const clap_host &host);
       ~CorePlugin() override;
 
-      const PathProvider &pathProvider() const noexcept { return *_pathProvider; }
       const TuningProvider &tuningProvider() const noexcept { return _tuningProvider; }
 
       auto& host() const noexcept { return _host; }
@@ -181,9 +175,7 @@ namespace clap {
       //-----------------//
       bool implementsGui() const noexcept override;
       bool guiIsApiSupported(const char *api, bool isFloating) noexcept override;
-#   ifdef CLAP_PLUGINS_GUI_IMGUI
       bool guiGetPreferredApi(const char **api, bool *isFloating) noexcept override;
-#   endif
       bool guiCreate(const char *api, bool isFloating) noexcept override;
       bool guiSetParent(const clap_window *window) noexcept override;
       bool guiSetTransient(const clap_window *window) noexcept override;
@@ -200,6 +192,9 @@ namespace clap {
       void guiSubscribeUndo();
       void guiUnsubscribeUndo();
       virtual void guiPopulateProperties() {}
+
+      // A value which the skin can show, see ImGuiGui::property()
+      void guiSetProperty(const std::string &name, const InvocationArgumentType &value);
 
       // For the experimental extensions
       const void *extension(const char *id) noexcept override;
@@ -318,7 +313,7 @@ namespace clap {
       helpers::ParamQueue<GuiToPluginEvent, 32> _guiToPluginQueue;
       helpers::ReducingParamQueue<clap_id, PluginToGuiValue> _pluginToGuiQueue;
 
-      std::unique_ptr<PathProvider> _pathProvider;
+      const std::string _skinName;
 
       bool _hasTrackInfo = false;
       clap_track_info _trackInfo;
@@ -332,13 +327,8 @@ namespace clap {
 
 #ifndef CLAP_PLUGINS_HEADLESS
       clap_id _guiTimerId = CLAP_INVALID_ID;
-      std::shared_ptr<AbstractGuiFactory> _guiFactory;
-      std::unique_ptr<GuiHandle> _guiHandle;
-#   ifdef CLAP_PLUGINS_GUI_IMGUI
+      std::unique_ptr<ImGuiGui> _gui;
       static const clap_plugin_gui_wayland _guiWayland;
-#   else
-      std::unique_ptr<ThreadedGuiListenerProxy> _threadedGuiListenerProxy;
-#   endif
 #endif
 
       Parameters _parameters;

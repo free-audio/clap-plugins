@@ -5,10 +5,9 @@
 # stable/xdg-shell/xdg-shell.xml
 function(target_wayland_protocols target)
   find_package(PkgConfig REQUIRED)
+  # 1.32: cursor-shape
+  pkg_check_modules(WAYLAND_PROTOCOLS REQUIRED wayland-protocols>=1.32)
   pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
-  if(NOT WAYLAND_PROTOCOLS_DIR)
-    message(FATAL_ERROR "wayland-protocols not found")
-  endif()
   find_program(WAYLAND_SCANNER wayland-scanner REQUIRED)
 
   set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/wayland-protocols)

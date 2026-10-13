@@ -13,7 +13,7 @@ namespace clap {
 
    // Listener for events produced by the Gui, to the destination of the plugin.
    //
-   // Beaware that the callbacks happen on the plugin's GUI thread, not the host's main thread.
+   // The callbacks happen on the main thread.
    class AbstractGuiListener {
    public:
       virtual ~AbstractGuiListener();

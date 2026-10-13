@@ -1,131 +1,132 @@
-- [Example Clap Plugins](#example-clap-plugins)
-  - [Notes on GUI, static build vs dynamic build and symbols](#notes-on-gui-static-build-vs-dynamic-build-and-symbols)
-- [Building on various platforms](#building-on-various-platforms)
-  - [Headless](#headless)
-  - [macOS with vcpkg](#macos-with-vcpkg)
+- [Example CLAP Plugins](#example-clap-plugins)
+  - [The GUI](#the-gui)
+  - [Notes on distributing a plugin](#notes-on-distributing-a-plugin)
+- [Building](#building)
+  - [Linux](#linux)
+  - [macOS](#macos)
   - [Windows](#windows)
-    - [Enable long path support](#enable-long-path-support)
-    - [Build](#build)
-  - [Linux, using vcpkg (static)](#linux-using-vcpkg-static)
-  - [Linux, ImGui GUI in a floating Wayland window (experimental)](#linux-imgui-gui-in-a-floating-wayland-window-experimental)
+  - [Without GUI](#without-gui)
+  - [Installing](#installing)
+- [Trying the GUIs on Linux](#trying-the-guis-on-linux)
 
-# Example Clap Plugins
+# Example CLAP Plugins
 
 This repo serves as an example to demonstrate how to create a CLAP plugin.
 
 <br/><a href="https://repology.org/project/clap-plugins/versions" target="_blank" rel="noopener" title="Packaging status"><img src="https://repology.org/badge/vertical-allrepos/clap-plugins.svg"></a>
 
-## Notes on GUI, static build vs dynamic build and symbols
+## The GUI
 
-The plugins use Qt for the GUI.
+The GUI is written with [Dear ImGui](https://github.com/ocornut/imgui), which is a submodule,
+and rendered in software into a pixel buffer. It doesn't need any library besides the system ones,
+nor any GPU context: each platform only has to show the pixels and to report the mouse events.
 
-It is fine to dynamically link to Qt for a host, but it is very dangerous for a plugin.
+| Platform | Window API | Embedded | Floating |
+|----------|------------|----------|----------|
+| Linux    | X11        | yes      | yes      |
+| Linux    | Wayland    | no       | yes, experimental, see [`wayland-floating.h`](plugins/gui/wayland-floating.h) |
+| Windows  | Win32      | yes      | no       |
+| macOS    | Cocoa      | yes      | no       |
 
-Also one very important aspect of the plugin is the distribution.
-Ideally a clap plugin should be self contained: it should not rely upon symbols from the host,
-and it should export only one symbol: `clap_entry`.
+Everything runs on the main thread. On Linux, the host's timer drives the GUI
+([`clap.timer-support`](https://github.com/free-audio/clap/blob/main/include/clap/ext/timer-support.h));
+on Windows and macOS, the window has its own timer.
 
-You should be aware that even if you hide all your symbols some may still remain visible
-at unexpected places. Objective-C seems to register every classes including those coming from
-plugins in a **flat namespace**. Which means that if two plugins define two different
-Objective-C classes but with the same, they will clash which will result in undeflined behavior.
+The skins, one per plugin, are in [`skins.cc`](plugins/gui/skins.cc).
+The plugins without a skin show a knob per parameter.
 
-Qt uses a few Objective-C classes on macOS. So it is crucial to use `QT_NAMESPACE`.
+There is no keyboard input yet.
 
-We abstracted the relation between the plugin and the GUI:
-[`AbstractGui`](plugins/gui/abstract-gui.hh) and [`AbstractGuiListener`](plugins/gui/abstract-gui-listener.hh)
-which lets us transparently insert proxies.
+## Notes on distributing a plugin
 
-The GUI itself work with proxy objects to the parameters, transport info, ...
-They are then bound into QML objects.
-See [`Knob.qml`](plugins/gui/qml/clap/Knob.qml) and [`parameter-proxy.hh`](plugins/gui/parameter-proxy.hh).
+A CLAP plugin should be self-contained: it should not rely upon symbols from the host, and it
+should export only one symbol: `clap_entry`.
 
-# Building on various platforms
+Even if you hide all your symbols, some may remain visible at unexpected places:
+- Objective-C registers every class, including those coming from plugins, in a **flat namespace**.
+  If two plugins define different classes with the same name, they clash, which results in
+  undefined behavior. That's why our `NSView` subclass is created at runtime, with a name unique to
+  the plugin's binary.
+- Xlib's error handlers are process-wide, a plugin would replace the host's ones.
+  That's why we use XCB on X11.
+- Wayland objects belong to a connection: the plugin opens its own one rather than sharing the
+  host's, see [`wayland-floating.h`](plugins/gui/wayland-floating.h).
 
-## Headless
+# Building
 
-This build variant doesn't include the GUI and is **much** faster to build due to the lack of dependencies.
+You need CMake 3.17 or newer, a C++20 compiler, and the submodules:
 
 ```bash
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins
 cd clap-plugins
-cmake --preset ninja-headless
-cmake --build --preset ninja-headless
 ```
 
-## macOS with vcpkg
+The plugins are then in `builds/<preset>/plugins/Release/clap-plugins.clap`.
 
-```shell
-# Install build tools
-brew install cmake ninja autoconf automake pkg-config libtool
+## Linux
 
-# Checkout the code
-git clone --recurse-submodules https://github.com/free-audio/clap-plugins
-cd clap-plugins
-scripts/build-gui.sh
+The GUI needs `libwayland-client` 1.22 or newer, `wayland-protocols` 1.32 or newer, and `libxcb`,
+for example Ubuntu 24.04 or newer.
+
+```bash
+# on ubuntu, adapt to your distribution and package manager
+sudo apt install git ninja-build cmake pkg-config g++ libwayland-dev wayland-protocols libxcb1-dev
+
+# on archlinux, adapt to your distribution and package manager
+sudo pacman -S git ninja cmake pkgconf wayland wayland-protocols libxcb
+
+cmake --preset ninja
+cmake --build --preset ninja --config Release
+```
+
+## macOS
+
+Install the Xcode command line tools, then:
+
+```bash
+brew install cmake ninja
+
+cmake --preset ninja
+cmake --build --preset ninja --config Release
 ```
 
 ## Windows
 
-### Enable long path support
+Install **Visual Studio 2022**, with its C++ and CMake components. Then in a PowerShell:
 
-Make sure your system supports long paths. Run this in an administrator PowerShell:
-
-```powershell
-New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-```
-
-Reference: https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=powershell
-
-### Build
-
-Install **Visual Studio 2022**; you can install it from the **Microsoft Store**. It can also install **git** and **CMake** for you.
-
-Use the following command inside `Powershell`:
 ```ps1
-# Checkout the code very close to the root to avoid windows long path issues...
-cd c:\
-git clone --recurse-submodules https://github.com/free-audio/clap-plugins c-p
-cd c-p
-
-Powershell.exe -noexit -executionpolicy bypass -File .\scripts\build-gui.ps1
+cmake --preset vs
+cmake --build --preset vs --config Release
 ```
 
-## Linux, using vcpkg (static)
+## Without GUI
+
+The `ninja-headless` and `vs-headless` presets build the plugins without GUI:
 
 ```bash
-# on unbuntu, adapt to your distribution and package manager
-sudo apt install git ninja-build cmake
-
-# on archlinux, adapt to your distribution and package manager
-sudo pacman -S git ninja cmake
-
-git clone --recurse-submodules https://github.com/free-audio/clap-plugins
-cd clap-plugins
-scripts/build-gui.sh
+cmake --preset ninja-headless
+cmake --build --preset ninja-headless --config Release
 ```
 
-## Linux, ImGui GUI in a floating Wayland window (experimental)
+## Installing
 
-An experimental GUI, written with [Dear ImGui](https://github.com/ocornut/imgui) and rendered in software.
-It doesn't need Qt or vcpkg. It shows up in a floating Wayland window, which has its own connection
-to the compositor and stays above the host's window.
-The contract between the host and the plugin is described in [`wayland-floating.h`](plugins/gui/wayland-floating.h),
-and it is not part of CLAP.
+Copy `clap-plugins.clap` where the hosts look for plugins, for example `~/.clap` on Linux,
+`~/Library/Audio/Plug-Ins/CLAP` on macOS, or `%LOCALAPPDATA%\Programs\Common\CLAP` on Windows.
 
-So far, only the gain plugin has a skin; the other plugins show a knob per parameter.
+# Trying the GUIs on Linux
+
+[`clap-gui-host`](tools/gui-host/main.cc) is a minimal host, which only shows a plugin's GUI.
+It prints the parameter changes.
 
 ```bash
-# on archlinux, adapt to your distribution and package manager
-sudo pacman -S git ninja cmake wayland wayland-protocols
-
-git clone --recurse-submodules https://github.com/free-audio/clap-plugins
-cd clap-plugins
-cmake --preset ninja-imgui
-cmake --build --preset ninja-imgui --config Release
-
-# A minimal host, which implements the host side of the contract.
-# Click in its window to show or hide the plugin's window.
-builds/ninja-imgui/tools/wayland-host/Release/clap-wayland-host \
-  builds/ninja-imgui/plugins/Release/clap-plugins.clap com.github.free-audio.clap.gain
+builds/ninja/tools/gui-host/Release/clap-gui-host \
+  builds/ninja/plugins/Release/clap-plugins.clap com.github.free-audio.clap.synth
 ```
+
+By default it uses the plugin's preferred window API. The options:
+- `--x11` or `--wayland`: the window API
+- `--floating`: a floating window rather than an embedded one; Wayland is always floating.
+  Click in the host's window to show or hide the plugin's window.
+- `--scale <factor>`: the scale given to the plugin, for X11
+
+Without a plugin id, it shows the gain plugin. With an unknown one, it lists the plugins.

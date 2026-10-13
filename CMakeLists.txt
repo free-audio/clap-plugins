@@ -35,8 +35,8 @@ include_directories(yas/include)
 
 add_subdirectory(plugins)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT CLAP_PLUGINS_HEADLESS AND CLAP_PLUGINS_GUI STREQUAL "imgui")
-  add_subdirectory(tools/wayland-host)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT CLAP_PLUGINS_HEADLESS)
+  add_subdirectory(tools/gui-host)
 endif()
 
 ###########

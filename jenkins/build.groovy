@@ -14,11 +14,6 @@ pipeline {
             name: 'CLEAN_BUILD')
 
         booleanParam(
-            defaultValue: false,
-            description: 'Rebuilds VCPKG dependencies.',
-            name: 'REBUILD_VCPKG')
-
-        booleanParam(
             defaultValue: true,
             description: 'Check to enable Linux build',
             name: 'shouldBuildLinux')
@@ -51,28 +46,21 @@ pipeline {
                         }
                     }
                     options {
-                        timeout(time: 4, unit: 'HOURS')
+                        timeout(time: 1, unit: 'HOURS')
                     }
                     steps {
                         script {
                             if (params.CLEAN_BUILD) {
                                 sh 'rm -rf builds'
                             }
-                            if (params.REBUILD_VCPKG) {
-                                sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
-                            }
                         }
-                        sh 'scripts/build-gui.sh'
+                        sh 'cmake --preset ninja && cmake --build --preset ninja --config Release'
                     }
                     post {
                         always {
-                            zip zipFile: 'linux-vcpkg-logs.zip', archive: true, overwrite: true,
-                                glob: 'buildtrees/**/*.log, installed/vcpkg/issue_body.md',
-                                dir: 'vcpkg/'
-
                             zip zipFile: 'linux-clap-plugins.zip', archive: true, overwrite: true,
                                 glob: '*.clap',
-                                dir: 'builds/ninja-vcpkg/plugins/Release/'
+                                dir: 'builds/ninja/plugins/Release/'
                         }
                     }
                 }
@@ -86,29 +74,22 @@ pipeline {
                         label 'macos-build'
                     }
                     options {
-                        timeout(time: 4, unit: 'HOURS')
+                        timeout(time: 1, unit: 'HOURS')
                     }
                     steps {
                         script {
                             if (params.CLEAN_BUILD) {
                                 sh 'rm -rf builds'
                             }
-                            if (params.REBUILD_VCPKG) {
-                                sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
-                            }
                         }
-                        sh 'scripts/build-gui.sh'
+                        sh 'cmake --preset ninja && cmake --build --preset ninja --config Release'
                     }
                     post {
                         always {
-                            zip zipFile: 'macOS-vcpkg-logs.zip', archive: true, overwrite: true,
-                                glob: 'buildtrees/**/*.log, installed/vcpkg/issue_body.md',
-                                dir: 'vcpkg/'
-
                             // macOS produces a bundle which is a directory itself
                             zip zipFile: 'macOS-clap-plugins.zip', archive: true, overwrite: true,
                                 glob: '*.clap/**',
-                                dir: 'builds/ninja-vcpkg/plugins/Release/'
+                                dir: 'builds/ninja/plugins/Release/'
                         }
                     }
                 }
@@ -122,30 +103,16 @@ pipeline {
                         label 'windows-build'
                     }
                     options {
-                        timeout(time: 4, unit: 'HOURS')
+                        timeout(time: 1, unit: 'HOURS')
                     }
                     steps {
-                        // script {
-                        //     if (params.CLEAN_BUILD) {
-                        //         sh 'rm -rf builds'
-                        //     }
-                        //     if (params.REBUILD_VCPKG) {
-                        //         sh 'rm -rf vcpkg/{installed,buildtree} ~/.cache/vcpkg'
-                        //     }
-                        // }
-                        // sh 'scripts/build-gui.sh'
-
-                        powershell 'Powershell.exe -noexit -executionpolicy bypass -File ./scripts/build-gui.ps1'
+                        powershell 'cmake --preset vs; cmake --build --preset vs --config Release'
                     }
                     post {
                         always {
-                            zip zipFile: 'windows-vcpkg-logs.zip', archive: true, overwrite: true,
-                                glob: 'buildtrees/**/*.log, installed/vcpkg/issue_body.md',
-                                dir: 'vcpkg/'
-
                             zip zipFile: 'windows-clap-plugins.zip', archive: true, overwrite: true,
                                 glob: '*.clap',
-                                dir: 'builds/vs-vcpkg/plugins/Release/'
+                                dir: 'builds/vs/plugins/Release/'
                         }
                     }
                 }

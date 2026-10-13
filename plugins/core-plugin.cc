@@ -17,15 +17,8 @@
 #include "modules/voice-expander-module.hh"
 #include "stream-helper.hh"
 
-#include "gui/abstract-gui.hh"
-
 #ifndef CLAP_PLUGINS_HEADLESS
-#   ifdef CLAP_PLUGINS_GUI_IMGUI
-#      include "gui/imgui/imgui-gui-factory.hh"
-#   else
-#      include "gui/local-gui-factory.hh"
-#      include "gui/threaded-gui-factory.hh"
-#   endif
+#   include "gui/imgui-gui.hh"
 #endif
 
 namespace clap {
@@ -35,12 +28,10 @@ namespace clap {
    template class helpers::HostProxy<helpers::MisbehaviourHandler::Terminate,
                                      helpers::CheckingLevel::Maximal>;
 
-   CorePlugin::CorePlugin(std::unique_ptr<PathProvider> &&pathProvider,
+   CorePlugin::CorePlugin(std::string skinName,
                           const clap_plugin_descriptor *desc,
                           const clap_host &host)
-      : Plugin(desc, &host), _pathProvider(std::move(pathProvider)) {
-      assert(_pathProvider);
-   }
+      : Plugin(desc, &host), _skinName(std::move(skinName)) {}
 
    CorePlugin::~CorePlugin() = default;
 
@@ -69,8 +60,8 @@ namespace clap {
 
    void CorePlugin::guiDefineTrackInfo() noexcept {
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().updateTrackInfo(_hasTrackInfo, _trackInfo);
+      if (_gui)
+         _gui->updateTrackInfo(_hasTrackInfo, _trackInfo);
 #endif
    }
 
@@ -155,7 +146,7 @@ namespace clap {
       }
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
+      if (_gui)
          guiPopulateProperties();
 #endif
 
@@ -166,139 +157,76 @@ namespace clap {
    bool CorePlugin::implementsGui() const noexcept { return true; }
 
    bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept {
-#ifdef CLAP_PLUGINS_GUI_IMGUI
-#   ifdef __linux__
-      return isFloating && !strcmp(api, CLAP_WINDOW_API_WAYLAND);
-#   else
-      return false;
-#   endif
-#else
-      return true;
-#endif
+      return ImGuiGui::windowApi(api, isFloating).has_value();
    }
 
-#ifdef CLAP_PLUGINS_GUI_IMGUI
    bool CorePlugin::guiGetPreferredApi(const char **api, bool *isFloating) noexcept {
-#   ifdef __linux__
-      *api = CLAP_WINDOW_API_WAYLAND;
-      *isFloating = true;
+      ImGuiGui::preferredApi(api, isFloating);
       return true;
-#   else
-      return false;
-#   endif
    }
-#endif
 
    bool CorePlugin::guiCreate(const char *api, bool isFloating) noexcept {
-#ifdef CLAP_PLUGINS_GUI_IMGUI
-      // api may be blank for floating windows
-      if (!isFloating || (api && *api && !guiIsApiSupported(api, isFloating)))
+      const auto windowApi = ImGuiGui::windowApi(api, isFloating);
+      if (!windowApi)
          return false;
 
-      // The GUI has no event loop, it is driven by a timer on the main thread
-      if (!_host.canUseTimerSupport())
+      // On Linux, the GUI has no event loop: a timer drives it on the main thread
+      if (ImGuiGui::needsTimer() && !_host.canUseTimerSupport())
          return false;
 
-      _guiFactory = ImGuiGuiFactory::getInstance();
-      _guiHandle = _guiFactory->createGui(*this);
-      if (!_guiHandle)
-         return false;
-
-      if (!_host.timerSupportRegister(1000 / 60, &_guiTimerId)) {
-         _guiHandle.reset();
-         return false;
-      }
-#else
-      _guiFactory = LocalGuiFactory::getInstance();
-      if (_guiFactory) {
-         _guiHandle = _guiFactory->createGui(*this);
-      } else {
-         _guiFactory = ThreadedGuiFactory::getInstance();
-         if (!_threadedGuiListenerProxy)
-            _threadedGuiListenerProxy = std::make_unique<ThreadedGuiListenerProxy>(*this);
-         _guiHandle = _guiFactory->createGui(*_threadedGuiListenerProxy);
-      }
-
-      if (!_guiHandle)
-         return false;
-#endif
+      _gui = std::make_unique<ImGuiGui>(*this, *windowApi, isFloating);
 
       guiDefineParameters();
       guiDefineTrackInfo();
       guiSubscribeUndo();
       guiPopulateProperties();
 
-      _guiHandle->gui().setCanRedo(_canRedo);
-      _guiHandle->gui().setCanUndo(_canUndo);
-      _guiHandle->gui().setRedoName(_redoName.value_or("(none)"));
-      _guiHandle->gui().setUndoName(_undoName.value_or("(none)"));
+      _gui->setCanRedo(_canRedo);
+      _gui->setCanUndo(_canUndo);
+      _gui->setRedoName(_redoName.value_or("(none)"));
+      _gui->setUndoName(_undoName.value_or("(none)"));
 
-#ifdef CLAP_PLUGINS_GUI_IMGUI
-      _guiHandle->gui().setSkin(_pathProvider->pluginName());
-      _guiHandle->gui().setTitle(clapPlugin()->desc->name);
-      if (!_guiHandle->gui().openWindow()) {
+      // After the parameters, the generic skin's size depends on them
+      _gui->setSkin(_skinName);
+      _gui->setTitle(clapPlugin()->desc->name);
+
+      if (isFloating && !_gui->openWindow()) {
          guiDestroy();
          return false;
       }
-#else
-      auto skinPath = _pathProvider->getQmlSkinPath();
-      _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
-      _guiHandle->gui().setSkin(skinPath);
-#endif
+
+      if (ImGuiGui::needsTimer() && !_host.timerSupportRegister(1000 / 60, &_guiTimerId)) {
+         guiDestroy();
+         return false;
+      }
 
       return true;
    }
 
    bool CorePlugin::guiSetParent(const clap_window *window) noexcept {
-      if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
-         return _guiHandle->gui().attachCocoa(window->cocoa);
-
-      if (!strcmp(CLAP_WINDOW_API_WIN32, window->api))
-         return _guiHandle->gui().attachWin32(window->win32);
-
-      if (!strcmp(CLAP_WINDOW_API_X11, window->api))
-         return _guiHandle->gui().attachX11(window->x11);
-
-      return false;
+      return _gui->attach(*window);
    }
 
    bool CorePlugin::guiSetTransient(const clap_window *window) noexcept {
-      if (!_guiHandle->gui().openWindow())
-         return false;
-
-      if (!window)
-         return true;
-
-      if (!strcmp(CLAP_WINDOW_API_COCOA, window->api))
-         _guiHandle->gui().setTransientCocoa(window->cocoa);
-      else if (!strcmp(CLAP_WINDOW_API_WIN32, window->api))
-         _guiHandle->gui().setTransientWin32(window->win32);
-      else if (!strcmp(CLAP_WINDOW_API_X11, window->api))
-         _guiHandle->gui().setTransientX11(window->x11);
-      else if (!strcmp(CLAP_WINDOW_API_WAYLAND, window->api))
-         _guiHandle->gui().setTransientWayland(static_cast<const char *>(window->ptr));
-
-      return true;
+      return _gui->setTransient(*window);
    }
 
    void CorePlugin::guiSuggestTitle(const char *title) noexcept {
-      if (_guiHandle && title)
-         _guiHandle->gui().setTitle(title);
+      if (_gui && title)
+         _gui->setTitle(title);
    }
 
-#ifdef CLAP_PLUGINS_GUI_IMGUI
    const clap_plugin_gui_wayland CorePlugin::_guiWayland = {
       .set_activation_token =
          [](const clap_plugin *plugin, const char *token) {
             auto &self = static_cast<CorePlugin &>(from(plugin));
-            if (self._guiHandle)
-               self._guiHandle->gui().setWaylandActivationToken(token);
+            if (self._gui)
+               self._gui->setActivationToken(token);
          },
    };
-#endif
 
    const void *CorePlugin::extension(const char *id) noexcept {
-#ifdef CLAP_PLUGINS_GUI_IMGUI
+#ifdef __linux__
       if (!strcmp(id, CLAP_EXT_GUI_WAYLAND))
          return &_guiWayland;
 #endif
@@ -308,21 +236,25 @@ namespace clap {
    void CorePlugin::guiDefineParameters() {
       for (int i = 0; i < paramsCount(); ++i) {
          auto p = _parameters.getByIndex(i);
-         _guiHandle->gui().defineParameter(p->info());
-         _guiHandle->gui().updateParameter(p->info().id, p->value(), p->modulation());
+         _gui->defineParameter(p->info());
+         _gui->updateParameter(p->info().id, p->value(), p->modulation());
 
          if (p->hasMappingIndication())
-            _guiHandle->gui().setParameterMappingIndication(
-               p->info().id,
-               true,
-               p->mappingIndicationColor(),
-               p->mappingIndicationLabel().c_str(),
-               p->mappingIndicationDescription().c_str());
+            _gui->setParameterMappingIndication(p->info().id,
+                                                true,
+                                                p->mappingIndicationColor(),
+                                                p->mappingIndicationLabel().c_str(),
+                                                p->mappingIndicationDescription().c_str());
 
          if (p->automationIndicationState() != CLAP_PARAM_INDICATION_AUTOMATION_NONE)
-            _guiHandle->gui().setParameterAutomationIndication(
+            _gui->setParameterAutomationIndication(
                p->info().id, p->automationIndicationState(), p->automationIndicationColor());
       }
+   }
+
+   void CorePlugin::guiSetProperty(const std::string &name, const InvocationArgumentType &value) {
+      if (_gui)
+         _gui->setProperty(name, value);
    }
 
    void CorePlugin::guiDestroy() noexcept {
@@ -333,42 +265,42 @@ namespace clap {
          _guiTimerId = CLAP_INVALID_ID;
       }
 
-      _guiHandle.reset();
+      _gui.reset();
    }
 
    void CorePlugin::onTimer(clap_id timerId) noexcept {
-      if (timerId == _guiTimerId && _guiHandle)
-         _guiHandle->gui().onTimer();
+      if (timerId == _guiTimerId && _gui)
+         _gui->onTimer();
    }
 
    bool CorePlugin::guiGetSize(uint32_t *width, uint32_t *height) noexcept {
-      if (!_guiHandle)
+      if (!_gui)
          return false;
-      return _guiHandle->gui().getSize(width, height);
+      return _gui->getSize(width, height);
    }
 
    bool CorePlugin::guiAdjustSize(uint32_t *width, uint32_t *height) noexcept {
-      if (!_guiHandle)
+      if (!_gui)
          return false;
-      return _guiHandle->gui().roundSize(width, height);
+      return _gui->roundSize(width, height);
    }
 
    bool CorePlugin::guiSetSize(uint32_t width, uint32_t height) noexcept {
-      if (!_guiHandle)
+      if (!_gui)
          return false;
-      return _guiHandle->gui().setSize(width, height);
+      return _gui->setSize(width, height);
    }
 
    bool CorePlugin::guiSetScale(double scale) noexcept {
-      if (!_guiHandle)
+      if (!_gui)
          return false;
-      return _guiHandle->gui().setScale(scale);
+      return _gui->setScale(scale);
    }
 
    bool CorePlugin::guiShow() noexcept {
-      if (!_guiHandle)
+      if (!_gui)
          return false;
-      if (!_guiHandle->gui().show())
+      if (!_gui->show())
          return false;
 
       guiSubscribeUndo();
@@ -376,9 +308,9 @@ namespace clap {
    }
 
    bool CorePlugin::guiHide() noexcept {
-      if (!_guiHandle)
+      if (!_gui)
          return false;
-      if (!_guiHandle->gui().hide())
+      if (!_gui->hide())
          return false;
 
       guiUnsubscribeUndo();
@@ -404,11 +336,11 @@ namespace clap {
 
    void CorePlugin::onGuiPoll() {
       _pluginToGuiQueue.consume([this](clap_id paramId, const CorePlugin::PluginToGuiValue &value) {
-         _guiHandle->gui().updateParameter(paramId, value.value, value.mod);
+         _gui->updateParameter(paramId, value.value, value.mod);
       });
 
       if (_isGuiTransportSubscribed && _hasTransportCopy) {
-         _guiHandle->gui().updateTransport(_transportCopy);
+         _gui->updateTransport(_transportCopy);
          _hasTransportCopy = false;
       }
 
@@ -1050,8 +982,8 @@ namespace clap {
          param->clearMappingIndication();
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().setParameterMappingIndication(
+      if (_gui)
+         _gui->setParameterMappingIndication(
             param_id, has_mapping, c, label ? label : "", description ? description : "");
 #endif
    }
@@ -1067,8 +999,8 @@ namespace clap {
       param->setAutomationIndication(automation_state, c);
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().setParameterAutomationIndication(param_id, automation_state, c);
+      if (_gui)
+         _gui->setParameterAutomationIndication(param_id, automation_state, c);
 #endif
    }
 
@@ -1085,8 +1017,8 @@ namespace clap {
       _canUndo = can_undo;
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().setCanUndo(can_undo);
+      if (_gui)
+         _gui->setCanUndo(can_undo);
 #endif
 
       if (!can_undo)
@@ -1097,8 +1029,8 @@ namespace clap {
       _canRedo = can_redo;
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().setCanRedo(can_redo);
+      if (_gui)
+         _gui->setCanRedo(can_redo);
 #endif
 
       if (!can_redo)
@@ -1112,8 +1044,8 @@ namespace clap {
          _undoName.reset();
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().setUndoName(_undoName.value_or("(none)"));
+      if (_gui)
+         _gui->setUndoName(_undoName.value_or("(none)"));
 #endif
    }
 
@@ -1124,8 +1056,8 @@ namespace clap {
          _redoName.reset();
 
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().setRedoName(_redoName.value_or("(none)"));
+      if (_gui)
+         _gui->setRedoName(_redoName.value_or("(none)"));
 #endif
    }
 } // namespace clap

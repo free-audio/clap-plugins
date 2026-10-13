@@ -34,7 +34,7 @@ struct zxdg_toplevel_decoration_v1;
 namespace clap {
 
    // A floating window, with its own connection to the compositor.
-   // See wayland-floating.h for the contract with the host.
+   // See clap-wayland-experiment for the contract with the host.
    class WaylandWindow final : public PlatformWindow {
    public:
       explicit WaylandWindow(Listener &listener);
@@ -43,7 +43,8 @@ namespace clap {
       // Connects to the compositor and creates the window, without showing it
       [[nodiscard]] bool open();
 
-      // Keeps the window above the host's window, exported with xdg-foreign
+      // Keeps the window above the host's window, exported with xdg-foreign.
+      // NULL removes the parent.
       bool setTransient(const char *exportedHandle);
 
       // xdg-activation token, used the next time the window is shown

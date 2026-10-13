@@ -35,7 +35,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # 1.22: wl_surface.preferred_buffer_scale
   pkg_check_modules(WAYLAND_CLIENT REQUIRED IMPORTED_TARGET wayland-client>=1.22)
   pkg_check_modules(XCB REQUIRED IMPORTED_TARGET xcb)
-  target_sources(clap-plugins-gui PRIVATE wayland-floating.h wayland-window.hh wayland-window.cc
+  target_sources(clap-plugins-gui PRIVATE wayland-window.hh wayland-window.cc
                                           x11-window.hh x11-window.cc)
   target_wayland_protocols(
     clap-plugins-gui

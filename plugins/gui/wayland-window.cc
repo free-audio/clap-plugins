@@ -372,10 +372,15 @@ namespace clap {
    }
 
    bool WaylandWindow::setTransient(const char *exportedHandle) {
-      if (!_importer || !_toplevel || !exportedHandle)
+      if (!_importer || !_toplevel)
          return false;
 
       destroyImported();
+      if (!exportedHandle) {
+         flush();
+         return true;
+      }
+
       _imported = zxdg_importer_v2_import_toplevel(_importer, exportedHandle);
       zxdg_imported_v2_add_listener(_imported, &importedListener, this);
       zxdg_imported_v2_set_parent_of(_imported, _surface);

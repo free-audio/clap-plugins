@@ -99,7 +99,7 @@ set_target_properties(clap-plugins-core PROPERTIES CXX_STANDARD 20)
 set_target_properties(clap-plugins-core PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 if(NOT CLAP_PLUGINS_HEADLESS)
-  target_link_libraries(clap-plugins-core PUBLIC clap-plugins-gui)
+  target_link_libraries(clap-plugins-core PUBLIC clap-plugins-gui clap-wayland-experiment)
 endif()
 
 target_link_libraries(clap-plugins-core PUBLIC clap-helpers)

@@ -83,7 +83,7 @@ namespace clap {
       if (!strcmp(api, CLAP_WINDOW_API_X11))
          return WindowApi::X11;
 
-      // Wayland can't embed a window from another connection, see wayland-floating.h
+      // Wayland can't embed a window from another connection, see clap-wayland-experiment
       if (isFloating && !strcmp(api, CLAP_WINDOW_API_WAYLAND))
          return WindowApi::Wayland;
 #elif defined(_WIN32)
@@ -397,14 +397,19 @@ namespace clap {
 
    bool ImGuiGui::setTransient(const clap_window &parent) {
 #ifdef __linux__
-      if (_waylandWindow && isApi(parent, CLAP_WINDOW_API_WAYLAND))
-         return _waylandWindow->setTransient(static_cast<const char *>(parent.ptr));
-
       if (_x11Window && _isFloating && isApi(parent, CLAP_WINDOW_API_X11))
          return _x11Window->setTransient(parent.x11);
 #endif
 
       return false;
+   }
+
+   bool ImGuiGui::setWaylandTransient(const char *handle) {
+#ifdef __linux__
+      return _waylandWindow && _waylandWindow->setTransient(handle);
+#else
+      return false;
+#endif
    }
 
    void ImGuiGui::setActivationToken(const char *token) {

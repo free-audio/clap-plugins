@@ -7,7 +7,7 @@
 // plugin the desktop's scale, unless --scale overrides it. The plugin's GUI is
 // embedded into the host's window, or floats above it; then clicking the host's window shows
 // or hides the plugin's window. With Wayland, the GUI is always floating, see
-// plugins/gui/wayland-floating.h.
+// clap-wayland-experiment.
 //
 // It only shows the GUI: the plugin isn't activated, and the parameter changes are flushed with
 // clap_plugin_params.flush() and printed.
@@ -30,11 +30,11 @@
 #include <unistd.h>
 
 #include <clap/clap.h>
+#include <clap/ext/draft/wayland-experiment.h>
 #include <wayland-client.h>
 #include <xcb/xcb.h>
 
 #include "cursor-shape-v1-client-protocol.h"
-#include "wayland-floating.h"
 #include "xdg-activation-v1-client-protocol.h"
 #include "xdg-decoration-unstable-v1-client-protocol.h"
 #include "xdg-foreign-unstable-v2-client-protocol.h"
@@ -76,6 +76,9 @@ namespace {
       // For clap_plugin_gui.set_parent() and set_transient()
       virtual clap_window clapWindow() const = 0;
 
+      // For clap_plugin_gui_xdg_foreign_v2.set_transient(), with Wayland
+      virtual const char *xdgForeignHandle() const { return nullptr; }
+
       virtual void resize(uint32_t width, uint32_t height) = 0;
 
       // The scale which the host gives to the plugin, 0 for none.
@@ -102,6 +105,9 @@ namespace {
 
       bool open(const char *title) override;
       clap_window clapWindow() const override;
+      const char *xdgForeignHandle() const override {
+         return _exportedHandle.empty() ? nullptr : _exportedHandle.c_str();
+      }
       void resize(uint32_t width, uint32_t height) override {}
       void dispatch(int timeoutMs) override;
 
@@ -257,10 +263,11 @@ namespace {
       return _isOpen;
    }
 
+   // clap_window has nothing for Wayland, see xdgForeignHandle()
    clap_window WaylandHostWindow::clapWindow() const {
       clap_window window;
       window.api = CLAP_WINDOW_API_WAYLAND;
-      window.ptr = _exportedHandle.empty() ? nullptr : const_cast<char *>(_exportedHandle.c_str());
+      window.ptr = nullptr;
       return window;
    }
 
@@ -737,7 +744,8 @@ namespace {
       const clap_plugin_entry *_entry = nullptr;
       const clap_plugin *_plugin = nullptr;
       const clap_plugin_gui *_pluginGui = nullptr;
-      const clap_plugin_gui_wayland *_pluginGuiWayland = nullptr;
+      const clap_plugin_gui_xdg_foreign_v2 *_pluginXdgForeign = nullptr;
+      const clap_plugin_gui_xdg_activation_v1 *_pluginXdgActivation = nullptr;
       const clap_plugin_params *_pluginParams = nullptr;
       const clap_plugin_timer_support *_pluginTimerSupport = nullptr;
       bool _isGuiCreated = false;
@@ -893,8 +901,10 @@ namespace {
       }
 
       _pluginGui = static_cast<const clap_plugin_gui *>(_plugin->get_extension(_plugin, CLAP_EXT_GUI));
-      _pluginGuiWayland = static_cast<const clap_plugin_gui_wayland *>(
-         _plugin->get_extension(_plugin, CLAP_EXT_GUI_WAYLAND));
+      _pluginXdgForeign = static_cast<const clap_plugin_gui_xdg_foreign_v2 *>(
+         _plugin->get_extension(_plugin, CLAP_EXT_GUI_XDG_FOREIGN_V2));
+      _pluginXdgActivation = static_cast<const clap_plugin_gui_xdg_activation_v1 *>(
+         _plugin->get_extension(_plugin, CLAP_EXT_GUI_XDG_ACTIVATION_V1));
       _pluginParams =
          static_cast<const clap_plugin_params *>(_plugin->get_extension(_plugin, CLAP_EXT_PARAMS));
       _pluginTimerSupport = static_cast<const clap_plugin_timer_support *>(
@@ -953,8 +963,18 @@ namespace {
 
       const clap_window window = _window->clapWindow();
       if (isFloating) {
-         if (window.ptr && !_pluginGui->set_transient(_plugin, &window))
+         // Wayland has its own extension
+         if (!strcmp(api, CLAP_WINDOW_API_WAYLAND)) {
+            if (const char *handle = _window->xdgForeignHandle()) {
+               if (!_pluginXdgForeign)
+                  std::cerr << "the plugin doesn't support " << CLAP_EXT_GUI_XDG_FOREIGN_V2
+                            << ", its window has no parent" << std::endl;
+               else if (!_pluginXdgForeign->set_transient(_plugin, handle))
+                  std::cerr << "the plugin refused the xdg-foreign handle" << std::endl;
+            }
+         } else if (!_pluginGui->set_transient(_plugin, &window))
             std::cerr << "the plugin refused the transient window" << std::endl;
+
          _pluginGui->suggest_title(_plugin, "Plugin (CLAP GUI Host)");
       } else {
          uint32_t width = 0;
@@ -996,8 +1016,8 @@ namespace {
    }
 
    void Host::showGui(const char *activationToken) {
-      if (activationToken && _pluginGuiWayland)
-         _pluginGuiWayland->set_activation_token(_plugin, activationToken);
+      if (activationToken && _pluginXdgActivation)
+         _pluginXdgActivation->set_activation_token(_plugin, activationToken);
 
       _isGuiVisible = _pluginGui->show(_plugin);
    }

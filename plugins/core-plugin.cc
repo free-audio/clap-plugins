@@ -207,6 +207,7 @@ namespace clap {
       return _gui->attach(*window);
    }
 
+   // Not for Wayland, which uses clap_plugin_gui_xdg_foreign_v2 instead
    bool CorePlugin::guiSetTransient(const clap_window *window) noexcept {
       return _gui->setTransient(*window);
    }
@@ -216,7 +217,15 @@ namespace clap {
          _gui->setTitle(title);
    }
 
-   const clap_plugin_gui_wayland CorePlugin::_guiWayland = {
+   const clap_plugin_gui_xdg_foreign_v2 CorePlugin::_guiXdgForeignV2 = {
+      .set_transient =
+         [](const clap_plugin *plugin, const char *handle) {
+            auto &self = static_cast<CorePlugin &>(from(plugin));
+            return self._gui && self._gui->setWaylandTransient(handle);
+         },
+   };
+
+   const clap_plugin_gui_xdg_activation_v1 CorePlugin::_guiXdgActivationV1 = {
       .set_activation_token =
          [](const clap_plugin *plugin, const char *token) {
             auto &self = static_cast<CorePlugin &>(from(plugin));
@@ -227,8 +236,10 @@ namespace clap {
 
    const void *CorePlugin::extension(const char *id) noexcept {
 #ifdef __linux__
-      if (!strcmp(id, CLAP_EXT_GUI_WAYLAND))
-         return &_guiWayland;
+      if (!strcmp(id, CLAP_EXT_GUI_XDG_FOREIGN_V2))
+         return &_guiXdgForeignV2;
+      if (!strcmp(id, CLAP_EXT_GUI_XDG_ACTIVATION_V1))
+         return &_guiXdgActivationV1;
 #endif
       return super::extension(id);
    }

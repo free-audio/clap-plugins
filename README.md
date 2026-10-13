@@ -24,7 +24,7 @@ nor any GPU context: each platform only has to show the pixels and to report the
 | Platform | Window API | Embedded | Floating |
 |----------|------------|----------|----------|
 | Linux    | X11        | yes      | yes      |
-| Linux    | Wayland    | no       | yes, experimental, see [`wayland-floating.h`](plugins/gui/wayland-floating.h) |
+| Linux    | Wayland    | no       | yes, experimental, see [clap-wayland-experiment](https://github.com/free-audio/clap-wayland-experiment) |
 | Windows  | Win32      | yes      | no       |
 | macOS    | Cocoa      | yes      | no       |
 
@@ -50,7 +50,9 @@ Even if you hide all your symbols, some may remain visible at unexpected places:
 - Xlib's error handlers are process-wide, a plugin would replace the host's ones.
   That's why we use XCB on X11.
 - Wayland objects belong to a connection: the plugin opens its own one rather than sharing the
-  host's, see [`wayland-floating.h`](plugins/gui/wayland-floating.h).
+  host's. The host and the plugin only exchange strings, the xdg-foreign handle and the
+  xdg-activation token, with the extensions from
+  [clap-wayland-experiment](https://github.com/free-audio/clap-wayland-experiment), a submodule.
 
 # Building
 

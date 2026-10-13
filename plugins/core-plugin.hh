@@ -13,7 +13,7 @@
 #include "context.hh"
 #include "gui/abstract-gui-listener.hh"
 #ifndef CLAP_PLUGINS_HEADLESS
-#   include "gui/wayland-floating.h"
+#   include <clap/ext/draft/wayland-experiment.h>
 #endif
 #include "intrusive-list.hh"
 #include "parameters.hh"
@@ -328,7 +328,9 @@ namespace clap {
 #ifndef CLAP_PLUGINS_HEADLESS
       clap_id _guiTimerId = CLAP_INVALID_ID;
       std::unique_ptr<ImGuiGui> _gui;
-      static const clap_plugin_gui_wayland _guiWayland;
+      // Floating windows on Wayland, see clap-wayland-experiment
+      static const clap_plugin_gui_xdg_foreign_v2 _guiXdgForeignV2;
+      static const clap_plugin_gui_xdg_activation_v1 _guiXdgActivationV1;
 #endif
 
       Parameters _parameters;

@@ -10,3 +10,6 @@
 [submodule "imgui"]
 	path = imgui
 	url = ../../ocornut/imgui.git
+[submodule "clap-wayland-experiment"]
+	path = clap-wayland-experiment
+	url = ../clap-wayland-experiment

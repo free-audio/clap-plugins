@@ -107,10 +107,14 @@ namespace clap {
       // Embedded windows: creates the window into the host's one
       [[nodiscard]] bool attach(const clap_window &parent);
 
-      // Floating windows: keeps the window above the host's one
+      // Floating windows: keeps the window above the host's one. Not for Wayland, which uses the
+      // following methods (see clap-wayland-experiment).
       bool setTransient(const clap_window &parent);
 
-      // Wayland, see wayland-floating.h
+      // clap_plugin_gui_xdg_foreign_v2: handle is from zxdg_exported_v2, NULL removes the parent
+      bool setWaylandTransient(const char *handle);
+
+      // clap_plugin_gui_xdg_activation_v1
       void setActivationToken(const char *token);
 
       bool isApiPhysical() const noexcept {

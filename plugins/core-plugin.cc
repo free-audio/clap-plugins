@@ -20,8 +20,12 @@
 #include "gui/abstract-gui.hh"
 
 #ifndef CLAP_PLUGINS_HEADLESS
-#   include "gui/local-gui-factory.hh"
-#   include "gui/threaded-gui-factory.hh"
+#   ifdef CLAP_PLUGINS_GUI_IMGUI
+#      include "gui/imgui/imgui-gui-factory.hh"
+#   else
+#      include "gui/local-gui-factory.hh"
+#      include "gui/threaded-gui-factory.hh"
+#   endif
 #endif
 
 namespace clap {
@@ -161,9 +165,50 @@ namespace clap {
 #ifndef CLAP_PLUGINS_HEADLESS
    bool CorePlugin::implementsGui() const noexcept { return true; }
 
-   bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept { return true; }
+   bool CorePlugin::guiIsApiSupported(const char *api, bool isFloating) noexcept {
+#ifdef CLAP_PLUGINS_GUI_IMGUI
+#   ifdef __linux__
+      return isFloating && !strcmp(api, CLAP_WINDOW_API_WAYLAND);
+#   else
+      return false;
+#   endif
+#else
+      return true;
+#endif
+   }
+
+#ifdef CLAP_PLUGINS_GUI_IMGUI
+   bool CorePlugin::guiGetPreferredApi(const char **api, bool *isFloating) noexcept {
+#   ifdef __linux__
+      *api = CLAP_WINDOW_API_WAYLAND;
+      *isFloating = true;
+      return true;
+#   else
+      return false;
+#   endif
+   }
+#endif
 
    bool CorePlugin::guiCreate(const char *api, bool isFloating) noexcept {
+#ifdef CLAP_PLUGINS_GUI_IMGUI
+      // api may be blank for floating windows
+      if (!isFloating || (api && *api && !guiIsApiSupported(api, isFloating)))
+         return false;
+
+      // The GUI has no event loop, it is driven by a timer on the main thread
+      if (!_host.canUseTimerSupport())
+         return false;
+
+      _guiFactory = ImGuiGuiFactory::getInstance();
+      _guiHandle = _guiFactory->createGui(*this);
+      if (!_guiHandle)
+         return false;
+
+      if (!_host.timerSupportRegister(1000 / 60, &_guiTimerId)) {
+         _guiHandle.reset();
+         return false;
+      }
+#else
       _guiFactory = LocalGuiFactory::getInstance();
       if (_guiFactory) {
          _guiHandle = _guiFactory->createGui(*this);
@@ -176,6 +221,7 @@ namespace clap {
 
       if (!_guiHandle)
          return false;
+#endif
 
       guiDefineParameters();
       guiDefineTrackInfo();
@@ -187,9 +233,18 @@ namespace clap {
       _guiHandle->gui().setRedoName(_redoName.value_or("(none)"));
       _guiHandle->gui().setUndoName(_undoName.value_or("(none)"));
 
+#ifdef CLAP_PLUGINS_GUI_IMGUI
+      _guiHandle->gui().setSkin(_pathProvider->pluginName());
+      _guiHandle->gui().setTitle(clapPlugin()->desc->name);
+      if (!_guiHandle->gui().openWindow()) {
+         guiDestroy();
+         return false;
+      }
+#else
       auto skinPath = _pathProvider->getQmlSkinPath();
       _guiHandle->gui().addImportPath(_pathProvider->getQmlLibraryPath());
       _guiHandle->gui().setSkin(skinPath);
+#endif
 
       return true;
    }
@@ -220,8 +275,34 @@ namespace clap {
          _guiHandle->gui().setTransientWin32(window->win32);
       else if (!strcmp(CLAP_WINDOW_API_X11, window->api))
          _guiHandle->gui().setTransientX11(window->x11);
+      else if (!strcmp(CLAP_WINDOW_API_WAYLAND, window->api))
+         _guiHandle->gui().setTransientWayland(static_cast<const char *>(window->ptr));
 
       return true;
+   }
+
+   void CorePlugin::guiSuggestTitle(const char *title) noexcept {
+      if (_guiHandle && title)
+         _guiHandle->gui().setTitle(title);
+   }
+
+#ifdef CLAP_PLUGINS_GUI_IMGUI
+   const clap_plugin_gui_wayland CorePlugin::_guiWayland = {
+      .set_activation_token =
+         [](const clap_plugin *plugin, const char *token) {
+            auto &self = static_cast<CorePlugin &>(from(plugin));
+            if (self._guiHandle)
+               self._guiHandle->gui().setWaylandActivationToken(token);
+         },
+   };
+#endif
+
+   const void *CorePlugin::extension(const char *id) noexcept {
+#ifdef CLAP_PLUGINS_GUI_IMGUI
+      if (!strcmp(id, CLAP_EXT_GUI_WAYLAND))
+         return &_guiWayland;
+#endif
+      return super::extension(id);
    }
 
    void CorePlugin::guiDefineParameters() {
@@ -246,7 +327,18 @@ namespace clap {
 
    void CorePlugin::guiDestroy() noexcept {
       guiUnsubscribeUndo();
+
+      if (_guiTimerId != CLAP_INVALID_ID) {
+         _host.timerSupportUnregister(_guiTimerId);
+         _guiTimerId = CLAP_INVALID_ID;
+      }
+
       _guiHandle.reset();
+   }
+
+   void CorePlugin::onTimer(clap_id timerId) noexcept {
+      if (timerId == _guiTimerId && _guiHandle)
+         _guiHandle->gui().onTimer();
    }
 
    bool CorePlugin::guiGetSize(uint32_t *width, uint32_t *height) noexcept {

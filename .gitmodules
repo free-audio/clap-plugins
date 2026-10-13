@@ -10,3 +10,6 @@
 [submodule "yas"]
 	path = yas
 	url = ../../niXman/yas.git
+[submodule "imgui"]
+	path = imgui
+	url = ../../ocornut/imgui.git

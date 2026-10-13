@@ -14,6 +14,9 @@
 #include "gui/abstract-gui-factory.hh"
 #include "gui/abstract-gui-listener.hh"
 #include "gui/threaded-gui-listener-proxy.hh"
+#if !defined(CLAP_PLUGINS_HEADLESS) && defined(CLAP_PLUGINS_GUI_IMGUI)
+#   include "gui/wayland-floating.h"
+#endif
 #include "intrusive-list.hh"
 #include "parameters.hh"
 #include "path-provider.hh"
@@ -178,9 +181,13 @@ namespace clap {
       //-----------------//
       bool implementsGui() const noexcept override;
       bool guiIsApiSupported(const char *api, bool isFloating) noexcept override;
+#   ifdef CLAP_PLUGINS_GUI_IMGUI
+      bool guiGetPreferredApi(const char **api, bool *isFloating) noexcept override;
+#   endif
       bool guiCreate(const char *api, bool isFloating) noexcept override;
       bool guiSetParent(const clap_window *window) noexcept override;
       bool guiSetTransient(const clap_window *window) noexcept override;
+      void guiSuggestTitle(const char *title) noexcept override;
       void guiDestroy() noexcept override;
       bool guiCanResize() const noexcept override { return true; }
       bool guiGetSize(uint32_t *width, uint32_t *height) noexcept override;
@@ -193,6 +200,15 @@ namespace clap {
       void guiSubscribeUndo();
       void guiUnsubscribeUndo();
       virtual void guiPopulateProperties() {}
+
+      // For the experimental extensions
+      const void *extension(const char *id) noexcept override;
+
+      //---------------------------//
+      // clap_plugin_timer_support //
+      //---------------------------//
+      bool implementsTimerSupport() const noexcept override { return true; }
+      void onTimer(clap_id timerId) noexcept override;
 
       //---------------------//
       // AbstractGuiListener //
@@ -318,7 +334,11 @@ namespace clap {
       clap_id _guiTimerId = CLAP_INVALID_ID;
       std::shared_ptr<AbstractGuiFactory> _guiFactory;
       std::unique_ptr<GuiHandle> _guiHandle;
+#   ifdef CLAP_PLUGINS_GUI_IMGUI
+      static const clap_plugin_gui_wayland _guiWayland;
+#   else
       std::unique_ptr<ThreadedGuiListenerProxy> _threadedGuiListenerProxy;
+#   endif
 #endif
 
       Parameters _parameters;

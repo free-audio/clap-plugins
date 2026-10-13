@@ -1,5 +1,4 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
 
 # GUI interfaces
 add_library(
@@ -11,6 +10,13 @@ set_property(TARGET clap-plugin-gui-common PROPERTY CXX_STANDARD 20)
 set_property(TARGET clap-plugin-gui-common PROPERTY POSITION_INDEPENDENT_CODE
                                                     true)
 target_link_libraries(clap-plugin-gui-common PUBLIC clap)
+
+if(CLAP_PLUGINS_GUI STREQUAL "imgui")
+  add_subdirectory(imgui)
+  return()
+endif()
+
+set(CMAKE_AUTOMOC ON)
 
 # Actual GUI implementation and display
 add_library(

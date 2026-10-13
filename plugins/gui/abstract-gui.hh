@@ -41,6 +41,13 @@ namespace clap {
       virtual bool setTransientWin32(clap_hwnd window) = 0;
       virtual bool setTransientCocoa(clap_nsview nsView) = 0;
 
+      // Experimental, see wayland-floating.h
+      virtual bool setTransientWayland(const char *exportedHandle) { return false; }
+      virtual void setWaylandActivationToken(const char *token) {}
+
+      // For floating windows
+      virtual void setTitle(const std::string &title) {}
+
       [[nodiscard]] virtual bool canResize() = 0;
       [[nodiscard]] virtual bool getSize(uint32_t *width, uint32_t *height) = 0;
       [[nodiscard]] virtual bool setSize(uint32_t width, uint32_t height) = 0;
@@ -56,6 +63,10 @@ namespace clap {
       virtual void setCanRedo(bool can_redo) = 0;
       virtual void setUndoName(std::string name) = 0;
       virtual void setRedoName(std::string name) = 0;
+
+      // Called periodically on the main thread, for the implementations which don't run their
+      // own event loop.
+      virtual void onTimer() {}
 
       AbstractGuiListener& listener() const { return _listener; }
 

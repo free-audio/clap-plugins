@@ -38,6 +38,16 @@
             }
         },
         {
+            "name": "imgui",
+            "hidden": true,
+            "cacheVariables": {
+                "CLAP_PLUGINS_GUI": {
+                    "type": "STRING",
+                    "value": "imgui"
+                }
+            }
+        },
+        {
             "name": "vcpkg",
             "hidden": true,
             "cacheVariables": {
@@ -65,6 +75,13 @@
             "binaryDir": "${sourceDir}/builds/${presetName}",
             "inherits": [
                 "base", "headless"
+            ]
+        },
+        {
+            "name": "ninja-imgui",
+            "description": "Ninja + System Libraries + ImGui GUI (experimental)",
+            "inherits": [
+                "base", "imgui"
             ]
         },
         {
@@ -104,6 +121,15 @@
             "inherits": "base",
             "description": "Build using Ninja and system libraries (headless)",
             "configurePreset": "ninja-headless"
+        },
+        {
+            "name": "ninja-imgui",
+            "description": "Build using Ninja and system libraries, with the ImGui GUI (experimental)",
+            "configurePreset": "ninja-imgui",
+            "targets": [
+                "clap-plugins",
+                "clap-wayland-host"
+            ]
         },
         {
             "name": "vs-vcpkg",

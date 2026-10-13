@@ -12,6 +12,8 @@ namespace clap {
       static std::unique_ptr<PathProvider> create(const std::string &pluginPath,
                                                   const std::string &pluginName);
 
+      const std::string &pluginName() const noexcept { return _pluginName; }
+
       std::string getQmlLibraryPath() const;
       std::string getQmlSkinPath() const;
       virtual std::string getGuiExecutable() const = 0;

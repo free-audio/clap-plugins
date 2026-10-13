@@ -7,6 +7,7 @@
     - [Enable long path support](#enable-long-path-support)
     - [Build](#build)
   - [Linux, using vcpkg (static)](#linux-using-vcpkg-static)
+  - [Linux, ImGui GUI in a floating Wayland window (experimental)](#linux-imgui-gui-in-a-floating-wayland-window-experimental)
 
 # Example Clap Plugins
 
@@ -102,4 +103,29 @@ sudo pacman -S git ninja cmake
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins
 cd clap-plugins
 scripts/build-gui.sh
+```
+
+## Linux, ImGui GUI in a floating Wayland window (experimental)
+
+An experimental GUI, written with [Dear ImGui](https://github.com/ocornut/imgui) and rendered in software.
+It doesn't need Qt or vcpkg. It shows up in a floating Wayland window, which has its own connection
+to the compositor and stays above the host's window.
+The contract between the host and the plugin is described in [`wayland-floating.h`](plugins/gui/wayland-floating.h),
+and it is not part of CLAP.
+
+So far, only the gain plugin has a skin; the other plugins show a knob per parameter.
+
+```bash
+# on archlinux, adapt to your distribution and package manager
+sudo pacman -S git ninja cmake wayland wayland-protocols
+
+git clone --recurse-submodules https://github.com/free-audio/clap-plugins
+cd clap-plugins
+cmake --preset ninja-imgui
+cmake --build --preset ninja-imgui --config Release
+
+# A minimal host, which implements the host side of the contract.
+# Click in its window to show or hide the plugin's window.
+builds/ninja-imgui/tools/wayland-host/Release/clap-wayland-host \
+  builds/ninja-imgui/plugins/Release/clap-plugins.clap com.github.free-audio.clap.gain
 ```

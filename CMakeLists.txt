@@ -30,11 +30,7 @@ endif()
 
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)
-
-# Experimental extensions for floating windows on Wayland
-add_library(clap-wayland-experiment INTERFACE)
-target_include_directories(clap-wayland-experiment INTERFACE clap-wayland-experiment/include)
-target_link_libraries(clap-wayland-experiment INTERFACE clap)
+add_subdirectory(clap-wayland-experiment EXCLUDE_FROM_ALL)
 
 include_directories(yas/include)
 

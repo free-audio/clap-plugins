@@ -102,6 +102,12 @@ if(NOT CLAP_PLUGINS_HEADLESS)
   target_link_libraries(clap-plugins-core PUBLIC clap-plugins-gui clap-wayland-experiment)
 endif()
 
+# They test the hosts' window APIs
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT CLAP_PLUGINS_HEADLESS)
+  target_sources(clap-plugins-core PRIVATE plugs/check-window-api/check-window-api.hh
+                                           plugs/check-window-api/check-window-api.cc)
+endif()
+
 target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 
 add_library(clap-plugins MODULE clap-entry.cc)

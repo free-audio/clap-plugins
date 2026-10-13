@@ -151,6 +151,12 @@ namespace clap {
       uint32_t width() const noexcept { return _width; }
       uint32_t height() const noexcept { return _height; }
 
+      // The CLAP window API, for example CLAP_WINDOW_API_X11
+      const char *windowApiName() const noexcept;
+      bool isFloating() const noexcept { return _isFloating; }
+      // Physical pixels per logical pixel
+      double scale() const noexcept { return _window ? _window->scale() : apiScale(); }
+
       // In definition order
       const std::vector<clap_id> &paramIds() const noexcept { return _paramIds; }
       GuiParam *param(clap_id paramId);

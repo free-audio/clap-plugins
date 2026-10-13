@@ -103,6 +103,22 @@ namespace clap {
       return std::nullopt;
    }
 
+   const char *ImGuiGui::windowApiName() const noexcept {
+      switch (_api) {
+      case WindowApi::X11:
+         return CLAP_WINDOW_API_X11;
+      case WindowApi::Wayland:
+         return CLAP_WINDOW_API_WAYLAND;
+      case WindowApi::WaylandSurfaceEmbedding:
+         return CLAP_WINDOW_API_WAYLAND_SURFACE_EMBEDDING_V1;
+      case WindowApi::Win32:
+         return CLAP_WINDOW_API_WIN32;
+      case WindowApi::Cocoa:
+         return CLAP_WINDOW_API_COCOA;
+      }
+      return "?";
+   }
+
    void ImGuiGui::preferredApi(const char **api, bool *isFloating) {
 #if defined(__linux__)
       // Most hosts are X11 clients, even within a Wayland session

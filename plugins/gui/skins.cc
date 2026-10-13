@@ -415,6 +415,32 @@ namespace clap {
          knobRow(gui, l.volume, kVoiceModule, {2});
       }
 
+      //////////////////////
+      // Check Window API //
+      //////////////////////
+
+      // For the plugins which force a window API, to test the hosts
+      constexpr float kCheckKnobSize = 80;
+
+      void checkWindowApiSize(const ImGuiGui &, uint32_t *width, uint32_t *height) {
+         *width = 300;
+         *height = 220;
+      }
+
+      void checkWindowApiDraw(ImGuiGui &gui) {
+         ImGui::SetCursorPos(ImVec2(kTextMargin, kTextMargin));
+         ImGui::PushFont(nullptr, kLargeFontSize);
+         ImGui::TextUnformatted(gui.windowApiName());
+         ImGui::PopFont();
+         ImGui::TextUnformatted(gui.isFloating() ? "floating" : "embedded");
+         ImGui::Text("scale: %g", gui.scale());
+         ImGui::Text("size: %u x %u (logical)", gui.width(), gui.height());
+
+         ImGui::SetCursorPos(ImVec2(gui.width() - kCheckKnobSize - kTextMargin,
+                                    gui.height() - knobHeight(kCheckKnobSize) - kTextMargin));
+         knob(gui, 0, kCheckKnobSize);
+      }
+
       const Skin skins[] = {
          {"", kDarkBackground, false, genericSize, genericDraw},
          {"gain", kDarkBackground, false, singleKnobSize, singleKnobDraw},
@@ -424,6 +450,7 @@ namespace clap {
          {"transport-info", kLightBackground, true, textBlockSize, transportInfoDraw},
          {"undo-test", kLightBackground, false, undoTestSize, undoTestDraw},
          {"synth", kDarkBackground, false, synthSize, synthDraw},
+         {"check-window-api", kDarkBackground, false, checkWindowApiSize, checkWindowApiDraw},
       };
    } // namespace
 

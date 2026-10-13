@@ -8,6 +8,9 @@
 
 #include "plugs/adsr/adsr-plug.hh"
 #include "plugs/char-check/char-check.hh"
+#if defined(__linux__) && !defined(CLAP_PLUGINS_HEADLESS)
+#   include "plugs/check-window-api/check-window-api.hh"
+#endif
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/dc-offset-with-latency/dc-offset-with-latency.hh"
 #include "plugs/gain/gain.hh"
@@ -68,6 +71,13 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::UndoTest<false, false>>();
    addPlugin<clap::UndoTest<true, false>>();
    addPlugin<clap::UndoTest<true, true>>();
+
+#if defined(__linux__) && !defined(CLAP_PLUGINS_HEADLESS)
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::X11Floating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::X11Embed>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::WaylandFloating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::WaylandEmbed>>();
+#endif
    return true;
 }
 

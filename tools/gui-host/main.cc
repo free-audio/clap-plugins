@@ -927,6 +927,11 @@ namespace {
          return false;
       }
 
+      if (strcmp(api, CLAP_WINDOW_API_X11) && strcmp(api, CLAP_WINDOW_API_WAYLAND)) {
+         std::cerr << "clap-gui-host can't host the window API " << api << " yet" << std::endl;
+         return false;
+      }
+
       // Wayland can only have floating plugin windows
       if (!strcmp(api, CLAP_WINDOW_API_WAYLAND)) {
          isFloating = true;

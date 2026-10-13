@@ -25,8 +25,8 @@ nor any GPU context: each platform only has to show the pixels and to report the
 |----------|------------|----------|----------|
 | Linux    | X11        | yes      | yes      |
 | Linux    | Wayland    | experimental, through the host's compositor (1) | experimental (1) |
-| Windows  | Win32      | yes      | no       |
-| macOS    | Cocoa      | yes      | no       |
+| Windows  | Win32      | yes      | yes      |
+| macOS    | Cocoa      | yes      | yes      |
 
 (1) With the extensions from [clap-wayland-experiment](https://github.com/free-audio/clap-wayland-experiment),
 a submodule. Embedding uses the `wayland-surface-embedding-v1` window API: the host runs a Wayland
@@ -39,6 +39,12 @@ on Windows and macOS, the window has its own timer.
 
 The skins, one per plugin, are in [`skins.cc`](plugins/gui/skins.cc).
 The plugins without a skin show a knob per parameter.
+
+To test the hosts, the `check-*` plugins support only one window API and mode each, and their
+GUI shows the window API, the mode, the scale and the size:
+- Linux: `check-x11-floating`, `check-x11-embed`, `check-wayland-floating`, `check-wayland-embed`
+- Windows: `check-windows-floating`, `check-windows-embed`
+- macOS: `check-cocoa-floating`, `check-cocoa-embed`
 
 There is no keyboard input yet.
 

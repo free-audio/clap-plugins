@@ -3,6 +3,7 @@
 #include <cwchar>
 #include <iostream>
 #include <iterator>
+#include <string>
 
 #include <windows.h>
 #include <windowsx.h>
@@ -15,6 +16,28 @@ namespace clap {
       constexpr UINT_PTR kTimerId = 1;
       // The timers fire on the system tick, about 15.6 ms: asking for less makes it every tick
       constexpr UINT kTimerPeriodMs = 10;
+
+      constexpr DWORD kChildStyle = WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+      constexpr DWORD kFloatingStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
+
+      // The window's size, for the given size of its client area
+      SIZE outerSize(uint32_t width, uint32_t height, bool isFloating) {
+         if (!isFloating)
+            return {LONG(width), LONG(height)};
+
+         RECT rect = {0, 0, LONG(width), LONG(height)};
+         AdjustWindowRectEx(&rect, kFloatingStyle, FALSE, 0);
+         return {rect.right - rect.left, rect.bottom - rect.top};
+      }
+
+      std::wstring toWide(const std::string &s) {
+         if (s.empty())
+            return {};
+         const int size = MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), nullptr, 0);
+         std::wstring w(size, L'\0');
+         MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), w.data(), size);
+         return w;
+      }
 
       HINSTANCE moduleHandle() {
          HMODULE module = nullptr;
@@ -86,16 +109,20 @@ namespace clap {
          return false;
       }
 
+      _isFloating = !parent;
       _physicalWidth = std::max<uint32_t>(1, std::lround(_width * _scale));
       _physicalHeight = std::max<uint32_t>(1, std::lround(_height * _scale));
+
+      // For a floating window, the size includes the frame
+      const SIZE size = outerSize(_physicalWidth, _physicalHeight, _isFloating);
       _hwnd = CreateWindowExW(0,
                               className,
-                              L"",
-                              WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-                              0,
-                              0,
-                              _physicalWidth,
-                              _physicalHeight,
+                              toWide(_title).c_str(),
+                              _isFloating ? kFloatingStyle : kChildStyle,
+                              _isFloating ? CW_USEDEFAULT : 0,
+                              _isFloating ? CW_USEDEFAULT : 0,
+                              size.cx,
+                              size.cy,
                               static_cast<HWND>(parent),
                               nullptr,
                               moduleHandle(),
@@ -127,9 +154,29 @@ namespace clap {
       }
    }
 
+   bool Win32Window::setTransient(void *owner) {
+      if (!_isFloating || !_hwnd)
+         return false;
+
+      // A floating window stays above its owner, and has no taskbar button
+      SetWindowLongPtrW(static_cast<HWND>(_hwnd), GWLP_HWNDPARENT, reinterpret_cast<LONG_PTR>(owner));
+      return true;
+   }
+
+   void Win32Window::setTitle(const std::string &title) {
+      _title = title;
+      if (_isFloating && _hwnd)
+         SetWindowTextW(static_cast<HWND>(_hwnd), toWide(title).c_str());
+   }
+
+   void Win32Window::setMinSize(uint32_t width, uint32_t height) {
+      _minWidth = std::max(width, 1u);
+      _minHeight = std::max(height, 1u);
+   }
+
    void Win32Window::setSize(uint32_t width, uint32_t height) {
-      _width = std::max(width, 1u);
-      _height = std::max(height, 1u);
+      _width = std::max(width, _minWidth);
+      _height = std::max(height, _minHeight);
       applySize();
    }
 
@@ -150,12 +197,13 @@ namespace clap {
 
       _physicalWidth = width;
       _physicalHeight = height;
+      const SIZE size = outerSize(width, height, _isFloating);
       SetWindowPos(static_cast<HWND>(_hwnd),
                    nullptr,
                    0,
                    0,
-                   width,
-                   height,
+                   size.cx,
+                   size.cy,
                    SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
    }
 
@@ -163,8 +211,9 @@ namespace clap {
       if (!_hwnd)
          return;
 
+      // A floating window takes the focus, an embedded one leaves it to the host
       auto hwnd = static_cast<HWND>(_hwnd);
-      ShowWindow(hwnd, isVisible ? SW_SHOWNA : SW_HIDE);
+      ShowWindow(hwnd, isVisible ? (_isFloating ? SW_SHOW : SW_SHOWNA) : SW_HIDE);
       if (!isVisible) {
          leavePointer();
          if (GetCapture() == hwnd)
@@ -252,6 +301,22 @@ namespace clap {
       case WM_ERASEBKGND:
          return 1;
 
+      // The user closes the floating window: we only hide it
+      case WM_CLOSE:
+         _listener.onCloseRequested();
+         return 0;
+
+      case WM_GETMINMAXINFO: {
+         if (!_isFloating)
+            break;
+         const SIZE size = outerSize(
+            std::lround(_minWidth * _scale), std::lround(_minHeight * _scale), true);
+         auto *info = reinterpret_cast<MINMAXINFO *>(lParam);
+         info->ptMinTrackSize.x = size.cx;
+         info->ptMinTrackSize.y = size.cy;
+         return 0;
+      }
+
       case WM_MOUSEMOVE:
          onMouseMove(lParam);
          return 0;
@@ -308,7 +373,7 @@ namespace clap {
          _pressedButtons = 0;
          break;
 
-      // The host resized our window
+      // The host or the user resized our window
       case WM_SIZE: {
          const uint32_t width = LOWORD(lParam);
          const uint32_t height = HIWORD(lParam);

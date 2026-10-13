@@ -18,7 +18,9 @@ struct ImGuiContext;
 namespace clap {
 
    class ImGuiGui;
+   class CocoaWindow;
    class WaylandWindow;
+   class Win32Window;
    class X11Window;
 
    struct GuiParam {
@@ -210,10 +212,14 @@ namespace clap {
 
       ImGuiContext *_context = nullptr;
       std::unique_ptr<PlatformWindow> _window;
-#ifdef __linux__
       // Same as _window
+#if defined(__linux__)
       WaylandWindow *_waylandWindow = nullptr;
       X11Window *_x11Window = nullptr;
+#elif defined(_WIN32)
+      Win32Window *_win32Window = nullptr;
+#elif defined(__APPLE__)
+      CocoaWindow *_cocoaWindow = nullptr;
 #endif
       const Skin *_skin = nullptr;
 

@@ -103,7 +103,7 @@ if(NOT CLAP_PLUGINS_HEADLESS)
 endif()
 
 # They test the hosts' window APIs
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT CLAP_PLUGINS_HEADLESS)
+if(NOT CLAP_PLUGINS_HEADLESS)
   target_sources(clap-plugins-core PRIVATE plugs/check-window-api/check-window-api.hh
                                            plugs/check-window-api/check-window-api.cc)
 endif()

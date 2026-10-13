@@ -142,6 +142,7 @@ namespace clap {
       }
 
       NSView *viewOf(void *view) { return (__bridge NSView *)view; }
+      NSWindow *windowOf(void *window) { return (__bridge NSWindow *)window; }
    } // namespace
 
    CocoaWindow::CocoaWindow(Listener &listener) : PlatformWindow(listener) {}
@@ -150,8 +151,7 @@ namespace clap {
 
    bool CocoaWindow::open(void *parent) {
       NSView *parentView = (__bridge NSView *)parent;
-      if (!parentView)
-         return false;
+      _isFloating = !parentView;
 
       NSView *view = [[viewClass() alloc] initWithFrame:NSMakeRect(0, 0, _width, _height)];
       objc_setAssociatedObject(
@@ -166,8 +166,12 @@ namespace clap {
              userInfo:nil];
       [view addTrackingArea:area];
 
-      view.hidden = YES;
-      [parentView addSubview:view];
+      if (_isFloating)
+         openWindow((__bridge void *)view);
+      else {
+         view.hidden = YES;
+         [parentView addSubview:view];
+      }
       _view = (__bridge_retained void *)view;
       updateScale();
 
@@ -185,12 +189,67 @@ namespace clap {
       return true;
    }
 
+   // A floating window, whose content is the view
+   void CocoaWindow::openWindow(void *contentView) {
+      NSView *view = viewOf(contentView);
+      NSWindow *window = [[NSWindow alloc]
+         initWithContentRect:NSMakeRect(0, 0, _width, _height)
+                   styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable |
+                             NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable
+                     backing:NSBackingStoreBuffered
+                       defer:YES];
+      // Closing it only hides it
+      window.releasedWhenClosed = NO;
+      window.contentView = view;
+      window.contentMinSize = NSMakeSize(_minWidth, _minHeight);
+      // nil for invalid UTF-8, which the title doesn't accept
+      window.title = [NSString stringWithUTF8String:_title.c_str()] ?: @"";
+      [window center];
+
+      auto *cocoaWindow = this;
+      NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
+      id closeObserver = [center addObserverForName:NSWindowWillCloseNotification
+                                             object:window
+                                              queue:nil
+                                         usingBlock:^(NSNotification *notification) {
+                                           cocoaWindow->onWindowClosed();
+                                         }];
+      id resizeObserver = [center addObserverForName:NSWindowDidResizeNotification
+                                              object:window
+                                               queue:nil
+                                          usingBlock:^(NSNotification *notification) {
+                                            cocoaWindow->onWindowResized();
+                                          }];
+      _observers = (__bridge_retained void *)@[closeObserver, resizeObserver];
+      _window = (__bridge_retained void *)window;
+   }
+
    void CocoaWindow::destroy() {
       if (_timer) {
          auto timer = static_cast<CFRunLoopTimerRef>(_timer);
          CFRunLoopTimerInvalidate(timer);
          CFRelease(timer);
          _timer = nullptr;
+      }
+
+      if (_observers) {
+         NSArray *observers = (__bridge_transfer NSArray *)_observers;
+         _observers = nullptr;
+         for (id observer in observers)
+            [NSNotificationCenter.defaultCenter removeObserver:observer];
+      }
+
+      if (_window) {
+         NSWindow *window = (__bridge_transfer NSWindow *)_window;
+         _window = nullptr;
+         [window.parentWindow removeChildWindow:window];
+         [window orderOut:nil];
+         window.contentView = nil;
+      }
+
+      if (_transientParent) {
+         CFRelease(_transientParent);
+         _transientParent = nullptr;
       }
 
       if (_view) {
@@ -204,19 +263,90 @@ namespace clap {
    }
 
    void CocoaWindow::setSize(uint32_t width, uint32_t height) {
-      _width = std::max(width, 1u);
-      _height = std::max(height, 1u);
-      if (_view)
+      _width = std::max(width, _minWidth);
+      _height = std::max(height, _minHeight);
+      if (_window)
+         [windowOf(_window) setContentSize:NSMakeSize(_width, _height)];
+      else if (_view)
          [viewOf(_view) setFrameSize:NSMakeSize(_width, _height)];
+   }
+
+   void CocoaWindow::setMinSize(uint32_t width, uint32_t height) {
+      _minWidth = std::max(width, 1u);
+      _minHeight = std::max(height, 1u);
+      if (_window)
+         windowOf(_window).contentMinSize = NSMakeSize(_minWidth, _minHeight);
+   }
+
+   void CocoaWindow::setTitle(const std::string &title) {
+      _title = title;
+      if (_window)
+         windowOf(_window).title = [NSString stringWithUTF8String:title.c_str()] ?: @"";
+   }
+
+   // The child window stays above its parent, and moves with it
+   bool CocoaWindow::setTransient(void *hostView) {
+      if (!_window)
+         return false;
+
+      NSWindow *parent = ((__bridge NSView *)hostView).window;
+      if (!parent)
+         return false;
+
+      if (_transientParent)
+         CFRelease(_transientParent);
+      _transientParent = (__bridge_retained void *)parent;
+
+      NSWindow *window = windowOf(_window);
+      if (window.isVisible)
+         [parent addChildWindow:window ordered:NSWindowAbove];
+      return true;
    }
 
    void CocoaWindow::setVisible(bool isVisible) {
       if (!_view)
          return;
 
-      viewOf(_view).hidden = !isVisible;
       if (!isVisible)
          leavePointer();
+
+      if (!_window) {
+         viewOf(_view).hidden = !isVisible;
+         return;
+      }
+
+      NSWindow *window = windowOf(_window);
+      if (!isVisible) {
+         [window orderOut:nil];
+         return;
+      }
+
+      // Hiding a child window detaches it from its parent
+      if (_transientParent && window.parentWindow != windowOf(_transientParent))
+         [windowOf(_transientParent) addChildWindow:window ordered:NSWindowAbove];
+      [window makeKeyAndOrderFront:nil];
+   }
+
+   // The user closed the floating window, which is now hidden
+   void CocoaWindow::onWindowClosed() {
+      leavePointer();
+      _listener.onCloseRequested();
+   }
+
+   // The user resized the floating window
+   void CocoaWindow::onWindowResized() {
+      if (!_view)
+         return;
+
+      const NSSize size = viewOf(_view).bounds.size;
+      const uint32_t width = std::max<uint32_t>(1, std::lround(size.width));
+      const uint32_t height = std::max<uint32_t>(1, std::lround(size.height));
+      if (width == _width && height == _height)
+         return;
+
+      _width = width;
+      _height = height;
+      _listener.onResized(width, height);
    }
 
    void CocoaWindow::updateScale() {
@@ -241,7 +371,7 @@ namespace clap {
          return nullptr;
 
       NSView *view = viewOf(_view);
-      if (!view.window || view.isHiddenOrHasHiddenAncestor)
+      if (!view.window || !view.window.isVisible || view.isHiddenOrHasHiddenAncestor)
          return nullptr;
 
       const int width = std::max<int>(1, std::lround(_width * _scale));

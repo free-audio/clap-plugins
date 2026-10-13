@@ -41,7 +41,16 @@ namespace clap {
             return "com.github.free-audio.clap.check-wayland-floating";
          case CheckWindowApiKind::WaylandEmbed:
             return "com.github.free-audio.clap.check-wayland-embed";
+         case CheckWindowApiKind::Win32Floating:
+            return "com.github.free-audio.clap.check-windows-floating";
+         case CheckWindowApiKind::Win32Embed:
+            return "com.github.free-audio.clap.check-windows-embed";
+         case CheckWindowApiKind::CocoaFloating:
+            return "com.github.free-audio.clap.check-cocoa-floating";
+         case CheckWindowApiKind::CocoaEmbed:
+            return "com.github.free-audio.clap.check-cocoa-embed";
          }
+         return "";
       }
 
       template <CheckWindowApiKind kind>
@@ -55,7 +64,16 @@ namespace clap {
             return "Check Wayland Floating";
          case CheckWindowApiKind::WaylandEmbed:
             return "Check Wayland Embed";
+         case CheckWindowApiKind::Win32Floating:
+            return "Check Windows Floating";
+         case CheckWindowApiKind::Win32Embed:
+            return "Check Windows Embed";
+         case CheckWindowApiKind::CocoaFloating:
+            return "Check Cocoa Floating";
+         case CheckWindowApiKind::CocoaEmbed:
+            return "Check Cocoa Embed";
          }
+         return "";
       }
    } // namespace
 
@@ -121,6 +139,12 @@ namespace clap {
          return CLAP_WINDOW_API_WAYLAND;
       case CheckWindowApiKind::WaylandEmbed:
          return CLAP_WINDOW_API_WAYLAND_SURFACE_EMBEDDING_V1;
+      case CheckWindowApiKind::Win32Floating:
+      case CheckWindowApiKind::Win32Embed:
+         return CLAP_WINDOW_API_WIN32;
+      case CheckWindowApiKind::CocoaFloating:
+      case CheckWindowApiKind::CocoaEmbed:
+         return CLAP_WINDOW_API_COCOA;
       }
       return nullptr;
    }
@@ -168,5 +192,9 @@ namespace clap {
    template class CheckWindowApi<CheckWindowApiKind::X11Embed>;
    template class CheckWindowApi<CheckWindowApiKind::WaylandFloating>;
    template class CheckWindowApi<CheckWindowApiKind::WaylandEmbed>;
+   template class CheckWindowApi<CheckWindowApiKind::Win32Floating>;
+   template class CheckWindowApi<CheckWindowApiKind::Win32Embed>;
+   template class CheckWindowApi<CheckWindowApiKind::CocoaFloating>;
+   template class CheckWindowApi<CheckWindowApiKind::CocoaEmbed>;
 
 } // namespace clap

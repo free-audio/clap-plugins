@@ -93,10 +93,10 @@ namespace clap {
       if (!isFloating && !strcmp(api, CLAP_WINDOW_API_WAYLAND_SURFACE_EMBEDDING_V1))
          return WindowApi::WaylandSurfaceEmbedding;
 #elif defined(_WIN32)
-      if (!isFloating && !isBlank && !strcmp(api, CLAP_WINDOW_API_WIN32))
+      if ((isBlank && isFloating) || (!isBlank && !strcmp(api, CLAP_WINDOW_API_WIN32)))
          return WindowApi::Win32;
 #elif defined(__APPLE__)
-      if (!isFloating && !isBlank && !strcmp(api, CLAP_WINDOW_API_COCOA))
+      if ((isBlank && isFloating) || (!isBlank && !strcmp(api, CLAP_WINDOW_API_COCOA)))
          return WindowApi::Cocoa;
 #endif
 
@@ -163,9 +163,13 @@ namespace clap {
    }
 
    ImGuiGui::~ImGuiGui() {
-#ifdef __linux__
+#if defined(__linux__)
       _waylandWindow = nullptr;
       _x11Window = nullptr;
+#elif defined(_WIN32)
+      _win32Window = nullptr;
+#elif defined(__APPLE__)
+      _cocoaWindow = nullptr;
 #endif
       _window.reset();
 
@@ -381,6 +385,30 @@ namespace clap {
          _x11Window = x11Window;
          return true;
       }
+#elif defined(_WIN32)
+      if (_api == WindowApi::Win32) {
+         auto window = std::make_unique<Win32Window>(windowListener());
+         if (!window->open(nullptr))
+            return false;
+
+         auto *win32Window = window.get();
+         if (!attachWindow(std::move(window)))
+            return false;
+         _win32Window = win32Window;
+         return true;
+      }
+#elif defined(__APPLE__)
+      if (_api == WindowApi::Cocoa) {
+         auto window = std::make_unique<CocoaWindow>(windowListener());
+         if (!window->open(nullptr))
+            return false;
+
+         auto *cocoaWindow = window.get();
+         if (!attachWindow(std::move(window)))
+            return false;
+         _cocoaWindow = cocoaWindow;
+         return true;
+      }
 #endif
 
       return false;
@@ -418,9 +446,18 @@ namespace clap {
    }
 
    bool ImGuiGui::setTransient(const clap_window &parent) {
-#ifdef __linux__
-      if (_x11Window && _isFloating && isApi(parent, CLAP_WINDOW_API_X11))
+      if (!_isFloating)
+         return false;
+
+#if defined(__linux__)
+      if (_x11Window && isApi(parent, CLAP_WINDOW_API_X11))
          return _x11Window->setTransient(parent.x11);
+#elif defined(_WIN32)
+      if (_win32Window && isApi(parent, CLAP_WINDOW_API_WIN32))
+         return _win32Window->setTransient(parent.win32);
+#elif defined(__APPLE__)
+      if (_cocoaWindow && isApi(parent, CLAP_WINDOW_API_COCOA))
+         return _cocoaWindow->setTransient(parent.cocoa);
 #endif
 
       return false;

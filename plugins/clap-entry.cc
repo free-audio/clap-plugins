@@ -8,7 +8,7 @@
 
 #include "plugs/adsr/adsr-plug.hh"
 #include "plugs/char-check/char-check.hh"
-#if defined(__linux__) && !defined(CLAP_PLUGINS_HEADLESS)
+#ifndef CLAP_PLUGINS_HEADLESS
 #   include "plugs/check-window-api/check-window-api.hh"
 #endif
 #include "plugs/dc-offset/dc-offset.hh"
@@ -72,11 +72,20 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::UndoTest<true, false>>();
    addPlugin<clap::UndoTest<true, true>>();
 
-#if defined(__linux__) && !defined(CLAP_PLUGINS_HEADLESS)
+   // Each one on its window API's platform
+#ifndef CLAP_PLUGINS_HEADLESS
+#   if defined(__linux__)
    addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::X11Floating>>();
    addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::X11Embed>>();
    addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::WaylandFloating>>();
    addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::WaylandEmbed>>();
+#   elif defined(_WIN32)
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::Win32Floating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::Win32Embed>>();
+#   elif defined(__APPLE__)
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::CocoaFloating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::CocoaEmbed>>();
+#   endif
 #endif
    return true;
 }

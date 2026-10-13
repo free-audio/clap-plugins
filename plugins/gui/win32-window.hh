@@ -1,13 +1,14 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "platform-window.hh"
 
 namespace clap {
 
-   // A child window of the host's window.
+   // A child window of the host's window, or a floating window.
    //
    // The host runs a message loop on the main thread, so the window has its own timer.
    //
@@ -18,10 +19,15 @@ namespace clap {
       explicit Win32Window(Listener &listener);
       ~Win32Window() override;
 
-      // parent is the host's HWND
+      // parent is the host's HWND, or nullptr for a floating window
       [[nodiscard]] bool open(void *parent);
 
+      // Floating windows: keeps the window above the host's one, its HWND
+      bool setTransient(void *owner);
+
       void setSize(uint32_t width, uint32_t height) override;
+      void setMinSize(uint32_t width, uint32_t height) override;
+      void setTitle(const std::string &title) override;
       void setVisible(bool isVisible) override;
       double scale() const override { return _scale; }
       void setScale(double scale) override;
@@ -43,10 +49,14 @@ namespace clap {
 
       void *_hwnd = nullptr;
       bool _hasClass = false;
+      bool _isFloating = false;
+      std::string _title;
 
-      // Logical sizes
+      // Logical sizes, of the client area
       uint32_t _width = 1;
       uint32_t _height = 1;
+      uint32_t _minWidth = 1;
+      uint32_t _minHeight = 1;
       // Physical size of the window
       uint32_t _physicalWidth = 0;
       uint32_t _physicalHeight = 0;

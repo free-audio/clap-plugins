@@ -6,16 +6,25 @@ namespace clap {
 
    // The window API and mode which the plugin forces
    enum class CheckWindowApiKind {
+      // Linux
       X11Floating,
       X11Embed,
       WaylandFloating,
       WaylandEmbed,
+
+      // Windows
+      Win32Floating,
+      Win32Embed,
+
+      // macOS
+      CocoaFloating,
+      CocoaEmbed,
    };
 
    // Plugins which support only one window API, floating or embedded, to test the hosts.
    // Their GUI shows the window API, the mode, the scale and the size.
    //
-   // Linux only.
+   // Each one is only available on its window API's platform.
    template <CheckWindowApiKind kind>
    class CheckWindowApi final : public CorePlugin {
    private:
@@ -40,7 +49,9 @@ namespace clap {
       static const char *forcedApi() noexcept;
       static constexpr bool isForcedFloating() noexcept {
          return kind == CheckWindowApiKind::X11Floating ||
-                kind == CheckWindowApiKind::WaylandFloating;
+                kind == CheckWindowApiKind::WaylandFloating ||
+                kind == CheckWindowApiKind::Win32Floating ||
+                kind == CheckWindowApiKind::CocoaFloating;
       }
       static bool isForced(const char *api, bool isFloating) noexcept;
 
@@ -51,5 +62,9 @@ namespace clap {
    extern template class CheckWindowApi<CheckWindowApiKind::X11Embed>;
    extern template class CheckWindowApi<CheckWindowApiKind::WaylandFloating>;
    extern template class CheckWindowApi<CheckWindowApiKind::WaylandEmbed>;
+   extern template class CheckWindowApi<CheckWindowApiKind::Win32Floating>;
+   extern template class CheckWindowApi<CheckWindowApiKind::Win32Embed>;
+   extern template class CheckWindowApi<CheckWindowApiKind::CocoaFloating>;
+   extern template class CheckWindowApi<CheckWindowApiKind::CocoaEmbed>;
 
 } // namespace clap

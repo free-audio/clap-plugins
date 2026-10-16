@@ -72,6 +72,8 @@ add_library(
   plugs/undo-test/undo-test.hxx
   plugs/scratch-memory/scratch-memory.cc
   plugs/scratch-memory/scratch-memory.hh
+  plugs/slow-destroy/slow-destroy.cc
+  plugs/slow-destroy/slow-destroy.hh
   plugs/project-location/project-location.cc
   plugs/project-location/project-location.hh
   smoothed-value.hh

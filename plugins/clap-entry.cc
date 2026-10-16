@@ -21,6 +21,7 @@
 #include "plugs/offline-latency/offline-latency.hh"
 #include "plugs/realtime-requirement/realtime-requirement.hh"
 #include "plugs/scratch-memory/scratch-memory.hh"
+#include "plugs/slow-destroy/slow-destroy.hh"
 #include "plugs/svf/svf-plug.hh"
 #include "plugs/synth/synth.hh"
 #include "plugs/track-info/track-info.hh"
@@ -64,6 +65,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::OfflineLatency>();
    addPlugin<clap::RealtimeRequirement>();
    addPlugin<clap::ScratchMemory>();
+   addPlugin<clap::SlowDestroy>();
    addPlugin<clap::SvfPlug>();
    addPlugin<clap::Synth>();
    addPlugin<clap::TrackInfo>();

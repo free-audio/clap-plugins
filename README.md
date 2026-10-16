@@ -6,6 +6,7 @@
   - [macOS](#macos)
   - [Windows](#windows)
   - [Without GUI](#without-gui)
+  - [Tests](#tests)
   - [Installing](#installing)
 - [Trying the GUIs on Linux](#trying-the-guis-on-linux)
 
@@ -67,7 +68,7 @@ Even if you hide all your symbols, some may remain visible at unexpected places:
 
 # Building
 
-You need CMake 3.17 or newer, a C++20 compiler, and the submodules:
+You need CMake 3.21 or newer, a C++20 compiler, and the submodules:
 
 ```bash
 git clone --recurse-submodules https://github.com/free-audio/clap-plugins
@@ -86,7 +87,7 @@ for example Ubuntu 24.04 or newer.
 sudo apt install git ninja-build cmake pkg-config g++ libwayland-dev wayland-protocols libxcb1-dev
 
 # on archlinux, adapt to your distribution and package manager
-sudo pacman -S git ninja cmake pkgconf wayland wayland-protocols libxcb
+sudo pacman -S git ninja cmake pkgconf gcc wayland wayland-protocols libxcb
 
 cmake --preset ninja
 cmake --build --preset ninja --config Release
@@ -119,6 +120,17 @@ The `ninja-headless` and `vs-headless` presets build the plugins without GUI:
 ```bash
 cmake --preset ninja-headless
 cmake --build --preset ninja-headless --config Release
+```
+
+## Tests
+
+The unit tests need [Catch2](https://github.com/catchorg/Catch2) 3 or newer, and
+`CLAP_BUILD_TESTS`:
+
+```bash
+cmake --preset ninja -DCLAP_BUILD_TESTS=ON
+cmake --build --preset ninja --config Release --target clap-tests
+ctest --preset ninja -C Release
 ```
 
 ## Installing

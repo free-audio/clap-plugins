@@ -465,7 +465,10 @@ namespace clap {
    }
 
    void CorePlugin::onGuiWindowClosed(bool wasDestroyed) {
-      runOnMainThread([this, wasDestroyed] { _host.guiClosed(wasDestroyed); });
+      runOnMainThread([this, wasDestroyed] {
+         if (_host.canUseGui())
+            _host.guiClosed(wasDestroyed);
+      });
    }
 
    void CorePlugin::onGuiUndo() {

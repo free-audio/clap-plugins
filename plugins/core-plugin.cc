@@ -1008,7 +1008,7 @@ namespace clap {
 
    template <class Callback>
    void CorePlugin::foreachActiveVoice(
-      int16_t noteId, int16_t port, int32_t channel, int16_t key, const Callback &callback) const {
+      int32_t noteId, int16_t port, int32_t channel, int16_t key, const Callback &callback) const {
       // Monophonic plugins have no voices to target
       auto voiceExpander = getVoiceExpander();
       if (!voiceExpander)

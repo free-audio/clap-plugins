@@ -1,6 +1,0 @@
-{
-  "name": "clap-plugins",
-  "description": "Build C++ code with CMake and Ninja.",
-  "iconName": "cmake",
-  "categories": ["CMake", "cpp", "cplusplus", "Ninja"]
-}

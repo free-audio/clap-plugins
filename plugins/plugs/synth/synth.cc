@@ -139,7 +139,7 @@ namespace clap {
       protected:
          AdsrModule _ampAdsr;
          AdsrModule _filterAdsr;
-         SvfModule _filter;
+         SvfModule<1> _filter;
          DigiOscModule _digiOsc1;
          DigiOscModule _digiOsc2;
 

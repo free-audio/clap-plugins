@@ -32,7 +32,7 @@ namespace clap {
       }
 
    protected:
-      SvfModule _svf;
+      SvfModule<2> _svf;
    };
 
    const clap_plugin_descriptor *SvfPlug::descriptor() {

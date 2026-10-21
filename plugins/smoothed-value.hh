@@ -26,6 +26,7 @@ namespace clap {
             return;
          }
 
+         _target = val;
          _ramp = (val - _value) / steps;
          _steps = steps;
       }
@@ -33,8 +34,9 @@ namespace clap {
       // Advances the value by 1 samples and return the new value + modulation
       double step() noexcept {
          if (_steps > 0) [[likely]] {
-            _value += _ramp;
             --_steps;
+            // Land exactly on the target: accumulating the ramp may overshoot the parameter range
+            _value = _steps > 0 ? _value + _ramp : _target;
          }
 
          return _value;
@@ -44,8 +46,8 @@ namespace clap {
       double step(uint32_t n) noexcept {
          if (_steps > 0) [[likely]] {
             auto k = std::min<uint32_t>(_steps, n);
-            _value += k * _ramp;
             _steps -= k;
+            _value = _steps > 0 ? _value + k * _ramp : _target;
          }
 
          return _value;
@@ -67,6 +69,7 @@ namespace clap {
 
    private:
       double _value = 0;
+      double _target = 0;
       double _ramp = 0;
       uint32_t _steps = 0;
    };

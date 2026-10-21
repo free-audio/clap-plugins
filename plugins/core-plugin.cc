@@ -952,7 +952,9 @@ namespace clap {
       if (!param)
          return false;
 
-      *value = param->valueType()->fromText(display);
+      // The user may type anything, including out of range values
+      auto &info = param->info();
+      *value = std::clamp(param->valueType()->fromText(display), info.min_value, info.max_value);
       return true;
    }
 

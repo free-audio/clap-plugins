@@ -659,11 +659,11 @@ namespace clap {
                         if (!voice._resetHook.isHooked())
                            voiceModule->_parametersToReset.pushBack(&voice._resetHook);
                      } else {
-                        voice._modulation.setSmoothed(ev->value, _paramSmoothingDuration);
+                        voice._value.setSmoothed(ev->value, _paramSmoothingDuration);
                      }
 
-                     if (!voice._modulationToProcessHook.isHooked())
-                        _parameterModulationToProcess.pushBack(&voice._modulationToProcessHook);
+                     if (!voice._valueToProcessHook.isHooked())
+                        _parameterValueToProcess.pushBack(&voice._valueToProcessHook);
                      if (!voice._modulatedValueToProcessHook.isHooked())
                         _parameterModulatedValueToProcess.pushBack(
                            &voice._modulatedValueToProcessHook);

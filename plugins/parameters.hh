@@ -55,7 +55,9 @@ namespace clap {
             auto *p = getById(v.first);
             if (!p)
                continue;
-            p->setValueImmediately(v.second);
+            // Older states may hold values slightly out of range
+            p->setValueImmediately(
+               std::clamp(v.second, p->info().min_value, p->info().max_value));
          }
       }
 

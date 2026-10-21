@@ -85,7 +85,7 @@ namespace clap {
             }
          } else if (a.channelCount() == 1) {
             T vb[BLOCK_SIZE];
-            for (uint32_t c = 0; c < a._channelCount; ++c)
+            for (uint32_t c = 0; c < b._channelCount; ++c)
                vb[c] = b._data[c];
 
             for (uint32_t i = 0; i < numFrames; ++i) {

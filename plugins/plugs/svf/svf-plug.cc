@@ -22,6 +22,8 @@ namespace clap {
          return false;
       }
 
+      void doDeactivate() override { _svf.deactivate(); }
+
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          _svf.setInput(c.audioInputs[0].get());
          auto status = _svf.process(c, numFrames);

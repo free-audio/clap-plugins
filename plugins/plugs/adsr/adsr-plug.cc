@@ -28,6 +28,8 @@ namespace clap {
          return false;
       }
 
+      void doDeactivate() override { _adsr.deactivate(); }
+
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          auto status = _adsr.process(c, numFrames);
          c.audioOutputs[0]->copy(_adsr.outputBuffer(), numFrames);

@@ -1,6 +1,0 @@
-{
-  "name": "clap-host",
-  "description": "Build C++ code with CMake, Ninja and vcpkg.",
-  "iconName": "cmake",
-  "categories": ["CMake", "cpp", "cplusplus", "vcpkg", "Ninja"]
-}

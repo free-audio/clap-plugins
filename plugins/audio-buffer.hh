@@ -120,7 +120,7 @@ namespace clap {
       }
 
       void product(const AudioBuffer<T> &a, const AudioBuffer<T> &b, uint32_t numFrames) noexcept {
-         struct Sum {
+         struct Prod {
             T operator()(T a, T b) const noexcept { return a * b; }
          } op;
 

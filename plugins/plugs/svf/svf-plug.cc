@@ -22,6 +22,8 @@ namespace clap {
          return false;
       }
 
+      void doDeactivate() override { _svf.deactivate(); }
+
       clap_process_status process(const Context &c, uint32_t numFrames) noexcept override {
          _svf.setInput(c.audioInputs[0].get());
          auto status = _svf.process(c, numFrames);
@@ -30,7 +32,7 @@ namespace clap {
       }
 
    protected:
-      SvfModule _svf;
+      SvfModule<2> _svf;
    };
 
    const clap_plugin_descriptor *SvfPlug::descriptor() {
@@ -53,7 +55,7 @@ namespace clap {
    }
 
    SvfPlug::SvfPlug(const std::string &pluginPath, const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "svf"), descriptor(), host) {
+      : CorePlugin("svf", descriptor(), host) {
       _rootModule = std::make_unique<SvfPlugModule>(*this);
    }
 

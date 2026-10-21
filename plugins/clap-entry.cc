@@ -8,6 +8,9 @@
 
 #include "plugs/adsr/adsr-plug.hh"
 #include "plugs/char-check/char-check.hh"
+#ifndef CLAP_PLUGINS_HEADLESS
+#   include "plugs/check-window-api/check-window-api.hh"
+#endif
 #include "plugs/dc-offset/dc-offset.hh"
 #include "plugs/dc-offset-with-latency/dc-offset-with-latency.hh"
 #include "plugs/gain/gain.hh"
@@ -18,6 +21,7 @@
 #include "plugs/offline-latency/offline-latency.hh"
 #include "plugs/realtime-requirement/realtime-requirement.hh"
 #include "plugs/scratch-memory/scratch-memory.hh"
+#include "plugs/slow-destroy/slow-destroy.hh"
 #include "plugs/svf/svf-plug.hh"
 #include "plugs/synth/synth.hh"
 #include "plugs/track-info/track-info.hh"
@@ -61,6 +65,7 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::OfflineLatency>();
    addPlugin<clap::RealtimeRequirement>();
    addPlugin<clap::ScratchMemory>();
+   addPlugin<clap::SlowDestroy>();
    addPlugin<clap::SvfPlug>();
    addPlugin<clap::Synth>();
    addPlugin<clap::TrackInfo>();
@@ -68,6 +73,22 @@ static bool clap_init(const char *plugin_path) {
    addPlugin<clap::UndoTest<false, false>>();
    addPlugin<clap::UndoTest<true, false>>();
    addPlugin<clap::UndoTest<true, true>>();
+
+   // Each one on its window API's platform
+#ifndef CLAP_PLUGINS_HEADLESS
+#   if defined(__linux__)
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::X11Floating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::X11Embed>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::WaylandFloating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::WaylandEmbed>>();
+#   elif defined(_WIN32)
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::Win32Floating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::Win32Embed>>();
+#   elif defined(__APPLE__)
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::CocoaFloating>>();
+   addPlugin<clap::CheckWindowApi<clap::CheckWindowApiKind::CocoaEmbed>>();
+#   endif
+#endif
    return true;
 }
 

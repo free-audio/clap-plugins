@@ -1,7 +1,5 @@
 #include <cstring>
 
-#include "../../gui/abstract-gui.hh"
-#include "../../gui/gui-handle.hh"
 #include "undo-test.hh"
 
 namespace clap {
@@ -50,7 +48,7 @@ namespace clap {
    template <bool hasDelta, bool areDeltasPersistant>
    UndoTest<hasDelta, areDeltasPersistant>::UndoTest(const std::string &pluginPath,
                                                      const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "undo-test"), descriptor(), host) {
+      : CorePlugin("undo-test", descriptor(), host) {
       _rootModule = std::make_unique<UndoTestModule<hasDelta, areDeltasPersistant>>(*this);
    }
 
@@ -187,8 +185,8 @@ namespace clap {
    template <bool hasDelta, bool areDeltasPersistant>
    void UndoTest<hasDelta, areDeltasPersistant>::notifyGuiStateProperties() {
 #ifndef CLAP_PLUGINS_HEADLESS
-      if (_guiHandle)
-         _guiHandle->gui().setGuiProperty("counter", _counter);
+      if (_gui)
+         guiSetProperty("counter", _counter);
 #endif
    }
 

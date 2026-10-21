@@ -1,0 +1,63 @@
+name: Build
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.preset }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, preset: ninja }
+          # Without the GUI, the tests don't need a display
+          - { os: ubuntu-24.04, preset: ninja-headless, tests: true }
+          - { os: macos-latest, preset: ninja }
+          - { os: windows-2022, preset: vs }
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Setup Ubuntu
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y
+          ninja-build cmake pkg-config catch2
+          libwayland-dev wayland-protocols libxcb1-dev
+
+      - name: Setup macOS
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }} -DCLAP_BUILD_TESTS=${{ matrix.tests && 'ON' || 'OFF' }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} --config Release
+
+      - name: Test
+        if: matrix.tests
+        run: |
+          cmake --build --preset ${{ matrix.preset }} --config Release --target clap-tests
+          ctest --preset ${{ matrix.preset }} -C Release --output-on-failure
+
+      # The macOS plugin is a bundle, which is a directory
+      - name: Archive artifact
+        if: ${{ !endsWith(matrix.preset, '-headless') }}
+        shell: bash
+        run: tar -cvJf clap-plugins.clap.tar.xz -C builds/${{ matrix.preset }}/plugins/Release clap-plugins.clap
+
+      - name: Upload artifact
+        if: ${{ !endsWith(matrix.preset, '-headless') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: clap-plugins-${{ runner.os }}-${{ runner.arch }}.tar.xz
+          path: clap-plugins.clap.tar.xz

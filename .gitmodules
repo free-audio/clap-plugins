@@ -4,9 +4,12 @@
 [submodule "clap-helpers"]
 	path = clap-helpers
 	url = ../clap-helpers
-[submodule "vcpkg"]
-	path = vcpkg
-	url = ../../microsoft/vcpkg
 [submodule "yas"]
 	path = yas
 	url = ../../niXman/yas.git
+[submodule "imgui"]
+	path = imgui
+	url = ../../ocornut/imgui.git
+[submodule "clap-wayland-experiment"]
+	path = clap-wayland-experiment
+	url = ../clap-wayland-experiment

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "../domain-converter.hh"
 #include "module.hh"
 
@@ -7,8 +9,13 @@ namespace clap {
    /**
     * State Variable Filter
     * Based on https://cytomic.com/files/dsp/SvfLinearTrapOptimised2.pdf by Andy Simper.
+    *
+    * The input must have ChannelCount channels, the output has ChannelCount channels.
     */
+   template <uint32_t ChannelCount>
    class SvfModule : public Module {
+      static_assert(ChannelCount > 0 && ChannelCount <= MAX_AUDIO_CHANNELS);
+
    public:
       SvfModule(CorePlugin &plugin, std::string name, uint32_t moduleId);
       SvfModule(const SvfModule &);
@@ -27,22 +34,27 @@ namespace clap {
       auto &outputBuffer() const { return _output; }
 
    protected:
+      // Each channel has its own coefficients, because the FM may differ between channels
+      struct Channel {
+         // coefficients
+         double _g = 0.f;
+         double _k = 0.f;
+         double _a1 = 0.f;
+         double _a2 = 0.f;
+         double _a3 = 0.f;
+         double _lastFreq = 0;
+         double _lastReso = 0;
+
+         // state
+         double _ic1eq = 0.f;
+         double _ic2eq = 0.f;
+      };
+
       // freq: 20 - 20000
       // resonance: 0 - 1 (1: self oscillating, maybe keep it just below that)
-      void setFilter(double freq, double reso);
+      void setFilter(Channel &ch, double freq, double reso);
 
-      // coefficients
-      double _g = 0.f;
-      double _k = 0.f;
-      double _a1 = 0.f;
-      double _a2 = 0.f;
-      double _a3 = 0.f;
-      double _lastFreq = 0;
-      double _lastReso = 0;
-
-      // state
-      double _ic1eq = 0.f;
-      double _ic2eq = 0.f;
+      std::array<Channel, ChannelCount> _channels;
 
       double _sampleRate = 0;
 
@@ -64,8 +76,11 @@ namespace clap {
       const AudioBuffer<double> *_fmInput = nullptr;
 
       AudioBuffer<double> _envBuffer{1, BLOCK_SIZE};
-      AudioBuffer<double> _fmBuffer{1, BLOCK_SIZE};
+      AudioBuffer<double> _fmBuffer{ChannelCount, BLOCK_SIZE};
       AudioBuffer<double> _ktBuffer{1, BLOCK_SIZE};
-      AudioBuffer<double> _output{1, BLOCK_SIZE};
+      AudioBuffer<double> _output{ChannelCount, BLOCK_SIZE};
    };
 } // namespace clap
+
+extern template class clap::SvfModule<1>;
+extern template class clap::SvfModule<2>;

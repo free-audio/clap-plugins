@@ -139,7 +139,7 @@ namespace clap {
       protected:
          AdsrModule _ampAdsr;
          AdsrModule _filterAdsr;
-         SvfModule _filter;
+         SvfModule<1> _filter;
          DigiOscModule _digiOsc1;
          DigiOscModule _digiOsc2;
 
@@ -223,7 +223,7 @@ namespace clap {
    }
 
    Synth::Synth(const std::string &pluginPath, const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "synth"), descriptor(), host) {
+      : CorePlugin("synth", descriptor(), host) {
       _rootModule = std::make_unique<SynthModule>(*this);
    }
 

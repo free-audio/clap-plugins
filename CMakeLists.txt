@@ -9,12 +9,11 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0)
 
 project(CLAP_PLUGINS C CXX)
 
-set(CMAKE_AUTOMOC ON)
-
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang|GNU")
-  add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden
+  add_compile_options(-fvisibility=hidden
     -Werror=return-type -Werror=unused-result -Wno-unused-parameter
-    -Wuninitialized -Wvla -Wmultichar -Werror=non-virtual-dtor -Woverloaded-virtual)
+    -Wuninitialized -Wvla -Wmultichar
+    "$<$<COMPILE_LANGUAGE:CXX>:-fvisibility-inlines-hidden;-Werror=non-virtual-dtor;-Woverloaded-virtual>")
 endif()
 
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang|Clang")
@@ -31,10 +30,15 @@ endif()
 
 add_subdirectory(clap EXCLUDE_FROM_ALL)
 add_subdirectory(clap-helpers EXCLUDE_FROM_ALL)
+add_subdirectory(clap-wayland-experiment EXCLUDE_FROM_ALL)
 
 include_directories(yas/include)
 
 add_subdirectory(plugins)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT CLAP_PLUGINS_HEADLESS)
+  add_subdirectory(tools/gui-host)
+endif()
 
 ###########
 ## CPACK ##

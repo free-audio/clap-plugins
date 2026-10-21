@@ -73,7 +73,7 @@ namespace clap {
    }
 
    DcOffsetWithLatency::DcOffsetWithLatency(const std::string &pluginPath, const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "dc-offset"), descriptor(), host) {
+      : CorePlugin("dc-offset", descriptor(), host) {
       _rootModule = std::make_unique<DcOffsetWithLatencyModule>(*this);
    }
 

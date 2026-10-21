@@ -59,7 +59,7 @@ namespace clap {
    }
 
    GainMetering::GainMetering(const std::string &pluginPath, const clap_host &host)
-      : CorePlugin(PathProvider::create(pluginPath, "gain-metering"), descriptor(), host) {
+      : CorePlugin("gain-metering", descriptor(), host) {
       _rootModule = std::make_unique<GainMeteringModule>(*this);
    }
 

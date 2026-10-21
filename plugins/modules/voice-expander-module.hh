@@ -33,7 +33,7 @@ namespace clap {
       auto &outputBuffer() const noexcept { return _outputBuffer; }
 
       template <class Callback>
-      void foreachActiveVoice(int16_t noteId,
+      void foreachActiveVoice(int32_t noteId,
                               int16_t port,
                               int32_t channel,
                               int16_t key,

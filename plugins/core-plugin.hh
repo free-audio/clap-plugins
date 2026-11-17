@@ -169,6 +169,15 @@ namespace clap {
       virtual std::vector<uint8_t> stateSaveExtra() noexcept { return {}; }
       virtual bool stateLoadExtra(const std::vector<uint8_t> &data) noexcept { return true; }
 
+      //-------------------------//
+      // clap_plugin_preset_load //
+      //-------------------------//
+      // Loads the presets built into the binary, see builtin-presets.hh
+      bool implementsPresetLoad() const noexcept override { return true; }
+      bool presetLoadFromLocation(uint32_t location_kind,
+                                  const char *location,
+                                  const char *load_key) noexcept override;
+
 #ifndef CLAP_PLUGINS_HEADLESS
       //-----------------//
       // clap_plugin_gui //

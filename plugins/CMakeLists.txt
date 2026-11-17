@@ -11,6 +11,8 @@ add_library(
 
   audio-buffer.cc
   audio-buffer.hh
+  builtin-presets.cc
+  builtin-presets.hh
   constants.hh
   container-of.hh
   context.hh
@@ -112,7 +114,7 @@ endif()
 
 target_link_libraries(clap-plugins-core PUBLIC clap-helpers)
 
-add_library(clap-plugins MODULE clap-entry.cc)
+add_library(clap-plugins MODULE clap-entry.cc preset-discovery-factory.cc preset-discovery-factory.hh)
 target_link_libraries(clap-plugins PUBLIC clap-plugins-core)
 set_target_properties(clap-plugins PROPERTIES CXX_STANDARD 20)
 

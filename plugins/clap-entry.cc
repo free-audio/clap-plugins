@@ -6,6 +6,8 @@
 #include <mutex>
 #include <vector>
 
+#include "preset-discovery-factory.hh"
+
 #include "plugs/adsr/adsr-plug.hh"
 #include "plugs/char-check/char-check.hh"
 #ifndef CLAP_PLUGINS_HEADLESS
@@ -148,6 +150,9 @@ static const clap_plugin_factory g_clap_plugin_factory = {
 const void *clap_get_factory(const char *factory_id) {
    if (!::strcmp(factory_id, CLAP_PLUGIN_FACTORY_ID))
       return &g_clap_plugin_factory;
+   if (!::strcmp(factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) ||
+       !::strcmp(factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID_COMPAT))
+      return clap::presetDiscoveryFactory();
    return nullptr;
 }
 

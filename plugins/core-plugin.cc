@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <chrono>
 #include <sstream>
 #include <string>
@@ -11,6 +12,7 @@
 #include <clap/helpers/host-proxy.hxx>
 #include <clap/helpers/plugin.hxx>
 
+#include "builtin-presets.hh"
 #include "container-of.hh"
 #include "core-plugin.hh"
 #include "modules/module.hh"
@@ -157,6 +159,44 @@ namespace clap {
          guiPopulateProperties();
 #endif
 
+      return true;
+   }
+
+   //-------------------------//
+   // clap_plugin_preset_load //
+   //-------------------------//
+   bool CorePlugin::presetLoadFromLocation(uint32_t location_kind,
+                                           const char *location,
+                                           const char *load_key) noexcept {
+      checkMainThread();
+
+      const BuiltinPreset *preset = nullptr;
+      if (location_kind == CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN && load_key)
+         preset = findBuiltinPreset(clapPlugin()->desc->id, load_key);
+
+      if (!preset) {
+         if (_host.canUsePresetLoad())
+            _host.presetLoadOnError(
+               location_kind, location, load_key, 0, "No such preset built into the plug-in");
+         return false;
+      }
+
+      // As a state load does: a preset sets every parameter, to its default if it names none
+      _parameters.reset();
+      for (auto &[paramId, value] : preset->values) {
+         auto *param = _parameters.getById(paramId);
+         if (param)
+            param->setValueImmediately(
+               std::clamp(value, param->info().min_value, param->info().max_value));
+      }
+
+#ifndef CLAP_PLUGINS_HEADLESS
+      if (_gui)
+         guiPopulateProperties();
+#endif
+
+      if (_host.canUsePresetLoad())
+         _host.presetLoadLoaded(location_kind, location, load_key);
       return true;
    }
 
